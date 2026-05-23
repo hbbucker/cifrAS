@@ -167,6 +167,14 @@ export const TheaterModePage: React.FC = () => {
     };
   }, []);
 
+  const handleExit = () => {
+    if (window.history.state && window.history.state.idx > 0) {
+      navigate(-1);
+    } else {
+      navigate(playlistId ? `/playlists/${playlistId}` : songId ? `/song/${songId}` : '/songs');
+    }
+  };
+
   // Calculate opacity based on scroll position (1.0 at top, down to 0.2 after 200px)
   const headerOpacity = Math.max(0.2, 1 - scrollTop / 200);
 
@@ -237,7 +245,7 @@ export const TheaterModePage: React.FC = () => {
           onNextSong={playlistId ? handleNextSong : undefined}
           onPrevSong={playlistId ? handlePrevSong : undefined}
           onToggleFullscreen={toggleFullscreen}
-          onExit={() => navigate(playlistId ? `/playlists/${playlistId}` : songId ? `/song/${songId}` : '/songs')}
+          onExit={handleExit}
           onFontSizeIncrease={() => handleFontSizeChange(2)}
           onFontSizeDecrease={() => handleFontSizeChange(-2)}
         />
