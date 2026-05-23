@@ -16,8 +16,10 @@ import static org.hamcrest.Matchers.*;
  * 3. POST /songs/{id}/transpose with semitones < -11 → 400
  * 4. GET /songs/{id}?transpose=N → 200 with stateless transposition
  */
+import br.com.cifras.BaseIntegrationTest;
+
 @QuarkusTest
-class SongTranspositionTest {
+class SongTranspositionTest extends BaseIntegrationTest {
 
     private static final String OWNER = "transpose-owner-uuid";
 

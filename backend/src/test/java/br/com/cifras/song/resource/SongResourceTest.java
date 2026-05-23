@@ -21,8 +21,10 @@ import static org.hamcrest.Matchers.*;
  * 6. PUT /songs/{id} by non-owner → 403/404
  * 7. DELETE /songs/{id} → 204 soft delete
  */
+import br.com.cifras.BaseIntegrationTest;
+
 @QuarkusTest
-class SongResourceTest {
+class SongResourceTest extends BaseIntegrationTest {
 
     private static final String OWNER = "owner-user-uuid";
     private static final String OTHER = "other-user-uuid";

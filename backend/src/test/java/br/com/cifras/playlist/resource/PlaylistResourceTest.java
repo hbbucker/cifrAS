@@ -19,8 +19,10 @@ import static org.hamcrest.Matchers.*;
  * 4. DELETE /playlists/{id}/songs/{songId} → 204 song removed
  * 5. PATCH /playlists/{id}/songs/reorder → 204 songs reordered
  */
+import br.com.cifras.BaseIntegrationTest;
+
 @QuarkusTest
-class PlaylistResourceTest {
+class PlaylistResourceTest extends BaseIntegrationTest {
 
     private static final String OWNER = "playlist-res-owner-uuid";
 

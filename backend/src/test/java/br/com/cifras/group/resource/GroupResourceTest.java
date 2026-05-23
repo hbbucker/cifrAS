@@ -18,8 +18,10 @@ import static org.hamcrest.Matchers.*;
  * 3. POST /groups/{id}/members → 204 member added
  * 4. DELETE /groups/{id}/members/{targetUserId} → 204 member removed
  */
+import br.com.cifras.BaseIntegrationTest;
+
 @QuarkusTest
-class GroupResourceTest {
+class GroupResourceTest extends BaseIntegrationTest {
 
     private static final String OWNER = "group-owner-uuid";
     private static final String MEMBER = "group-member-uuid";

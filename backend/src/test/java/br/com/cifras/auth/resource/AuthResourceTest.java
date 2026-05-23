@@ -19,8 +19,10 @@ import static org.hamcrest.Matchers.*;
  * 3. Routes are accessible without auth (@PermitAll)
  * 4. Empty body returns 400 (not 404)
  */
+import br.com.cifras.BaseIntegrationTest;
+
 @QuarkusTest
-class AuthResourceTest {
+class AuthResourceTest extends BaseIntegrationTest {
 
     /**
      * Test 1: /auth/register endpoint is accessible without auth token (PermitAll).
