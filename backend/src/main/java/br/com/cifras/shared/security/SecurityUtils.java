@@ -19,14 +19,16 @@ public class SecurityUtils {
     SecurityIdentity securityIdentity;
 
     /**
-     * Returns the authenticated user ID (Supabase Auth UUID from "sub" claim).
+     * Returns the authenticated user ID (Supabase Auth UUID from "sub" claim, or test user name).
+     * Uses SecurityIdentity.getPrincipal().getName() which works with both real JWTs and @TestSecurity.
+     *
      * @throws IllegalStateException if called outside an authenticated context
      */
     public String getCurrentUserId() {
-        if (jwt == null || jwt.getSubject() == null) {
+        if (securityIdentity.isAnonymous()) {
             throw new IllegalStateException("No authenticated user in current context");
         }
-        return jwt.getSubject();
+        return securityIdentity.getPrincipal().getName();
     }
 
     public boolean isAuthenticated() {
