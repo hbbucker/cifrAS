@@ -16,9 +16,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * T14: Collaborative Playlist authorization tests.
- * Tests: 2
- * 1. Member of the linked group CAN add songs to a collaborative playlist.
- * 2. Non-member CANNOT add songs to a collaborative playlist.
+ * Tests: 3
+ * 1. Member of the linked group CAN read a collaborative playlist.
+ * 2. Member of the linked group CANNOT add songs to a collaborative playlist (read-only).
+ * 3. Non-member CANNOT read or edit a collaborative playlist.
  */
 @QuarkusTest
 class PlaylistCollaborationTest {
@@ -38,33 +39,47 @@ class PlaylistCollaborationTest {
 
     @Test
     @Transactional
-    void givenCollaborativePlaylist_whenGroupMemberAddsSong_thenSuccess() {
+    void givenCollaborativePlaylist_whenGroupMemberReads_thenSuccess() {
         Group group = groupService.createGroup("Collab Band", OWNER);
         groupService.addMember(group.id, MEMBER, OWNER);
 
         Playlist playlist = playlistService.create(
-            new CreatePlaylistRequest("Collab Setlist", true, group.id), OWNER);
+            new CreatePlaylistRequest("Collab Setlist", false, null), OWNER);
+        groupService.linkPlaylist(group.id, playlist.id, OWNER);
 
-        Song song = songService.create(
-            new CreateSongRequest("Song 1", "Artist", "C", null), OWNER);
-
-        assertDoesNotThrow(() -> playlistService.addSong(playlist.id, song.id, 0, MEMBER),
-            "Group member should be able to add a song to a collaborative playlist");
+        assertDoesNotThrow(() -> playlistService.getById(playlist.id, MEMBER),
+            "Group member should be able to read a collaborative playlist");
     }
 
     @Test
     @Transactional
-    void givenCollaborativePlaylist_whenStrangerAddsSong_thenThrowsForbiddenException() {
+    void givenCollaborativePlaylist_whenGroupMemberAddsSong_thenThrowsForbiddenException() {
+        Group group = groupService.createGroup("Collab Band Edit", OWNER);
+        groupService.addMember(group.id, MEMBER, OWNER);
+
+        Playlist playlist = playlistService.create(
+            new CreatePlaylistRequest("Collab Setlist Edit", false, null), OWNER);
+        groupService.linkPlaylist(group.id, playlist.id, OWNER);
+
+        Song song = songService.create(
+            new CreateSongRequest("Song 1", "Artist", "C", null), OWNER);
+
+        assertThrows(br.com.cifras.shared.exception.ForbiddenException.class,
+            () -> playlistService.addSong(playlist.id, song.id, 0, MEMBER),
+            "Group member must NOT be able to edit a collaborative playlist (read-only)");
+    }
+
+    @Test
+    @Transactional
+    void givenCollaborativePlaylist_whenStrangerAccesses_thenThrowsForbiddenException() {
         Group group = groupService.createGroup("Exclusive Band", OWNER);
 
         Playlist playlist = playlistService.create(
-            new CreatePlaylistRequest("Exclusive Setlist", true, group.id), OWNER);
-
-        Song song = songService.create(
-            new CreateSongRequest("Song 2", "Artist", "C", null), OWNER);
+            new CreatePlaylistRequest("Exclusive Setlist", false, null), OWNER);
+        groupService.linkPlaylist(group.id, playlist.id, OWNER);
 
         assertThrows(br.com.cifras.shared.exception.ForbiddenException.class,
-            () -> playlistService.addSong(playlist.id, song.id, 0, STRANGER),
-            "Stranger must NOT be able to add a song to a collaborative playlist");
+            () -> playlistService.getById(playlist.id, STRANGER),
+            "Stranger must NOT be able to read a collaborative playlist");
     }
 }

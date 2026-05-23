@@ -65,7 +65,7 @@ public class PlaylistService {
         Playlist playlist = playlistRepository.findActiveById(playlistId)
             .orElseThrow(() -> new NotFoundException("Playlist not found"));
 
-        if (!canModify(playlist, userId)) {
+        if (!canRead(playlist, userId)) {
             // Technically it could be public view, but for now only owner/group can view
             throw new ForbiddenException("Access denied to playlist");
         }
@@ -168,10 +168,17 @@ public class PlaylistService {
     }
 
     /**
-     * Checks if the user can modify this playlist (is owner or group member for collaborative).
+     * Checks if the user can modify this playlist (only owner).
      */
     private boolean canModify(Playlist playlist, String userId) {
-        if (userId.equals(playlist.userId)) {
+        return userId.equals(playlist.userId);
+    }
+
+    /**
+     * Checks if the user can read this playlist (owner or group member).
+     */
+    private boolean canRead(Playlist playlist, String userId) {
+        if (canModify(playlist, userId)) {
             return true;
         }
         if (playlist.isCollaborative && playlist.group != null) {
