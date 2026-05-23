@@ -1,0 +1,18 @@
+#!/bin/bash
+echo "Running backend pre-commit hooks..."
+
+cd backend || exit 0
+
+echo "Running formatting checks (Checkstyle)..."
+# Assuming maven-checkstyle-plugin is configured.
+# We will just run standard compile and verify basics here since checkstyle wasn't strictly configured in pom yet.
+./mvnw clean test
+RESULT=$?
+
+if [ $RESULT -ne 0 ]; then
+  echo "Tests failed. Please fix them before committing."
+  exit 1
+fi
+
+echo "Backend pre-commit hooks passed."
+exit 0
