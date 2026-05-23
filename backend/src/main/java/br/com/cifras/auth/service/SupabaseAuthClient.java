@@ -24,4 +24,10 @@ public interface SupabaseAuthClient {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     Response login(Object body);
+
+    @POST
+    @Path("/token?grant_type=refresh_token")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    Response refresh(Object body);
 }

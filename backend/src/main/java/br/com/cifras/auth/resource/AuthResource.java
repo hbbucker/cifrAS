@@ -90,4 +90,34 @@ public class AuthResource {
             .entity(Map.of("error", "Credenciais inválidas"))
             .build();
     }
+
+    /**
+     * POST /auth/refresh — silent token refresh.
+     * Returns 200 with new accessToken and refreshToken.
+     */
+    @POST
+    @Path("/refresh")
+    public Response refresh(Map<String, String> body) {
+        if (body == null || !body.containsKey("refreshToken")) {
+            return Response.status(400).entity(Map.of("error", "refresh token missing")).build();
+        }
+
+        Map<String, String> supabaseBody = Map.of(
+            "refresh_token", body.get("refreshToken")
+        );
+
+        Response supabaseResponse = supabaseClient.refresh(supabaseBody);
+        int status = supabaseResponse.getStatus();
+
+        if (status == 200) {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> responseBody = supabaseResponse.readEntity(Map.class);
+            Map<String, Object> result = new HashMap<>();
+            result.put("accessToken", responseBody.get("access_token"));
+            result.put("refreshToken", responseBody.get("refresh_token"));
+            return Response.ok(result).build();
+        }
+
+        return Response.status(status).entity(Map.of("error", "Refresh token failed")).build();
+    }
 }
