@@ -79,6 +79,61 @@ export const isChordLineHelper = (line: string) => {
   return wordCount > 0 && (chordCount / wordCount) >= 0.7;
 };
 
+export const isTabLineHelper = (line: string) => {
+  return /^\s*([eBGDAEa-g][#b]?|[1-6])\s*\|/.test(line);
+};
+
+export const transposeTabLine = (line: string, steps: number): string => {
+  if (steps === 0) return line;
+
+  const tabPrefixRegex = /^(\s*(?:[eBGDAEa-g][#b]?|[1-6])\s*\|)(.*)$/;
+  const match = line.match(tabPrefixRegex);
+  
+  if (!match) return line;
+
+  const prefix = match[1];
+  let rest = match[2];
+
+  const resultRest = rest.replace(/(-*)([0-9Oo]+)(-*)/g, (fullMatch, leftDashes, numStr, rightDashes, offset, string) => {
+    // Prevent transposing repetition markers like "2x"
+    // Only apply this if there are no dashes around the number, as a number with dashes (e.g., -2x- or -0---X) is a fret note followed by a mute or other symbol.
+    if (leftDashes.length === 0 && rightDashes.length === 0 && string[offset + fullMatch.length]?.toLowerCase() === 'x') {
+      return fullMatch;
+    }
+
+    const normalizedNumStr = numStr.replace(/[Oo]/g, '0');
+    const originalNum = parseInt(normalizedNumStr, 10);
+    const newNum = originalNum + steps;
+    
+    // Wrap negative numbers in parentheses to prevent the minus sign from blending into the tab line
+    const newNumStr = newNum < 0 ? `(${newNum})` : newNum.toString();
+    
+    const lengthDiff = newNumStr.length - numStr.length;
+    
+    let newLeftDashes = leftDashes;
+    let newRightDashes = rightDashes;
+    
+    // Balance dashes to maintain vertical alignment
+    if (lengthDiff > 0) {
+      for (let i = 0; i < lengthDiff; i++) {
+        if (newRightDashes.length > 0) {
+          newRightDashes = newRightDashes.slice(0, -1);
+        } else if (newLeftDashes.length > 0) {
+          newLeftDashes = newLeftDashes.slice(0, -1);
+        }
+      }
+    } else if (lengthDiff < 0) {
+      for (let i = 0; i < -lengthDiff; i++) {
+        newRightDashes += '-';
+      }
+    }
+    
+    return `${newLeftDashes}${newNumStr}${newRightDashes}`;
+  });
+
+  return prefix + resultRest;
+};
+
 export const transposeContent = (content: string, steps: number): string => {
   if (steps === 0) return content;
   
@@ -98,6 +153,8 @@ export const transposeContent = (content: string, steps: number): string => {
         }
         return part;
       }).join('');
+    } else if (isTabLineHelper(line)) {
+      return transposeTabLine(line, steps);
     }
     return line;
   }).join('\n');

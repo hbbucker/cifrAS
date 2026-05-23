@@ -5,7 +5,7 @@ import { ChordSheet } from '../components/music/ChordSheet';
 import { ArrowLeft, PlayCircle, Settings2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { stringifyLyrics } from '../utils/lyricsParser';
-import { getNextKey, transposeContent } from '../utils/chordTransposer';
+import { transposeContent } from '../utils/chordTransposer';
 
 export const SongViewPage: React.FC = () => {
   const navigate = useNavigate();
