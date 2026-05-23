@@ -5,14 +5,16 @@ import { ChordSheet } from '../components/music/ChordSheet';
 import { ArrowLeft, PlayCircle, Settings2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { stringifyLyrics } from '../utils/lyricsParser';
+import { getNextKey, transposeContent } from '../utils/chordTransposer';
 
 export const SongViewPage: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [currentKey, setCurrentKey] = useState('G');
+  
   const [song, setSong] = useState({
     title: 'I Took A Pill In Ibiza',
     artist: 'Mike Posner',
+    originalKey: 'G',
     content: `[Intro]
 G D Em C
 
@@ -22,6 +24,8 @@ I took a pill in Ibiza
                  Em                     C
 To show Avicii I was cool`
   });
+  
+  const [transposeSteps, setTransposeSteps] = useState(0);
 
   useEffect(() => {
     if (id) {
@@ -33,12 +37,16 @@ To show Avicii I was cool`
         return res.json();
       })
       .then(data => {
-        setSong({ ...data, content: stringifyLyrics(data.lyrics) });
-        setCurrentKey(data.originalKey || data.keySignature || 'C');
+        const key = data.originalKey || data.keySignature || 'C';
+        setSong({ ...data, content: stringifyLyrics(data.lyrics), originalKey: key });
+        setTransposeSteps(0);
       })
       .catch(console.error);
     }
   }, [id]);
+
+  const currentKey = transposeContent(song.originalKey, transposeSteps);
+  const transposedContent = transposeContent(song.content, transposeSteps);
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
@@ -58,8 +66,8 @@ To show Avicii I was cool`
           <div className="flex items-center gap-3">
             <TransposePad 
               currentKey={currentKey}
-              onTransposeDown={() => setCurrentKey('F#')}
-              onTransposeUp={() => setCurrentKey('G#')}
+              onTransposeDown={() => setTransposeSteps(s => s - 1)}
+              onTransposeUp={() => setTransposeSteps(s => s + 1)}
             />
             
             <button className="hidden sm:flex items-center gap-2 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
@@ -79,7 +87,7 @@ To show Avicii I was cool`
 
         <div className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900/50">
           <div className="max-w-3xl mx-auto h-full flex flex-col">
-            <ChordSheet content={song.content} fontSize={20} />
+            <ChordSheet content={transposedContent} fontSize={20} />
           </div>
         </div>
       </main>
