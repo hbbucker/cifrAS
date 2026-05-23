@@ -1,5 +1,7 @@
 package br.com.cifras.playlist.service;
 
+import br.com.cifras.group.domain.Group;
+import br.com.cifras.group.repository.GroupRepository;
 import br.com.cifras.playlist.domain.Playlist;
 import br.com.cifras.playlist.domain.PlaylistSong;
 import br.com.cifras.playlist.dto.CreatePlaylistRequest;
@@ -23,6 +25,9 @@ public class PlaylistService {
     @Inject
     PlaylistRepository playlistRepository;
 
+    @Inject
+    GroupRepository groupRepository;
+
     /**
      * Creates a new playlist for the given user.
      */
@@ -32,6 +37,16 @@ public class PlaylistService {
         playlist.userId = userId;
         playlist.name = req.name();
         playlist.isCollaborative = req.isCollaborative();
+        
+        if (req.isCollaborative() && req.groupId() != null) {
+            Group group = Group.findById(req.groupId());
+            if (group == null) throw new NotFoundException("Group not found");
+            if (!groupRepository.isOwner(req.groupId(), userId)) {
+                throw new ForbiddenException("Only group owner can link a playlist to it");
+            }
+            playlist.group = group;
+        }
+        
         playlistRepository.persist(playlist);
         return playlist;
     }
@@ -142,7 +157,12 @@ public class PlaylistService {
      * Checks if the user can modify this playlist (is owner or group member for collaborative).
      */
     private boolean canModify(Playlist playlist, String userId) {
-        return userId.equals(playlist.userId);
-        // Note: collaborative group membership check is added in T14
+        if (userId.equals(playlist.userId)) {
+            return true;
+        }
+        if (playlist.isCollaborative && playlist.group != null) {
+            return groupRepository.isMember(playlist.group.id, userId);
+        }
+        return false;
     }
 }
