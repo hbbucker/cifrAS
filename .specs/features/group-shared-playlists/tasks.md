@@ -96,12 +96,14 @@ T3 ────┼────────────────────�
 - Skill: NONE
 
 **Done when**:
-- [ ] Funções `linkPlaylist`, `unlinkPlaylist` e `getGroupPlaylists` exportadas corretamente.
-- [ ] Nomes de rota compatíveis com T1.
-- [ ] Gate check passes: `npm run lint` ou build rápido
+- [x] Funções `linkPlaylist`, `unlinkPlaylist` e `getGroupPlaylists` exportadas corretamente.
+- [x] Nomes de rota compatíveis com T1.
+- [x] Gate check passes: `npm run lint` ou build rápido
 
 **Tests**: none
 **Gate**: quick
+
+**Status**: ✅ Complete
 
 ---
 
@@ -118,12 +120,14 @@ T3 ────┼────────────────────�
 - Skill: NONE
 
 **Done when**:
-- [ ] Renderiza lista de playlists do usuário e chama `linkPlaylist` na seleção.
-- [ ] Gate check passes: `npm run test`
-- [ ] Test count: testes não foram deletados.
+- [x] Renderiza lista de playlists do usuário e chama `linkPlaylist` na seleção.
+- [x] Gate check passes: `npm run test`
+- [x] Test count: testes não foram deletados.
 
 **Tests**: unit
 **Gate**: quick
+
+**Status**: ✅ Complete
 
 ---
 
@@ -140,13 +144,15 @@ T3 ────┼────────────────────�
 - Skill: NONE
 
 **Done when**:
-- [ ] Listagem de playlists compartilhadas consumindo `getGroupPlaylists`.
-- [ ] Modal do T4 renderizado e acionado por um botão "Compartilhar Playlist".
-- [ ] Funcionalidade de desvincular funcionando.
-- [ ] Gate check passes: `npm run test`
+- [x] Listagem de playlists compartilhadas consumindo `getGroupPlaylists`.
+- [x] Modal do T4 renderizado e acionado por um botão "Compartilhar Playlist".
+- [x] Funcionalidade de desvincular funcionando.
+- [x] Gate check passes: `npm run test`
 
 **Tests**: unit
 **Gate**: quick
+
+**Status**: ✅ Complete
 
 ---
 
@@ -163,13 +169,15 @@ T3 ────┼────────────────────�
 - Skill: NONE
 
 **Done when**:
-- [ ] Botões de Drag & Drop desabilitados ou ocultos para não-donos.
-- [ ] Botão "Adicionar música" oculto para não-donos.
-- [ ] Botão de "Performar / Modo Teatro" continua visível.
-- [ ] Gate check passes: `npm run test`
+- [x] Botões de Drag & Drop desabilitados ou ocultos para não-donos.
+- [x] Botão "Adicionar música" oculto para não-donos.
+- [x] Botão de "Performar / Modo Teatro" continua visível.
+- [x] Gate check passes: `npm run test`
 
 **Tests**: integration
 **Gate**: quick
+
+**Status**: ✅ Complete
 
 ---
 
