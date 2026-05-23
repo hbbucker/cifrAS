@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Sidebar } from '../components/layout/Sidebar';
-import { ArrowLeft, PlayCircle, GripVertical, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
+import { ArrowLeft, PlayCircle, GripVertical, Trash2, ChevronUp, ChevronDown, Plus } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 export const PlaylistViewPage: React.FC = () => {
@@ -135,6 +135,7 @@ export const PlaylistViewPage: React.FC = () => {
               }}
               className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-900 dark:text-white px-4 py-2.5 rounded-lg font-bold transition-colors"
             >
+              <Plus className="w-5 h-5" />
               <span className="hidden sm:inline">Add Song</span>
             </button>
             <button 
