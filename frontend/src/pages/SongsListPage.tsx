@@ -4,9 +4,11 @@ import { BottomNav } from '../components/layout/BottomNav';
 import { MusicCard } from '../components/cards/MusicCard';
 import { Filter, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 export const SongsListPage: React.FC = () => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const [songs, setSongs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -15,6 +17,11 @@ export const SongsListPage: React.FC = () => {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
     })
     .then(res => {
+      if (res.status === 401) {
+        logout();
+        navigate('/login');
+        throw new Error('Unauthorized');
+      }
       if (!res.ok) throw new Error('Fetch failed');
       return res.json();
     })
@@ -34,6 +41,25 @@ export const SongsListPage: React.FC = () => {
       setLoading(false);
     });
   }, []);
+
+  const handleDelete = (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this song?')) return;
+    
+    fetch(`/api/songs/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    })
+    .then(res => {
+      if (res.status === 401) {
+        logout();
+        navigate('/login');
+        throw new Error('Unauthorized');
+      }
+      if (!res.ok) throw new Error('Delete failed');
+      setSongs(prev => prev.filter(song => song.id !== id));
+    })
+    .catch(console.error);
+  };
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
@@ -79,7 +105,7 @@ export const SongsListPage: React.FC = () => {
                     onToggleFavorite={() => {}}
                     onEdit={(id) => navigate(`/songs/edit/${id}`)}
                     onShare={() => {}}
-                    onDelete={() => {}}
+                    onDelete={handleDelete}
                   />
                 </div>
               ))}

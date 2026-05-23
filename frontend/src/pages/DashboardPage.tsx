@@ -8,7 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 export const DashboardPage: React.FC = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [songs, setSongs] = useState<any[]>([]);
@@ -17,10 +17,15 @@ export const DashboardPage: React.FC = () => {
     fetch('/api/songs', {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
     })
-    .then(res => {
-      if (!res.ok) throw new Error('Fetch failed');
-      return res.json();
-    })
+      .then(res => {
+        if (res.status === 401) {
+          logout();
+          navigate('/login');
+          throw new Error('Unauthorized');
+        }
+        if (!res.ok) throw new Error('Fetch failed');
+        return res.json();
+      })
     .then(data => {
       const items = Array.isArray(data) ? data : (data.data || []);
       const mappedSongs = items.slice(0, 3).map((song: any) => ({
@@ -37,6 +42,25 @@ export const DashboardPage: React.FC = () => {
       setLoading(false);
     });
   }, []);
+
+  const handleDelete = (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this song?')) return;
+    
+    fetch(`/api/songs/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    })
+    .then(res => {
+      if (res.status === 401) {
+        logout();
+        navigate('/login');
+        throw new Error('Unauthorized');
+      }
+      if (!res.ok) throw new Error('Delete failed');
+      setSongs(prev => prev.filter(song => song.id !== id));
+    })
+    .catch(console.error);
+  };
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
@@ -82,8 +106,8 @@ export const DashboardPage: React.FC = () => {
                     {...song} 
                     onToggleFavorite={() => {}}
                     onEdit={(id) => navigate(`/songs/edit/${id}`)}
-                    onShare={() => {}}
-                    onDelete={() => {}}
+                    onShare={() => { }}
+                    onDelete={handleDelete}
                   />
                 </div>
               ))}
