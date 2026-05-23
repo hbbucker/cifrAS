@@ -10,6 +10,12 @@ import org.junit.jupiter.api.Test;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
+import io.quarkus.test.InjectMock;
+import org.mockito.Mockito;
+import br.com.cifras.shared.security.UserService;
+import br.com.cifras.group.service.GroupService;
+import jakarta.inject.Inject;
+
 /**
  * T13: GroupResource REST integration tests
  * Tests: 4
@@ -22,6 +28,12 @@ import br.com.cifras.BaseIntegrationTest;
 
 @QuarkusTest
 class GroupResourceTest extends BaseIntegrationTest {
+
+    @InjectMock
+    UserService userService;
+
+    @Inject
+    GroupService groupService;
 
     private static final String OWNER = "group-owner-uuid";
     private static final String MEMBER = "group-member-uuid";
@@ -64,12 +76,14 @@ class GroupResourceTest extends BaseIntegrationTest {
 
     @Test
     @TestSecurity(user = OWNER, roles = {"user"})
-    void givenOwnerAndTarget_whenAddMember_thenReturns204() {
+    void givenOwnerAndTarget_whenInviteMember_thenReturns204() {
         Integer groupId = createGroup("Band With Members");
+
+        Mockito.when(userService.getUserIdByEmail("member@example.com")).thenReturn(MEMBER);
 
         given()
             .contentType(ContentType.JSON)
-            .body(new AddMemberRequest(MEMBER))
+            .body(new AddMemberRequest("member@example.com"))
             .when().post("/groups/" + groupId + "/members")
             .then()
             .statusCode(204);
@@ -80,11 +94,7 @@ class GroupResourceTest extends BaseIntegrationTest {
     void givenOwnerAndExistingMember_whenRemoveMember_thenReturns204() {
         Integer groupId = createGroup("Band For Removal");
 
-        given()
-            .contentType(ContentType.JSON)
-            .body(new AddMemberRequest(MEMBER))
-            .when().post("/groups/" + groupId + "/members")
-            .then().statusCode(204);
+        groupService.addMember(groupId.longValue(), MEMBER, OWNER);
 
         given()
             .when().delete("/groups/" + groupId + "/members/" + MEMBER)
