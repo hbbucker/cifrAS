@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, Pause, ChevronLeft, ChevronRight, Maximize } from 'lucide-react';
+import { Play, Pause, ChevronLeft, ChevronRight, Maximize, X } from 'lucide-react';
 import { TransposePad } from '../music/TransposePad';
 
 interface TheaterControlsProps {
@@ -13,12 +13,13 @@ interface TheaterControlsProps {
   onNextSong?: () => void;
   onPrevSong?: () => void;
   onToggleFullscreen?: () => void;
+  onExit?: () => void;
 }
 
 export const TheaterControls: React.FC<TheaterControlsProps> = ({
   isScrolling, speed, currentKey,
   onPlayPause, onSpeedChange, onTransposeUp, onTransposeDown,
-  onNextSong, onPrevSong, onToggleFullscreen
+  onNextSong, onPrevSong, onToggleFullscreen, onExit
 }) => {
   return (
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900/90 backdrop-blur-md text-white px-6 py-4 rounded-2xl shadow-2xl border border-gray-700/50 flex flex-col md:flex-row items-center gap-6 z-50 transition-all hover:bg-gray-900 flex-wrap" data-testid="theater-controls">
@@ -69,9 +70,15 @@ export const TheaterControls: React.FC<TheaterControlsProps> = ({
       <div className="w-px h-8 bg-gray-700 hidden md:block" />
 
       {/* Display Options */}
-      <button onClick={onToggleFullscreen} className="p-3 hover:bg-gray-800 rounded-full transition-colors text-gray-400 hover:text-white" title="Fullscreen" data-testid="fullscreen-btn">
-        <Maximize className="w-5 h-5" />
-      </button>
+      <div className="flex items-center gap-2">
+        <button onClick={onExit} className="p-3 hover:bg-red-500/20 rounded-full transition-colors text-gray-400 hover:text-red-400" title="Exit Theater" data-testid="exit-theater-btn">
+          <X className="w-5 h-5" />
+        </button>
+
+        <button onClick={onToggleFullscreen} className="p-3 hover:bg-gray-800 rounded-full transition-colors text-gray-400 hover:text-white" title="Fullscreen" data-testid="fullscreen-btn">
+          <Maximize className="w-5 h-5" />
+        </button>
+      </div>
 
     </div>
   );

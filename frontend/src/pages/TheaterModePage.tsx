@@ -86,13 +86,6 @@ But fuck it, it was something to do`;
           <h1 className="text-2xl font-bold">{song.title}</h1>
           <p className="text-gray-400">{song.artist}</p>
         </div>
-        <button 
-          onClick={() => navigate(playlistId ? `/playlists/${playlistId}` : songId ? `/song/${songId}` : '/songs')}
-          className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full font-medium transition-colors"
-          data-testid="exit-theater-btn"
-        >
-          Exit Theater
-        </button>
       </header>
 
       {/* Main scrolling container */}
@@ -117,6 +110,7 @@ But fuck it, it was something to do`;
         onNextSong={() => {}}
         onPrevSong={() => {}}
         onToggleFullscreen={toggleFullscreen}
+        onExit={() => navigate(playlistId ? `/playlists/${playlistId}` : songId ? `/song/${songId}` : '/songs')}
       />
     </div>
   );
