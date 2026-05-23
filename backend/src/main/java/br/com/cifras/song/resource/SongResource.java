@@ -2,12 +2,12 @@ package br.com.cifras.song.resource;
 
 import br.com.cifras.shared.dto.PagedResponse;
 import br.com.cifras.shared.security.SecurityUtils;
+import br.com.cifras.song.domain.EnharmonicConvention;
+import br.com.cifras.song.domain.LyricsStructure;
 import br.com.cifras.song.domain.Song;
-import br.com.cifras.song.dto.CreateSongRequest;
-import br.com.cifras.song.dto.SongDTO;
-import br.com.cifras.song.dto.SongSummaryDTO;
-import br.com.cifras.song.dto.UpdateSongRequest;
+import br.com.cifras.song.dto.*;
 import br.com.cifras.song.service.SongService;
+import br.com.cifras.song.service.TranspositionService;
 import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -34,6 +34,9 @@ public class SongResource {
 
     @Inject
     SecurityUtils securityUtils;
+
+    @Inject
+    TranspositionService transpositionService;
 
     /**
      * GET /songs — list songs with optional search and pagination.
@@ -72,10 +75,35 @@ public class SongResource {
      */
     @GET
     @Path("/{id}")
-    public Response getSong(@PathParam("id") Long id) {
+    public Response getSong(
+        @PathParam("id") Long id,
+        @QueryParam("transpose") Integer transpose
+    ) {
         String userId = securityUtils.getCurrentUserId();
         Song song = songService.findByIdAndUser(id, userId);
-        return Response.ok(SongDTO.from(song)).build();
+        LyricsStructure lyrics = song.lyrics;
+        if (transpose != null && lyrics != null) {
+            lyrics = transpositionService.transpose(lyrics, transpose, EnharmonicConvention.SHARPS);
+        }
+        SongDTO dto = new SongDTO(song.id, song.title, song.artist, song.originalKey,
+            lyrics, null, song.createdAt, song.updatedAt);
+        return Response.ok(dto).build();
+    }
+
+    /**
+     * POST /songs/{id}/transpose — transposes song lyrics by the given semitones.
+     * Validates semitones in range [-11, 11]. Stateless — does NOT persist the transposed version.
+     */
+    @POST
+    @Path("/{id}/transpose")
+    public Response transposeSong(@PathParam("id") Long id, @Valid TransposeRequest request) {
+        String userId = securityUtils.getCurrentUserId();
+        Song song = songService.findByIdAndUser(id, userId);
+        LyricsStructure transposed = transpositionService.transpose(
+            song.lyrics, request.semitones(), request.convention());
+        SongDTO dto = new SongDTO(song.id, song.title, song.artist, song.originalKey,
+            transposed, null, song.createdAt, song.updatedAt);
+        return Response.ok(dto).build();
     }
 
     /**
