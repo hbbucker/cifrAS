@@ -24,17 +24,18 @@ To show Avicii I was cool`
 
   useEffect(() => {
     if (id) {
-      const mockSongs = [
-        { id: '1', title: 'Wonderwall', artist: 'Oasis', keySignature: 'F#m', content: '[Em]Today is [G]gonna be the day...' },
-        { id: '2', title: 'Hotel California', artist: 'Eagles', keySignature: 'Bm', content: '[Bm]On a dark desert highway...' },
-        { id: '3', title: 'Let It Be', artist: 'The Beatles', keySignature: 'C', content: 'When I [C]find myself in [G]times of trouble...' },
-      ];
-      
-      const foundSong = mockSongs.find(s => s.id === id);
-      if (foundSong) {
-        setSong(foundSong);
-        setCurrentKey(foundSong.keySignature);
-      }
+      fetch(`/api/songs/${id}`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('Fetch failed');
+        return res.json();
+      })
+      .then(data => {
+        setSong(data);
+        setCurrentKey(data.keySignature || 'C');
+      })
+      .catch(console.error);
     }
   }, [id]);
 

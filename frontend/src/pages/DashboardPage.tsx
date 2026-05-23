@@ -14,14 +14,28 @@ export const DashboardPage: React.FC = () => {
   const [songs, setSongs] = useState<any[]>([]);
 
   useEffect(() => {
-    // Mock fetching songs
-    setTimeout(() => {
-      setSongs([
-        { id: '1', title: 'Wonderwall', artist: 'Oasis', keySignature: 'F#m', isFavorite: true, categories: ['Rock', '90s'] },
-        { id: '2', title: 'Hotel California', artist: 'Eagles', keySignature: 'Bm', isFavorite: false, categories: ['Classic Rock'] },
-      ]);
+    fetch('/api/songs', {
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    })
+    .then(res => {
+      if (!res.ok) throw new Error('Fetch failed');
+      return res.json();
+    })
+    .then(data => {
+      const items = Array.isArray(data) ? data : (data.data || []);
+      const mappedSongs = items.slice(0, 3).map((song: any) => ({
+        ...song,
+        keySignature: song.originalKey || song.keySignature || 'C',
+        isFavorite: song.isFavorite || false,
+        categories: song.categories || [],
+      }));
+      setSongs(mappedSongs);
       setLoading(false);
-    }, 1500);
+    })
+    .catch(err => {
+      console.error(err);
+      setLoading(false);
+    });
   }, []);
 
   return (

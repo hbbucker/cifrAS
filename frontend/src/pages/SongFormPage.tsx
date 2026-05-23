@@ -19,32 +19,55 @@ export const SongFormPage: React.FC = () => {
 
   useEffect(() => {
     if (id) {
-      // Mock fetching song data
-      const mockSongs = [
-        { id: '1', title: 'Wonderwall', artist: 'Oasis', keySignature: 'F#m', content: '[Em]Today is [G]gonna be the day...' },
-        { id: '2', title: 'Hotel California', artist: 'Eagles', keySignature: 'Bm', content: '[Bm]On a dark desert highway...' },
-        { id: '3', title: 'Let It Be', artist: 'The Beatles', keySignature: 'C', content: 'When I [C]find myself in [G]times of trouble...' },
-      ];
-      
-      const song = mockSongs.find(s => s.id === id);
-      if (song) {
-        setTitle(song.title);
-        setArtist(song.artist);
-        setKey(song.keySignature);
-        setContent(song.content);
+      fetch(`/api/songs/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch');
+        return res.json();
+      })
+      .then(song => {
+        setTitle(song.title || '');
+        setArtist(song.artist || '');
+        setKey(song.keySignature || 'C');
+        setContent(song.content || '');
         setIsDirty(false);
-      }
+      })
+      .catch(err => {
+        console.error(err);
+        toast('Failed to load song', 'error');
+      });
     }
-  }, [id]);
+  }, [id, toast]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!title || !artist || !content) {
       toast('Title, Artist and Content are required', 'warning');
       return;
     }
-    toast('Song saved successfully!', 'success');
-    setIsDirty(false);
-    navigate('/songs');
+    
+    try {
+      const payload = { title, artist, keySignature: key, content };
+      const res = await fetch(id ? `/api/songs/${id}` : '/api/songs', {
+        method: id ? 'PUT' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(payload)
+      });
+      
+      if (!res.ok) throw new Error('Save failed');
+      
+      toast(id ? 'Song updated successfully!' : 'Song created successfully!', 'success');
+      setIsDirty(false);
+      navigate('/songs');
+    } catch (err) {
+      console.error(err);
+      toast('Error saving song', 'error');
+    }
   };
 
   const handleBack = () => {

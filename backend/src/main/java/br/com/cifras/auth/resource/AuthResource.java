@@ -40,7 +40,13 @@ public class AuthResource {
             "password", request.password()
         );
 
-        Response supabaseResponse = supabaseClient.signup(body);
+        Response supabaseResponse;
+        try {
+            supabaseResponse = supabaseClient.signup(body);
+        } catch (jakarta.ws.rs.WebApplicationException ex) {
+            supabaseResponse = ex.getResponse();
+        }
+
         int status = supabaseResponse.getStatus();
 
         if (status == 200 || status == 201) {
@@ -58,7 +64,20 @@ public class AuthResource {
                 .build();
         }
 
-        return Response.status(status).entity(Map.of("error", "Registration failed")).build();
+        String errorMsg = "Registration failed";
+        try {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> errorBody = supabaseResponse.readEntity(Map.class);
+            if (errorBody != null && errorBody.containsKey("msg")) {
+                errorMsg = (String) errorBody.get("msg");
+            } else if (errorBody != null && errorBody.containsKey("message")) {
+                errorMsg = (String) errorBody.get("message");
+            }
+        } catch (Exception e) {
+            // Ignora se não conseguir ler
+        }
+
+        return Response.status(status).entity(Map.of("error", errorMsg)).build();
     }
 
     /**
@@ -74,7 +93,13 @@ public class AuthResource {
             "password", request.password()
         );
 
-        Response supabaseResponse = supabaseClient.login(body);
+        Response supabaseResponse;
+        try {
+            supabaseResponse = supabaseClient.login("password", body);
+        } catch (jakarta.ws.rs.WebApplicationException ex) {
+            supabaseResponse = ex.getResponse();
+        }
+
         int status = supabaseResponse.getStatus();
 
         if (status == 200) {
@@ -86,8 +111,32 @@ public class AuthResource {
             return Response.ok(result).build();
         }
 
+        String errorMsg = "Credenciais inválidas";
+        try {
+            String rawBody = supabaseResponse.readEntity(String.class);
+            if (rawBody != null) {
+                if (rawBody.contains("\"error_description\":\"")) {
+                    int start = rawBody.indexOf("\"error_description\":\"") + 21;
+                    int end = rawBody.indexOf("\"", start);
+                    errorMsg = rawBody.substring(start, end);
+                } else if (rawBody.contains("\"msg\":\"")) {
+                    int start = rawBody.indexOf("\"msg\":\"") + 7;
+                    int end = rawBody.indexOf("\"", start);
+                    errorMsg = rawBody.substring(start, end);
+                } else if (rawBody.contains("\"message\":\"")) {
+                    int start = rawBody.indexOf("\"message\":\"") + 11;
+                    int end = rawBody.indexOf("\"", start);
+                    errorMsg = rawBody.substring(start, end);
+                } else {
+                    errorMsg = rawBody; // Fallback to see raw content
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to read Supabase error response: " + e.getMessage());
+        }
+
         return Response.status(401)
-            .entity(Map.of("error", "Credenciais inválidas"))
+            .entity(Map.of("error", errorMsg))
             .build();
     }
 
@@ -106,7 +155,13 @@ public class AuthResource {
             "refresh_token", body.get("refreshToken")
         );
 
-        Response supabaseResponse = supabaseClient.refresh(supabaseBody);
+        Response supabaseResponse;
+        try {
+            supabaseResponse = supabaseClient.refresh("refresh_token", supabaseBody);
+        } catch (jakarta.ws.rs.WebApplicationException ex) {
+            supabaseResponse = ex.getResponse();
+        }
+
         int status = supabaseResponse.getStatus();
 
         if (status == 200) {

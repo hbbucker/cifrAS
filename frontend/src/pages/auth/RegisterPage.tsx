@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+
 import { useToast } from '../../context/ToastContext';
 import authClient from '../../services/authService';
 import { Music } from 'lucide-react';
@@ -11,7 +11,6 @@ export const RegisterPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -29,13 +28,12 @@ export const RegisterPage: React.FC = () => {
 
     setIsLoading(true);
     try {
-      // Mock API call
-      await new Promise(r => setTimeout(r, 1000));
-      login('mock-token-reg', 'mock-refresh', { id: '2', email, name });
-      toast('Registered successfully!', 'success');
-      navigate('/dashboard');
-    } catch (error) {
-      toast('Failed to register', 'error');
+      await authClient.post('/register', { email, password });
+      toast('Registered successfully! Please log in.', 'success');
+      navigate('/login');
+    } catch (error: any) {
+      const msg = error.response?.data?.error || 'Failed to register';
+      toast(msg, 'error');
     } finally {
       setIsLoading(false);
     }

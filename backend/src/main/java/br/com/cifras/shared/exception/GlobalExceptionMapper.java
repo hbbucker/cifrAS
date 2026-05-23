@@ -27,7 +27,7 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
             return buildResponse(403, "Forbidden", null);
         }
 
-        if (exception instanceof NotFoundException) {
+        if (exception instanceof NotFoundException || exception instanceof jakarta.ws.rs.NotFoundException) {
             return buildResponse(404, "Not found", null);
         }
 

@@ -73,4 +73,21 @@ class GlobalExceptionMapperTest {
         Map<String, Object> body = (Map<String, Object>) response.getEntity();
         assertEquals("Not found", body.get("error"));
     }
+
+    /**
+     * Test 4: jakarta.ws.rs.NotFoundException → 404 Not Found.
+     * Often thrown by Quarkus Resteasy Reactive when an endpoint is not found.
+     */
+    @Test
+    void givenJakartaNotFoundException_whenMapped_thenReturns404() {
+        jakarta.ws.rs.NotFoundException cause = new jakarta.ws.rs.NotFoundException("HTTP 404 Not Found");
+
+        Response response = mapper.toResponse(cause);
+
+        assertEquals(404, response.getStatus());
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> body = (Map<String, Object>) response.getEntity();
+        assertEquals("Not found", body.get("error"));
+    }
 }

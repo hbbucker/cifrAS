@@ -1,0 +1,71 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< br.com.cifras:cifras-backend >--------------------
+[INFO] Building cifras-backend 1.0.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] ------------------------------[ quarkus ]-------------------------------
+[WARNING] The artifact io.quarkus:quarkus-junit5:jar:3.35.4 has been relocated to io.quarkus:quarkus-junit:jar:3.35.4: Update the artifactId in your project build file. Refer to https://github.com/quarkusio/quarkus/wiki/Migration-Guide-3.31 for more information.
+[WARNING] The artifact io.quarkus:quarkus-junit5-mockito:jar:3.35.4 has been relocated to io.quarkus:quarkus-junit-mockito:jar:3.35.4: Update the artifactId in your project build file. Refer to https://github.com/quarkusio/quarkus/wiki/Migration-Guide-3.31 for more information.
+[INFO] 
+[INFO] --- quarkus:3.35.4:dev (default-cli) @ cifras-backend ---
+[INFO] Invoking quarkus:3.35.4:generate-code (default-generate-code) @ cifras-backend
+[INFO] Invoking resources:3.3.1:resources (default-resources) @ cifras-backend
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Invoking compiler:3.15.0:compile (default-compile) @ cifras-backend
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] Invoking quarkus:3.35.4:generate-code-tests (default-generate-code-tests) @ cifras-backend
+[INFO] Invoking resources:3.3.1:testResources (default-testResources) @ cifras-backend
+[INFO] Copying 2 resources from src/test/resources to target/test-classes
+[INFO] Invoking compiler:3.15.0:testCompile (default-testCompile) @ cifras-backend
+[INFO] Nothing to compile - all classes are up to date.
+[WARNING] [io.quarkus.deployment.dev.DevModeCommandLineBuilder] Changed debug port to 40439 because of a port conflict
+Listening for transport dt_socket at address: 40439
+Press [e] to edit command line args (currently ''), [h] for more options>
+Tests paused
+Press [e] to edit command line args (currently ''), [r] to resume testing, [h] for more options>
+Press [e] to edit command line args (currently ''), [r] to resume testing, [o] Toggle test output, [h] for more options>
+2026-05-23 16:31:51,611 WARN  [io.quarkus.runtime.logging.LoggingSetupRecorder] (build-5) Log level TRACE for category 'io.smallrye.jwt' set below minimum logging level DEBUG, promoting it to DEBUG. Set the build time configuration property 'quarkus.log.category."io.smallrye.jwt".min-level' to 'TRACE' to avoid this warning
+2026-05-23 16:31:51,611 WARN  [io.quarkus.runtime.logging.LoggingSetupRecorder] (build-5) Log level TRACE for category 'io.quarkus.security' set below minimum logging level DEBUG, promoting it to DEBUG. Set the build time configuration property 'quarkus.log.category."io.quarkus.security".min-level' to 'TRACE' to avoid this warning
+2026-05-23 16:31:51,728 INFO  [org.testcontainers.DockerClientFactory] (build-32) Testcontainers version: 2.0.5
+2026-05-23 16:31:51,910 INFO  [org.testcontainers.dockerclient.DockerClientProviderStrategy] (build-32) Loaded org.testcontainers.dockerclient.UnixSocketClientProviderStrategy from ~/.testcontainers.properties, will try it first
+2026-05-23 16:31:52,284 INFO  [org.testcontainers.dockerclient.DockerClientProviderStrategy] (build-32) Found Docker environment with local Unix socket (unix:///var/run/docker.sock)
+2026-05-23 16:31:52,286 INFO  [org.testcontainers.DockerClientFactory] (build-32) Docker host IP address is localhost
+2026-05-23 16:31:52,300 INFO  [org.testcontainers.DockerClientFactory] (build-32) Connected to docker: 
+  Server Version: 25.0.2
+  API Version: 1.44
+  Operating System: Ubuntu 24.04.4 LTS
+  Total Memory: 31941 MB
+2026-05-23 16:31:52,307 INFO  [org.testcontainers.images.PullPolicy] (build-32) Image pull policy will be performed by: DefaultPullPolicy()
+2026-05-23 16:31:52,308 INFO  [org.testcontainers.utility.ImageNameSubstitutor] (build-32) Image name substitution will be performed by: DefaultImageNameSubstitutor (composite of 'ConfigurationFileImageNameSubstitutor' and 'PrefixingImageNameSubstitutor')
+2026-05-23 16:31:52,311 INFO  [org.testcontainers.DockerClientFactory] (build-32) Checking the system...
+2026-05-23 16:31:52,311 INFO  [org.testcontainers.DockerClientFactory] (build-32) ✔︎ Docker server version should be at least 1.6.0
+__  ____  __  _____   ___  __ ____  ______ 
+ --/ __ \/ / / / _ | / _ \/ //_/ / / / __/ 
+ -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \   
+--\___\_\____/_/ |_/_/|_/_/|_|\____/___/   
+2026-05-23 16:31:53,694 WARN  [io.quarkus.runtime.logging.LoggingSetupRecorder] (Quarkus Main Thread) Log level TRACE for category 'io.smallrye.jwt' set below minimum logging level DEBUG, promoting it to DEBUG. Set the build time configuration property 'quarkus.log.category."io.smallrye.jwt".min-level' to 'TRACE' to avoid this warning
+2026-05-23 16:31:53,694 WARN  [io.quarkus.runtime.logging.LoggingSetupRecorder] (Quarkus Main Thread) Log level TRACE for category 'io.quarkus.security' set below minimum logging level DEBUG, promoting it to DEBUG. Set the build time configuration property 'quarkus.log.category."io.quarkus.security".min-level' to 'TRACE' to avoid this warning
+2026-05-23 16:31:53,695 WARN  [io.quarkus.config] (Quarkus Main Thread) The "quarkus.hibernate-orm.database.generation" config property is deprecated and should not be used anymore.
+2026-05-23 16:31:55,634 INFO  [io.quarkus] (Quarkus Main Thread) cifras-backend 1.0.0-SNAPSHOT on JVM (powered by Quarkus 3.35.4) started in 5.025s. Listening on: http://localhost:8081
+2026-05-23 16:31:55,634 INFO  [io.quarkus] (Quarkus Main Thread) Profile dev activated. Live Coding activated.
+2026-05-23 16:31:55,634 INFO  [io.quarkus] (Quarkus Main Thread) Installed features: [agroal, cdi, compose, hibernate-orm, hibernate-orm-panache, hibernate-validator, jdbc-postgresql, narayana-jta, rest, rest-client, rest-client-jackson, rest-jackson, security, smallrye-context-propagation, smallrye-jwt, vertx]
+2026-05-23 16:32:03,194 DEBUG [io.smallrye.jwt.auth] (vert.x-eventloop-thread-0) SRJWT06000: tokenHeaderName = Authorization
+2026-05-23 16:32:03,207 DEBUG [io.smallrye.jwt.auth.principal] (vert.x-worker-thread-1) SRJWT08015: loadSpi, cl=jdk.internal.loader.ClassLoaders$PlatformClassLoader@45097b9a, u=null, sl=java.util.ServiceLoader[io.smallrye.jwt.auth.principal.JWTCallerPrincipalFactory]
+2026-05-23 16:32:03,208 DEBUG [io.smallrye.jwt.auth.principal] (vert.x-worker-thread-1) SRJWT08015: loadSpi, cl=jdk.internal.loader.ClassLoaders$AppClassLoader@2626b418, u=null, sl=java.util.ServiceLoader[io.smallrye.jwt.auth.principal.JWTCallerPrincipalFactory]
+2026-05-23 16:32:03,208 DEBUG [io.smallrye.jwt.auth.principal] (vert.x-worker-thread-1) SRJWT08015: loadSpi, cl=QuarkusClassLoader:Quarkus Base Runtime ClassLoader: DEV for cifras-backend-1.0.0-SNAPSHOT@4a883b15, u=null, sl=java.util.ServiceLoader[io.smallrye.jwt.auth.principal.JWTCallerPrincipalFactory]
+2026-05-23 16:32:03,209 DEBUG [io.smallrye.jwt.auth.principal] (vert.x-worker-thread-1) SRJWT08015: loadSpi, cl=QuarkusClassLoader:Quarkus Runtime ClassLoader: DEV for cifras-backend-1.0.0-SNAPSHOT restart no:0@3d9f5016, u=null, sl=java.util.ServiceLoader[io.smallrye.jwt.auth.principal.JWTCallerPrincipalFactory]
+2026-05-23 16:32:03,209 DEBUG [io.smallrye.jwt.auth.principal] (vert.x-worker-thread-1) SRJWT08015: loadSpi, cl=jdk.internal.loader.ClassLoaders$PlatformClassLoader@45097b9a, u=null, sl=java.util.ServiceLoader[io.smallrye.jwt.auth.principal.JWTCallerPrincipalFactory]
+2026-05-23 16:32:03,209 DEBUG [io.smallrye.jwt.auth.principal] (vert.x-worker-thread-1) SRJWT08015: loadSpi, cl=jdk.internal.loader.ClassLoaders$AppClassLoader@2626b418, u=null, sl=java.util.ServiceLoader[io.smallrye.jwt.auth.principal.JWTCallerPrincipalFactory]
+2026-05-23 16:32:03,210 DEBUG [io.smallrye.jwt.auth.principal] (vert.x-worker-thread-1) SRJWT08015: loadSpi, cl=QuarkusClassLoader:Quarkus Base Runtime ClassLoader: DEV for cifras-backend-1.0.0-SNAPSHOT@4a883b15, u=null, sl=java.util.ServiceLoader[io.smallrye.jwt.auth.principal.JWTCallerPrincipalFactory]
+2026-05-23 16:32:03,211 DEBUG [io.smallrye.jwt.auth.principal] (vert.x-worker-thread-1) SRJWT08015: loadSpi, cl=jdk.internal.loader.ClassLoaders$PlatformClassLoader@45097b9a, u=null, sl=java.util.ServiceLoader[io.smallrye.jwt.auth.principal.JWTCallerPrincipalFactory]
+2026-05-23 16:32:03,211 DEBUG [io.smallrye.jwt.auth.principal] (vert.x-worker-thread-1) SRJWT08015: loadSpi, cl=jdk.internal.loader.ClassLoaders$AppClassLoader@2626b418, u=null, sl=java.util.ServiceLoader[io.smallrye.jwt.auth.principal.JWTCallerPrincipalFactory]
+2026-05-23 16:32:03,212 DEBUG [io.smallrye.jwt.auth.principal] (vert.x-worker-thread-1) SRJWT08015: loadSpi, cl=QuarkusClassLoader:Quarkus Base Runtime ClassLoader: DEV for cifras-backend-1.0.0-SNAPSHOT@4a883b15, u=null, sl=java.util.ServiceLoader[io.smallrye.jwt.auth.principal.JWTCallerPrincipalFactory]
+2026-05-23 16:32:03,212 DEBUG [io.smallrye.jwt.auth.principal] (vert.x-worker-thread-1) SRJWT08015: loadSpi, cl=QuarkusClassLoader:Quarkus Runtime ClassLoader: DEV for cifras-backend-1.0.0-SNAPSHOT restart no:0@3d9f5016, u=null, sl=java.util.ServiceLoader[io.smallrye.jwt.auth.principal.JWTCallerPrincipalFactory]
+2026-05-23 16:32:03,212 DEBUG [io.smallrye.jwt.auth.principal] (vert.x-worker-thread-1) SRJWT08015: loadSpi, cl=jdk.internal.loader.ClassLoaders$PlatformClassLoader@45097b9a, u=null, sl=java.util.ServiceLoader[io.smallrye.jwt.auth.principal.JWTCallerPrincipalFactory]
+2026-05-23 16:32:03,212 DEBUG [io.smallrye.jwt.auth.principal] (vert.x-worker-thread-1) SRJWT08015: loadSpi, cl=jdk.internal.loader.ClassLoaders$AppClassLoader@2626b418, u=null, sl=java.util.ServiceLoader[io.smallrye.jwt.auth.principal.JWTCallerPrincipalFactory]
+2026-05-23 16:32:03,213 DEBUG [io.smallrye.jwt.auth.principal] (vert.x-worker-thread-1) SRJWT08015: loadSpi, cl=QuarkusClassLoader:Quarkus Base Runtime ClassLoader: DEV for cifras-backend-1.0.0-SNAPSHOT@4a883b15, u=null, sl=java.util.ServiceLoader[io.smallrye.jwt.auth.principal.JWTCallerPrincipalFactory]
+2026-05-23 16:32:03,216 DEBUG [io.smallrye.jwt.auth.principal] (vert.x-worker-thread-1) SRJWT08019: AuthContextInfo is: JWTAuthContextInfo{publicVerificationKey=null, secretVerificationKey=null, privateDecryptionKey=null, secretDecryptionKey=null, issuedBy='https://lyjekqxblyytyvyobtnw.supabase.co/auth/v1', expGracePeriodSecs=0, maxTimeToLiveSecs=null, tokenAge=null, publicKeyLocation='https://lyjekqxblyytyvyobtnw.supabase.co/auth/v1/.well-known/jwks.json', publicKeyContent='null', secretKeyContent='null', decryptionKeyLocation='null', decryptionKeyContent='null', jwksRefreshInterval=60, jwksRetainCacheOnErrorDuration=0, tokenHeader='Authorization', tokenCookie='null', alwaysCheckAuthorization=false, tokenKeyId='null', tokenDecryptionKeyId='null', tokenSchemes=[Bearer], requireNamedPrincipal=true, defaultSubClaim='null', subPath='null', defaultGroupsClaim='null', groupsPath='role', signatureAlgorithm=[RS256], keyEncryptionAlgorithm=[RSA_OAEP, RSA_OAEP_256], keyFormat=ANY, keyProvider=DEFAULT, keyCacheSize=100, keyCacheTimeToLive=10, expectedAudience=[authenticated], groupsSeparator=' ', relaxVerificationKeyValidation=true, verifyCertificateThumbprint=false, tlsCertificatePath=null, tlsTrustAll=false, tlsTrustedHosts=null, httpProxyHost=null, httpProxyPort=80}
+2026-05-23 16:32:03,222 DEBUG [io.smallrye.jwt.auth.principal] (vert.x-worker-thread-1) SRJWT08043: Trying to create a key from the HTTPS JWK(S)
+2026-05-23 16:32:03,490 DEBUG [io.smallrye.jwt.auth.principal] (vert.x-worker-thread-1) SRJWT08005: Verification key is unresolvable
+2026-05-23 16:32:08,945 INFO  [io.quarkus] (Shutdown thread) cifras-backend stopped in 0.048s
+Press [e] to edit command line args (currently ''), [h] for more options>

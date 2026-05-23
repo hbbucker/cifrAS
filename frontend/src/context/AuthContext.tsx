@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import type { ReactNode } from 'react';
-import authClient from '../services/authService';
+
 
 interface User {
   id: string;
@@ -37,14 +37,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem('token');
-      if (token) {
-        try {
-          // This would ideally hit a /me endpoint, using a mock for now
-          const { data } = await authClient.get('/me');
-          setUser(data.user);
-        } catch (error) {
-          logout();
-        }
+      if (token && token !== 'mock-token' && token !== 'mock-token-reg') {
+        // Assume valid for now. Real validity checked upon API requests via 401 interceptor.
+        setUser({ id: 'user', email: 'user@example.com', name: 'Musician' });
+      } else {
+        logout();
       }
       setLoading(false);
     };

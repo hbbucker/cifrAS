@@ -6,15 +6,15 @@ interface AutoScrollResult {
   play: () => void;
   pause: () => void;
   setSpeed: (speed: number) => void;
-  containerRef: React.RefObject<HTMLDivElement>;
+  containerRef: React.RefObject<HTMLDivElement | null>;
 }
 
 export const useAutoScroll = (initialSpeed = 3): AutoScrollResult => {
   const [isScrolling, setIsScrolling] = useState(false);
   const [speed, setSpeedState] = useState(initialSpeed); // 1-10 scale
   const containerRef = useRef<HTMLDivElement>(null);
-  const requestRef = useRef<number>();
-  const lastTimeRef = useRef<number>();
+  const requestRef = useRef<number | undefined>(undefined);
+  const lastTimeRef = useRef<number | undefined>(undefined);
 
   const play = useCallback(() => setIsScrolling(true), []);
   const pause = useCallback(() => setIsScrolling(false), []);

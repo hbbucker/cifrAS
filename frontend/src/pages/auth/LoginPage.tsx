@@ -22,16 +22,14 @@ export const LoginPage: React.FC = () => {
 
     setIsLoading(true);
     try {
-      // Mock API call since backend isn't linked yet
       const response = await authClient.post('/login', { email, password });
-      login(response.data.token, response.data.refreshToken, response.data.user);
+      const { accessToken, refreshToken } = response.data;
+      login(accessToken, refreshToken, { id: 'user', email, name: email.split('@')[0] });
       toast('Logged in successfully!', 'success');
       navigate('/dashboard');
-    } catch (error) {
-      // Mock success for E2E testing
-      login('mock-token', 'mock-refresh', { id: '1', email, name: 'Test User' });
-      toast('Logged in successfully! (Mock)', 'success');
-      navigate('/dashboard');
+    } catch (error: any) {
+      const msg = error.response?.data?.error || 'Failed to login';
+      toast(msg, 'error');
     } finally {
       setIsLoading(false);
     }

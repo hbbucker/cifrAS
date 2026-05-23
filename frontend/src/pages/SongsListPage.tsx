@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sidebar } from '../components/layout/Sidebar';
 import { BottomNav } from '../components/layout/BottomNav';
 import { MusicCard } from '../components/cards/MusicCard';
@@ -7,12 +7,33 @@ import { useNavigate } from 'react-router-dom';
 
 export const SongsListPage: React.FC = () => {
   const navigate = useNavigate();
-  // Mock data for display
-  const [songs] = useState([
-    { id: '1', title: 'Wonderwall', artist: 'Oasis', keySignature: 'F#m', isFavorite: true, categories: ['Rock', '90s'] },
-    { id: '2', title: 'Hotel California', artist: 'Eagles', keySignature: 'Bm', isFavorite: false, categories: ['Classic Rock'] },
-    { id: '3', title: 'Let It Be', artist: 'The Beatles', keySignature: 'C', isFavorite: true, categories: ['Pop', '60s'] },
-  ]);
+  const [songs, setSongs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/songs', {
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    })
+    .then(res => {
+      if (!res.ok) throw new Error('Fetch failed');
+      return res.json();
+    })
+    .then(data => {
+      const items = Array.isArray(data) ? data : (data.data || []);
+      const mappedSongs = items.map((song: any) => ({
+        ...song,
+        keySignature: song.originalKey || song.keySignature || 'C',
+        isFavorite: song.isFavorite || false,
+        categories: song.categories || [],
+      }));
+      setSongs(mappedSongs);
+      setLoading(false);
+    })
+    .catch(err => {
+      console.error(err);
+      setLoading(false);
+    });
+  }, []);
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
@@ -45,19 +66,25 @@ export const SongsListPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {songs.map(song => (
-              <div key={song.id} onClick={() => navigate(`/song/${song.id}`)} className="cursor-pointer" data-testid={`view-song-${song.id}`}>
-                <MusicCard 
-                  {...song} 
-                  onToggleFavorite={() => {}}
-                  onEdit={(id) => navigate(`/songs/edit/${id}`)}
-                  onShare={() => {}}
-                  onDelete={() => {}}
-                />
-              </div>
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex justify-center py-12">
+              <div className="animate-spin w-8 h-8 border-4 border-[#aa3bff] border-t-transparent rounded-full" />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {songs.map(song => (
+                <div key={song.id} onClick={() => navigate(`/song/${song.id}`)} className="cursor-pointer" data-testid={`view-song-${song.id}`}>
+                  <MusicCard 
+                    {...song} 
+                    onToggleFavorite={() => {}}
+                    onEdit={(id) => navigate(`/songs/edit/${id}`)}
+                    onShare={() => {}}
+                    onDelete={() => {}}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </main>
       <BottomNav />

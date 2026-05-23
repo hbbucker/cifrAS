@@ -3,6 +3,7 @@ package br.com.cifras.auth.service;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 /**
@@ -11,6 +12,8 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
  */
 @RegisterRestClient(configKey = "supabase-auth")
 @Path("/auth/v1")
+@ClientHeaderParam(name = "apikey", value = "${supabase.apikey}")
+@ClientHeaderParam(name = "Authorization", value = "Bearer ${supabase.apikey}")
 public interface SupabaseAuthClient {
 
     @POST
@@ -20,14 +23,14 @@ public interface SupabaseAuthClient {
     Response signup(Object body);
 
     @POST
-    @Path("/token?grant_type=password")
+    @Path("/token")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    Response login(Object body);
+    Response login(@QueryParam("grant_type") String grantType, Object body);
 
     @POST
-    @Path("/token?grant_type=refresh_token")
+    @Path("/token")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    Response refresh(Object body);
+    Response refresh(@QueryParam("grant_type") String grantType, Object body);
 }
