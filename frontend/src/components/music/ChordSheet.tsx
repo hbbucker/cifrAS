@@ -29,8 +29,9 @@ export const ChordSheet: React.FC<ChordSheetProps> = ({
     if (words.length === 0) return false;
     
     // Strict chord regex covering extended chords, slashes, and parentheses
-    const chordRegex = /^[A-G][#b]?(m|maj|dim|aug|sus|add|M)?\d*(b\d+|#\d+)?(\([^)]+\))?(\/[A-G][#b]?)?$/;
-    const ignoreRegex = /^(\(\dx\)|\d+x|\||%|-|~)$/i;
+    const chordRegex = /^[A-G][#b]?(m|M|maj|dim|aug|sus|add)?\d*(m|M|maj|dim|aug|sus|add)?(b\d+|#\d+)?(\([^)]+\))?(\/([A-G][#b]?|\d+))?$/;
+    // Ignore structural words and punctuation when calculating the chord ratio
+    const ignoreRegex = /^(intro|introdução|tab|solo|riff|base|parte|refrão|chorus|verse|ponte|bridge|final|end)?:?(,|:|\.|\||%|-|~|\(\dx\)|\d+x)?$/i;
 
     let chordCount = 0;
     let wordCount = 0;

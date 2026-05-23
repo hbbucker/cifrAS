@@ -61,8 +61,9 @@ export const isChordLineHelper = (line: string) => {
   const words = cleanLine.split(/\s+/);
   if (words.length === 0) return false;
   
-  const chordRegex = /^[A-G][#b]?(m|maj|dim|aug|sus|add|M)?\d*(b\d+|#\d+)?(\([^)]+\))?(\/[A-G][#b]?)?$/;
-  const ignoreRegex = /^(\(\dx\)|\d+x|\||%|-|~)$/i;
+  const chordRegex = /^[A-G][#b]?(m|M|maj|dim|aug|sus|add)?\d*(m|M|maj|dim|aug|sus|add)?(b\d+|#\d+)?(\([^)]+\))?(\/([A-G][#b]?|\d+))?$/;
+  // Ignore structural words and punctuation when calculating the chord ratio
+  const ignoreRegex = /^(intro|introdução|tab|solo|riff|base|parte|refrão|chorus|verse|ponte|bridge|final|end)?:?(,|:|\.|\||%|-|~|\(\dx\)|\d+x)?$/i;
 
   let chordCount = 0;
   let wordCount = 0;
@@ -91,7 +92,7 @@ export const transposeContent = (content: string, steps: number): string => {
         if (part.trim() === '') return part; // Space
         
         // Let's use a more strict chord regex for exact match on the part
-        const strictChordRegex = /^[A-G][#b]?(m|maj|dim|aug|sus|add|M)?\d*(b\d+|#\d+)?(\([^)]+\))?(\/[A-G][#b]?)?$/;
+        const strictChordRegex = /^[A-G][#b]?(m|M|maj|dim|aug|sus|add)?\d*(m|M|maj|dim|aug|sus|add)?(b\d+|#\d+)?(\([^)]+\))?(\/([A-G][#b]?|\d+))?$/;
         if (strictChordRegex.test(part)) {
           return transposeChord(part, steps);
         }
