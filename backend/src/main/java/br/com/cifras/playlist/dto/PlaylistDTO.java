@@ -11,9 +11,11 @@ public record PlaylistDTO(
     Long id,
     String name,
     boolean isCollaborative,
+    int songCount,
     Instant createdAt
 ) {
     public static PlaylistDTO from(Playlist p) {
-        return new PlaylistDTO(p.id, p.name, p.isCollaborative, p.createdAt);
+        int count = p.songs != null ? p.songs.size() : 0;
+        return new PlaylistDTO(p.id, p.name, p.isCollaborative, count, p.createdAt);
     }
 }

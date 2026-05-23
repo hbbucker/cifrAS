@@ -46,6 +46,15 @@ public class PlaylistResource {
         return Response.ok(dtos).build();
     }
 
+    /** GET /playlists/{id} → 200 */
+    @GET
+    @Path("/{id}")
+    public Response getPlaylist(@PathParam("id") Long id) {
+        String userId = securityUtils.getCurrentUserId();
+        Playlist playlist = playlistService.getById(id, userId);
+        return Response.ok(PlaylistDetailsDTO.from(playlist)).build();
+    }
+
     /** POST /playlists/{id}/songs → 204 */
     @POST
     @Path("/{id}/songs")

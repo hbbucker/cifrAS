@@ -59,6 +59,20 @@ public class PlaylistService {
     }
 
     /**
+     * Gets a playlist by ID and verifies access.
+     */
+    public Playlist getById(Long playlistId, String userId) {
+        Playlist playlist = playlistRepository.findActiveById(playlistId)
+            .orElseThrow(() -> new NotFoundException("Playlist not found"));
+
+        if (!canModify(playlist, userId)) {
+            // Technically it could be public view, but for now only owner/group can view
+            throw new ForbiddenException("Access denied to playlist");
+        }
+        return playlist;
+    }
+
+    /**
      * Adds a song to a playlist at the given position.
      * Shifts existing songs at or after that position down by 1.
      *
