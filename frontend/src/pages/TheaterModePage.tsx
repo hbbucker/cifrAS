@@ -65,7 +65,6 @@ But fuck it, it was something to do`;
       <div 
         ref={containerRef} 
         className="flex-1 overflow-y-auto px-4 md:px-12 pt-28 pb-48 no-scrollbar"
-        style={{ scrollBehavior: 'smooth' }}
         data-testid="theater-scroll-container"
       >
         <div className="max-w-4xl mx-auto">

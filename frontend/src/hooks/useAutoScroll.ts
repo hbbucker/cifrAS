@@ -15,6 +15,7 @@ export const useAutoScroll = (initialSpeed = 3): AutoScrollResult => {
   const containerRef = useRef<HTMLDivElement>(null);
   const requestRef = useRef<number | undefined>(undefined);
   const lastTimeRef = useRef<number | undefined>(undefined);
+  const fractionalScrollRef = useRef<number>(0);
 
   const play = useCallback(() => setIsScrolling(true), []);
   const pause = useCallback(() => setIsScrolling(false), []);
@@ -23,17 +24,23 @@ export const useAutoScroll = (initialSpeed = 3): AutoScrollResult => {
   }, []);
 
   const animate = useCallback(
-    (time: number) => {
+    function animateFn(time: number) {
       if (lastTimeRef.current !== undefined && containerRef.current) {
         const deltaTime = time - lastTimeRef.current;
         // Map speed 1-10 to pixels per second (e.g., speed 5 = ~25px/s)
         const pixelsPerSecond = speed * 5; 
         const scrollAmount = (pixelsPerSecond * deltaTime) / 1000;
         
-        containerRef.current.scrollTop += scrollAmount;
+        fractionalScrollRef.current += scrollAmount;
+        
+        if (fractionalScrollRef.current >= 1) {
+          const pixelsToScroll = Math.floor(fractionalScrollRef.current);
+          containerRef.current.scrollTop += pixelsToScroll;
+          fractionalScrollRef.current -= pixelsToScroll;
+        }
       }
       lastTimeRef.current = time;
-      requestRef.current = requestAnimationFrame(animate);
+      requestRef.current = requestAnimationFrame(animateFn);
     },
     [speed]
   );
