@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Sidebar } from '../components/layout/Sidebar';
-import { ArrowLeft, PlayCircle, GripVertical, Trash2 } from 'lucide-react';
+import { ArrowLeft, PlayCircle, GripVertical, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 export const PlaylistViewPage: React.FC = () => {
@@ -15,6 +15,7 @@ export const PlaylistViewPage: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [allSongs, setAllSongs] = useState<any[]>([]);
   const [selectedSongId, setSelectedSongId] = useState<string>('');
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
   useEffect(() => {
     fetch(`/api/playlists/${id}`, {
@@ -48,6 +49,27 @@ export const PlaylistViewPage: React.FC = () => {
     const swapIndex = direction === 'up' ? index - 1 : index + 1;
     [newSongs[index], newSongs[swapIndex]] = [newSongs[swapIndex], newSongs[index]];
     setSongs(newSongs);
+
+    // Call API to reorder
+    const orderedIds = newSongs.map(s => s.id);
+    fetch(`/api/playlists/${id}/songs/reorder`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ orderedSongIds: orderedIds })
+    }).catch(console.error);
+  };
+
+  const handleDrop = (dropIndex: number) => {
+    if (draggedIndex === null || draggedIndex === dropIndex) return;
+    
+    const newSongs = [...songs];
+    const [removed] = newSongs.splice(draggedIndex, 1);
+    newSongs.splice(dropIndex, 0, removed);
+    setSongs(newSongs);
+    setDraggedIndex(null);
 
     // Call API to reorder
     const orderedIds = newSongs.map(s => s.id);
@@ -139,16 +161,43 @@ export const PlaylistViewPage: React.FC = () => {
               {songs.map((song, index) => (
                 <div 
                   key={song.id} 
-                  className="flex items-center gap-4 p-4 border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors group"
+                  draggable
+                  onDragStart={() => {
+                    // Slight delay allows the drag image to capture the current state before we mess with opacity
+                    setTimeout(() => setDraggedIndex(index), 0);
+                  }}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDragEnd={() => setDraggedIndex(null)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    handleDrop(index);
+                  }}
+                  className={`flex items-center gap-4 p-4 border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all group ${
+                    draggedIndex === index ? 'opacity-30' : ''
+                  }`}
                   data-testid={`playlist-item-${song.id}`}
                 >
-                  <div className="flex flex-col gap-1 items-center justify-center opacity-50 hover:opacity-100 sm:hidden">
-                    <button onClick={() => moveSong(index, 'up')} className="p-1" data-testid={`move-up-${song.id}`}>↑</button>
-                    <button onClick={() => moveSong(index, 'down')} className="p-1" data-testid={`move-down-${song.id}`}>↓</button>
+                  <div className="flex flex-col sm:flex-row gap-1 items-center justify-center">
+                    <button 
+                      onClick={() => moveSong(index, 'up')} 
+                      className="p-2 sm:p-1.5 text-gray-500 hover:text-[#aa3bff] bg-gray-100 hover:bg-[#aa3bff]/10 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95" 
+                      data-testid={`move-up-${song.id}`}
+                      aria-label="Move up"
+                    >
+                      <ChevronUp className="w-6 h-6 sm:w-5 sm:h-5" />
+                    </button>
+                    <button 
+                      onClick={() => moveSong(index, 'down')} 
+                      className="p-2 sm:p-1.5 text-gray-500 hover:text-[#aa3bff] bg-gray-100 hover:bg-[#aa3bff]/10 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95" 
+                      data-testid={`move-down-${song.id}`}
+                      aria-label="Move down"
+                    >
+                      <ChevronDown className="w-6 h-6 sm:w-5 sm:h-5" />
+                    </button>
                   </div>
                   
-                  <div className="hidden sm:flex text-gray-400 cursor-grab active:cursor-grabbing hover:text-[#aa3bff]">
-                    <GripVertical className="w-5 h-5" />
+                  <div className="text-gray-400 cursor-grab active:cursor-grabbing hover:text-[#aa3bff]">
+                    <GripVertical className="w-5 h-5 pointer-events-none" />
                   </div>
                   
                   <div className="w-8 text-center text-gray-400 font-medium">{index + 1}</div>
