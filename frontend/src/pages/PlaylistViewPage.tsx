@@ -7,7 +7,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 export const PlaylistViewPage: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   
   const [playlist, setPlaylist] = useState<any>(null);
   const [songs, setSongs] = useState<any[]>([]);
@@ -21,6 +21,8 @@ export const PlaylistViewPage: React.FC = () => {
     !songs.some(ps => ps.id === s.id) && 
     (s.title.toLowerCase().includes(searchQuery.toLowerCase()) || s.artist.toLowerCase().includes(searchQuery.toLowerCase()))
   );
+
+  const isOwner = playlist?.userId === user?.id;
 
   useEffect(() => {
     fetch(`/api/playlists/${id}`, {
@@ -125,24 +127,26 @@ export const PlaylistViewPage: React.FC = () => {
           </div>
           
           <div className="flex gap-2">
-            <button 
-              onClick={() => {
-                fetch('/api/songs', {
-                  headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-                })
-                .then(res => res.json())
-                .then(data => {
-                  const items = Array.isArray(data) ? data : (data.data || []);
-                  setAllSongs(items);
-                  setShowAddModal(true);
-                })
-                .catch(console.error);
-              }}
-              className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-900 dark:text-white px-4 py-2.5 rounded-lg font-bold transition-colors"
-            >
-              <Plus className="w-5 h-5" />
-              <span className="hidden sm:inline">Add Song</span>
-            </button>
+            {isOwner && (
+              <button 
+                onClick={() => {
+                  fetch('/api/songs', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                  })
+                  .then(res => res.json())
+                  .then(data => {
+                    const items = Array.isArray(data) ? data : (data.data || []);
+                    setAllSongs(items);
+                    setShowAddModal(true);
+                  })
+                  .catch(console.error);
+                }}
+                className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-900 dark:text-white px-4 py-2.5 rounded-lg font-bold transition-colors"
+              >
+                <Plus className="w-5 h-5" />
+                <span className="hidden sm:inline">Add Song</span>
+              </button>
+            )}
             <button 
               onClick={() => navigate(`/theater/${id}`)}
               className="flex items-center gap-2 bg-[#10B981] hover:bg-[#059669] text-white px-5 py-2.5 rounded-lg font-bold transition-colors shadow-lg shadow-emerald-500/20"
@@ -167,14 +171,18 @@ export const PlaylistViewPage: React.FC = () => {
               {songs.map((song, index) => (
                 <div 
                   key={song.id} 
-                  draggable
+                  draggable={isOwner}
                   onDragStart={() => {
-                    // Slight delay allows the drag image to capture the current state before we mess with opacity
+                    if (!isOwner) return;
                     setTimeout(() => setDraggedIndex(index), 0);
                   }}
-                  onDragOver={(e) => e.preventDefault()}
+                  onDragOver={(e) => {
+                    if (!isOwner) return;
+                    e.preventDefault();
+                  }}
                   onDragEnd={() => setDraggedIndex(null)}
                   onDrop={(e) => {
+                    if (!isOwner) return;
                     e.preventDefault();
                     handleDrop(index);
                   }}
@@ -183,28 +191,32 @@ export const PlaylistViewPage: React.FC = () => {
                   }`}
                   data-testid={`playlist-item-${song.id}`}
                 >
-                  <div className="flex flex-col sm:flex-row gap-1 items-center justify-center">
-                    <button 
-                      onClick={() => moveSong(index, 'up')} 
-                      className="p-2 sm:p-1.5 text-gray-500 hover:text-[#aa3bff] bg-gray-100 hover:bg-[#aa3bff]/10 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95" 
-                      data-testid={`move-up-${song.id}`}
-                      aria-label="Move up"
-                    >
-                      <ChevronUp className="w-6 h-6 sm:w-5 sm:h-5" />
-                    </button>
-                    <button 
-                      onClick={() => moveSong(index, 'down')} 
-                      className="p-2 sm:p-1.5 text-gray-500 hover:text-[#aa3bff] bg-gray-100 hover:bg-[#aa3bff]/10 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95" 
-                      data-testid={`move-down-${song.id}`}
-                      aria-label="Move down"
-                    >
-                      <ChevronDown className="w-6 h-6 sm:w-5 sm:h-5" />
-                    </button>
-                  </div>
+                  {isOwner && (
+                    <div className="flex flex-col sm:flex-row gap-1 items-center justify-center">
+                      <button 
+                        onClick={() => moveSong(index, 'up')} 
+                        className="p-2 sm:p-1.5 text-gray-500 hover:text-[#aa3bff] bg-gray-100 hover:bg-[#aa3bff]/10 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95" 
+                        data-testid={`move-up-${song.id}`}
+                        aria-label="Move up"
+                      >
+                        <ChevronUp className="w-6 h-6 sm:w-5 sm:h-5" />
+                      </button>
+                      <button 
+                        onClick={() => moveSong(index, 'down')} 
+                        className="p-2 sm:p-1.5 text-gray-500 hover:text-[#aa3bff] bg-gray-100 hover:bg-[#aa3bff]/10 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95" 
+                        data-testid={`move-down-${song.id}`}
+                        aria-label="Move down"
+                      >
+                        <ChevronDown className="w-6 h-6 sm:w-5 sm:h-5" />
+                      </button>
+                    </div>
+                  )}
                   
-                  <div className="text-gray-400 cursor-grab active:cursor-grabbing hover:text-[#aa3bff]">
-                    <GripVertical className="w-5 h-5 pointer-events-none" />
-                  </div>
+                  {isOwner && (
+                    <div className="text-gray-400 cursor-grab active:cursor-grabbing hover:text-[#aa3bff]">
+                      <GripVertical className="w-5 h-5 pointer-events-none" />
+                    </div>
+                  )}
                   
                   <div className="w-8 text-center text-gray-400 font-medium">{index + 1}</div>
                   
@@ -222,12 +234,14 @@ export const PlaylistViewPage: React.FC = () => {
                     {song.originalKey || song.key || '?'}
                   </div>
                   
-                  <button 
-                    onClick={() => removeSong(song.id)}
-                    className="p-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity rounded-full hover:bg-red-50 dark:hover:bg-red-900/20"
-                  >
-                    <Trash2 className="w-5 h-5" />
-                  </button>
+                  {isOwner && (
+                    <button 
+                      onClick={() => removeSong(song.id)}
+                      className="p-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity rounded-full hover:bg-red-50 dark:hover:bg-red-900/20"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  )}
                 </div>
               ))}
             </div>

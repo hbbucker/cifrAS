@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Users, MoreVertical, UserPlus, LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface GroupCardProps {
   id: string;
@@ -14,15 +15,19 @@ export const GroupCard: React.FC<GroupCardProps> = ({
   id, name, memberCount, role, onInvite, onLeave
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-all relative">
+    <div 
+      onClick={() => navigate(`/groups/${id}`)}
+      className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-all relative cursor-pointer"
+    >
       <div className="flex justify-between items-start mb-4">
         <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
           <Users className="w-6 h-6 text-blue-600 dark:text-blue-400" />
         </div>
         
-        <div className="relative">
+        <div className="relative" onClick={(e) => e.stopPropagation()}>
           <button 
             onClick={() => setMenuOpen(!menuOpen)}
             className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500"

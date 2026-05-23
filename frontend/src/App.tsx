@@ -12,6 +12,7 @@ import { PlaylistViewPage } from './pages/PlaylistViewPage';
 import { TheaterModePage } from './pages/TheaterModePage';
 import { SearchPage } from './pages/SearchPage';
 import { GroupsPage } from './pages/GroupsPage';
+import { GroupDetailsPage } from './pages/GroupDetailsPage';
 import { SharedWithMePage } from './pages/SharedWithMePage';
 import { SettingsPage } from './pages/SettingsPage';
 
@@ -38,6 +39,7 @@ function App() {
 
       {/* Phase 5 Routes */}
       <Route path="/groups" element={<PrivateRoute><GroupsPage /></PrivateRoute>} />
+      <Route path="/groups/:id" element={<PrivateRoute><GroupDetailsPage /></PrivateRoute>} />
       <Route path="/shared" element={<PrivateRoute><SharedWithMePage /></PrivateRoute>} />
       <Route path="/settings" element={<PrivateRoute><SettingsPage /></PrivateRoute>} />
     </Routes>
