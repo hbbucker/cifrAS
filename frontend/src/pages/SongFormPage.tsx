@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Save, ArrowLeft } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import { ConfirmModal } from '../components/modals/ConfirmModal';
+import { parseContentToLyrics, stringifyLyrics } from '../utils/lyricsParser';
 
 export const SongFormPage: React.FC = () => {
   const { id } = useParams();
@@ -31,8 +32,8 @@ export const SongFormPage: React.FC = () => {
       .then(song => {
         setTitle(song.title || '');
         setArtist(song.artist || '');
-        setKey(song.keySignature || 'C');
-        setContent(song.content || '');
+        setKey(song.originalKey || song.keySignature || 'C');
+        setContent(song.content || stringifyLyrics(song.lyrics) || '');
         setIsDirty(false);
       })
       .catch(err => {
@@ -49,7 +50,7 @@ export const SongFormPage: React.FC = () => {
     }
     
     try {
-      const payload = { title, artist, keySignature: key, content };
+      const payload = { title, artist, originalKey: key, lyrics: parseContentToLyrics(content) };
       const res = await fetch(id ? `/api/songs/${id}` : '/api/songs', {
         method: id ? 'PUT' : 'POST',
         headers: {

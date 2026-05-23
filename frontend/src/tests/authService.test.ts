@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import axios from 'axios';
+// import axios from 'axios';
 import authClient from '../services/authService';
 
 vi.mock('axios', async () => {
@@ -8,11 +8,11 @@ vi.mock('axios', async () => {
     ...actual,
     create: vi.fn(() => {
       const client = vi.fn();
-      client.interceptors = {
+      (client as any).interceptors = {
         request: { use: vi.fn() },
         response: { use: vi.fn() }
       };
-      client.defaults = { headers: { common: {} } };
+      (client as any).defaults = { headers: { common: {} } };
       return client;
     }),
     post: vi.fn()

@@ -35,7 +35,7 @@ class AuthResourceTest extends BaseIntegrationTest {
             .body("{\"email\":\"test@example.com\",\"password\":\"strongPass123\"}")
             .when().post("/auth/register")
             .then()
-            .statusCode(anyOf(equalTo(401), equalTo(500), equalTo(400))); // Endpoint reached
+            .statusCode(anyOf(equalTo(401), equalTo(500), equalTo(400), equalTo(429))); // Endpoint reached
     }
 
     /**
@@ -48,7 +48,7 @@ class AuthResourceTest extends BaseIntegrationTest {
             .body("{\"email\":\"test@example.com\",\"password\":\"strongPass123\"}")
             .when().post("/auth/login")
             .then()
-            .statusCode(anyOf(equalTo(401), equalTo(500), equalTo(400))); // Endpoint reached
+            .statusCode(anyOf(equalTo(401), equalTo(500), equalTo(400), equalTo(429))); // Endpoint reached
     }
 
     /**

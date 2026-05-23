@@ -4,6 +4,7 @@ import { TransposePad } from '../components/music/TransposePad';
 import { ChordSheet } from '../components/music/ChordSheet';
 import { ArrowLeft, PlayCircle, Settings2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { stringifyLyrics } from '../utils/lyricsParser';
 
 export const SongViewPage: React.FC = () => {
   const navigate = useNavigate();
@@ -32,8 +33,8 @@ To show Avicii I was cool`
         return res.json();
       })
       .then(data => {
-        setSong(data);
-        setCurrentKey(data.keySignature || 'C');
+        setSong({ ...data, content: stringifyLyrics(data.lyrics) });
+        setCurrentKey(data.originalKey || data.keySignature || 'C');
       })
       .catch(console.error);
     }
@@ -75,9 +76,9 @@ To show Avicii I was cool`
           </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto p-6 bg-white dark:bg-gray-900">
-          <div className="max-w-3xl mx-auto">
-            <ChordSheet content={song.content} fontSize={20} height={600} />
+        <div className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900/50">
+          <div className="max-w-3xl mx-auto h-full flex flex-col">
+            <ChordSheet content={song.content} fontSize={20} />
           </div>
         </div>
       </main>
