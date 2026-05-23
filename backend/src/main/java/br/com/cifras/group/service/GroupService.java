@@ -10,6 +10,7 @@ import br.com.cifras.group.domain.GroupInvitationStatus;
 import br.com.cifras.shared.security.UserService;
 import br.com.cifras.shared.exception.ForbiddenException;
 import br.com.cifras.shared.exception.NotFoundException;
+import br.com.cifras.playlist.domain.Playlist;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -153,5 +154,45 @@ public class GroupService {
     public List<Group> listGroupsByUser(String userId) {
         return GroupMember.<GroupMember>list("userId", userId)
             .stream().map(m -> m.group).toList();
+    }
+
+    @Transactional
+    public void linkPlaylist(Long groupId, Long playlistId, String requestingUserId) {
+        if (!isOwner(groupId, requestingUserId)) throw new ForbiddenException("Only OWNER can link playlists to the group");
+        
+        Group group = Group.findById(groupId);
+        if (group == null) throw new NotFoundException("Group not found");
+
+        Playlist playlist = Playlist.findById(playlistId);
+        if (playlist == null) throw new NotFoundException("Playlist not found");
+
+        if (!playlist.userId.equals(requestingUserId)) throw new ForbiddenException("Only the playlist owner can link it");
+
+        playlist.group = group;
+        playlist.isCollaborative = true;
+    }
+
+    @Transactional
+    public void unlinkPlaylist(Long groupId, Long playlistId, String requestingUserId) {
+        if (!isOwner(groupId, requestingUserId)) throw new ForbiddenException("Only OWNER can unlink playlists from the group");
+
+        Playlist playlist = Playlist.findById(playlistId);
+        if (playlist == null) throw new NotFoundException("Playlist not found");
+
+        if (playlist.group == null || !playlist.group.id.equals(groupId)) {
+            throw new IllegalArgumentException("Playlist is not linked to this group");
+        }
+
+        playlist.group = null;
+        playlist.isCollaborative = false;
+    }
+
+    public List<Playlist> listGroupPlaylists(Long groupId, String requestingUserId) {
+        if (!isMember(groupId, requestingUserId)) throw new ForbiddenException("Only members can view group playlists");
+        
+        Group group = Group.findById(groupId);
+        if (group == null) throw new NotFoundException("Group not found");
+
+        return Playlist.list("group.id = ?1 and deletedAt is null", groupId);
     }
 }

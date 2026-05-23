@@ -4,6 +4,9 @@ import br.com.cifras.group.domain.Group;
 import br.com.cifras.group.dto.AddMemberRequest;
 import br.com.cifras.group.dto.CreateGroupRequest;
 import br.com.cifras.group.dto.GroupDTO;
+import br.com.cifras.group.dto.LinkPlaylistRequest;
+import br.com.cifras.playlist.domain.Playlist;
+import br.com.cifras.playlist.dto.PlaylistDTO;
 import br.com.cifras.group.service.GroupService;
 import br.com.cifras.shared.security.SecurityUtils;
 import io.quarkus.security.Authenticated;
@@ -55,6 +58,31 @@ public class GroupResource {
     public Response removeMember(@PathParam("id") Long id, @PathParam("targetUserId") String targetUserId) {
         String userId = securityUtils.getCurrentUserId();
         groupService.removeMember(id, targetUserId, userId);
+        return Response.noContent().build();
+    }
+
+    @POST
+    @Path("/{id}/playlists")
+    public Response linkPlaylist(@PathParam("id") Long id, @Valid LinkPlaylistRequest request) {
+        String userId = securityUtils.getCurrentUserId();
+        groupService.linkPlaylist(id, request.playlistId(), userId);
+        return Response.noContent().build();
+    }
+
+    @GET
+    @Path("/{id}/playlists")
+    public Response listGroupPlaylists(@PathParam("id") Long id) {
+        String userId = securityUtils.getCurrentUserId();
+        List<Playlist> playlists = groupService.listGroupPlaylists(id, userId);
+        List<PlaylistDTO> dtos = playlists.stream().map(PlaylistDTO::from).toList();
+        return Response.ok(dtos).build();
+    }
+
+    @DELETE
+    @Path("/{id}/playlists/{playlistId}")
+    public Response unlinkPlaylist(@PathParam("id") Long id, @PathParam("playlistId") Long playlistId) {
+        String userId = securityUtils.getCurrentUserId();
+        groupService.unlinkPlaylist(id, playlistId, userId);
         return Response.noContent().build();
     }
 }

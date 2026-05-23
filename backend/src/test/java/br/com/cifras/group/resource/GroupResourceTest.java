@@ -14,6 +14,10 @@ import io.quarkus.test.InjectMock;
 import org.mockito.Mockito;
 import br.com.cifras.shared.security.UserService;
 import br.com.cifras.group.service.GroupService;
+import br.com.cifras.playlist.service.PlaylistService;
+import br.com.cifras.playlist.dto.CreatePlaylistRequest;
+import br.com.cifras.group.dto.LinkPlaylistRequest;
+import br.com.cifras.playlist.domain.Playlist;
 import jakarta.inject.Inject;
 
 /**
@@ -34,6 +38,9 @@ class GroupResourceTest extends BaseIntegrationTest {
 
     @Inject
     GroupService groupService;
+
+    @Inject
+    PlaylistService playlistService;
 
     private static final String OWNER = "group-owner-uuid";
     private static final String MEMBER = "group-member-uuid";
@@ -98,6 +105,52 @@ class GroupResourceTest extends BaseIntegrationTest {
 
         given()
             .when().delete("/groups/" + groupId + "/members/" + MEMBER)
+            .then()
+            .statusCode(204);
+    }
+
+    @Test
+    @TestSecurity(user = OWNER, roles = {"user"})
+    void givenOwnerAndPlaylist_whenLinkPlaylist_thenReturns204() {
+        Integer groupId = createGroup("Band with Playlist");
+        Playlist playlist = playlistService.create(new CreatePlaylistRequest("My Songs", false, null), OWNER);
+
+        given()
+            .contentType(ContentType.JSON)
+            .body(new LinkPlaylistRequest(playlist.id))
+            .when().post("/groups/" + groupId + "/playlists")
+            .then()
+            .statusCode(204);
+    }
+
+    @Test
+    @TestSecurity(user = MEMBER, roles = {"user"})
+    void givenMember_whenGetPlaylists_thenReturnsList() {
+        br.com.cifras.group.domain.Group group = groupService.createGroup("Band with Shared Playlists", OWNER);
+        Integer groupId = group.id.intValue();
+        groupService.addMember(groupId.longValue(), MEMBER, OWNER);
+        Playlist playlist = playlistService.create(new CreatePlaylistRequest("Setlist", false, null), OWNER);
+        groupService.linkPlaylist(groupId.longValue(), playlist.id, OWNER);
+
+        given()
+            .when().get("/groups/" + groupId + "/playlists")
+            .then()
+            .statusCode(200)
+            .body("$", instanceOf(java.util.List.class))
+            .body("size()", equalTo(1))
+            .body("[0].name", equalTo("Setlist"))
+            .body("[0].isCollaborative", equalTo(true));
+    }
+
+    @Test
+    @TestSecurity(user = OWNER, roles = {"user"})
+    void givenOwner_whenUnlinkPlaylist_thenReturns204() {
+        Integer groupId = createGroup("Band for Unlink");
+        Playlist playlist = playlistService.create(new CreatePlaylistRequest("Temporary Setlist", false, null), OWNER);
+        groupService.linkPlaylist(groupId.longValue(), playlist.id, OWNER);
+
+        given()
+            .when().delete("/groups/" + groupId + "/playlists/" + playlist.id)
             .then()
             .statusCode(204);
     }
