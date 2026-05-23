@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Sidebar } from '../components/layout/Sidebar';
-import { ArrowLeft, PlayCircle, GripVertical, Trash2, ChevronUp, ChevronDown, Plus } from 'lucide-react';
+import { ArrowLeft, PlayCircle, GripVertical, Trash2, ChevronUp, ChevronDown, Plus, Search } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 export const PlaylistViewPage: React.FC = () => {
@@ -14,8 +14,13 @@ export const PlaylistViewPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [allSongs, setAllSongs] = useState<any[]>([]);
-  const [selectedSongId, setSelectedSongId] = useState<string>('');
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const availableSongs = allSongs.filter(s => 
+    !songs.some(ps => ps.id === s.id) && 
+    (s.title.toLowerCase().includes(searchQuery.toLowerCase()) || s.artist.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
 
   useEffect(() => {
     fetch(`/api/playlists/${id}`, {
@@ -206,9 +211,14 @@ export const PlaylistViewPage: React.FC = () => {
                   <div className="flex-1 min-w-0">
                     <h3 className="font-bold text-gray-900 dark:text-white truncate">{song.title}</h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{song.artist}</p>
+                    {/* Key on mobile */}
+                    <div className="mt-1 sm:hidden inline-block px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded font-mono text-xs text-gray-800 dark:text-gray-200 font-bold">
+                      {song.originalKey || song.key || '?'}
+                    </div>
                   </div>
                   
-                  <div className="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded font-mono text-sm text-gray-800 dark:text-gray-200 font-bold">
+                  {/* Key on desktop */}
+                  <div className="hidden sm:block px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded font-mono text-sm text-gray-800 dark:text-gray-200 font-bold">
                     {song.originalKey || song.key || '?'}
                   </div>
                   
@@ -225,55 +235,78 @@ export const PlaylistViewPage: React.FC = () => {
         </div>
       </main>
 
-      {/* Add Song Modal */}
+      {/* Add Song Modal (Full Screen) */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6 shadow-2xl">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Add Song to Playlist</h2>
-            
-            <select
-              value={selectedSongId}
-              onChange={(e) => setSelectedSongId(e.target.value)}
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg mb-6 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#aa3bff] outline-none"
-            >
-              <option value="">Select a song...</option>
-              {allSongs.map(s => (
-                <option key={s.id} value={s.id}>{s.title} - {s.artist}</option>
-              ))}
-            </select>
-            
-            <div className="flex justify-end gap-3">
-              <button onClick={() => setShowAddModal(false)} className="px-4 py-2 font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">Cancel</button>
-              <button 
-                onClick={() => {
-                  if (!selectedSongId) return;
-                  fetch(`/api/playlists/${id}/songs`, {
-                    method: 'POST',
-                    headers: { 
-                      'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                      'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ songId: parseInt(selectedSongId), position: songs.length })
-                  })
-                  .then(res => {
-                    if (res.ok) {
-                      const addedSong = allSongs.find(s => s.id.toString() === selectedSongId);
-                      if (addedSong) {
-                        setSongs([...songs, addedSong]);
-                      }
-                      setShowAddModal(false);
-                      setSelectedSongId('');
-                    } else {
-                      console.error('Failed to add song');
-                    }
-                  })
-                  .catch(console.error);
-                }}
-                disabled={!selectedSongId}
-                className="px-4 py-2 font-medium bg-[#aa3bff] hover:bg-[#902be6] text-white rounded-lg transition-colors disabled:opacity-50"
-              >
-                Add
+        <div className="fixed inset-0 bg-gray-50 dark:bg-gray-900 z-50 flex flex-col">
+          <header className="h-20 flex items-center justify-between px-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shrink-0">
+            <div className="flex items-center gap-4">
+              <button onClick={() => setShowAddModal(false)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full text-gray-600 dark:text-gray-300">
+                <ArrowLeft className="w-6 h-6" />
               </button>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">Add Songs</h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Select songs to add to your playlist</p>
+              </div>
+            </div>
+          </header>
+
+          <div className="flex-1 flex flex-col max-w-3xl mx-auto w-full p-6 overflow-hidden">
+            <div className="relative mb-6 shrink-0">
+              <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search by title or artist..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#aa3bff] outline-none shadow-sm"
+              />
+            </div>
+
+            <div className="flex-1 overflow-y-auto bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+              {availableSongs.length === 0 ? (
+                <div className="text-center py-12 text-gray-500">
+                  {allSongs.length === 0 ? 'Loading library...' : 'No matching songs found.'}
+                </div>
+              ) : (
+                availableSongs.map(s => (
+                  <div key={s.id} className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                    <div className="flex-1 min-w-0 pr-4">
+                      <h3 className="font-bold text-gray-900 dark:text-white truncate">{s.title}</h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{s.artist}</p>
+                    </div>
+                    
+                    <div className="flex items-center gap-4">
+                      <div className="hidden sm:block px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded font-mono text-sm text-gray-800 dark:text-gray-200 font-bold">
+                        {s.originalKey || s.key || '?'}
+                      </div>
+                      <button 
+                        onClick={() => {
+                          fetch(`/api/playlists/${id}/songs`, {
+                            method: 'POST',
+                            headers: { 
+                              'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                              'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ songId: s.id, position: songs.length })
+                          })
+                          .then(res => {
+                            if (res.ok) {
+                              setSongs(prev => [...prev, s]);
+                            } else {
+                              console.error('Failed to add song');
+                            }
+                          })
+                          .catch(console.error);
+                        }}
+                        className="flex items-center gap-1 px-4 py-2 bg-gray-100 hover:bg-[#aa3bff] hover:text-white dark:bg-gray-700 dark:hover:bg-[#aa3bff] text-gray-700 dark:text-gray-200 rounded-lg font-bold transition-colors"
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>Add</span>
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
