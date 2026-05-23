@@ -5,7 +5,7 @@ import { useAutoScroll } from '../hooks/useAutoScroll';
 
 export const TheaterModePage: React.FC = () => {
   const navigate = useNavigate();
-  const { playlistId } = useParams();
+  const { playlistId, songId } = useParams();
   
   const { isScrolling, speed, play, pause, setSpeed, containerRef } = useAutoScroll(3);
   const [currentKey, setCurrentKey] = useState('G');
@@ -53,7 +53,7 @@ But fuck it, it was something to do`;
           <p className="text-gray-400">Mike Posner • Song 1 of 3</p>
         </div>
         <button 
-          onClick={() => navigate(playlistId ? `/playlists/${playlistId}` : '/songs')}
+          onClick={() => navigate(playlistId ? `/playlists/${playlistId}` : songId ? `/song/${songId}` : '/songs')}
           className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full font-medium transition-colors"
           data-testid="exit-theater-btn"
         >

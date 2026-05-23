@@ -33,6 +33,7 @@ function App() {
       <Route path="/playlists" element={<PrivateRoute><PlaylistsPage /></PrivateRoute>} />
       <Route path="/playlists/:id" element={<PrivateRoute><PlaylistViewPage /></PrivateRoute>} />
       <Route path="/theater/:playlistId" element={<PrivateRoute><TheaterModePage /></PrivateRoute>} />
+      <Route path="/theater/song/:songId" element={<PrivateRoute><TheaterModePage /></PrivateRoute>} />
       <Route path="/search" element={<PrivateRoute><SearchPage /></PrivateRoute>} />
 
       {/* Phase 5 Routes */}

@@ -67,6 +67,7 @@ To show Avicii I was cool`
             </button>
             
             <button 
+              onClick={() => navigate(`/theater/song/${id}`)}
               className="flex items-center gap-2 bg-[#aa3bff] hover:bg-[#902be6] text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm"
               data-testid="theater-mode-btn"
             >
