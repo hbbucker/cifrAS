@@ -14,12 +14,12 @@ public record MusicalKey(String root, String suffix) {
     /**
      * Chromatic scale — sharps convention.
      */
-    static final String[] SHARPS = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+    public static final String[] SHARPS = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
 
     /**
      * Chromatic scale — flats convention.
      */
-    static final String[] FLATS = {"C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"};
+    public static final String[] FLATS = {"C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"};
 
     /**
      * Parses a chord string into root + suffix.
