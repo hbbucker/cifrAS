@@ -44,9 +44,9 @@ public class GroupResource {
 
     @POST
     @Path("/{id}/members")
-    public Response addMember(@PathParam("id") Long id, @Valid AddMemberRequest request) {
+    public Response inviteMember(@PathParam("id") Long id, @Valid AddMemberRequest request) {
         String userId = securityUtils.getCurrentUserId();
-        groupService.addMember(id, request.targetUserId(), userId);
+        groupService.inviteMember(id, request.email(), userId);
         return Response.noContent().build();
     }
 

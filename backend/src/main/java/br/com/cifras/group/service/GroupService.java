@@ -4,6 +4,10 @@ import br.com.cifras.group.domain.Group;
 import br.com.cifras.group.domain.GroupMember;
 import br.com.cifras.group.domain.GroupRole;
 import br.com.cifras.group.repository.GroupRepository;
+import br.com.cifras.group.repository.GroupInvitationRepository;
+import br.com.cifras.group.domain.GroupInvitation;
+import br.com.cifras.group.domain.GroupInvitationStatus;
+import br.com.cifras.shared.security.UserService;
 import br.com.cifras.shared.exception.ForbiddenException;
 import br.com.cifras.shared.exception.NotFoundException;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
@@ -22,6 +26,12 @@ public class GroupService {
 
     @Inject
     GroupRepository groupRepository;
+
+    @Inject
+    GroupInvitationRepository invitationRepository;
+
+    @Inject
+    UserService userService;
 
     public boolean isMember(Long groupId, String userId) {
         return groupRepository.isMember(groupId, userId);
@@ -59,6 +69,77 @@ public class GroupService {
         member.userId = targetUserId;
         member.role = GroupRole.MEMBER;
         member.persist();
+    }
+
+    @Transactional
+    public void inviteMember(Long groupId, String targetEmail, String requestingUserId) {
+        if (!isOwner(groupId, requestingUserId)) throw new ForbiddenException("Only OWNER can invite members");
+        Group group = Group.findById(groupId);
+        if (group == null) throw new NotFoundException("Group not found");
+
+        String targetUserId = userService.getUserIdByEmail(targetEmail);
+        if (targetUserId == null) {
+            throw new IllegalArgumentException("User with provided email is not registered.");
+        }
+        
+        if (isMember(groupId, targetUserId)) {
+            throw new IllegalArgumentException("User is already a member of this group.");
+        }
+
+        GroupInvitation invite = new GroupInvitation();
+        invite.group = group;
+        invite.inviterId = requestingUserId;
+        invite.inviteeEmail = targetEmail;
+        invite.status = GroupInvitationStatus.PENDING;
+        invitationRepository.persist(invite);
+    }
+
+    @Transactional
+    public void acceptInvite(Long inviteId, String currentUserEmail, String currentUserId) {
+        GroupInvitation invite = invitationRepository.findById(inviteId);
+        if (invite == null || !invite.inviteeEmail.equalsIgnoreCase(currentUserEmail)) {
+            throw new NotFoundException("Invitation not found");
+        }
+        if (invite.status != GroupInvitationStatus.PENDING) {
+            throw new IllegalArgumentException("Invitation is not pending");
+        }
+        invite.status = GroupInvitationStatus.ACCEPTED;
+        
+        if (!isMember(invite.group.id, currentUserId)) {
+            GroupMember member = new GroupMember();
+            member.group = invite.group;
+            member.userId = currentUserId;
+            member.role = GroupRole.MEMBER;
+            member.persist();
+        }
+    }
+
+    @Transactional
+    public void declineInvite(Long inviteId, String currentUserEmail) {
+        GroupInvitation invite = invitationRepository.findById(inviteId);
+        if (invite == null || !invite.inviteeEmail.equalsIgnoreCase(currentUserEmail)) {
+            throw new NotFoundException("Invitation not found");
+        }
+        if (invite.status != GroupInvitationStatus.PENDING) {
+            throw new IllegalArgumentException("Invitation is not pending");
+        }
+        invite.status = GroupInvitationStatus.DECLINED;
+    }
+
+    public List<GroupInvitation> getPendingInvites(String email) {
+        return invitationRepository.findPendingByEmail(email);
+    }
+
+    public List<GroupInvitation> getDeclinedInvites(String inviterId) {
+        return invitationRepository.list("inviterId = ?1 and status = ?2", inviterId, GroupInvitationStatus.DECLINED);
+    }
+
+    @Transactional
+    public void dismissInvite(Long inviteId, String inviterId) {
+        GroupInvitation invite = invitationRepository.findById(inviteId);
+        if (invite != null && invite.inviterId.equals(inviterId)) {
+            invite.delete();
+        }
     }
 
     @Transactional

@@ -31,6 +31,10 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
             return buildResponse(404, "Not found", null);
         }
 
+        if (exception instanceof IllegalArgumentException) {
+            return buildResponse(400, exception.getMessage(), null);
+        }
+
         // Unhandled exception — log with unique traceId, never expose details
         String traceId = UUID.randomUUID().toString();
         LOG.errorf(exception, "Unhandled exception [traceId=%s]", traceId);

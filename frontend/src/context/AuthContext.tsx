@@ -38,8 +38,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const checkAuth = async () => {
       const token = localStorage.getItem('token');
       if (token && token !== 'mock-token' && token !== 'mock-token-reg') {
-        // Assume valid for now. Real validity checked upon API requests via 401 interceptor.
-        setUser({ id: 'user', email: 'user@example.com', name: 'Musician' });
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          setUser({ 
+            id: payload.sub || 'user', 
+            email: payload.email || 'user@example.com', 
+            name: payload.user_metadata?.full_name || payload.email || 'Musician' 
+          });
+        } catch (e) {
+          // Fallback if parsing fails
+          setUser({ id: 'user', email: 'user@example.com', name: 'Musician' });
+        }
       } else {
         logout();
       }

@@ -34,4 +34,14 @@ public class SecurityUtils {
     public boolean isAuthenticated() {
         return !securityIdentity.isAnonymous();
     }
+
+    /**
+     * Returns the email from the JWT claims, if present.
+     */
+    public String getCurrentUserEmail() {
+        if (jwt != null && jwt.containsClaim("email")) {
+            return jwt.getClaim("email");
+        }
+        return null;
+    }
 }
