@@ -60,4 +60,21 @@ describe('MusicCard Component', () => {
     fireEvent.click(screen.getByText('Delete'));
     expect(mockProps.onDelete).toHaveBeenCalledWith('1');
   });
+
+  it('stops event propagation when clicking menu items', () => {
+    const mockClick = vi.fn();
+    render(
+      <div onClick={mockClick} data-testid="parent-wrapper">
+        <MusicCard {...mockProps} />
+      </div>
+    );
+    
+    // Click menu button
+    fireEvent.click(screen.getByTestId('menu-btn'));
+    expect(mockClick).not.toHaveBeenCalled();
+    
+    // Click Edit
+    fireEvent.click(screen.getByText('Edit'));
+    expect(mockClick).not.toHaveBeenCalled();
+  });
 });

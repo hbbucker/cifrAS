@@ -63,14 +63,15 @@ export const DashboardPage: React.FC = () => {
           ) : songs.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {songs.map((song) => (
-                <MusicCard 
-                  key={song.id} 
-                  {...song} 
-                  onToggleFavorite={() => {}}
-                  onEdit={() => {}}
-                  onShare={() => {}}
-                  onDelete={() => {}}
-                />
+                <div key={song.id} onClick={() => navigate(`/song/${song.id}`)} className="cursor-pointer" data-testid={`view-song-${song.id}`}>
+                  <MusicCard 
+                    {...song} 
+                    onToggleFavorite={() => {}}
+                    onEdit={(id) => navigate(`/songs/edit/${id}`)}
+                    onShare={() => {}}
+                    onDelete={() => {}}
+                  />
+                </div>
               ))}
             </div>
           ) : (

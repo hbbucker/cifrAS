@@ -60,7 +60,7 @@ export const MusicCard: React.FC<MusicCardProps> = ({
       <div className="mt-auto flex justify-end">
         <div className="relative">
           <button 
-            onClick={() => setMenuOpen(!menuOpen)}
+            onClick={(e) => { e.stopPropagation(); setMenuOpen(!menuOpen); }}
             className="w-12 h-12 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500"
             aria-label="Actions menu"
             aria-expanded={menuOpen}
@@ -71,13 +71,13 @@ export const MusicCard: React.FC<MusicCardProps> = ({
 
           {menuOpen && (
             <div className="absolute right-0 top-12 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-10 py-1" data-testid="dropdown-menu">
-              <button onClick={() => { onEdit(id); setMenuOpen(false); }} className="w-full text-left px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
+              <button onClick={(e) => { e.stopPropagation(); onEdit(id); setMenuOpen(false); }} className="w-full text-left px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
                 <Edit2 className="w-4 h-4" /> Edit
               </button>
-              <button onClick={() => { onShare(id); setMenuOpen(false); }} className="w-full text-left px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
+              <button onClick={(e) => { e.stopPropagation(); onShare(id); setMenuOpen(false); }} className="w-full text-left px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
                 <Share2 className="w-4 h-4" /> Share
               </button>
-              <button onClick={() => { onDelete(id); setMenuOpen(false); }} className="w-full text-left px-4 py-3 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 flex items-center gap-2 text-sm">
+              <button onClick={(e) => { e.stopPropagation(); onDelete(id); setMenuOpen(false); }} className="w-full text-left px-4 py-3 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 flex items-center gap-2 text-sm">
                 <Trash2 className="w-4 h-4" /> Delete
               </button>
             </div>

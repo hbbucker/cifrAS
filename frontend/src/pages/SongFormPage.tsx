@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sidebar } from '../components/layout/Sidebar';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Save, ArrowLeft } from 'lucide-react';
@@ -10,12 +10,32 @@ export const SongFormPage: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  const [title, setTitle] = useState(id ? 'Edit Mode Song' : '');
+  const [title, setTitle] = useState('');
   const [artist, setArtist] = useState('');
   const [key, setKey] = useState('C');
   const [content, setContent] = useState('');
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
+
+  useEffect(() => {
+    if (id) {
+      // Mock fetching song data
+      const mockSongs = [
+        { id: '1', title: 'Wonderwall', artist: 'Oasis', keySignature: 'F#m', content: '[Em]Today is [G]gonna be the day...' },
+        { id: '2', title: 'Hotel California', artist: 'Eagles', keySignature: 'Bm', content: '[Bm]On a dark desert highway...' },
+        { id: '3', title: 'Let It Be', artist: 'The Beatles', keySignature: 'C', content: 'When I [C]find myself in [G]times of trouble...' },
+      ];
+      
+      const song = mockSongs.find(s => s.id === id);
+      if (song) {
+        setTitle(song.title);
+        setArtist(song.artist);
+        setKey(song.keySignature);
+        setContent(song.content);
+        setIsDirty(false);
+      }
+    }
+  }, [id]);
 
   const handleSave = () => {
     if (!title || !artist || !content) {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sidebar } from '../components/layout/Sidebar';
 import { TransposePad } from '../components/music/TransposePad';
 import { ChordSheet } from '../components/music/ChordSheet';
@@ -9,15 +9,34 @@ export const SongViewPage: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [currentKey, setCurrentKey] = useState('G');
-  
-  const mockContent = `[Intro]
+  const [song, setSong] = useState({
+    title: 'I Took A Pill In Ibiza',
+    artist: 'Mike Posner',
+    content: `[Intro]
 G D Em C
 
 [Verse 1]
 G                 D
 I took a pill in Ibiza
                  Em                     C
-To show Avicii I was cool`;
+To show Avicii I was cool`
+  });
+
+  useEffect(() => {
+    if (id) {
+      const mockSongs = [
+        { id: '1', title: 'Wonderwall', artist: 'Oasis', keySignature: 'F#m', content: '[Em]Today is [G]gonna be the day...' },
+        { id: '2', title: 'Hotel California', artist: 'Eagles', keySignature: 'Bm', content: '[Bm]On a dark desert highway...' },
+        { id: '3', title: 'Let It Be', artist: 'The Beatles', keySignature: 'C', content: 'When I [C]find myself in [G]times of trouble...' },
+      ];
+      
+      const foundSong = mockSongs.find(s => s.id === id);
+      if (foundSong) {
+        setSong(foundSong);
+        setCurrentKey(foundSong.keySignature);
+      }
+    }
+  }, [id]);
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
@@ -29,8 +48,8 @@ To show Avicii I was cool`;
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div>
-              <h1 className="text-lg font-bold text-gray-900 dark:text-white leading-tight">I Took A Pill In Ibiza</h1>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Mike Posner</p>
+              <h1 className="text-lg font-bold text-gray-900 dark:text-white leading-tight">{song.title}</h1>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{song.artist}</p>
             </div>
           </div>
           
@@ -57,7 +76,7 @@ To show Avicii I was cool`;
 
         <div className="flex-1 overflow-y-auto p-6 bg-white dark:bg-gray-900">
           <div className="max-w-3xl mx-auto">
-            <ChordSheet content={mockContent} fontSize={20} height={600} />
+            <ChordSheet content={song.content} fontSize={20} height={600} />
           </div>
         </div>
       </main>
