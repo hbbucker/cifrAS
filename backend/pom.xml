@@ -74,11 +74,7 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-hibernate-validator</artifactId>
         </dependency>
-        <dependency>
-            <groupId>io.hypersistence</groupId>
-            <artifactId>hypersistence-utils-hibernate-70</artifactId>
-            <version>3.10.2</version>
-        </dependency>
+        <!-- JSONB handled natively by Hibernate 6.4+ via @JdbcTypeCode(SqlTypes.JSON) -->
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-smallrye-jwt-build</artifactId>
