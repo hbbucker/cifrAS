@@ -61,31 +61,8 @@ export const useAutoScroll = (initialSpeed = 3): AutoScrollResult => {
     };
   }, [isScrolling, animate]);
 
-  // Handle manual touch drag to halt
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
+  // Manual scroll interruption has been removed as per user request
 
-    const handleTouchStart = () => {
-      if (isScrolling) {
-        pause();
-      }
-    };
-
-    const handleWheel = () => {
-       if (isScrolling) {
-         pause();
-       }
-    };
-
-    container.addEventListener('touchstart', handleTouchStart, { passive: true });
-    container.addEventListener('wheel', handleWheel, { passive: true });
-
-    return () => {
-      container.removeEventListener('touchstart', handleTouchStart);
-      container.removeEventListener('wheel', handleWheel);
-    };
-  }, [isScrolling, pause]);
 
   return { isScrolling, speed, play, pause, setSpeed, containerRef };
 };

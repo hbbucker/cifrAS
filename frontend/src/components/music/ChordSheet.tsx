@@ -5,13 +5,15 @@ interface ChordSheetProps {
   fontSize?: number;
   width?: number | string;
   height?: number | string;
+  transparent?: boolean;
 }
 
 export const ChordSheet: React.FC<ChordSheetProps> = ({ 
   content, 
   fontSize = 18, 
   width = '100%', 
-  height = '100%' 
+  height = '100%',
+  transparent = false
 }) => {
   // Parse content line by line
   const lines = useMemo(() => content.split('\n'), [content]);
@@ -70,8 +72,8 @@ export const ChordSheet: React.FC<ChordSheetProps> = ({
 
   return (
     <div 
-      className="bg-white dark:bg-gray-900 rounded p-4 border border-gray-100 dark:border-gray-800 shadow-sm overflow-y-auto"
-      style={{ fontSize: `${fontSize}px`, width, height }}
+      className={transparent ? "w-full overflow-hidden" : "bg-white dark:bg-gray-900 rounded p-4 border border-gray-100 dark:border-gray-800 shadow-sm overflow-y-auto"}
+      style={transparent ? { fontSize: `${fontSize}px` } : { fontSize: `${fontSize}px`, width, height }}
       data-testid="chord-sheet-container"
     >
       <div className="h-full w-full" style={{ lineHeight: `${itemSize}px` }}>
@@ -82,7 +84,7 @@ export const ChordSheet: React.FC<ChordSheetProps> = ({
           const isTabLine = /^[eBGDAEa-g][#b]?\|/.test(trimmed);
           const isStrumLine = /^[\s]*[↓↑v^]+[\s↓↑v^]*$/.test(line) && trimmed.length > 0;
           
-          let lineClasses = 'text-gray-800 dark:text-gray-200';
+          let lineClasses = transparent ? 'text-inherit' : 'text-gray-800 dark:text-gray-200';
           if (isChordLine) {
             lineClasses = 'text-[#aa3bff] font-bold';
           } else if (isSectionHeader) {
