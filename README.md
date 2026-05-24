@@ -45,23 +45,16 @@ O projeto adota uma arquitetura full-stack moderna, focada em performance e esca
 * **Maven** (ou utilize o wrapper `./mvnw` incluso)
 * Conta no **Supabase** (para as variáveis de ambiente do backend)
 
-### 1. Configurando o Backend (Quarkus)
-Navegue até a pasta `backend/` e configure o arquivo de ambiente:
+### 1. Configurando o Projeto (Quarkus + Quinoa + React)
+Navegue até a pasta `codebase/` e configure o arquivo de ambiente:
 ```bash
-cd backend
+cd codebase
 # Crie seu arquivo .env baseado nas variáveis necessárias (Supabase URL, API Keys, DB Password)
 ./mvnw quarkus:dev
 ```
-O backend estará rodando em `http://localhost:8080`.
-
-### 2. Configurando o Frontend (React)
-Navegue até a pasta `frontend/`:
-```bash
-cd frontend
-npm install
-npm run dev
-```
-O frontend iniciará via Vite em `http://localhost:5173`. As requisições de API são automaticamente enviadas via proxy para o backend (porta 8080).
+O Quarkus irá compilar o backend e utilizar a extensão Quinoa para rodar o Vite e servir o frontend automaticamente.
+Acesse a aplicação em `http://localhost:8080`.
+O backend (REST API) estará disponível em `http://localhost:8080/api` e o frontend estará na raiz.
 
 ---
 
