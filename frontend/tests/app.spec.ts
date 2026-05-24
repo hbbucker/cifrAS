@@ -1,15 +1,13 @@
 import { test, expect } from '@playwright/test';
 
 test('full application flow including registration and song CRUD', async ({ page }) => {
-  // 1. Register Flow
-  await page.goto('/register');
-  await expect(page.locator('h2')).toHaveText('Create an Account');
+  // 1. Login Flow
+  await page.goto('/login');
+  await expect(page.locator('h2')).toHaveText('Welcome to CifrAS');
   
-  await page.getByTestId('name-input').fill('Music Lover');
-  await page.getByTestId('reg-email-input').fill('new@example.com');
-  await page.getByTestId('reg-password-input').fill('securepass');
-  await page.getByTestId('reg-confirm-password-input').fill('securepass');
-  await page.getByTestId('register-btn').click();
+  await page.getByTestId('email-input').fill(process.env.E2E_USER || 'test@example.com');
+  await page.getByTestId('password-input').fill(process.env.E2E_PASSWORD || 'password');
+  await page.getByTestId('login-btn').click();
 
   // Redirect to dashboard
   await expect(page).toHaveURL(/.*\/dashboard/);

@@ -10,6 +10,7 @@ jobs:
   backend:
     name: Backend Validation and Tests
     runs-on: ubuntu-latest
+    environment: pipeline
     defaults:
       run:
         working-directory: ./backend
@@ -31,6 +32,7 @@ jobs:
   frontend:
     name: Frontend Validation and Tests
     runs-on: ubuntu-latest
+    environment: pipeline
     defaults:
       run:
         working-directory: ./frontend
@@ -55,8 +57,33 @@ jobs:
       - name: Build App
         run: npm run build
 
+      - name: Set up Java 21 (For Backend)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Start Backend in Background
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_API_KEY: ${{ secrets.SUPABASE_API_KEY }}
+          SUPABASE_JWKS_URL: ${{ secrets.SUPABASE_JWKS_URL }}
+          SUPABASE_JWT_ISSUER: ${{ secrets.SUPABASE_JWT_ISSUER }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_URL: ${{ secrets.DB_URL }}
+        run: |
+          cd ../backend
+          ./mvnw clean compile quarkus:dev -Dquarkus.http.port=8080 &
+          # Wait until backend is healthy
+          timeout 60s bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:8080/q/health/ready)" != "200" ]]; do sleep 2; done' || false
+
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
       - name: Run Tests
+        env:
+          E2E_USER: ${{ secrets.E2E_USER }}
+          E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
         run: npm run e2e
