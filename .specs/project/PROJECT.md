@@ -13,24 +13,29 @@
 
 ## Tech Stack
 
+**Arquitetura Unificada (Quarkus Quinoa):**
+O projeto roda como um monólito onde o Quarkus gerencia tanto o servidor de backend REST quanto a compilação e entrega do frontend estático gerado pelo Vite/React.
+
 **Backend (Java Quarkus):**
 - Framework: Quarkus 3.x
 - Linguagem: Java 21
 - ORM: Panache (Hibernate Reactive ou JPA)
 - Banco de Dados: PostgreSQL via Supabase
 - Auth: Supabase Auth (JWT validation)
-- APIs: RESTful JSON
+- APIs: RESTful JSON (prefixadas em `/api`)
 
 **Frontend (React):**
-- Framework: React 18 + TypeScript
+- Framework: React 19 + TypeScript
+- Build/Server: Vite (integrado via Quinoa em `src/main/webui`)
 - Estilização: TailwindCSS
 - Gerenciamento de Estado: Context API (v1), Zustand (se necessário)
 - HTTP Client: Axios
 - Target: Web (PWA) — iOS/Android via React Native na v2
 
-**Infraestrutura:**
+**Infraestrutura e Testes:**
 - Supabase (PostgreSQL + Auth + Storage)
-- Deploy: A definir (Vercel/Fly.io)
+- Deploy: Executável nativo Quarkus (ou `.jar` standalone)
+- Testes: Testcontainers (Backend), Playwright (E2E Frontend)
 
 ## Scope
 

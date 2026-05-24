@@ -2,6 +2,7 @@
 
 ## Decisions
 
+- **[2026-05-24] Arquitetura Unificada:** Frontend React e Backend Quarkus migrados para uma única pasta `codebase/` utilizando a extensão **Quarkus Quinoa**. Simplifica desenvolvimento e implantação ao servir o frontend estático e as rotas `/api` a partir do mesmo servidor Quarkus.
 - **[2026-05-23] Stack confirmada:** Quarkus (Java) + React (TypeScript) + Supabase (PostgreSQL + Auth). Sem mudança prevista para v1.
 - **[2026-05-23] Convenção enarmônica default:** sustenidos (#) — configurável por usuário em v2.
 - **[2026-05-23] Gerenciamento de estado frontend:** Context API para v1; migração para Zustand se surgir complexidade de estado global.
