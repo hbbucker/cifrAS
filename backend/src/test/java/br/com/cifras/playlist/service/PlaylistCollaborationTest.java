@@ -21,8 +21,10 @@ import static org.junit.jupiter.api.Assertions.*;
  * 2. Member of the linked group CANNOT add songs to a collaborative playlist (read-only).
  * 3. Non-member CANNOT read or edit a collaborative playlist.
  */
+import br.com.cifras.BaseIntegrationTest;
+
 @QuarkusTest
-class PlaylistCollaborationTest {
+class PlaylistCollaborationTest extends BaseIntegrationTest {
 
     @Inject
     PlaylistService playlistService;

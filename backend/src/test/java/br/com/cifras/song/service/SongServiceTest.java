@@ -25,8 +25,10 @@ import static org.junit.jupiter.api.Assertions.*;
  * 5. softDelete() marks deletedAt; song disappears from list
  * 6. findByIdAndUser() throws NotFoundException for another user's song
  */
+import br.com.cifras.BaseIntegrationTest;
+
 @QuarkusTest
-class SongServiceTest {
+class SongServiceTest extends BaseIntegrationTest {
 
     @Inject
     SongService songService;

@@ -16,8 +16,10 @@ import static org.junit.jupiter.api.Assertions.*;
  * 2. ForbiddenException → 403 with error message
  * 3. NotFoundException → 404 with error message
  */
+import br.com.cifras.BaseIntegrationTest;
+
 @QuarkusTest
-class GlobalExceptionMapperTest {
+class GlobalExceptionMapperTest extends BaseIntegrationTest {
 
     @Inject
     GlobalExceptionMapper mapper;

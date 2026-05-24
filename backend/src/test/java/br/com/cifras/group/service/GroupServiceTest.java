@@ -20,8 +20,10 @@ import static org.junit.jupiter.api.Assertions.*;
  * 5. removeMember() removes existing member
  * 6. removeMember() throws ForbiddenException if non-owner tries to remove
  */
+import br.com.cifras.BaseIntegrationTest;
+
 @QuarkusTest
-class GroupServiceTest {
+class GroupServiceTest extends BaseIntegrationTest {
 
     @Inject
     GroupService groupService;

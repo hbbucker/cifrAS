@@ -16,8 +16,10 @@ import static org.hamcrest.Matchers.*;
  * 2. Request with invalid token returns 401
  * 3. Valid token (via @TestSecurity) returns 200 with userId
  */
+import br.com.cifras.BaseIntegrationTest;
+
 @QuarkusTest
-class JwtValidationTest {
+class JwtValidationTest extends BaseIntegrationTest {
 
     /**
      * Test 1: Requests without Authorization header must be rejected with 401.

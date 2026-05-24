@@ -23,8 +23,10 @@ import static org.junit.jupiter.api.Assertions.*;
  * 4. removeSong() deletes junction record
  * 5. Only owner can modify playlist (ForbiddenException for others)
  */
+import br.com.cifras.BaseIntegrationTest;
+
 @QuarkusTest
-class PlaylistServiceTest {
+class PlaylistServiceTest extends BaseIntegrationTest {
 
     @Inject
     PlaylistService playlistService;
