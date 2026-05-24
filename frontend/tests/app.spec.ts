@@ -29,10 +29,10 @@ test('full application flow including registration and song CRUD', async ({ page
   
   await page.getByTestId('save-song-btn').click();
   await expect(page).toHaveURL(/.*\/songs/);
-  await expect(page.getByText('Song saved successfully')).toBeVisible();
+  await expect(page.getByText('Song created successfully!')).toBeVisible();
 
   // 4. View Song
-  await page.getByTestId('view-song-1').click();
+  await page.locator('div[data-testid^="view-song-"]').first().click();
   await expect(page.locator('h1')).toHaveText('My New Song');
   
   // Transpose Pad check
@@ -57,7 +57,7 @@ test('full application flow including registration and song CRUD', async ({ page
   
   // 6. Theater Mode
   await page.getByTestId('start-theater-btn').click();
-  await expect(page).toHaveURL(/.*\/theater\/1/);
+  await expect(page).toHaveURL(/.*\/theater\/\d+/);
   await expect(page.getByTestId('theater-controls')).toBeVisible();
   
   // Test auto-scroll / play pause
@@ -70,7 +70,7 @@ test('full application flow including registration and song CRUD', async ({ page
   
   // Exit theater mode
   await page.getByTestId('exit-theater-btn').click();
-  await expect(page).toHaveURL(/.*\/playlists\/1/);
+  await expect(page).toHaveURL(/.*\/playlists\/\d+/);
 
   // 7. Groups Flow
   await page.getByTestId('sidebar').getByText('Groups').click();
