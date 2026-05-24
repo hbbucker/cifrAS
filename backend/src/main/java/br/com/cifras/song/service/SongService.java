@@ -7,6 +7,7 @@ import br.com.cifras.song.domain.Song;
 import br.com.cifras.song.dto.CreateSongRequest;
 import br.com.cifras.song.dto.UpdateSongRequest;
 import br.com.cifras.song.repository.SongRepository;
+import br.com.cifras.playlist.domain.PlaylistSong;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -44,7 +45,13 @@ public class SongService {
             .orElseThrow(() -> new NotFoundException("Song not found: " + id));
 
         if (!userId.equals(song.userId)) {
-            throw new NotFoundException("Song not found: " + id); // Don't leak existence to other users
+            long count = PlaylistSong.count(
+                "song.id = ?1 and playlist.isCollaborative = true and playlist.group.id in " +
+                "(select gm.group.id from GroupMember gm where gm.userId = ?2)", id, userId);
+            
+            if (count == 0) {
+                throw new NotFoundException("Song not found: " + id); // Don't leak existence to other users
+            }
         }
 
         return song;
