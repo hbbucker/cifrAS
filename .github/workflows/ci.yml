@@ -7,8 +7,8 @@ on:
     branches: [ master, main ]
 
 jobs:
-  backend:
-    name: Backend Validation and Tests
+  build-and-test:
+    name: Fullstack Build and Tests
     runs-on: ubuntu-latest
     environment: pipeline
     defaults:
@@ -26,21 +26,6 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Build and Test with Maven
-        run: ./mvnw clean verify
-        
-  frontend:
-    name: Frontend Validation and Tests
-    runs-on: ubuntu-latest
-    environment: pipeline
-    defaults:
-      run:
-        working-directory: ./codebase/src/main/webui
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -48,23 +33,18 @@ jobs:
           cache: 'npm'
           cache-dependency-path: './codebase/src/main/webui/package-lock.json'
 
-      - name: Install Dependencies
+      - name: Install Frontend Dependencies
+        working-directory: ./codebase/src/main/webui
         run: npm ci
 
-      - name: Run Linter
+      - name: Run Frontend Linter
+        working-directory: ./codebase/src/main/webui
         run: npm run lint
 
-      - name: Build App
-        run: npm run build
+      - name: Build and Test Backend (includes Quinoa Frontend Build)
+        run: ./mvnw clean verify
 
-      - name: Set up Java 21 (For Backend)
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-          cache: 'maven'
-
-      - name: Start Backend in Background
+      - name: Start Backend in Background (for E2E)
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_API_KEY: ${{ secrets.SUPABASE_API_KEY }}
@@ -74,15 +54,16 @@ jobs:
           DB_PASSWORD: ""
           DB_URL: ""
         run: |
-          cd ../../../
-          ./mvnw clean compile quarkus:dev -Dquarkus.http.port=8080 &
+          ./mvnw compile quarkus:dev -Dquarkus.http.port=8080 &
           # Wait until backend is fully ready
-          timeout 60s bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:8080/q/health/ready)" != "200" ]]; do sleep 2; done' || false
+          timeout 300s bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:8080/q/health/ready)" != "200" ]]; do sleep 5; done' || false
 
       - name: Install Playwright Browsers
+        working-directory: ./codebase/src/main/webui
         run: npx playwright install --with-deps
 
-      - name: Run Tests
+      - name: Run E2E Tests
+        working-directory: ./codebase/src/main/webui
         env:
           E2E_USER: ${{ secrets.E2E_USER }}
           E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
