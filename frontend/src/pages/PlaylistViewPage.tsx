@@ -3,11 +3,13 @@ import { useAuth } from '../context/AuthContext';
 import { Sidebar } from '../components/layout/Sidebar';
 import { ArrowLeft, PlayCircle, GripVertical, Trash2, ChevronUp, ChevronDown, Plus, Search } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useToast } from '../context/ToastContext';
 
 export const PlaylistViewPage: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { user, logout } = useAuth();
+  const { toast } = useToast();
   
   const [playlist, setPlaylist] = useState<any>(null);
   const [songs, setSongs] = useState<any[]>([]);
@@ -43,7 +45,7 @@ export const PlaylistViewPage: React.FC = () => {
       setLoading(false);
     })
     .catch(err => {
-      console.error(err);
+      toast('Failed to load playlist', 'error');
       setLoading(false);
     });
   }, [id]);
@@ -66,7 +68,7 @@ export const PlaylistViewPage: React.FC = () => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ orderedSongIds: orderedIds })
-    }).catch(console.error);
+    }).catch(() => toast('Failed to reorder playlist', 'error'));
   };
 
   const handleDrop = (dropIndex: number) => {
@@ -87,7 +89,7 @@ export const PlaylistViewPage: React.FC = () => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ orderedSongIds: orderedIds })
-    }).catch(console.error);
+    }).catch(() => toast('Failed to reorder playlist', 'error'));
   };
 
   const removeSong = (songId: string) => {
@@ -100,11 +102,12 @@ export const PlaylistViewPage: React.FC = () => {
     .then(res => {
       if (res.ok) {
         setSongs(prev => prev.filter(s => s.id !== songId));
+        toast('Song removed from playlist', 'success');
       } else {
-        console.error('Failed to remove song');
+        toast('Failed to remove song', 'error');
       }
     })
-    .catch(console.error);
+    .catch(() => toast('Failed to remove song', 'error'));
   };
 
   return (
@@ -139,7 +142,7 @@ export const PlaylistViewPage: React.FC = () => {
                     setAllSongs(items);
                     setShowAddModal(true);
                   })
-                  .catch(console.error);
+                  .catch(() => toast('Failed to fetch library', 'error'));
                 }}
                 className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-900 dark:text-white px-4 py-2.5 rounded-lg font-bold transition-colors"
               >
@@ -306,11 +309,12 @@ export const PlaylistViewPage: React.FC = () => {
                           .then(res => {
                             if (res.ok) {
                               setSongs(prev => [...prev, s]);
+                              toast('Song added to playlist', 'success');
                             } else {
-                              console.error('Failed to add song');
+                              toast('Failed to add song', 'error');
                             }
                           })
-                          .catch(console.error);
+                          .catch(() => toast('Failed to add song', 'error'));
                         }}
                         className="flex items-center gap-1 px-4 py-2 bg-gray-100 hover:bg-[#aa3bff] hover:text-white dark:bg-gray-700 dark:hover:bg-[#aa3bff] text-gray-700 dark:text-gray-200 rounded-lg font-bold transition-colors"
                       >

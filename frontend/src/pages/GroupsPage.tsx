@@ -4,10 +4,12 @@ import { GroupCard } from '../components/cards/GroupCard';
 import { Plus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '../context/ToastContext';
 
 export const GroupsPage: React.FC = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { toast } = useToast();
   const [groups, setGroups] = useState<any[]>([]);
   const [invites, setInvites] = useState<any[]>([]);
   const [declinedInvites, setDeclinedInvites] = useState<any[]>([]);
@@ -32,14 +34,14 @@ export const GroupsPage: React.FC = () => {
     })
     .then(res => res.ok ? res.json() : [])
     .then(data => setInvites(data))
-    .catch(console.error);
+    .catch(() => toast('Failed to load pending invites', 'error'));
 
     fetch('/api/invites/declined', {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
     })
     .then(res => res.ok ? res.json() : [])
     .then(data => setDeclinedInvites(data))
-    .catch(console.error);
+    .catch(() => toast('Failed to load declined invites', 'error'));
   };
 
   const handleAcceptInvite = (id: string) => {
@@ -47,23 +49,30 @@ export const GroupsPage: React.FC = () => {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
     }).then(() => {
+      toast('Invite accepted successfully', 'success');
       fetchInvites();
       fetchGroups();
-    });
+    }).catch(() => toast('Failed to accept invite', 'error'));
   };
 
   const handleDeclineInvite = (id: string) => {
     fetch(`/api/invites/${id}/decline`, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-    }).then(() => fetchInvites());
+    }).then(() => {
+      toast('Invite declined', 'success');
+      fetchInvites();
+    }).catch(() => toast('Failed to decline invite', 'error'));
   };
 
   const handleDismissDeclined = (id: string) => {
     fetch(`/api/invites/${id}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-    }).then(() => fetchInvites());
+    }).then(() => {
+      toast('Declined invite dismissed', 'success');
+      fetchInvites();
+    }).catch(() => toast('Failed to dismiss declined invite', 'error'));
   };
 
   const fetchGroups = () => {
@@ -91,7 +100,7 @@ export const GroupsPage: React.FC = () => {
       setLoading(false);
     })
     .catch(err => {
-      console.error(err);
+      toast('Failed to load groups', 'error');
       setLoading(false);
     });
   };
@@ -117,11 +126,12 @@ export const GroupsPage: React.FC = () => {
       return res.json();
     })
     .then(() => {
+      toast('Group created successfully', 'success');
       setShowCreateModal(false);
       setNewGroupName('');
       fetchGroups();
     })
-    .catch(console.error);
+    .catch(() => toast('Failed to create group', 'error'));
   };
 
   const handleInvite = async () => {
@@ -156,10 +166,11 @@ export const GroupsPage: React.FC = () => {
         return;
       }
 
+      toast('Invitation sent successfully', 'success');
       setShowInviteModal(false);
       setInviteEmail('');
     } catch (err) {
-      console.error(err);
+      toast('An unexpected error occurred while inviting', 'error');
       setInviteError('An unexpected error occurred.');
     }
   };
@@ -176,9 +187,10 @@ export const GroupsPage: React.FC = () => {
         throw new Error('Unauthorized');
       }
       if (!res.ok) throw new Error('Failed to leave group');
+      toast('Left group successfully', 'success');
       fetchGroups();
     })
-    .catch(console.error);
+    .catch(() => toast('Failed to leave group', 'error'));
   };
 
   return (

@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Sidebar } from '../components/layout/Sidebar';
 import { ArrowLeft, Users } from 'lucide-react';
-import { GroupPlaylistsSection } from '../features/groups/components/GroupPlaylistsSection';
-import { LinkPlaylistModal } from '../features/groups/components/LinkPlaylistModal';
+import { GroupPlaylistsSection } from '../components/groups/GroupPlaylistsSection';
+import { LinkPlaylistModal } from '../components/modals/LinkPlaylistModal';
 import { linkPlaylist } from '../api/groups';
 import { useAuth } from '../context/AuthContext';
 

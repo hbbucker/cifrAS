@@ -4,14 +4,20 @@ import { Sidebar } from '../components/layout/Sidebar';
 import { BottomNav } from '../components/layout/BottomNav';
 import { Plus, ListMusic, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '../context/ToastContext';
+import { Button } from '../components/ui/Button';
+import { EmptyState } from '../components/ui/EmptyState';
+import { Spinner } from '../components/ui/Spinner';
 
 export const PlaylistsPage: React.FC = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [showModal, setShowModal] = useState(false);
   const [newPlaylistName, setNewPlaylistName] = useState('');
   const { logout } = useAuth();
   const [playlists, setPlaylists] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isCreating, setIsCreating] = useState(false);
 
   useEffect(() => {
     fetchPlaylists();
@@ -35,7 +41,7 @@ export const PlaylistsPage: React.FC = () => {
       setLoading(false);
     })
     .catch(err => {
-      console.error(err);
+      toast('Failed to load playlists', 'error');
       setLoading(false);
     });
   };
@@ -43,6 +49,7 @@ export const PlaylistsPage: React.FC = () => {
   const handleCreatePlaylist = () => {
     if (!newPlaylistName.trim()) return;
     
+    setIsCreating(true);
     fetch('/api/playlists', {
       method: 'POST',
       headers: { 
@@ -64,11 +71,16 @@ export const PlaylistsPage: React.FC = () => {
       return res.json();
     })
     .then(data => {
+      toast('Playlist created', 'success');
       setShowModal(false);
       setNewPlaylistName('');
+      setIsCreating(false);
       navigate(`/playlists/${data.id}`);
     })
-    .catch(console.error);
+    .catch(() => {
+      toast('Failed to create playlist', 'error');
+      setIsCreating(false);
+    });
   };
 
   return (
@@ -77,25 +89,29 @@ export const PlaylistsPage: React.FC = () => {
       <main className="flex-1 flex flex-col overflow-hidden">
         <header className="h-16 flex items-center justify-between px-6 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
           <h1 className="text-xl font-bold text-gray-900 dark:text-white">Playlists</h1>
-          <button 
+          <Button 
             onClick={() => setShowModal(true)}
-            className="flex items-center gap-2 bg-[#aa3bff] hover:bg-[#902be6] text-white px-4 py-2 rounded-lg font-medium transition-colors"
             data-testid="create-playlist-btn"
           >
-            <Plus className="w-5 h-5" />
+            <Plus className="w-5 h-5 mr-1" />
             <span className="hidden sm:inline">New Playlist</span>
-          </button>
+          </Button>
         </header>
 
         <div className="flex-1 overflow-y-auto p-6 pb-24 sm:pb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {loading ? (
-              <div className="col-span-full text-center py-8 text-gray-500">Loading playlists...</div>
+            {loading && playlists.length === 0 ? (
+              <div className="col-span-full flex justify-center py-12">
+                <Spinner size="lg" />
+              </div>
             ) : playlists.length === 0 ? (
-              <div className="col-span-full text-center py-12 bg-white dark:bg-gray-800 rounded-xl border border-dashed border-gray-300 dark:border-gray-700">
-                <ListMusic className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No playlists yet</h3>
-                <p className="text-gray-500 dark:text-gray-400">Create your first playlist to organize your songs.</p>
+              <div className="col-span-full">
+                <EmptyState 
+                  icon={ListMusic} 
+                  title="No playlists yet" 
+                  description="Create your first playlist to organize your songs." 
+                  action={{ label: 'Create Playlist', onClick: () => setShowModal(true) }} 
+                />
               </div>
             ) : (
               playlists.map(pl => (
@@ -137,15 +153,15 @@ export const PlaylistsPage: React.FC = () => {
               data-testid="playlist-name-input"
             />
             <div className="flex justify-end gap-3">
-              <button onClick={() => setShowModal(false)} className="px-4 py-2 font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">Cancel</button>
-              <button 
+              <Button onClick={() => setShowModal(false)} variant="ghost">Cancel</Button>
+              <Button 
                 onClick={handleCreatePlaylist} 
-                className="px-4 py-2 font-medium bg-[#aa3bff] hover:bg-[#902be6] text-white rounded-lg transition-colors"
                 disabled={!newPlaylistName.trim()}
+                isLoading={isCreating}
                 data-testid="save-playlist-btn"
               >
                 Create
-              </button>
+              </Button>
             </div>
           </div>
         </div>

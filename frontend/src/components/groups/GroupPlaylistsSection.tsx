@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { getGroupPlaylists, unlinkPlaylist } from '../../../api/groups';
+import { getGroupPlaylists, unlinkPlaylist } from '../../api/groups';
 import { useNavigate } from 'react-router-dom';
-import { Play, Trash2, Plus } from 'lucide-react';
+import { Play, Trash2, Plus, ListMusic } from 'lucide-react';
+import { useToast } from '../../context/ToastContext';
+import { Button } from '../ui/Button';
+import { EmptyState } from '../ui/EmptyState';
+import { Spinner } from '../ui/Spinner';
 
 interface GroupPlaylistsSectionProps {
   groupId: string;
@@ -13,6 +17,7 @@ export const GroupPlaylistsSection: React.FC<GroupPlaylistsSectionProps> = ({ gr
   const [playlists, setPlaylists] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const fetchPlaylists = () => {
     setLoading(true);
@@ -22,7 +27,7 @@ export const GroupPlaylistsSection: React.FC<GroupPlaylistsSectionProps> = ({ gr
         setLoading(false);
       })
       .catch(err => {
-        console.error(err);
+        toast('Failed to load shared playlists', 'error');
         setLoading(false);
       });
   };
@@ -36,9 +41,9 @@ export const GroupPlaylistsSection: React.FC<GroupPlaylistsSectionProps> = ({ gr
     try {
       await unlinkPlaylist(groupId, playlistId);
       fetchPlaylists();
+      toast('Playlist removed from group', 'success');
     } catch (err) {
-      console.error(err);
-      alert('Failed to remove playlist');
+      toast('Failed to remove playlist', 'error');
     }
   };
 
@@ -47,19 +52,22 @@ export const GroupPlaylistsSection: React.FC<GroupPlaylistsSectionProps> = ({ gr
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white">Shared Playlists</h2>
         {role === 'Admin' && (
-          <button 
-            onClick={onLinkNew}
-            className="flex items-center gap-2 bg-[#aa3bff] hover:bg-[#902be6] text-white px-3 py-2 rounded-lg font-medium text-sm transition-colors"
-          >
-            <Plus className="w-4 h-4" /> Share Playlist
-          </button>
+          <Button onClick={onLinkNew} size="sm">
+            <Plus className="w-4 h-4 mr-1" /> Share Playlist
+          </Button>
         )}
       </div>
 
-      {loading ? (
-        <div className="text-center py-4 text-gray-500">Loading playlists...</div>
+      {loading && playlists.length === 0 ? (
+        <div className="flex justify-center py-8">
+          <Spinner />
+        </div>
       ) : playlists.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">No playlists shared with this group yet.</div>
+        <EmptyState 
+          icon={ListMusic} 
+          title="No shared playlists" 
+          description="No playlists shared with this group yet." 
+        />
       ) : (
         <div className="flex flex-col gap-3">
           {playlists.map(playlist => (

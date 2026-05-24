@@ -6,10 +6,12 @@ import { ArrowLeft, PlayCircle, Settings2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { stringifyLyrics } from '../utils/lyricsParser';
 import { transposeContent } from '../utils/chordTransposer';
+import { useToast } from '../context/ToastContext';
 
 export const SongViewPage: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { toast } = useToast();
   
   const [song, setSong] = useState({
     title: 'I Took A Pill In Ibiza',
@@ -41,7 +43,7 @@ To show Avicii I was cool`
         setSong({ ...data, content: stringifyLyrics(data.lyrics), originalKey: key });
         setTransposeSteps(0);
       })
-      .catch(console.error);
+      .catch(() => toast('Failed to load song details', 'error'));
     }
   }, [id]);
 

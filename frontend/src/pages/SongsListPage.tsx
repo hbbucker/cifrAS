@@ -2,13 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { Sidebar } from '../components/layout/Sidebar';
 import { BottomNav } from '../components/layout/BottomNav';
 import { MusicCard } from '../components/cards/MusicCard';
-import { Filter, Plus } from 'lucide-react';
+import { Filter, Plus, Music } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
+import { Button } from '../components/ui/Button';
+import { EmptyState } from '../components/ui/EmptyState';
+import { Spinner } from '../components/ui/Spinner';
 
 export const SongsListPage: React.FC = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const { toast } = useToast();
   const [songs, setSongs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -37,7 +42,7 @@ export const SongsListPage: React.FC = () => {
       setLoading(false);
     })
     .catch(err => {
-      console.error(err);
+      toast('Failed to load songs', 'error');
       setLoading(false);
     });
   }, []);
@@ -57,8 +62,9 @@ export const SongsListPage: React.FC = () => {
       }
       if (!res.ok) throw new Error('Delete failed');
       setSongs(prev => prev.filter(song => song.id !== id));
+      toast('Song deleted successfully', 'success');
     })
-    .catch(console.error);
+    .catch(() => toast('Failed to delete song', 'error'));
   };
 
   return (
@@ -67,14 +73,13 @@ export const SongsListPage: React.FC = () => {
       <main className="flex-1 flex flex-col overflow-hidden">
         <header className="h-16 flex items-center justify-between px-6 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
           <h1 className="text-xl font-bold text-gray-900 dark:text-white">My Repertoire</h1>
-          <button 
+          <Button 
             onClick={() => navigate('/songs/new')}
-            className="flex items-center gap-2 bg-[#aa3bff] hover:bg-[#902be6] text-white px-4 py-2 rounded-lg font-medium transition-colors"
             data-testid="add-song-btn"
           >
-            <Plus className="w-5 h-5" />
+            <Plus className="w-5 h-5 mr-1" />
             <span className="hidden sm:inline">Add Song</span>
-          </button>
+          </Button>
         </header>
 
         <div className="flex-1 overflow-y-auto p-6 pb-24 sm:pb-6">
@@ -92,10 +97,17 @@ export const SongsListPage: React.FC = () => {
             </div>
           </div>
 
-          {loading ? (
+          {loading && songs.length === 0 ? (
             <div className="flex justify-center py-12">
-              <div className="animate-spin w-8 h-8 border-4 border-[#aa3bff] border-t-transparent rounded-full" />
+              <Spinner size="lg" />
             </div>
+          ) : songs.length === 0 ? (
+            <EmptyState 
+              icon={Music} 
+              title="No songs yet" 
+              description="Your repertoire is empty. Start adding songs to build your library." 
+              action={{ label: 'Add First Song', onClick: () => navigate('/songs/new') }} 
+            />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {songs.map(song => (

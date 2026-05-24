@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, ListMusic } from 'lucide-react';
+import { useToast } from '../../context/ToastContext';
+import { Button } from '../ui/Button';
+import { Spinner } from '../ui/Spinner';
+import { EmptyState } from '../ui/EmptyState';
 
 interface Playlist {
   id: number;
@@ -14,8 +18,8 @@ interface LinkPlaylistModalProps {
 export const LinkPlaylistModal: React.FC<LinkPlaylistModalProps> = ({ onClose, onLink }) => {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [linking, setLinking] = useState(false);
+  const [linking, setLinking] = useState<number | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     fetch('/api/playlists', {
@@ -30,23 +34,21 @@ export const LinkPlaylistModal: React.FC<LinkPlaylistModalProps> = ({ onClose, o
         setLoading(false);
       })
       .catch(err => {
-        console.error(err);
-        setError('Could not load your playlists.');
+        toast('Could not load your playlists', 'error');
         setLoading(false);
       });
   }, []);
 
   const handleLink = async (playlistId: number) => {
     try {
-      setLinking(true);
-      setError('');
+      setLinking(playlistId);
       await onLink(playlistId.toString());
+      toast('Playlist shared successfully', 'success');
       onClose();
     } catch (err) {
-      console.error(err);
-      setError('Failed to link playlist.');
+      toast('Failed to link playlist', 'error');
     } finally {
-      setLinking(false);
+      setLinking(null);
     }
   };
 
@@ -62,28 +64,29 @@ export const LinkPlaylistModal: React.FC<LinkPlaylistModalProps> = ({ onClose, o
         <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Share a Playlist</h2>
         <p className="text-sm text-gray-500 mb-6">Select one of your personal playlists to share with this group. Members will be able to view and play it.</p>
         
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg">
-            {error}
-          </div>
-        )}
-
         {loading ? (
-          <div className="text-center py-4 text-gray-500">Loading your playlists...</div>
+          <div className="flex justify-center py-8">
+            <Spinner />
+          </div>
         ) : playlists.length === 0 ? (
-          <div className="text-center py-4 text-gray-500">You don't have any playlists yet.</div>
+          <EmptyState 
+            icon={ListMusic} 
+            title="No personal playlists" 
+            description="You don't have any playlists yet." 
+          />
         ) : (
           <div className="flex flex-col gap-3 max-h-60 overflow-y-auto">
             {playlists.map(p => (
               <div key={p.id} className="flex justify-between items-center p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50">
                 <span className="font-medium text-gray-900 dark:text-white">{p.name}</span>
-                <button 
+                <Button 
                   onClick={() => handleLink(p.id)}
-                  disabled={linking}
-                  className="px-3 py-1 bg-[#aa3bff] hover:bg-[#902be6] text-white text-sm font-medium rounded-lg disabled:opacity-50"
+                  isLoading={linking === p.id}
+                  disabled={linking !== null}
+                  size="sm"
                 >
                   Share
-                </button>
+                </Button>
               </div>
             ))}
           </div>

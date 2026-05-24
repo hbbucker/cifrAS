@@ -6,10 +6,12 @@ import { ChordSheet } from '../components/music/ChordSheet';
 import { transposeContent } from '../utils/chordTransposer';
 import { stringifyLyrics } from '../utils/lyricsParser';
 import { Settings2 } from 'lucide-react';
+import { useToast } from '../context/ToastContext';
 
 export const TheaterModePage: React.FC = () => {
   const navigate = useNavigate();
   const { playlistId, songId } = useParams();
+  const { toast } = useToast();
   
   const { isScrolling, speed, play, pause, setSpeed, containerRef } = useAutoScroll(3);
 
@@ -49,7 +51,9 @@ export const TheaterModePage: React.FC = () => {
           setSong({ title: 'Playlist is empty', artist: '', originalKey: 'C', content: '' });
         }
       })
-      .catch(console.error);
+      .catch(() => {
+        toast('Failed to load playlist queue', 'error');
+      });
     }
   }, [playlistId]);
 
@@ -84,7 +88,9 @@ export const TheaterModePage: React.FC = () => {
           setFontSize(isMobile ? 24 : 32); // defaults
         }
       })
-      .catch(console.error);
+      .catch(() => {
+        toast('Failed to load song details', 'error');
+      });
     }
   }, [activeSongId]);
 

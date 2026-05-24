@@ -6,10 +6,14 @@ import { MusicCard } from '../components/cards/MusicCard';
 import { SkeletonCard } from '../components/ui/SkeletonCard';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '../context/ToastContext';
+import { EmptyState } from '../components/ui/EmptyState';
+import { Music } from 'lucide-react';
 
 export const DashboardPage: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [songs, setSongs] = useState<any[]>([]);
 
@@ -38,7 +42,7 @@ export const DashboardPage: React.FC = () => {
       setLoading(false);
     })
     .catch(err => {
-      console.error(err);
+      toast('Failed to load recent songs', 'error');
       setLoading(false);
     });
   }, []);
@@ -58,8 +62,9 @@ export const DashboardPage: React.FC = () => {
       }
       if (!res.ok) throw new Error('Delete failed');
       setSongs(prev => prev.filter(song => song.id !== id));
+      toast('Song deleted successfully', 'success');
     })
-    .catch(console.error);
+    .catch(() => toast('Failed to delete song', 'error'));
   };
 
   return (
@@ -113,13 +118,12 @@ export const DashboardPage: React.FC = () => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-lg border border-dashed border-gray-300 dark:border-gray-700">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No songs yet</h3>
-              <p className="text-gray-500 dark:text-gray-400 mb-4">Start building your repertoire by adding your first song.</p>
-              <button className="px-4 py-2 bg-[#aa3bff] hover:bg-[#902be6] text-white font-medium rounded transition-colors">
-                Add New Song
-              </button>
-            </div>
+            <EmptyState 
+              icon={Music} 
+              title="No songs yet" 
+              description="Start building your repertoire by adding your first song." 
+              action={{ label: 'Add New Song', onClick: () => navigate('/songs/new') }} 
+            />
           )}
         </div>
       </main>
