@@ -10,13 +10,13 @@ RUN apt-get update && apt-get install -y curl \
 
 WORKDIR /app
 
-# Copy the Maven wrapper and project object model
-COPY pom.xml .
-COPY mvnw .
-COPY .mvn .mvn
+# Copy the Maven wrapper and project object model from the codebase directory
+COPY codebase/pom.xml .
+COPY codebase/mvnw .
+COPY codebase/.mvn .mvn
 
 # Copy the source code
-COPY src src
+COPY codebase/src src
 
 # Build the Quarkus application (this automatically triggers the Quinoa frontend build)
 # -DskipTests is used to speed up the container build process, tests run in CI
