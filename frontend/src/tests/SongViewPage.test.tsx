@@ -8,7 +8,7 @@ import '@testing-library/jest-dom/vitest';
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return {
-    ...actual as any,
+    ...actual as Record<string, unknown>,
     useParams: () => ({ id: '1' }),
   };
 });

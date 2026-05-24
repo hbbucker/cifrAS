@@ -10,11 +10,22 @@ import { Button } from '../components/ui/Button';
 import { EmptyState } from '../components/ui/EmptyState';
 import { Spinner } from '../components/ui/Spinner';
 
+interface SongData {
+  id: string;
+  title: string;
+  artist: string;
+  originalKey?: string;
+  keySignature: string;
+  isFavorite: boolean;
+  categories: string[];
+  [key: string]: unknown;
+}
+
 export const SongsListPage: React.FC = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const { toast } = useToast();
-  const [songs, setSongs] = useState<any[]>([]);
+  const [songs, setSongs] = useState<SongData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -32,20 +43,20 @@ export const SongsListPage: React.FC = () => {
     })
     .then(data => {
       const items = Array.isArray(data) ? data : (data.data || []);
-      const mappedSongs = items.map((song: any) => ({
+      const mappedSongs = items.map((song: Record<string, unknown>) => ({
         ...song,
-        keySignature: song.originalKey || song.keySignature || 'C',
+        keySignature: (song.originalKey as string) || (song.keySignature as string) || 'C',
         isFavorite: song.isFavorite || false,
         categories: song.categories || [],
       }));
       setSongs(mappedSongs);
       setLoading(false);
     })
-    .catch(err => {
+    .catch(() => {
       toast('Failed to load songs', 'error');
       setLoading(false);
     });
-  }, []);
+  }, [logout, navigate, toast]);
 
   const handleDelete = (id: string) => {
     if (!window.confirm('Are you sure you want to delete this song?')) return;

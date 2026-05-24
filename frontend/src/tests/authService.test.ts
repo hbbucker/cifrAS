@@ -8,11 +8,11 @@ vi.mock('axios', async () => {
     ...actual,
     create: vi.fn(() => {
       const client = vi.fn();
-      (client as any).interceptors = {
+      (client as unknown as { interceptors: Record<string, unknown> }).interceptors = {
         request: { use: vi.fn() },
         response: { use: vi.fn() }
       };
-      (client as any).defaults = { headers: { common: {} } };
+      (client as unknown as { defaults: Record<string, unknown> }).defaults = { headers: { common: {} } };
       return client;
     }),
     post: vi.fn()

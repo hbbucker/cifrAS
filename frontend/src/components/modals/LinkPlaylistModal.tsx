@@ -33,11 +33,11 @@ export const LinkPlaylistModal: React.FC<LinkPlaylistModalProps> = ({ onClose, o
         setPlaylists(data);
         setLoading(false);
       })
-      .catch(err => {
+      .catch(() => {
         toast('Could not load your playlists', 'error');
         setLoading(false);
       });
-  }, []);
+  }, [toast]);
 
   const handleLink = async (playlistId: number) => {
     try {
@@ -45,7 +45,7 @@ export const LinkPlaylistModal: React.FC<LinkPlaylistModalProps> = ({ onClose, o
       await onLink(playlistId.toString());
       toast('Playlist shared successfully', 'success');
       onClose();
-    } catch (err) {
+    } catch {
       toast('Failed to link playlist', 'error');
     } finally {
       setLinking(null);

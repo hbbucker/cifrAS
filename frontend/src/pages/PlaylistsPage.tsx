@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Sidebar } from '../components/layout/Sidebar';
 import { BottomNav } from '../components/layout/BottomNav';
@@ -8,6 +8,13 @@ import { useToast } from '../context/ToastContext';
 import { Button } from '../components/ui/Button';
 import { EmptyState } from '../components/ui/EmptyState';
 import { Spinner } from '../components/ui/Spinner';
+interface PlaylistData {
+  id: string;
+  name: string;
+  songCount?: number;
+  isCollaborative?: boolean;
+  [key: string]: unknown;
+}
 
 export const PlaylistsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -15,15 +22,11 @@ export const PlaylistsPage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [newPlaylistName, setNewPlaylistName] = useState('');
   const { logout } = useAuth();
-  const [playlists, setPlaylists] = useState<any[]>([]);
+  const [playlists, setPlaylists] = useState<PlaylistData[]>([]);
   const [loading, setLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
 
-  useEffect(() => {
-    fetchPlaylists();
-  }, []);
-
-  const fetchPlaylists = () => {
+  const fetchPlaylists = useCallback(() => {
     fetch('/api/playlists', {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
     })
@@ -40,11 +43,15 @@ export const PlaylistsPage: React.FC = () => {
       setPlaylists(data);
       setLoading(false);
     })
-    .catch(err => {
+    .catch(() => {
       toast('Failed to load playlists', 'error');
       setLoading(false);
     });
-  };
+  }, [logout, navigate, toast]);
+
+  useEffect(() => {
+    fetchPlaylists();
+  }, [fetchPlaylists]);
 
   const handleCreatePlaylist = () => {
     if (!newPlaylistName.trim()) return;

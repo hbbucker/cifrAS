@@ -8,6 +8,11 @@ import { stringifyLyrics } from '../utils/lyricsParser';
 import { Settings2 } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 
+interface SongData {
+  id: string;
+  [key: string]: unknown;
+}
+
 export const TheaterModePage: React.FC = () => {
   const navigate = useNavigate();
   const { playlistId, songId } = useParams();
@@ -23,7 +28,7 @@ export const TheaterModePage: React.FC = () => {
     content: ''
   });
 
-  const [playlistSongs, setPlaylistSongs] = useState<any[]>([]);
+  const [playlistSongs, setPlaylistSongs] = useState<SongData[]>([]);
   const [currentPlaylistIndex, setCurrentPlaylistIndex] = useState<number>(0);
   const [transposeSteps, setTransposeSteps] = useState(0);
   const [scrollTop, setScrollTop] = useState(0);
@@ -55,7 +60,7 @@ export const TheaterModePage: React.FC = () => {
         toast('Failed to load playlist queue', 'error');
       });
     }
-  }, [playlistId]);
+  }, [playlistId, toast]);
 
   // Fetch full song details for the active song ID
   const activeSongId = playlistId && playlistSongs.length > 0 ? playlistSongs[currentPlaylistIndex].id : songId;
@@ -92,7 +97,7 @@ export const TheaterModePage: React.FC = () => {
         toast('Failed to load song details', 'error');
       });
     }
-  }, [activeSongId]);
+  }, [activeSongId, isMobile, toast]);
 
   const handleNextSong = () => {
     if (playlistId && currentPlaylistIndex < playlistSongs.length - 1) {

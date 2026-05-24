@@ -5,17 +5,34 @@ import { ArrowLeft, PlayCircle, GripVertical, Trash2, ChevronUp, ChevronDown, Pl
 import { useNavigate, useParams } from 'react-router-dom';
 import { useToast } from '../context/ToastContext';
 
+interface SongData {
+  id: string;
+  title: string;
+  artist: string;
+  originalKey?: string;
+  key?: string;
+  [key: string]: unknown;
+}
+
+interface PlaylistData {
+  id?: string;
+  name?: string;
+  isCollaborative?: boolean;
+  userId?: string;
+  [key: string]: unknown;
+}
+
 export const PlaylistViewPage: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { user, logout } = useAuth();
   const { toast } = useToast();
   
-  const [playlist, setPlaylist] = useState<any>(null);
-  const [songs, setSongs] = useState<any[]>([]);
+  const [playlist, setPlaylist] = useState<PlaylistData | null>(null);
+  const [songs, setSongs] = useState<SongData[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [allSongs, setAllSongs] = useState<any[]>([]);
+  const [allSongs, setAllSongs] = useState<SongData[]>([]);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -44,11 +61,11 @@ export const PlaylistViewPage: React.FC = () => {
       setSongs(data.songs || []);
       setLoading(false);
     })
-    .catch(err => {
+    .catch(() => {
       toast('Failed to load playlist', 'error');
       setLoading(false);
     });
-  }, [id]);
+  }, [id, logout, navigate, toast]);
 
   const moveSong = (index: number, direction: 'up' | 'down') => {
     if (direction === 'up' && index === 0) return;

@@ -7,6 +7,13 @@ import { Button } from '../ui/Button';
 import { EmptyState } from '../ui/EmptyState';
 import { Spinner } from '../ui/Spinner';
 
+interface PlaylistData {
+  id: string | number;
+  name: string;
+  songs?: unknown[];
+  [key: string]: unknown;
+}
+
 interface GroupPlaylistsSectionProps {
   groupId: string;
   role: 'Admin' | 'Member';
@@ -14,27 +21,37 @@ interface GroupPlaylistsSectionProps {
 }
 
 export const GroupPlaylistsSection: React.FC<GroupPlaylistsSectionProps> = ({ groupId, role, onLinkNew }) => {
-  const [playlists, setPlaylists] = useState<any[]>([]);
+  const [playlists, setPlaylists] = useState<PlaylistData[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const fetchPlaylists = () => {
-    setLoading(true);
+  useEffect(() => {
+    let mounted = true;
     getGroupPlaylists(groupId)
       .then(data => {
-        setPlaylists(data);
-        setLoading(false);
+        if (mounted) {
+          setPlaylists(data as PlaylistData[]);
+          setLoading(false);
+        }
       })
-      .catch(err => {
-        toast('Failed to load shared playlists', 'error');
-        setLoading(false);
+      .catch(() => {
+        if (mounted) {
+          toast('Failed to load shared playlists', 'error');
+          setLoading(false);
+        }
       });
-  };
+    return () => { mounted = false; };
+  }, [groupId, toast]);
 
-  useEffect(() => {
-    fetchPlaylists();
-  }, [groupId]);
+  const fetchPlaylists = async () => {
+    try {
+      const data = await getGroupPlaylists(groupId);
+      setPlaylists(data as PlaylistData[]);
+    } catch {
+      toast('Failed to load shared playlists', 'error');
+    }
+  };
 
   const handleUnlink = async (playlistId: string) => {
     if (!window.confirm('Are you sure you want to remove this playlist from the group?')) return;
@@ -42,7 +59,7 @@ export const GroupPlaylistsSection: React.FC<GroupPlaylistsSectionProps> = ({ gr
       await unlinkPlaylist(groupId, playlistId);
       fetchPlaylists();
       toast('Playlist removed from group', 'success');
-    } catch (err) {
+    } catch {
       toast('Failed to remove playlist', 'error');
     }
   };

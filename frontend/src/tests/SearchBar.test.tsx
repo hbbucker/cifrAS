@@ -23,7 +23,7 @@ describe('SearchBar Component', () => {
 
   it('debounces input and calls search API', async () => {
     const mockData = { results: [{ id: '1', title: 'Test Song', artist: 'Test Artist', keySignature: 'C' }] };
-    (authClient.get as any).mockResolvedValue({ data: mockData });
+    (authClient.get as unknown as { mockResolvedValue: (val: unknown) => void }).mockResolvedValue({ data: mockData });
 
     render(
       <MemoryRouter>

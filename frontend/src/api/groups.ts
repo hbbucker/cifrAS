@@ -14,7 +14,7 @@ export const linkPlaylist = async (groupId: string, playlistId: string): Promise
   }
 };
 
-export const getGroupPlaylists = async (groupId: string): Promise<any[]> => {
+export const getGroupPlaylists = async (groupId: string): Promise<Record<string, unknown>[]> => {
   const token = localStorage.getItem('token');
   const res = await fetch(`/api/groups/${groupId}/playlists`, {
     headers: {

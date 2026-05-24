@@ -10,12 +10,23 @@ import { useToast } from '../context/ToastContext';
 import { EmptyState } from '../components/ui/EmptyState';
 import { Music } from 'lucide-react';
 
+interface SongData {
+  id: string;
+  title: string;
+  artist: string;
+  originalKey?: string;
+  keySignature: string;
+  isFavorite: boolean;
+  categories: string[];
+  [key: string]: unknown;
+}
+
 export const DashboardPage: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
-  const [songs, setSongs] = useState<any[]>([]);
+  const [songs, setSongs] = useState<SongData[]>([]);
 
   useEffect(() => {
     fetch('/api/songs', {
@@ -32,20 +43,20 @@ export const DashboardPage: React.FC = () => {
       })
     .then(data => {
       const items = Array.isArray(data) ? data : (data.data || []);
-      const mappedSongs = items.slice(0, 3).map((song: any) => ({
+      const mappedSongs = items.slice(0, 3).map((song: Record<string, unknown>) => ({
         ...song,
-        keySignature: song.originalKey || song.keySignature || 'C',
+        keySignature: (song.originalKey as string) || (song.keySignature as string) || 'C',
         isFavorite: song.isFavorite || false,
         categories: song.categories || [],
       }));
       setSongs(mappedSongs);
       setLoading(false);
     })
-    .catch(err => {
+    .catch(() => {
       toast('Failed to load recent songs', 'error');
       setLoading(false);
     });
-  }, []);
+  }, [logout, navigate, toast]);
 
   const handleDelete = (id: string) => {
     if (!window.confirm('Are you sure you want to delete this song?')) return;

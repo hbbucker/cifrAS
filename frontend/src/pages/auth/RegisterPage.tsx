@@ -31,8 +31,9 @@ export const RegisterPage: React.FC = () => {
       await authClient.post('/register', { email, password });
       toast('Registered successfully! Please log in.', 'success');
       navigate('/login');
-    } catch (error: any) {
-      const msg = error.response?.data?.error || 'Failed to register';
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { error?: string } } };
+      const msg = err.response?.data?.error || 'Failed to register';
       toast(msg, 'error');
     } finally {
       setIsLoading(false);

@@ -9,13 +9,18 @@ export const SearchPage: React.FC = () => {
   const query = searchParams.get('q') || '';
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [prevQuery, setPrevQuery] = useState(query);
+
+  if (query !== prevQuery) {
+    setPrevQuery(query);
+    setLoading(true);
+  }
 
   const mockResults = query.toLowerCase().includes('ibiza') 
     ? [{ id: '1', title: 'I Took A Pill In Ibiza', artist: 'Mike Posner', keySignature: 'G', isFavorite: false, categories: ['Pop'] }]
     : [];
 
   useEffect(() => {
-    setLoading(true);
     const timer = setTimeout(() => {
       setLoading(false);
     }, 500);

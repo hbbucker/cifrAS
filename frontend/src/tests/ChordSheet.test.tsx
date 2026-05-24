@@ -4,7 +4,7 @@ import { ChordSheet } from '../components/music/ChordSheet';
 import '@testing-library/jest-dom/vitest';
 
 vi.mock('react-window', () => ({
-  FixedSizeList: ({ children, itemCount }: any) => (
+  FixedSizeList: ({ children, itemCount }: { children: (props: { index: number; style: React.CSSProperties }) => React.ReactNode; itemCount: number }) => (
     <div data-testid="mock-virtual-list">
       {Array.from({ length: itemCount }).map((_, index) => 
         children({ index, style: {} })

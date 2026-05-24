@@ -11,7 +11,7 @@ vi.mock('../context/AuthContext', () => ({
 
 describe('PrivateRoute', () => {
   it('redirects to /login when unauthenticated', () => {
-    (useAuth as any).mockReturnValue({ isAuthenticated: false, loading: false });
+    (useAuth as unknown as { mockReturnValue: (val: unknown) => void }).mockReturnValue({ isAuthenticated: false, loading: false });
 
     render(
       <MemoryRouter initialEntries={['/protected']}>
@@ -34,7 +34,7 @@ describe('PrivateRoute', () => {
   });
 
   it('renders children when authenticated', () => {
-    (useAuth as any).mockReturnValue({ isAuthenticated: true, loading: false });
+    (useAuth as unknown as { mockReturnValue: (val: unknown) => void }).mockReturnValue({ isAuthenticated: true, loading: false });
 
     render(
       <MemoryRouter initialEntries={['/protected']}>

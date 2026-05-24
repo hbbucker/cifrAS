@@ -20,7 +20,7 @@ export const transposeChord = (chord: string, steps: number): string => {
   let newIndex = (currentIndex + steps) % 12;
   if (newIndex < 0) newIndex += 12;
 
-  let newRoot = CHORD_SCALE[newIndex];
+  const newRoot = CHORD_SCALE[newIndex];
   
   // Also transpose bass notes if present (e.g., /F#)
   let newRest = rest;
@@ -92,7 +92,7 @@ export const transposeTabLine = (line: string, steps: number): string => {
   if (!match) return line;
 
   const prefix = match[1];
-  let rest = match[2];
+  const rest = match[2];
 
   const resultRest = rest.replace(/(-*)([0-9Oo]+)(-*)/g, (fullMatch, leftDashes, numStr, rightDashes, offset, string) => {
     // Prevent transposing repetition markers like "2x"

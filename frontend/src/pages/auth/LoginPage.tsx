@@ -27,8 +27,9 @@ export const LoginPage: React.FC = () => {
       login(accessToken, refreshToken, { id: 'user', email, name: email.split('@')[0] });
       toast('Logged in successfully!', 'success');
       navigate('/dashboard');
-    } catch (error: any) {
-      const msg = error.response?.data?.error || 'Failed to login';
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { error?: string } } };
+      const msg = err.response?.data?.error || 'Failed to login';
       toast(msg, 'error');
     } finally {
       setIsLoading(false);

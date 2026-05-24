@@ -7,11 +7,19 @@ import { LinkPlaylistModal } from '../components/modals/LinkPlaylistModal';
 import { linkPlaylist } from '../api/groups';
 import { useAuth } from '../context/AuthContext';
 
+interface GroupDetailsData {
+  id: string;
+  name: string;
+  role: 'Admin' | 'Member';
+  ownerId?: string;
+  [key: string]: unknown;
+}
+
 export const GroupDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const [group, setGroup] = useState<any>(null);
+  const [group, setGroup] = useState<GroupDetailsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [showLinkModal, setShowLinkModal] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0); // Used to force reload the section
@@ -30,7 +38,7 @@ export const GroupDetailsPage: React.FC = () => {
       return res.json();
     })
     .then(data => {
-      const found = data.find((g: any) => g.id.toString() === id);
+      const found = data.find((g: Record<string, unknown>) => String(g.id) === id);
       if (found) {
         setGroup({
           ...found,

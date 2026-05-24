@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Sidebar } from '../components/layout/Sidebar';
 import { GroupCard } from '../components/cards/GroupCard';
 import { Plus } from 'lucide-react';
@@ -6,13 +6,28 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../context/ToastContext';
 
+interface GroupData {
+  id: string;
+  name: string;
+  memberCount: number;
+  role: 'Admin' | 'Member';
+  [key: string]: unknown;
+}
+
+interface InviteData {
+  id: string;
+  inviteeEmail?: string;
+  groupName?: string;
+  [key: string]: unknown;
+}
+
 export const GroupsPage: React.FC = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { toast } = useToast();
-  const [groups, setGroups] = useState<any[]>([]);
-  const [invites, setInvites] = useState<any[]>([]);
-  const [declinedInvites, setDeclinedInvites] = useState<any[]>([]);
+  const [groups, setGroups] = useState<GroupData[]>([]);
+  const [invites, setInvites] = useState<InviteData[]>([]);
+  const [declinedInvites, setDeclinedInvites] = useState<InviteData[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -23,12 +38,9 @@ export const GroupsPage: React.FC = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newGroupName, setNewGroupName] = useState('');
 
-  useEffect(() => {
-    fetchGroups();
-    fetchInvites();
-  }, []);
 
-  const fetchInvites = () => {
+
+  const fetchInvites = useCallback(() => {
     fetch('/api/invites', {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
     })
@@ -42,7 +54,7 @@ export const GroupsPage: React.FC = () => {
     .then(res => res.ok ? res.json() : [])
     .then(data => setDeclinedInvites(data))
     .catch(() => toast('Failed to load declined invites', 'error'));
-  };
+  }, [toast]);
 
   const handleAcceptInvite = (id: string) => {
     fetch(`/api/invites/${id}/accept`, {
@@ -75,7 +87,7 @@ export const GroupsPage: React.FC = () => {
     }).catch(() => toast('Failed to dismiss declined invite', 'error'));
   };
 
-  const fetchGroups = () => {
+  const fetchGroups = useCallback(() => {
     setLoading(true);
     fetch('/api/groups', {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
@@ -90,20 +102,25 @@ export const GroupsPage: React.FC = () => {
       return res.json();
     })
     .then(data => {
-      const formattedGroups = data.map((g: any) => ({
+      const formattedGroups = data.map((g: Record<string, unknown>) => ({
         ...g,
-        id: g.id.toString(), // Convert number ID to string for GroupCard
+        id: String(g.id), // Convert number ID to string for GroupCard
         memberCount: 1, // Defaulting as backend does not return it yet
         role: g.ownerId === user?.id ? 'Admin' : 'Member'
-      }));
+      })) as GroupData[];
       setGroups(formattedGroups);
       setLoading(false);
     })
-    .catch(err => {
+    .catch(() => {
       toast('Failed to load groups', 'error');
       setLoading(false);
     });
-  };
+  }, [logout, navigate, toast, user?.id]);
+
+  useEffect(() => {
+    fetchGroups();
+    fetchInvites();
+  }, [fetchGroups, fetchInvites]);
 
   const handleCreateGroup = () => {
     if (!newGroupName.trim()) return;
@@ -159,7 +176,7 @@ export const GroupsPage: React.FC = () => {
         try {
           const data = await res.json();
           if (data.error) errorMsg = data.error;
-        } catch (e) {
+        } catch {
           // ignore
         }
         setInviteError(errorMsg);
@@ -169,7 +186,7 @@ export const GroupsPage: React.FC = () => {
       toast('Invitation sent successfully', 'success');
       setShowInviteModal(false);
       setInviteEmail('');
-    } catch (err) {
+    } catch {
       toast('An unexpected error occurred while inviting', 'error');
       setInviteError('An unexpected error occurred.');
     }

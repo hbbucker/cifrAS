@@ -31,7 +31,7 @@ describe('AuthContext', () => {
   });
 
   it('provides default unauthenticated state', async () => {
-    (authClient.get as any).mockRejectedValue(new Error('Unauthorized'));
+    (authClient.get as unknown as { mockRejectedValue: (val: unknown) => void }).mockRejectedValue(new Error('Unauthorized'));
     
     await act(async () => {
       render(
@@ -45,7 +45,7 @@ describe('AuthContext', () => {
   });
 
   it('handles login and logout correctly', async () => {
-    (authClient.get as any).mockRejectedValue(new Error('Unauthorized'));
+    (authClient.get as unknown as { mockRejectedValue: (val: unknown) => void }).mockRejectedValue(new Error('Unauthorized'));
     
     await act(async () => {
       render(

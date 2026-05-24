@@ -45,7 +45,7 @@ To show Avicii I was cool`
       })
       .catch(() => toast('Failed to load song details', 'error'));
     }
-  }, [id]);
+  }, [id, toast]);
 
   const currentKey = transposeContent(song.originalKey, transposeSteps);
   const transposedContent = transposeContent(song.content, transposeSteps);

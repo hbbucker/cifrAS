@@ -45,7 +45,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             email: payload.email || 'user@example.com', 
             name: payload.user_metadata?.full_name || payload.email || 'Musician' 
           });
-        } catch (e) {
+        } catch {
           // Fallback if parsing fails
           setUser({ id: 'user', email: 'user@example.com', name: 'Musician' });
         }
@@ -64,6 +64,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
