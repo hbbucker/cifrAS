@@ -70,9 +70,9 @@ jobs:
           SUPABASE_API_KEY: ${{ secrets.SUPABASE_API_KEY }}
           SUPABASE_JWKS_URL: ${{ secrets.SUPABASE_JWKS_URL }}
           SUPABASE_JWT_ISSUER: ${{ secrets.SUPABASE_JWT_ISSUER }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_URL: ${{ secrets.DB_URL }}
+          DB_USER: ""
+          DB_PASSWORD: ""
+          DB_URL: ""
         run: |
           cd ../backend
           ./mvnw clean compile quarkus:dev -Dquarkus.http.port=8080 &
