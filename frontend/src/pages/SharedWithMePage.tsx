@@ -32,8 +32,8 @@ export const SharedWithMePage: React.FC = () => {
         const allPlaylists: Playlist[] = [];
         for (const group of groups) {
           try {
-            const groupPlaylists = await getGroupPlaylists(group.id);
-            groupPlaylists.forEach((p: Playlist) => {
+            const groupPlaylists = await getGroupPlaylists(group.id) as unknown as Playlist[];
+            groupPlaylists.forEach((p) => {
               allPlaylists.push({ ...p, groupName: group.name });
             });
           } catch {
