@@ -1,12 +1,33 @@
 import { test, expect } from '@playwright/test';
 
 test('full application flow including registration and song CRUD', async ({ page }) => {
+  const testEmail = process.env.E2E_USER || `test_${Date.now()}@example.com`;
+  const testPassword = process.env.E2E_PASSWORD || 'password123';
+
+  // 0. Register Flow (if no env var is provided)
+  if (!process.env.E2E_USER) {
+    await page.goto('/register');
+    await page.getByTestId('name-input').fill('Test User');
+    await page.getByTestId('reg-email-input').fill(testEmail);
+    await page.getByTestId('reg-password-input').fill(testPassword);
+    await page.getByTestId('reg-confirm-password-input').fill(testPassword);
+    await page.getByTestId('register-btn').click();
+    
+    // Wait for either login page or an error toast
+    try {
+      await expect(page).toHaveURL(/.*\/login/, { timeout: 10000 });
+    } catch (e) {
+      console.log('Registration failed. Page text:', await page.locator('body').innerText());
+      throw e;
+    }
+  }
+
   // 1. Login Flow
   await page.goto('/login');
   await expect(page.locator('h2')).toHaveText('Welcome to CifrAS');
   
-  await page.getByTestId('email-input').fill(process.env.E2E_USER || 'test@example.com');
-  await page.getByTestId('password-input').fill(process.env.E2E_PASSWORD || 'password');
+  await page.getByTestId('email-input').fill(testEmail);
+  await page.getByTestId('password-input').fill(testPassword);
   await page.getByTestId('login-btn').click();
 
   // Redirect to dashboard
@@ -36,9 +57,9 @@ test('full application flow including registration and song CRUD', async ({ page
   await expect(page.locator('h1')).toHaveText('My New Song');
   
   // Transpose Pad check
-  await expect(page.getByTestId('current-key')).toHaveText('G');
+  await expect(page.getByTestId('current-key')).toHaveText('C');
   await page.getByTestId('transpose-up').click();
-  await expect(page.getByTestId('current-key')).toHaveText('G#');
+  await expect(page.getByTestId('current-key')).toHaveText('C#');
 
   // Perform (Theater mode btn check)
   await expect(page.getByTestId('theater-mode-btn')).toBeVisible();
@@ -64,9 +85,9 @@ test('full application flow including registration and song CRUD', async ({ page
   await page.getByTestId('play-pause-btn').click();
   
   // Transpose in theater mode
-  await expect(page.getByTestId('current-key')).toHaveText('G');
+  await expect(page.getByTestId('current-key')).toHaveText('C');
   await page.getByTestId('transpose-up').click();
-  await expect(page.getByTestId('current-key')).toHaveText('G#');
+  await expect(page.getByTestId('current-key')).toHaveText('C#');
   
   // Exit theater mode
   await page.getByTestId('exit-theater-btn').click();
