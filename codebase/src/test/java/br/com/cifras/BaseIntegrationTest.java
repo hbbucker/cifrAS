@@ -8,4 +8,9 @@ import io.quarkus.test.common.QuarkusTestResource;
  */
 @QuarkusTestResource(PostgresTestResource.class)
 public abstract class BaseIntegrationTest {
+
+    @org.junit.jupiter.api.BeforeEach
+    public void setupRestAssured() {
+        io.restassured.RestAssured.basePath = "/api";
+    }
 }
