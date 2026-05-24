@@ -76,7 +76,7 @@ jobs:
         run: |
           cd ../backend
           ./mvnw clean compile quarkus:dev -Dquarkus.http.port=8080 &
-          # Wait until backend is healthy
+          # Wait until backend is fully ready
           timeout 60s bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:8080/q/health/ready)" != "200" ]]; do sleep 2; done' || false
 
       - name: Install Playwright Browsers
