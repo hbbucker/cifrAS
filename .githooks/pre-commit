@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "Running backend pre-commit hooks..."
 
-cd backend || exit 0
+cd codebase || exit 0
 
 echo "Running formatting checks (Checkstyle)..."
 # Assuming maven-checkstyle-plugin is configured.

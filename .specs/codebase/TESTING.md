@@ -1,63 +1,59 @@
-# Testing Infrastructure
+# CifrAS — Testing Infrastructure
 
 ## Test Frameworks
 
-**Unit/Integration:** Vitest + React Testing Library
-**E2E:** Playwright
-**Coverage:** Vitest coverage (c8/v8)
+A estratégia de testes acompanha a arquitetura unificada Quarkus + Quinoa:
+
+**Backend (Unit & Integration):** JUnit 5 + REST Assured + Testcontainers
+**Frontend (E2E):** Playwright
 
 ## Test Organization
 
-**Location:** `src/__tests__/` (Unit & Integration), `e2e/` (E2E)
-**Naming:** `*.test.ts` or `*.test.tsx` for unit/integration, `*.spec.ts` for E2E
+**Location:** 
+- `codebase/src/test/java/` (Backend Unit & Integration)
+- `codebase/src/main/webui/e2e/` (Frontend E2E via Playwright)
+
 **Structure:**
-- `src/__tests__/unit/`: Hooks, services, and utility logic
-- `src/__tests__/components/`: Core UI components
-- `src/__tests__/pages/`: Page-level integration tests
-- `e2e/`: Full flow E2E tests
+- `src/test/java/br/com/cifras/resource/`: Testes de integração JAX-RS com REST Assured.
+- `src/test/java/br/com/cifras/service/`: Testes unitários das regras de negócio (ex: Transposição).
+- `src/main/webui/e2e/`: Testes de interface garantindo que o app React interage corretamente com a API Quarkus e banco de dados real.
 
 ## Testing Patterns
 
-### Unit Tests
-- Mock Axios requests using `msw` or `vi.mock`
-- Use `@testing-library/react-hooks` or `renderHook` for custom hooks (`useAutoScroll`, `useTranspose`)
+### Backend Tests (JUnit + Testcontainers)
+- Testes que interagem com banco estendem classes que sobem instâncias isoladas do PostgreSQL via Testcontainers.
+- Mockamos dependências não-críticas e garantimos a validade do JWT enviando cabeçalhos Authorization estáticos para usuários de teste.
+- O `@QuarkusTest` sobe toda a aplicação e injeção de dependências automaticamente.
 
-### Integration Tests
-- Render page components with `MemoryRouter` and custom providers (`AuthContext`, `ToastContext`)
-- Verify transitions and user event flows using `@testing-library/user-event`
-
-### E2E Tests
-- Test full auth flows, song creation, transposing, and playlist management using real or mocked API responses
+### E2E Tests (Playwright)
+- Testes full-flow executados no navegador rodando os scripts localizados em `webui/e2e`.
+- Eles acessam a porta de desenvolvimento ou produção (ex: `http://localhost:8080`) para testar o sistema completo (banco, api e tela).
+- Os fluxos incluem autenticação, criação de músicas e transposição na interface (Modo Teatro).
 
 ## Test Execution
 
-**Commands:**
-- Run unit/integration tests: `npm run test`
-- Run E2E tests: `npm run test:e2e`
-- Run tests with coverage: `npm run test:coverage`
+A execução pode ocorrer de forma unificada ou individual:
+
+**Commands (a partir de `codebase/`):**
+- Testes completos do backend: `./mvnw test` ou `./mvnw verify`
+- Testes locais do Playwright: 
+  ```bash
+  cd src/main/webui
+  npx playwright test
+  ```
 
 ## Test Coverage Matrix
 
 | Code Layer | Required Test Type | Location Pattern | Run Command |
 | --- | --- | --- | --- |
-| Services & Hooks | unit | `src/__tests__/unit/**/*.test.ts` | `npm run test` |
-| UI Components | unit | `src/__tests__/components/**/*.test.tsx` | `npm run test` |
-| Pages (Integration) | integration | `src/__tests__/pages/**/*.test.tsx` | `npm run test` |
-| Full Flows (E2E) | e2e | `e2e/**/*.spec.ts` | `npm run test:e2e` |
-| Routing / Contexts | integration | `src/__tests__/pages/**/*.test.tsx` | `npm run test` |
-
-## Parallelism Assessment
-
-| Test Type | Parallel-Safe? | Isolation Model | Evidence |
-| --- | --- | --- | --- |
-| unit | Yes | InMemory / Mocks | No shared state between tests; Vitest runs files in parallel threads |
-| integration | Yes | Isolated Render / Mocks | JSDOM isolate instances per test file |
-| e2e | No | Shared Browser Port / DB state | Standard Playwright requires serial execution to avoid database race conditions |
+| Quarkus Services | unit | `codebase/src/test/java/.../service/*Test.java` | `./mvnw test` |
+| Quarkus REST API | integration | `codebase/src/test/java/.../resource/*Test.java` | `./mvnw test` |
+| Full Flows (Frontend) | e2e | `codebase/src/main/webui/e2e/*.spec.ts` | `npx playwright test` |
 
 ## Gate Check Commands
 
-| Gate Level | When to Use | Command |
+| Gate Level | Quando Usar | Comando (na pasta `codebase`) |
 | --- | --- | --- |
-| Quick | After tasks with unit tests only | `npm run test` |
-| Full | After tasks with e2e/integration tests | `npm run test && npm run test:e2e` |
-| Build | After phase completion | `npm run build && npm run test` |
+| Backend Core | Após refatorar serviços/APIs | `./mvnw test` |
+| Full Stack | Antes do PR ou deploy | `./mvnw verify` |
+| E2E Isolation | Modificações exclusivas na UI | `cd src/main/webui && npx playwright test` |
