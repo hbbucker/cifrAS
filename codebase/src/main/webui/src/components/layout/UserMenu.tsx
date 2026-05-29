@@ -4,7 +4,11 @@ import { useTheme } from '../../context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, Moon, Sun } from 'lucide-react';
 
-export const UserMenu: React.FC = () => {
+export interface UserMenuProps {
+ direction?: 'up' | 'down';
+}
+
+export const UserMenu: React.FC<UserMenuProps> = ({ direction = 'down' }) => {
  const { user, logout } = useAuth();
  const { theme, toggleTheme } = useTheme();
  const navigate = useNavigate();
@@ -48,7 +52,7 @@ export const UserMenu: React.FC = () => {
  </button>
 
  {isOpen && (
- <div className="absolute right-0 mt-2 w-48 bg-bg-card rounded-xl shadow-lg py-1 border border-border-main z-50">
+ <div className={`absolute w-48 bg-bg-card rounded-xl shadow-lg py-1 border border-border-main z-50 ${direction === 'up' ? 'bottom-full mb-2 left-0' : 'top-full mt-2 right-0'}`}>
  <div className="px-4 py-2 border-b border-border-main">
  <p className="text-sm font-medium text-text-main truncate">{user?.name || 'User'}</p>
  <p className="text-xs text-text-mute truncate">{user?.email || ''}</p>

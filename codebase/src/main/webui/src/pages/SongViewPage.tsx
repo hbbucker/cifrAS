@@ -54,18 +54,18 @@ To show Avicii I was cool`
  <div className="flex h-screen bg-bg-main">
  <Sidebar />
  <main className="flex-1 flex flex-col overflow-hidden">
- <header className="h-16 flex items-center justify-between px-6 bg-bg-card border-b border-border-main shrink-0">
- <div className="flex items-center gap-4">
- <button onClick={() => navigate('/songs')} className="p-2 hover:bg-bg-elevated rounded-full text-text-mute">
+ <header className="flex flex-col sm:flex-row sm:items-center justify-between px-4 sm:px-6 py-3 sm:py-0 sm:h-16 bg-bg-card border-b border-border-main shrink-0 gap-3 sm:gap-0">
+ <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto overflow-hidden">
+ <button onClick={() => navigate('/songs')} className="p-2 hover:bg-bg-elevated rounded-full text-text-mute shrink-0 -ml-2 sm:ml-0">
  <ArrowLeft className="w-5 h-5" />
  </button>
- <div>
- <h1 className="text-lg font-bold text-text-main leading-tight">{song.title}</h1>
- <p className="text-xs text-text-mute">{song.artist}</p>
+ <div className="min-w-0 flex-1">
+ <h1 className="text-lg font-bold text-text-main leading-tight truncate">{song.title}</h1>
+ <p className="text-xs text-text-mute truncate">{song.artist}</p>
  </div>
  </div>
  
- <div className="flex items-center gap-3">
+ <div className="flex items-center gap-3 self-end sm:self-auto">
  <TransposePad 
  currentKey={currentKey}
  onTransposeDown={() => setTransposeSteps(s => s - 1)}

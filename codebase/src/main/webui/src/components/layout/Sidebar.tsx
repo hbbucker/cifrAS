@@ -55,7 +55,7 @@ export const Sidebar: React.FC = () => {
  ))}
  </nav>
  <div className={`p-4 border-t border-border-main flex ${collapsed ? 'justify-center' : 'justify-start'}`}>
- <UserMenu />
+ <UserMenu direction="up" />
  </div>
  </aside>
  </>
