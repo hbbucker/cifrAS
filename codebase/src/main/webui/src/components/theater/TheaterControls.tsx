@@ -16,16 +16,17 @@ interface TheaterControlsProps {
  onExit?: () => void;
  onFontSizeIncrease?: () => void;
  onFontSizeDecrease?: () => void;
+ className?: string;
 }
 
  export const TheaterControls: React.FC<TheaterControlsProps> = ({
  isScrolling, speed, currentKey,
  onPlayPause, onSpeedChange, onTransposeUp, onTransposeDown,
  onNextSong, onPrevSong, onToggleFullscreen, onExit,
- onFontSizeIncrease, onFontSizeDecrease
+ onFontSizeIncrease, onFontSizeDecrease, className = ''
 }) => {
  return (
- <div className="fixed bottom-24 md:bottom-6 left-1/2 -translate-x-1/2 bg-bg-card/95 backdrop-blur-xl text-text-main px-4 md:px-6 py-4 rounded-3xl shadow-2xl border border-border-main flex flex-col md:flex-row items-center gap-4 md:gap-6 z-40 transition-all hover:bg-bg-card w-[92%] md:w-auto" data-testid="theater-controls">
+ <div className={`fixed bottom-28 md:bottom-6 left-1/2 -translate-x-1/2 bg-bg-card/95 backdrop-blur-xl text-text-main px-4 md:px-6 py-4 rounded-3xl shadow-2xl border border-border-main flex flex-col md:flex-row items-center gap-4 md:gap-6 z-40 transition-all hover:bg-bg-card w-[92%] md:w-auto ${className}`} data-testid="theater-controls">
  
  {/* --- First Row (Mobile) / Left Group (Desktop) --- */}
  <div className="flex flex-row items-center justify-between w-full md:w-auto gap-2 md:gap-6">

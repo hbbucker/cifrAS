@@ -244,8 +244,8 @@ export const TheaterModePage: React.FC = () => {
  </button>
  </div>
 
- <div className={`transition-all duration-300 ${!showControls && isMobile ? 'translate-y-48 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}`}>
  <TheaterControls 
+ className={!showControls && isMobile ? 'translate-y-48 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}
  isScrolling={isScrolling}
  speed={speed}
  currentKey={currentKey}
@@ -260,7 +260,6 @@ export const TheaterModePage: React.FC = () => {
  onFontSizeIncrease={() => handleFontSizeChange(2)}
  onFontSizeDecrease={() => handleFontSizeChange(-2)}
  />
- </div>
  </div>
  );
 };
