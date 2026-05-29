@@ -2,27 +2,28 @@ package br.com.cifras.group.repository;
 
 import br.com.cifras.group.domain.GroupMember;
 import br.com.cifras.group.domain.GroupRole;
-import io.quarkus.hibernate.orm.panache.PanacheRepository;
+import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * GroupRepository — queries for Group and GroupMember entities.
  */
 @ApplicationScoped
-public class GroupRepository implements PanacheRepository<GroupMember> {
+public class GroupRepository implements PanacheRepositoryBase<GroupMember, UUID> {
 
-    public boolean isMember(Long groupId, String userId) {
+    public boolean isMember(UUID groupId, String userId) {
         return count("group.id = ?1 AND userId = ?2", groupId, userId) > 0;
     }
 
-    public boolean isOwner(Long groupId, String userId) {
+    public boolean isOwner(UUID groupId, String userId) {
         return count("group.id = ?1 AND userId = ?2 AND role = ?3",
             groupId, userId, GroupRole.OWNER) > 0;
     }
 
-    public Optional<GroupMember> findMember(Long groupId, String userId) {
+    public Optional<GroupMember> findMember(UUID groupId, String userId) {
         return find("group.id = ?1 AND userId = ?2", groupId, userId).firstResultOptional();
     }
 }

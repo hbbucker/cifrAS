@@ -11,6 +11,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import java.util.List;
+import java.util.UUID;
 
 @Path("/invites")
 @Authenticated
@@ -37,7 +38,7 @@ public class InvitationResource {
 
     @POST
     @Path("/{id}/accept")
-    public Response acceptInvite(@PathParam("id") Long id) {
+    public Response acceptInvite(@PathParam("id") UUID id) {
         String email = securityUtils.getCurrentUserEmail();
         String userId = securityUtils.getCurrentUserId();
         groupService.acceptInvite(id, email, userId);
@@ -46,7 +47,7 @@ public class InvitationResource {
 
     @POST
     @Path("/{id}/decline")
-    public Response declineInvite(@PathParam("id") Long id) {
+    public Response declineInvite(@PathParam("id") UUID id) {
         String email = securityUtils.getCurrentUserEmail();
         groupService.declineInvite(id, email);
         return Response.noContent().build();
@@ -63,7 +64,7 @@ public class InvitationResource {
 
     @DELETE
     @Path("/{id}")
-    public Response dismissInvite(@PathParam("id") Long id) {
+    public Response dismissInvite(@PathParam("id") UUID id) {
         String userId = securityUtils.getCurrentUserId();
         groupService.dismissInvite(id, userId);
         return Response.noContent().build();

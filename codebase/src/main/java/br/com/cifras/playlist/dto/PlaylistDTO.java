@@ -3,12 +3,13 @@ package br.com.cifras.playlist.dto;
 import br.com.cifras.playlist.domain.Playlist;
 
 import java.time.Instant;
+import java.util.UUID;
 
 /**
  * Playlist response DTO.
  */
 public record PlaylistDTO(
-    Long id,
+    UUID id,
     String name,
     boolean isCollaborative,
     String userId,

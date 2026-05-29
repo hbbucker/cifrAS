@@ -4,9 +4,10 @@ import br.com.cifras.playlist.domain.Playlist;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.UUID;
 
 public record PlaylistDetailsDTO(
-    Long id,
+    UUID id,
     String name,
     boolean isCollaborative,
     String userId,

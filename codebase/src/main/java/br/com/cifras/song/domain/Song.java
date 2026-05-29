@@ -1,12 +1,14 @@
 package br.com.cifras.song.domain;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.type.SqlTypes;
 
 import java.time.Instant;
+import java.util.UUID;
 
 /**
  * Song entity — persisted in PostgreSQL.
@@ -16,7 +18,12 @@ import java.time.Instant;
  */
 @Entity
 @Table(name = "songs")
-public class Song extends PanacheEntity {
+public class Song extends PanacheEntityBase {
+
+    @Id
+    @GeneratedValue
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
+    public UUID id;
 
     @NotBlank
     public String userId;

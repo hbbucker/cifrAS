@@ -4,12 +4,13 @@ import br.com.cifras.song.domain.LyricsStructure;
 import br.com.cifras.song.domain.Song;
 
 import java.time.Instant;
+import java.util.UUID;
 
 /**
  * Full song response DTO — returned by GET /songs/{id} and POST /songs.
  */
 public record SongDTO(
-    Long id,
+    UUID id,
     String title,
     String artist,
     String originalKey,

@@ -45,13 +45,14 @@ class GroupResourceTest extends BaseIntegrationTest {
     private static final String OWNER = "group-owner-uuid";
     private static final String MEMBER = "group-member-uuid";
 
-    private Integer createGroup(String name) {
-        return given()
+    private java.util.UUID createGroup(String name) {
+        String idStr = given()
             .contentType(ContentType.JSON)
             .body(new CreateGroupRequest(name))
             .when().post("/groups")
             .then().statusCode(201)
             .extract().path("id");
+        return java.util.UUID.fromString(idStr);
     }
 
     @Test
@@ -84,7 +85,7 @@ class GroupResourceTest extends BaseIntegrationTest {
     @Test
     @TestSecurity(user = OWNER, roles = {"user"})
     void givenOwnerAndTarget_whenInviteMember_thenReturns204() {
-        Integer groupId = createGroup("Band With Members");
+        java.util.UUID groupId = createGroup("Band With Members");
 
         Mockito.when(userService.getUserIdByEmail("member@example.com")).thenReturn(MEMBER);
 
@@ -99,9 +100,9 @@ class GroupResourceTest extends BaseIntegrationTest {
     @Test
     @TestSecurity(user = OWNER, roles = {"user"})
     void givenOwnerAndExistingMember_whenRemoveMember_thenReturns204() {
-        Integer groupId = createGroup("Band For Removal");
+        java.util.UUID groupId = createGroup("Band For Removal");
 
-        groupService.addMember(groupId.longValue(), MEMBER, OWNER);
+        groupService.addMember(groupId, MEMBER, OWNER);
 
         given()
             .when().delete("/groups/" + groupId + "/members/" + MEMBER)
@@ -112,7 +113,7 @@ class GroupResourceTest extends BaseIntegrationTest {
     @Test
     @TestSecurity(user = OWNER, roles = {"user"})
     void givenOwnerAndPlaylist_whenLinkPlaylist_thenReturns204() {
-        Integer groupId = createGroup("Band with Playlist");
+        java.util.UUID groupId = createGroup("Band with Playlist");
         Playlist playlist = playlistService.create(new CreatePlaylistRequest("My Songs", false, null), OWNER);
 
         given()
@@ -127,10 +128,10 @@ class GroupResourceTest extends BaseIntegrationTest {
     @TestSecurity(user = MEMBER, roles = {"user"})
     void givenMember_whenGetPlaylists_thenReturnsList() {
         br.com.cifras.group.domain.Group group = groupService.createGroup("Band with Shared Playlists", OWNER);
-        Integer groupId = group.id.intValue();
-        groupService.addMember(groupId.longValue(), MEMBER, OWNER);
+        java.util.UUID groupId = group.id;
+        groupService.addMember(groupId, MEMBER, OWNER);
         Playlist playlist = playlistService.create(new CreatePlaylistRequest("Setlist", false, null), OWNER);
-        groupService.linkPlaylist(groupId.longValue(), playlist.id, OWNER);
+        groupService.linkPlaylist(groupId, playlist.id, OWNER);
 
         given()
             .when().get("/groups/" + groupId + "/playlists")
@@ -145,9 +146,9 @@ class GroupResourceTest extends BaseIntegrationTest {
     @Test
     @TestSecurity(user = OWNER, roles = {"user"})
     void givenOwner_whenUnlinkPlaylist_thenReturns204() {
-        Integer groupId = createGroup("Band for Unlink");
+        java.util.UUID groupId = createGroup("Band for Unlink");
         Playlist playlist = playlistService.create(new CreatePlaylistRequest("Temporary Setlist", false, null), OWNER);
-        groupService.linkPlaylist(groupId.longValue(), playlist.id, OWNER);
+        groupService.linkPlaylist(groupId, playlist.id, OWNER);
 
         given()
             .when().delete("/groups/" + groupId + "/playlists/" + playlist.id)

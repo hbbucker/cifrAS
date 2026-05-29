@@ -117,6 +117,6 @@ class PlaylistServiceTest extends BaseIntegrationTest {
             new CreateSongRequest("Orphan Song", "Artist", "A", null), OWNER);
 
         assertThrows(NotFoundException.class,
-            () -> playlistService.addSong(99999L, song.id, 0, OWNER));
+            () -> playlistService.addSong(java.util.UUID.randomUUID(), song.id, 0, OWNER));
     }
 }

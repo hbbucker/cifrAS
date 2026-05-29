@@ -1,7 +1,7 @@
 package br.com.cifras.song.repository;
 
 import br.com.cifras.song.domain.Song;
-import io.quarkus.hibernate.orm.panache.PanacheRepository;
+import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Page;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -15,7 +15,7 @@ import java.util.UUID;
  * All queries automatically filter deleted_at IS NULL (soft delete).
  */
 @ApplicationScoped
-public class SongRepository implements PanacheRepository<Song> {
+public class SongRepository implements PanacheRepositoryBase<Song, UUID> {
 
     private static final String ACTIVE_FILTER = "deletedAt IS NULL";
 
@@ -50,7 +50,7 @@ public class SongRepository implements PanacheRepository<Song> {
     /**
      * Find an active song by ID (not soft-deleted).
      */
-    public Optional<Song> findActiveById(Long id) {
+    public Optional<Song> findActiveById(UUID id) {
         return find("id = ?1 AND " + ACTIVE_FILTER, id).firstResultOptional();
     }
 }

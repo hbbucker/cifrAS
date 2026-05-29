@@ -14,6 +14,7 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * PlaylistService — business logic for playlist CRUD, song management, and reordering.
@@ -61,7 +62,7 @@ public class PlaylistService {
     /**
      * Gets a playlist by ID and verifies access.
      */
-    public Playlist getById(Long playlistId, String userId) {
+    public Playlist getById(UUID playlistId, String userId) {
         Playlist playlist = playlistRepository.findActiveById(playlistId)
             .orElseThrow(() -> new NotFoundException("Playlist not found"));
 
@@ -80,7 +81,7 @@ public class PlaylistService {
      * @throws ForbiddenException if user doesn't own the playlist
      */
     @Transactional
-    public void addSong(Long playlistId, Long songId, int position, String userId) {
+    public void addSong(UUID playlistId, UUID songId, int position, String userId) {
         Playlist playlist = playlistRepository.findActiveById(playlistId)
             .orElseThrow(() -> new NotFoundException("Playlist not found"));
 
@@ -116,7 +117,7 @@ public class PlaylistService {
      * @throws ForbiddenException if user doesn't own the playlist
      */
     @Transactional
-    public void removeSong(Long playlistId, Long songId, String userId) {
+    public void removeSong(UUID playlistId, UUID songId, String userId) {
         Playlist playlist = playlistRepository.findActiveById(playlistId)
             .orElseThrow(() -> new NotFoundException("Playlist not found"));
 
@@ -149,7 +150,7 @@ public class PlaylistService {
      * @throws ForbiddenException if user doesn't own the playlist
      */
     @Transactional
-    public void reorder(Long playlistId, List<Long> orderedSongIds, String userId) {
+    public void reorder(UUID playlistId, List<UUID> orderedSongIds, String userId) {
         Playlist playlist = playlistRepository.findActiveById(playlistId)
             .orElseThrow(() -> new NotFoundException("Playlist not found"));
 
@@ -159,7 +160,7 @@ public class PlaylistService {
 
         for (int i = 0; i < orderedSongIds.size(); i++) {
             final int newPos = i;
-            final Long targetSongId = orderedSongIds.get(i);
+            final UUID targetSongId = orderedSongIds.get(i);
             playlist.songs.stream()
                 .filter(ps -> ps.song.id.equals(targetSongId))
                 .findFirst()

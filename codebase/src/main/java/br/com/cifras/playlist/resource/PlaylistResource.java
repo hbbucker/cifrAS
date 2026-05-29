@@ -12,6 +12,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * PlaylistResource — REST endpoints for playlist CRUD, song management, and reordering.
@@ -49,7 +50,7 @@ public class PlaylistResource {
     /** GET /playlists/{id} → 200 */
     @GET
     @Path("/{id}")
-    public Response getPlaylist(@PathParam("id") Long id) {
+    public Response getPlaylist(@PathParam("id") UUID id) {
         String userId = securityUtils.getCurrentUserId();
         Playlist playlist = playlistService.getById(id, userId);
         return Response.ok(PlaylistDetailsDTO.from(playlist)).build();
@@ -58,7 +59,7 @@ public class PlaylistResource {
     /** POST /playlists/{id}/songs → 204 */
     @POST
     @Path("/{id}/songs")
-    public Response addSong(@PathParam("id") Long id, AddSongRequest request) {
+    public Response addSong(@PathParam("id") UUID id, AddSongRequest request) {
         String userId = securityUtils.getCurrentUserId();
         playlistService.addSong(id, request.songId(), request.position(), userId);
         return Response.noContent().build();
@@ -67,7 +68,7 @@ public class PlaylistResource {
     /** DELETE /playlists/{id}/songs/{songId} → 204 */
     @DELETE
     @Path("/{id}/songs/{songId}")
-    public Response removeSong(@PathParam("id") Long id, @PathParam("songId") Long songId) {
+    public Response removeSong(@PathParam("id") UUID id, @PathParam("songId") UUID songId) {
         String userId = securityUtils.getCurrentUserId();
         playlistService.removeSong(id, songId, userId);
         return Response.noContent().build();
@@ -76,7 +77,7 @@ public class PlaylistResource {
     /** PATCH /playlists/{id}/songs/reorder → 204 */
     @PATCH
     @Path("/{id}/songs/reorder")
-    public Response reorderSongs(@PathParam("id") Long id, ReorderRequest request) {
+    public Response reorderSongs(@PathParam("id") UUID id, ReorderRequest request) {
         String userId = securityUtils.getCurrentUserId();
         playlistService.reorder(id, request.orderedSongIds(), userId);
         return Response.noContent().build();

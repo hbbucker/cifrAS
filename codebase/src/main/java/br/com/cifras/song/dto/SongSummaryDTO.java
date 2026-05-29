@@ -3,12 +3,13 @@ package br.com.cifras.song.dto;
 import br.com.cifras.song.domain.Song;
 
 import java.time.Instant;
+import java.util.UUID;
 
 /**
  * Summary song DTO for paginated list — lighter than full SongDTO.
  */
 public record SongSummaryDTO(
-    Long id,
+    UUID id,
     String title,
     String artist,
     String originalKey,

@@ -97,7 +97,7 @@ class SongResourceTest extends BaseIntegrationTest {
     @TestSecurity(user = OWNER, roles = {"user"})
     void givenOwnedSong_whenGetById_thenReturns200() {
         // First create a song
-        Integer songId = given()
+        String idStr = given()
             .contentType(ContentType.JSON)
             .body("""
                 {"title":"Let It Be","artist":"Beatles","originalKey":"C"}
@@ -105,6 +105,7 @@ class SongResourceTest extends BaseIntegrationTest {
             .when().post("/songs")
             .then().statusCode(201)
             .extract().path("id");
+        java.util.UUID songId = java.util.UUID.fromString(idStr);
 
         // Then fetch it
         given()
@@ -133,7 +134,7 @@ class SongResourceTest extends BaseIntegrationTest {
     @Test
     @TestSecurity(user = OWNER, roles = {"user"})
     void givenOwnedSong_whenDelete_thenReturns204AndSoftDeletes() {
-        Integer songId = given()
+        String idStr = given()
             .contentType(ContentType.JSON)
             .body("""
                 {"title":"To Delete","artist":"Test","originalKey":"G"}
@@ -141,6 +142,7 @@ class SongResourceTest extends BaseIntegrationTest {
             .when().post("/songs")
             .then().statusCode(201)
             .extract().path("id");
+        java.util.UUID songId = java.util.UUID.fromString(idStr);
 
         given()
             .when().delete("/songs/" + songId)

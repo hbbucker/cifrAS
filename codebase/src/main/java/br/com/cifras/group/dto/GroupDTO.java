@@ -1,9 +1,10 @@
 package br.com.cifras.group.dto;
 
 import br.com.cifras.group.domain.Group;
+import java.util.UUID;
 
 public record GroupDTO(
-    Long id,
+    UUID id,
     String name,
     String ownerId
 ) {

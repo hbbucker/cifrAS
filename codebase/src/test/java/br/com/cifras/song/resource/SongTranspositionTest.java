@@ -23,8 +23,8 @@ class SongTranspositionTest extends BaseIntegrationTest {
 
     private static final String OWNER = "transpose-owner-uuid";
 
-    private Integer createSong() {
-        return given()
+    private java.util.UUID createSong() {
+        String idStr = given()
             .contentType(ContentType.JSON)
             .body("""
                 {
@@ -35,6 +35,7 @@ class SongTranspositionTest extends BaseIntegrationTest {
             .when().post("/songs")
             .then().statusCode(201)
             .extract().path("id");
+        return java.util.UUID.fromString(idStr);
     }
 
     /**
@@ -43,7 +44,7 @@ class SongTranspositionTest extends BaseIntegrationTest {
     @Test
     @TestSecurity(user = OWNER, roles = {"user"})
     void givenValidSemitones_whenTranspose_thenReturns200WithTransposedChords() {
-        Integer id = createSong();
+        java.util.UUID id = createSong();
 
         given()
             .contentType(ContentType.JSON)
@@ -61,7 +62,7 @@ class SongTranspositionTest extends BaseIntegrationTest {
     @Test
     @TestSecurity(user = OWNER, roles = {"user"})
     void givenSemitonesOver11_whenTranspose_thenReturns400() {
-        Integer id = createSong();
+        java.util.UUID id = createSong();
 
         given()
             .contentType(ContentType.JSON)
@@ -77,7 +78,7 @@ class SongTranspositionTest extends BaseIntegrationTest {
     @Test
     @TestSecurity(user = OWNER, roles = {"user"})
     void givenSemitonesUnderMinus11_whenTranspose_thenReturns400() {
-        Integer id = createSong();
+        java.util.UUID id = createSong();
 
         given()
             .contentType(ContentType.JSON)
@@ -93,7 +94,7 @@ class SongTranspositionTest extends BaseIntegrationTest {
     @Test
     @TestSecurity(user = OWNER, roles = {"user"})
     void givenTransposeQueryParam_whenGetSong_thenReturnsTransposedLyrics() {
-        Integer id = createSong();
+        java.util.UUID id = createSong();
 
         given()
             .queryParam("transpose", 2)

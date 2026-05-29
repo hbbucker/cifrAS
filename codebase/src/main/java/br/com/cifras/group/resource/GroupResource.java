@@ -17,6 +17,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import java.util.List;
+import java.util.UUID;
 
 @Path("/groups")
 @Authenticated
@@ -47,7 +48,7 @@ public class GroupResource {
 
     @POST
     @Path("/{id}/members")
-    public Response inviteMember(@PathParam("id") Long id, @Valid AddMemberRequest request) {
+    public Response inviteMember(@PathParam("id") UUID id, @Valid AddMemberRequest request) {
         String userId = securityUtils.getCurrentUserId();
         groupService.inviteMember(id, request.email(), userId);
         return Response.noContent().build();
@@ -55,7 +56,7 @@ public class GroupResource {
 
     @DELETE
     @Path("/{id}/members/{targetUserId}")
-    public Response removeMember(@PathParam("id") Long id, @PathParam("targetUserId") String targetUserId) {
+    public Response removeMember(@PathParam("id") UUID id, @PathParam("targetUserId") String targetUserId) {
         String userId = securityUtils.getCurrentUserId();
         groupService.removeMember(id, targetUserId, userId);
         return Response.noContent().build();
@@ -63,7 +64,7 @@ public class GroupResource {
 
     @POST
     @Path("/{id}/playlists")
-    public Response linkPlaylist(@PathParam("id") Long id, @Valid LinkPlaylistRequest request) {
+    public Response linkPlaylist(@PathParam("id") UUID id, @Valid LinkPlaylistRequest request) {
         String userId = securityUtils.getCurrentUserId();
         groupService.linkPlaylist(id, request.playlistId(), userId);
         return Response.noContent().build();
@@ -71,7 +72,7 @@ public class GroupResource {
 
     @GET
     @Path("/{id}/playlists")
-    public Response listGroupPlaylists(@PathParam("id") Long id) {
+    public Response listGroupPlaylists(@PathParam("id") UUID id) {
         String userId = securityUtils.getCurrentUserId();
         List<Playlist> playlists = groupService.listGroupPlaylists(id, userId);
         List<PlaylistDTO> dtos = playlists.stream().map(PlaylistDTO::from).toList();
@@ -80,7 +81,7 @@ public class GroupResource {
 
     @DELETE
     @Path("/{id}/playlists/{playlistId}")
-    public Response unlinkPlaylist(@PathParam("id") Long id, @PathParam("playlistId") Long playlistId) {
+    public Response unlinkPlaylist(@PathParam("id") UUID id, @PathParam("playlistId") UUID playlistId) {
         String userId = securityUtils.getCurrentUserId();
         groupService.unlinkPlaylist(id, playlistId, userId);
         return Response.noContent().build();

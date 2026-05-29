@@ -1,20 +1,27 @@
 package br.com.cifras.playlist.domain;
 
 import br.com.cifras.group.domain.Group;
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Playlist entity. Can be personal or collaborative (linked to a Group).
  */
 @Entity
 @Table(name = "playlists")
-public class Playlist extends PanacheEntity {
+public class Playlist extends PanacheEntityBase {
+
+    @Id
+    @GeneratedValue
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
+    public UUID id;
 
     @NotBlank
     public String userId;

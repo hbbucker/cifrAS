@@ -1,8 +1,10 @@
 package br.com.cifras.playlist.domain;
 
 import br.com.cifras.song.domain.Song;
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
+import org.hibernate.annotations.UuidGenerator;
+import java.util.UUID;
 
 /**
  * PlaylistSong — junction table between Playlist and Song with ordering position.
@@ -11,7 +13,12 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "playlist_songs",
     uniqueConstraints = @UniqueConstraint(columnNames = {"playlist_id", "song_id"}))
-public class PlaylistSong extends PanacheEntity {
+public class PlaylistSong extends PanacheEntityBase {
+
+    @Id
+    @GeneratedValue
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
+    public UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "playlist_id", nullable = false)

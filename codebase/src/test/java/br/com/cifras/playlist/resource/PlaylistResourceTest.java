@@ -26,22 +26,24 @@ class PlaylistResourceTest extends BaseIntegrationTest {
 
     private static final String OWNER = "playlist-res-owner-uuid";
 
-    private Integer createPlaylist(String name) {
-        return given()
+    private java.util.UUID createPlaylist(String name) {
+        String idStr = given()
             .contentType(ContentType.JSON)
             .body("{\"name\":\"" + name + "\",\"isCollaborative\":false}")
             .when().post("/playlists")
             .then().statusCode(201)
             .extract().path("id");
+        return java.util.UUID.fromString(idStr);
     }
 
-    private Integer createSong(String title) {
-        return given()
+    private java.util.UUID createSong(String title) {
+        String idStr = given()
             .contentType(ContentType.JSON)
             .body("{\"title\":\"" + title + "\",\"artist\":\"Artist\",\"originalKey\":\"C\"}")
             .when().post("/songs")
             .then().statusCode(201)
             .extract().path("id");
+        return java.util.UUID.fromString(idStr);
     }
 
     /**
@@ -79,12 +81,12 @@ class PlaylistResourceTest extends BaseIntegrationTest {
     @Test
     @TestSecurity(user = OWNER, roles = {"user"})
     void givenPlaylistAndSong_whenAddSong_thenReturns204() {
-        Integer playlistId = createPlaylist("Set for Add");
-        Integer songId = createSong("Song to Add");
+        java.util.UUID playlistId = createPlaylist("Set for Add");
+        java.util.UUID songId = createSong("Song to Add");
 
         given()
             .contentType(ContentType.JSON)
-            .body("{\"songId\":" + songId + ",\"position\":0}")
+            .body("{\"songId\":\"" + songId + "\",\"position\":0}")
             .when().post("/playlists/" + playlistId + "/songs")
             .then().statusCode(204);
     }
@@ -95,11 +97,11 @@ class PlaylistResourceTest extends BaseIntegrationTest {
     @Test
     @TestSecurity(user = OWNER, roles = {"user"})
     void givenSongInPlaylist_whenRemoveSong_thenReturns204() {
-        Integer playlistId = createPlaylist("Set for Remove");
-        Integer songId = createSong("Song to Remove");
+        java.util.UUID playlistId = createPlaylist("Set for Remove");
+        java.util.UUID songId = createSong("Song to Remove");
 
         given().contentType(ContentType.JSON)
-            .body("{\"songId\":" + songId + ",\"position\":0}")
+            .body("{\"songId\":\"" + songId + "\",\"position\":0}")
             .when().post("/playlists/" + playlistId + "/songs")
             .then().statusCode(204);
 
@@ -114,20 +116,20 @@ class PlaylistResourceTest extends BaseIntegrationTest {
     @Test
     @TestSecurity(user = OWNER, roles = {"user"})
     void givenSongsInPlaylist_whenReorder_thenReturns204() {
-        Integer playlistId = createPlaylist("Set for Reorder");
-        Integer song1Id = createSong("Song 1 Reorder");
-        Integer song2Id = createSong("Song 2 Reorder");
+        java.util.UUID playlistId = createPlaylist("Set for Reorder");
+        java.util.UUID song1Id = createSong("Song 1 Reorder");
+        java.util.UUID song2Id = createSong("Song 2 Reorder");
 
         given().contentType(ContentType.JSON)
-            .body("{\"songId\":" + song1Id + ",\"position\":0}")
+            .body("{\"songId\":\"" + song1Id + "\",\"position\":0}")
             .when().post("/playlists/" + playlistId + "/songs").then().statusCode(204);
         given().contentType(ContentType.JSON)
-            .body("{\"songId\":" + song2Id + ",\"position\":1}")
+            .body("{\"songId\":\"" + song2Id + "\",\"position\":1}")
             .when().post("/playlists/" + playlistId + "/songs").then().statusCode(204);
 
         given()
             .contentType(ContentType.JSON)
-            .body("{\"orderedSongIds\":[" + song2Id + "," + song1Id + "]}")
+            .body("{\"orderedSongIds\":[\"" + song2Id + "\",\"" + song1Id + "\"]}")
             .when().patch("/playlists/" + playlistId + "/songs/reorder")
             .then().statusCode(204);
     }

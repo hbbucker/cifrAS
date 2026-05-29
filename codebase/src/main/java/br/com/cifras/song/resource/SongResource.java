@@ -16,6 +16,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * SongResource — REST endpoints for song CRUD operations.
@@ -76,7 +77,7 @@ public class SongResource {
     @GET
     @Path("/{id}")
     public Response getSong(
-        @PathParam("id") Long id,
+        @PathParam("id") UUID id,
         @QueryParam("transpose") Integer transpose
     ) {
         String userId = securityUtils.getCurrentUserId();
@@ -96,7 +97,7 @@ public class SongResource {
      */
     @POST
     @Path("/{id}/transpose")
-    public Response transposeSong(@PathParam("id") Long id, @Valid TransposeRequest request) {
+    public Response transposeSong(@PathParam("id") UUID id, @Valid TransposeRequest request) {
         String userId = securityUtils.getCurrentUserId();
         Song song = songService.findByIdAndUser(id, userId);
         LyricsStructure transposed = transpositionService.transpose(
@@ -112,7 +113,7 @@ public class SongResource {
      */
     @PUT
     @Path("/{id}")
-    public Response updateSong(@PathParam("id") Long id, @Valid UpdateSongRequest request) {
+    public Response updateSong(@PathParam("id") UUID id, @Valid UpdateSongRequest request) {
         String userId = securityUtils.getCurrentUserId();
         Song song = songService.update(id, request, userId);
         return Response.ok(SongDTO.from(song)).build();
@@ -124,7 +125,7 @@ public class SongResource {
      */
     @DELETE
     @Path("/{id}")
-    public Response deleteSong(@PathParam("id") Long id) {
+    public Response deleteSong(@PathParam("id") UUID id) {
         String userId = securityUtils.getCurrentUserId();
         songService.softDelete(id, userId);
         return Response.noContent().build();

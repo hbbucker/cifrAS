@@ -1,10 +1,11 @@
 package br.com.cifras.group.dto;
 
 import br.com.cifras.group.domain.GroupInvitation;
+import java.util.UUID;
 
 public record GroupInvitationDTO(
-    Long id,
-    Long groupId,
+    UUID id,
+    UUID groupId,
     String groupName,
     String inviterId,
     String inviteeEmail,

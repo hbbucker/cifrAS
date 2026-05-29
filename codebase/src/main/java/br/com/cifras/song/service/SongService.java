@@ -14,6 +14,7 @@ import jakarta.transaction.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * SongService — business logic for song CRUD operations.
@@ -40,7 +41,7 @@ public class SongService {
      *
      * @throws NotFoundException if the song doesn't exist, is soft-deleted, or belongs to another user
      */
-    public Song findByIdAndUser(Long id, String userId) {
+    public Song findByIdAndUser(UUID id, String userId) {
         Song song = songRepository.findActiveById(id)
             .orElseThrow(() -> new NotFoundException("Song not found: " + id));
 
@@ -79,7 +80,7 @@ public class SongService {
      * @throws NotFoundException  if the song doesn't exist or is soft-deleted
      */
     @Transactional
-    public Song update(Long id, UpdateSongRequest req, String userId) {
+    public Song update(UUID id, UpdateSongRequest req, String userId) {
         Song song = songRepository.findActiveById(id)
             .orElseThrow(() -> new NotFoundException("Song not found: " + id));
 
@@ -101,7 +102,7 @@ public class SongService {
      * @throws NotFoundException  if the song doesn't exist or is already soft-deleted
      */
     @Transactional
-    public void softDelete(Long id, String userId) {
+    public void softDelete(UUID id, String userId) {
         Song song = songRepository.findActiveById(id)
             .orElseThrow(() -> new NotFoundException("Song not found: " + id));
 

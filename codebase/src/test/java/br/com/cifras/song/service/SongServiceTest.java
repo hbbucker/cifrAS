@@ -104,7 +104,7 @@ class SongServiceTest extends BaseIntegrationTest {
     @Transactional
     void givenExistingSong_whenSoftDelete_thenDisappearsFromActiveRecords() {
         Song song = songService.create(new CreateSongRequest("Deletable", "Artist", "D", null), USER_A);
-        Long songId = song.id;
+        java.util.UUID songId = song.id;
 
         songService.softDelete(songId, USER_A);
 

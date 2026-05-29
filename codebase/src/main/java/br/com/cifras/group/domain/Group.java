@@ -1,8 +1,10 @@
 package br.com.cifras.group.domain;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import org.hibernate.annotations.UuidGenerator;
+import java.util.UUID;
 
 /**
  * Group entity — represents a collaboration group.
@@ -10,7 +12,12 @@ import jakarta.validation.constraints.NotBlank;
  */
 @Entity
 @Table(name = "grupos")
-public class Group extends PanacheEntity {
+public class Group extends PanacheEntityBase {
+
+    @Id
+    @GeneratedValue
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
+    public UUID id;
 
     @NotBlank
     @Column(nullable = false)

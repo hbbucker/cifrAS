@@ -18,6 +18,7 @@ import jakarta.transaction.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * GroupService — group management and membership control.
@@ -34,11 +35,11 @@ public class GroupService {
     @Inject
     UserService userService;
 
-    public boolean isMember(Long groupId, String userId) {
+    public boolean isMember(UUID groupId, String userId) {
         return groupRepository.isMember(groupId, userId);
     }
 
-    public boolean isOwner(Long groupId, String userId) {
+    public boolean isOwner(UUID groupId, String userId) {
         return groupRepository.isOwner(groupId, userId);
     }
 
@@ -60,7 +61,7 @@ public class GroupService {
     }
 
     @Transactional
-    public void addMember(Long groupId, String targetUserId, String requestingUserId) {
+    public void addMember(UUID groupId, String targetUserId, String requestingUserId) {
         Group group = Group.findById(groupId);
         if (group == null) throw new NotFoundException("Group not found");
         if (!isOwner(groupId, requestingUserId)) throw new ForbiddenException("Only OWNER can invite members");
@@ -73,7 +74,7 @@ public class GroupService {
     }
 
     @Transactional
-    public void inviteMember(Long groupId, String targetEmail, String requestingUserId) {
+    public void inviteMember(UUID groupId, String targetEmail, String requestingUserId) {
         if (!isOwner(groupId, requestingUserId)) throw new ForbiddenException("Only OWNER can invite members");
         Group group = Group.findById(groupId);
         if (group == null) throw new NotFoundException("Group not found");
@@ -96,7 +97,7 @@ public class GroupService {
     }
 
     @Transactional
-    public void acceptInvite(Long inviteId, String currentUserEmail, String currentUserId) {
+    public void acceptInvite(UUID inviteId, String currentUserEmail, String currentUserId) {
         GroupInvitation invite = invitationRepository.findById(inviteId);
         if (invite == null || !invite.inviteeEmail.equalsIgnoreCase(currentUserEmail)) {
             throw new NotFoundException("Invitation not found");
@@ -116,7 +117,7 @@ public class GroupService {
     }
 
     @Transactional
-    public void declineInvite(Long inviteId, String currentUserEmail) {
+    public void declineInvite(UUID inviteId, String currentUserEmail) {
         GroupInvitation invite = invitationRepository.findById(inviteId);
         if (invite == null || !invite.inviteeEmail.equalsIgnoreCase(currentUserEmail)) {
             throw new NotFoundException("Invitation not found");
@@ -136,7 +137,7 @@ public class GroupService {
     }
 
     @Transactional
-    public void dismissInvite(Long inviteId, String inviterId) {
+    public void dismissInvite(UUID inviteId, String inviterId) {
         GroupInvitation invite = invitationRepository.findById(inviteId);
         if (invite != null && invite.inviterId.equals(inviterId)) {
             invite.delete();
@@ -144,7 +145,7 @@ public class GroupService {
     }
 
     @Transactional
-    public void removeMember(Long groupId, String targetUserId, String requestingUserId) {
+    public void removeMember(UUID groupId, String targetUserId, String requestingUserId) {
         if (!isOwner(groupId, requestingUserId)) throw new ForbiddenException("Only OWNER can remove members");
         GroupMember member = groupRepository.findMember(groupId, targetUserId)
             .orElseThrow(() -> new NotFoundException("Member not found"));
@@ -157,7 +158,7 @@ public class GroupService {
     }
 
     @Transactional
-    public void linkPlaylist(Long groupId, Long playlistId, String requestingUserId) {
+    public void linkPlaylist(UUID groupId, UUID playlistId, String requestingUserId) {
         if (!isOwner(groupId, requestingUserId)) throw new ForbiddenException("Only OWNER can link playlists to the group");
         
         Group group = Group.findById(groupId);
@@ -173,7 +174,7 @@ public class GroupService {
     }
 
     @Transactional
-    public void unlinkPlaylist(Long groupId, Long playlistId, String requestingUserId) {
+    public void unlinkPlaylist(UUID groupId, UUID playlistId, String requestingUserId) {
         if (!isOwner(groupId, requestingUserId)) throw new ForbiddenException("Only OWNER can unlink playlists from the group");
 
         Playlist playlist = Playlist.findById(playlistId);
@@ -187,7 +188,7 @@ public class GroupService {
         playlist.isCollaborative = false;
     }
 
-    public List<Playlist> listGroupPlaylists(Long groupId, String requestingUserId) {
+    public List<Playlist> listGroupPlaylists(UUID groupId, String requestingUserId) {
         if (!isMember(groupId, requestingUserId)) throw new ForbiddenException("Only members can view group playlists");
         
         Group group = Group.findById(groupId);
