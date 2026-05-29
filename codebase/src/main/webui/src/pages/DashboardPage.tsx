@@ -28,9 +28,12 @@ export const DashboardPage: React.FC = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [songs, setSongs] = useState<SongData[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    fetch('/api/songs', {
+    setLoading(true);
+    const url = searchQuery ? `/api/songs?q=${encodeURIComponent(searchQuery)}` : '/api/songs';
+    fetch(url, {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
     })
       .then(res => {
@@ -57,7 +60,7 @@ export const DashboardPage: React.FC = () => {
         toast('Failed to load recent songs', 'error');
         setLoading(false);
       });
-  }, [logout, navigate, toast]);
+  }, [logout, navigate, toast, searchQuery]);
 
   const handleDelete = (id: string) => {
     if (!window.confirm('Are you sure you want to delete this song?')) return;
@@ -87,7 +90,7 @@ export const DashboardPage: React.FC = () => {
         <header className="h-16 flex items-center justify-between px-6 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
           <h1 className="text-xl font-bold text-gray-900 dark:text-white hidden sm:block">Dashboard</h1>
           <div className="flex-1 sm:ml-8">
-            <SearchBar />
+            <SearchBar onSearch={setSearchQuery} />
           </div>
           <div className="ml-4 flex items-center gap-4">
             <UserMenu />
@@ -101,7 +104,9 @@ export const DashboardPage: React.FC = () => {
           </div>
 
           <div className="mb-6 flex justify-between items-center">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Recently Added</h3>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+              {searchQuery ? `Search Results for "${searchQuery}"` : 'Recently Added'}
+            </h3>
             <button
               onClick={() => navigate('/songs')}
               className="text-sm font-medium text-[#aa3bff] hover:underline"

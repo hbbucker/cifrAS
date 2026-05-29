@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Loader2 } from 'lucide-react';
-import authClient from '../../services/authService';
+import { Search, Loader2, X } from 'lucide-react';
+
 
 interface SearchResult {
   id: string;
@@ -10,7 +10,11 @@ interface SearchResult {
   keySignature: string;
 }
 
-export const SearchBar: React.FC = () => {
+interface SearchBarProps {
+  onSearch?: (query: string) => void;
+}
+
+export const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -31,8 +35,10 @@ export const SearchBar: React.FC = () => {
 
   // Fetch results
   useEffect(() => {
+    const controller = new AbortController();
+
     const fetchResults = async () => {
-      if (debouncedQuery.trim().length === 0) {
+      if (debouncedQuery.trim().length < 3) {
         setResults([]);
         setIsDropdownOpen(false);
         return;
@@ -40,18 +46,39 @@ export const SearchBar: React.FC = () => {
 
       setIsLoading(true);
       try {
-        // Assume API endpoint /search?q=
-        const { data } = await authClient.get(`/search?q=${encodeURIComponent(debouncedQuery)}&limit=5`);
-        setResults(data.results || []);
+        const token = localStorage.getItem('token');
+        const response = await fetch(`/api/songs?q=${encodeURIComponent(debouncedQuery)}&pageSize=5`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+          signal: controller.signal
+        });
+        
+        if (!response.ok) throw new Error('Search failed');
+        
+        const data = await response.json();
+        const items = Array.isArray(data) ? data : (data.data || []);
+        const mappedItems = items.map((item: any) => ({
+          ...item,
+          keySignature: item.originalKey || item.keySignature || 'C'
+        }));
+        setResults(mappedItems);
         setIsDropdownOpen(true);
-      } catch (error) {
+      } catch (error: any) {
+        if (error.name === 'AbortError') {
+          return;
+        }
         console.error('Search failed:', error);
       } finally {
-        setIsLoading(false);
+        if (!controller.signal.aborted) {
+          setIsLoading(false);
+        }
       }
     };
 
     fetchResults();
+
+    return () => {
+      controller.abort();
+    };
   }, [debouncedQuery]);
 
   // Click outside to close dropdown
@@ -67,9 +94,23 @@ export const SearchBar: React.FC = () => {
   }, []);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && query.trim()) {
+    if (e.key === 'Enter') {
       setIsDropdownOpen(false);
-      navigate(`/search?q=${encodeURIComponent(query)}`);
+      if (onSearch) {
+        onSearch(query.trim());
+      } else if (query.trim()) {
+        navigate(`/search?q=${encodeURIComponent(query)}`);
+      }
+    }
+  };
+
+  const handleClear = () => {
+    setQuery('');
+    setDebouncedQuery('');
+    setResults([]);
+    setIsDropdownOpen(false);
+    if (onSearch) {
+      onSearch('');
     }
   };
 
@@ -91,6 +132,15 @@ export const SearchBar: React.FC = () => {
           className="w-full pl-10 pr-10 py-2 bg-gray-100 dark:bg-gray-800 border-none rounded-lg focus:ring-2 focus:ring-[#aa3bff] focus:outline-none transition-all dark:text-white"
           data-testid="search-input"
         />
+        {query && !isLoading && (
+          <button
+            onClick={handleClear}
+            className="absolute right-3 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-600 transition-colors"
+            data-testid="search-clear"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
         {isLoading && (
           <Loader2 className="absolute right-3 w-5 h-5 text-gray-400 animate-spin" data-testid="search-loader" />
         )}

@@ -2,28 +2,26 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { SearchBar } from '../components/search/SearchBar';
-import authClient from '../services/authService';
 import '@testing-library/jest-dom/vitest';
-
-vi.mock('../services/authService', () => ({
-  default: {
-    get: vi.fn(),
-  }
-}));
 
 describe('SearchBar Component', () => {
   beforeEach(() => {
     vi.useFakeTimers();
+    vi.stubGlobal('fetch', vi.fn());
   });
 
   afterEach(() => {
     vi.clearAllMocks();
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 
   it('debounces input and calls search API', async () => {
-    const mockData = { results: [{ id: '1', title: 'Test Song', artist: 'Test Artist', keySignature: 'C' }] };
-    (authClient.get as unknown as { mockResolvedValue: (val: unknown) => void }).mockResolvedValue({ data: mockData });
+    const mockData = [{ id: '1', title: 'Test Song', artist: 'Test Artist', keySignature: 'C' }];
+    (fetch as any).mockResolvedValue({
+      ok: true,
+      json: async () => mockData
+    });
 
     render(
       <MemoryRouter>
@@ -35,7 +33,7 @@ describe('SearchBar Component', () => {
     fireEvent.change(input, { target: { value: 'Test' } });
 
     // Instantly shouldn't call API
-    expect(authClient.get).not.toHaveBeenCalled();
+    expect(fetch).not.toHaveBeenCalled();
 
     // Fast-forward timers
     await act(async () => {
@@ -47,7 +45,7 @@ describe('SearchBar Component', () => {
       vi.runAllTimers();
     });
 
-    expect(authClient.get).toHaveBeenCalledWith('/search?q=Test&limit=5');
+    expect(fetch).toHaveBeenCalledWith('/api/songs?q=Test&pageSize=5', expect.any(Object));
     expect(screen.getByTestId('search-dropdown')).toBeInTheDocument();
     expect(screen.getByText('Test Song')).toBeInTheDocument();
   });
