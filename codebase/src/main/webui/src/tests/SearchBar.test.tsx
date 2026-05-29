@@ -5,65 +5,65 @@ import { SearchBar } from '../components/search/SearchBar';
 import '@testing-library/jest-dom/vitest';
 
 describe('SearchBar Component', () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-    vi.stubGlobal('fetch', vi.fn());
-  });
+ beforeEach(() => {
+ vi.useFakeTimers();
+ vi.stubGlobal('fetch', vi.fn());
+ });
 
-  afterEach(() => {
-    vi.clearAllMocks();
-    vi.restoreAllMocks();
-    vi.unstubAllGlobals();
-  });
+ afterEach(() => {
+ vi.clearAllMocks();
+ vi.restoreAllMocks();
+ vi.unstubAllGlobals();
+ });
 
-  it('debounces input and calls search API', async () => {
-    const mockData = [{ id: '1', title: 'Test Song', artist: 'Test Artist', keySignature: 'C' }];
-    (fetch as any).mockResolvedValue({
-      ok: true,
-      json: async () => mockData
-    });
+ it('debounces input and calls search API', async () => {
+ const mockData = [{ id: '1', title: 'Test Song', artist: 'Test Artist', keySignature: 'C' }];
+ (fetch as any).mockResolvedValue({
+ ok: true,
+ json: async () => mockData
+ });
 
-    render(
-      <MemoryRouter>
-        <SearchBar />
-      </MemoryRouter>
-    );
+ render(
+ <MemoryRouter>
+ <SearchBar />
+ </MemoryRouter>
+ );
 
-    const input = screen.getByTestId('search-input');
-    fireEvent.change(input, { target: { value: 'Test' } });
+ const input = screen.getByTestId('search-input');
+ fireEvent.change(input, { target: { value: 'Test' } });
 
-    // Instantly shouldn't call API
-    expect(fetch).not.toHaveBeenCalled();
+ // Instantly shouldn't call API
+ expect(fetch).not.toHaveBeenCalled();
 
-    // Fast-forward timers
-    await act(async () => {
-      vi.advanceTimersByTime(300);
-    });
+ // Fast-forward timers
+ await act(async () => {
+ vi.advanceTimersByTime(300);
+ });
 
-    // We might need an extra tick for promises to resolve
-    await act(async () => {
-      vi.runAllTimers();
-    });
+ // We might need an extra tick for promises to resolve
+ await act(async () => {
+ vi.runAllTimers();
+ });
 
-    expect(fetch).toHaveBeenCalledWith('/api/songs?q=Test&pageSize=5', expect.any(Object));
-    expect(screen.getByTestId('search-dropdown')).toBeInTheDocument();
-    expect(screen.getByText('Test Song')).toBeInTheDocument();
-  });
+ expect(fetch).toHaveBeenCalledWith('/api/songs?q=Test&pageSize=5', expect.any(Object));
+ expect(screen.getByTestId('search-dropdown')).toBeInTheDocument();
+ expect(screen.getByText('Test Song')).toBeInTheDocument();
+ });
 
-  it('redirects on Enter key', async () => {
-    render(
-      <MemoryRouter initialEntries={['/']}>
-        <Routes>
-          <Route path="/" element={<SearchBar />} />
-          <Route path="/search" element={<div data-testid="search-page">Search Page</div>} />
-        </Routes>
-      </MemoryRouter>
-    );
+ it('redirects on Enter key', async () => {
+ render(
+ <MemoryRouter initialEntries={['/']}>
+ <Routes>
+ <Route path="/" element={<SearchBar />} />
+ <Route path="/search" element={<div data-testid="search-page">Search Page</div>} />
+ </Routes>
+ </MemoryRouter>
+ );
 
-    const input = screen.getByTestId('search-input');
-    fireEvent.change(input, { target: { value: 'Oasis' } });
-    fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
+ const input = screen.getByTestId('search-input');
+ fireEvent.change(input, { target: { value: 'Oasis' } });
+ fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
 
-    expect(screen.getByTestId('search-page')).toBeInTheDocument();
-  });
+ expect(screen.getByTestId('search-page')).toBeInTheDocument();
+ });
 });

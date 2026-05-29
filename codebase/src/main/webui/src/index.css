@@ -1,1 +1,71 @@
 @import "tailwindcss";
+
+@theme {
+  --color-primary: #e60023;
+  --color-on-primary: #ffffff;
+  --color-primary-pressed: #cc001f;
+  
+  --color-ink: #000000;
+  --color-ink-soft: #211922;
+  --color-body: #33332e;
+  --color-charcoal: #262622;
+  --color-mute: #62625b;
+  --color-ash: #91918c;
+  --color-stone: #c8c8c1;
+  --color-hairline: #dadad3;
+  --color-hairline-soft: #e5e5e0;
+  
+  --color-on-secondary: #000000;
+  --color-secondary-bg: #e5e5e0;
+  --color-secondary-pressed: #c8c8c1;
+  
+  --color-canvas: #ffffff;
+  --color-surface-soft: #fbfbf9;
+  --color-surface-card: #f6f6f3;
+  --color-surface-elevated: #ffffff;
+  
+  --color-on-dark: #ffffff;
+  --color-on-dark-mute: rgba(255,255,255,0.7);
+  --color-surface-dark: #262622;
+  
+  --color-focus-outer: #435ee5;
+  --color-focus-inner: #ffffff;
+  
+  --color-success-deep: #103c25;
+  --color-success-pale: #c7f0da;
+  --color-error: #9e0a0a;
+  --color-error-deep: #cc001f;
+
+  /* Semantic Theme Expositions */
+  --color-bg-main: var(--theme-bg-main);
+  --color-bg-card: var(--theme-bg-card);
+  --color-bg-elevated: var(--theme-bg-elevated);
+  --color-text-main: var(--theme-text-main);
+  --color-text-mute: var(--theme-text-mute);
+  --color-border-main: var(--theme-border-main);
+}
+
+@layer base {
+  :root {
+    --theme-bg-main: var(--color-canvas);
+    --theme-bg-card: var(--color-surface-card);
+    --theme-bg-elevated: var(--color-surface-elevated);
+    --theme-text-main: var(--color-ink);
+    --theme-text-mute: var(--color-mute);
+    --theme-border-main: var(--color-hairline);
+  }
+
+  .dark {
+    --theme-bg-main: var(--color-surface-dark);
+    --theme-bg-card: var(--color-charcoal);
+    --theme-bg-elevated: var(--color-charcoal);
+    --theme-text-main: var(--color-on-dark);
+    --theme-text-mute: var(--color-on-dark-mute);
+    --theme-border-main: var(--color-mute);
+  }
+
+  body {
+    background-color: var(--theme-bg-main);
+    color: var(--theme-text-main);
+  }
+}
