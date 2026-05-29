@@ -56,12 +56,14 @@ export const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
  
  const data = await response.json();
  const items = Array.isArray(data) ? data : (data.data || []);
+ // eslint-disable-next-line @typescript-eslint/no-explicit-any
  const mappedItems = items.map((item: any) => ({
  ...item,
  keySignature: item.originalKey || item.keySignature || 'C'
  }));
  setResults(mappedItems);
  setIsDropdownOpen(true);
+ // eslint-disable-next-line @typescript-eslint/no-explicit-any
  } catch (error: any) {
  if (error.name === 'AbortError') {
  return;

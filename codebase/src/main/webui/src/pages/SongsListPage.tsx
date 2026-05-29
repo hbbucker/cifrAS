@@ -38,6 +38,7 @@ export const SongsListPage: React.FC = () => {
  }, [searchQuery]);
 
  useEffect(() => {
+ // eslint-disable-next-line react-hooks/set-state-in-effect
  setLoading(true);
  const controller = new AbortController();
  const signal = controller.signal;

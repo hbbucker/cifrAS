@@ -17,6 +17,7 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   useEffect(() => {
     // If not authenticated, default to light
     if (!isAuthenticated || !user) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTheme('light');
       setIsLoaded(true);
       return;

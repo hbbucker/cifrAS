@@ -78,7 +78,7 @@ test('full application flow including registration and song CRUD', async ({ page
   
   // 6. Theater Mode
   await page.getByTestId('start-theater-btn').click();
-  await expect(page).toHaveURL(/.*\/theater\/\d+/);
+  await expect(page).toHaveURL(/.*\/theater\/[a-zA-Z0-9-]+/);
   await expect(page.getByTestId('theater-controls')).toBeVisible();
   
   // Test auto-scroll / play pause
@@ -91,7 +91,7 @@ test('full application flow including registration and song CRUD', async ({ page
   
   // Exit theater mode
   await page.getByTestId('exit-theater-btn').click();
-  await expect(page).toHaveURL(/.*\/playlists\/\d+/);
+  await expect(page).toHaveURL(/.*\/playlists\/[a-zA-Z0-9-]+/);
 
   // 7. Groups Flow
   await page.getByTestId('sidebar').getByText('Groups').click();

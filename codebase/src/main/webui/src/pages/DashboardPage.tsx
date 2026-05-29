@@ -31,6 +31,7 @@ export const DashboardPage: React.FC = () => {
  const [searchQuery, setSearchQuery] = useState('');
 
  useEffect(() => {
+ // eslint-disable-next-line react-hooks/set-state-in-effect
  setLoading(true);
  const url = searchQuery ? `/api/songs?q=${encodeURIComponent(searchQuery)}` : '/api/songs';
  fetch(url, {

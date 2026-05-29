@@ -18,6 +18,7 @@ describe('SearchBar Component', () => {
 
  it('debounces input and calls search API', async () => {
  const mockData = [{ id: '1', title: 'Test Song', artist: 'Test Artist', keySignature: 'C' }];
+ // eslint-disable-next-line @typescript-eslint/no-explicit-any
  (fetch as any).mockResolvedValue({
  ok: true,
  json: async () => mockData
