@@ -1,45 +1,45 @@
-# Stage 1: Build the application (Java + Node.js)
-FROM maven:3.9.6-eclipse-temurin-21 AS build
+# Stage 1: Build the native application
+FROM quay.io/quarkus/ubi9-quarkus-mandrel-builder-image:23.1-java21 AS build
+
+# The builder image runs as 'quarkus', we need root to install Node.js
+USER root
 
 # Install Node.js (required by Quinoa to build the Vite/React frontend)
-RUN apt-get update && apt-get install -y curl \
-    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+RUN curl -fsSL https://rpm.nodesource.com/setup_20.x | bash - \
+    && microdnf install -y nodejs gcc-c++ make \
+    && microdnf clean all
+
+# Revert to 'quarkus' user
+USER quarkus
 
 WORKDIR /app
 
 # Copy the Maven wrapper and project object model from the codebase directory
-COPY codebase/pom.xml .
-COPY codebase/mvnw .
-COPY codebase/.mvn .mvn
+COPY --chown=quarkus:quarkus codebase/pom.xml .
+COPY --chown=quarkus:quarkus codebase/mvnw .
+COPY --chown=quarkus:quarkus codebase/.mvn .mvn
 
 # Copy the source code
-COPY codebase/src src
+COPY --chown=quarkus:quarkus codebase/src src
 
-# Build the Quarkus application (this automatically triggers the Quinoa frontend build)
-# -DskipTests is used to speed up the container build process, tests run in CI
-RUN mvn clean package -DskipTests
+# Build the Quarkus Native application 
+# -Dnative compiles to a GraalVM native image
+# -DskipTests speeds up the build process
+RUN ./mvnw clean package -Dnative -DskipTests -Dquarkus.native.native-image-xmx=8g
 
-# Stage 2: Create the minimal runtime image
-FROM eclipse-temurin:21-jre-jammy
+# Stage 2: Create the minimal runtime micro-image
+FROM registry.access.redhat.com/ubi9/ubi-minimal:latest
 
-WORKDIR /app
+WORKDIR /work/
 
-# Copy the Quarkus fast-jar application structure from the build stage
-COPY --from=build /app/target/quarkus-app/lib/ /app/lib/
-COPY --from=build /app/target/quarkus-app/*.jar /app/
-COPY --from=build /app/target/quarkus-app/app/ /app/app/
-COPY --from=build /app/target/quarkus-app/quarkus/ /app/quarkus/
+# Copy the native executable from the build stage
+COPY --from=build /app/target/*-runner /work/application
 
-# Expose port 8080 (the default for Quarkus, and expected by Fly.io)
+# Expose port 8080
 EXPOSE 8080
 
 # Configure environment variables for runtime
 ENV QUARKUS_HTTP_HOST=0.0.0.0
-# The java.util.logging.manager ensures proper logging for Quarkus fast-jar
-ENV JAVA_OPTS="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
 
-# Start the application
-CMD ["java", "-jar", "/app/quarkus-run.jar"]
+# Start the native application
+CMD ["./application", "-Dquarkus.http.host=0.0.0.0"]

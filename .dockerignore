@@ -7,3 +7,6 @@ node_modules/
 .env
 codebase/target/
 codebase/node_modules/
+codebase/src/main/webui/node_modules/
+codebase/src/main/webui/dist/
+codebase/src/main/webui/.vite/
