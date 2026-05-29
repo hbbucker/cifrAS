@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Sidebar } from '../components/layout/Sidebar';
 import { BottomNav } from '../components/layout/BottomNav';
 import { MusicCard } from '../components/cards/MusicCard';
-import { Filter, Plus, Music } from 'lucide-react';
+import { Filter, Plus, Music, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -27,10 +27,28 @@ export const SongsListPage: React.FC = () => {
   const { toast } = useToast();
   const [songs, setSongs] = useState<SongData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
 
   useEffect(() => {
-    fetch('/api/songs', {
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    setLoading(true);
+    const controller = new AbortController();
+    const signal = controller.signal;
+    
+    const queryParam = debouncedQuery.trim().length >= 3 
+      ? `?q=${encodeURIComponent(debouncedQuery.trim())}` 
+      : '';
+
+    fetch(`/api/songs${queryParam}`, {
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+      signal
     })
     .then(res => {
       if (res.status === 401) {
@@ -52,11 +70,16 @@ export const SongsListPage: React.FC = () => {
       setSongs(mappedSongs);
       setLoading(false);
     })
-    .catch(() => {
+    .catch((err) => {
+      if (err.name === 'AbortError') return;
       toast('Failed to load songs', 'error');
       setLoading(false);
     });
-  }, [logout, navigate, toast]);
+
+    return () => {
+      controller.abort();
+    };
+  }, [debouncedQuery, logout, navigate, toast]);
 
   const handleDelete = (id: string) => {
     if (!window.confirm('Are you sure you want to delete this song?')) return;
@@ -98,10 +121,22 @@ export const SongsListPage: React.FC = () => {
             <div className="relative max-w-sm w-full">
               <input 
                 type="text" 
-                placeholder="Filter songs..." 
+                placeholder="Search songs or artists..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-4 pr-10 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-[#aa3bff] outline-none dark:text-white"
               />
-              <Filter className="absolute right-3 top-2.5 w-5 h-5 text-gray-400" />
+              {searchQuery ? (
+                <button 
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 focus:outline-none"
+                  aria-label="Clear search"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              ) : (
+                <Filter className="absolute right-3 top-2.5 w-5 h-5 text-gray-400" />
+              )}
             </div>
             <div className="flex gap-2">
               <span className="text-sm text-gray-500 dark:text-gray-400">{songs.length} songs</span>
