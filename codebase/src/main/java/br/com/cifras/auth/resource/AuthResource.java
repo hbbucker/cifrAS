@@ -36,9 +36,8 @@ public class AuthResource {
     @Path("/register")
     public Response register(@Valid AuthRequest request) {
         Map<String, String> body = Map.of(
-            "email", request.email(),
-            "password", request.password()
-        );
+                "email", request.email(),
+                "password", request.password());
 
         Response supabaseResponse;
         try {
@@ -60,8 +59,8 @@ public class AuthResource {
 
         if (status == 422) {
             return Response.status(409)
-                .entity(Map.of("error", "Email já cadastrado"))
-                .build();
+                    .entity(Map.of("error", "Email já cadastrado"))
+                    .build();
         }
 
         String errorMsg = "Registration failed";
@@ -89,9 +88,8 @@ public class AuthResource {
     @Path("/login")
     public Response login(@Valid AuthRequest request) {
         Map<String, String> body = Map.of(
-            "email", request.email(),
-            "password", request.password()
-        );
+                "email", request.email(),
+                "password", request.password());
 
         Response supabaseResponse;
         try {
@@ -136,8 +134,8 @@ public class AuthResource {
         }
 
         return Response.status(401)
-            .entity(Map.of("error", errorMsg))
-            .build();
+                .entity(Map.of("error", errorMsg))
+                .build();
     }
 
     /**
@@ -152,8 +150,7 @@ public class AuthResource {
         }
 
         Map<String, String> supabaseBody = Map.of(
-            "refresh_token", body.get("refreshToken")
-        );
+                "refresh_token", body.get("refreshToken"));
 
         Response supabaseResponse;
         try {
@@ -174,5 +171,30 @@ public class AuthResource {
         }
 
         return Response.status(status).entity(Map.of("error", "Refresh token failed")).build();
+    }
+
+    /**
+     * POST /auth/logout — invalidates the token in Supabase Auth.
+     */
+    @POST
+    @Path("/logout")
+    public Response logout(@HeaderParam("Authorization") String authorization) {
+        if (authorization == null || authorization.isBlank()) {
+            return Response.status(401).entity(Map.of("error", "No token provided")).build();
+        }
+
+        Response supabaseResponse;
+        try {
+            supabaseResponse = supabaseClient.logout(authorization);
+        } catch (jakarta.ws.rs.WebApplicationException ex) {
+            supabaseResponse = ex.getResponse();
+        }
+
+        int status = supabaseResponse.getStatus();
+        if (status == 204 || status == 200) {
+            return Response.ok(Map.of("message", "Logged out successfully")).build();
+        }
+
+        return Response.status(status).entity(Map.of("error", "Logout failed")).build();
     }
 }

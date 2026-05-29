@@ -8,7 +8,8 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 /**
  * REST client for Supabase Auth API.
- * URL configured via quarkus.rest-client.supabase-auth.url in application.properties.
+ * URL configured via quarkus.rest-client.supabase-auth.url in
+ * application.properties.
  */
 @RegisterRestClient(configKey = "supabase-auth")
 @Path("/auth/v1")
@@ -33,4 +34,10 @@ public interface SupabaseAuthClient {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     Response refresh(@QueryParam("grant_type") String grantType, Object body);
+
+    @POST
+    @Path("/logout")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    Response logout(@HeaderParam("Authorization") String authorization);
 }
