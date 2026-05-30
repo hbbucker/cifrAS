@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Sidebar } from '../components/layout/Sidebar';
 import { BottomNav } from '../components/layout/BottomNav';
 import { SearchBar } from '../components/search/SearchBar';
@@ -24,6 +25,7 @@ interface SongData {
 
 export const DashboardPage: React.FC = () => {
  const { user, logout } = useAuth();
+ const { t } = useTranslation();
  const navigate = useNavigate();
  const { toast } = useToast();
  const [loading, setLoading] = useState(true);
@@ -58,13 +60,13 @@ export const DashboardPage: React.FC = () => {
  setLoading(false);
  })
  .catch(() => {
- toast('Failed to load recent songs', 'error');
+ toast(t('dashboard.loadError'), 'error');
  setLoading(false);
  });
- }, [logout, navigate, toast, searchQuery]);
+ }, [logout, navigate, toast, searchQuery, t]);
 
  const handleDelete = (id: string) => {
- if (!window.confirm('Are you sure you want to delete this song?')) return;
+ if (!window.confirm(t('dashboard.confirmDelete'))) return;
 
  fetch(`/api/songs/${id}`, {
  method: 'DELETE',
@@ -78,9 +80,9 @@ export const DashboardPage: React.FC = () => {
  }
  if (!res.ok) throw new Error('Delete failed');
  setSongs(prev => prev.filter(song => song.id !== id));
- toast('Song deleted successfully', 'success');
+ toast(t('dashboard.deleteSuccess'), 'success');
  })
- .catch(() => toast('Failed to delete song', 'error'));
+ .catch(() => toast(t('dashboard.deleteError'), 'error'));
  };
 
  return (
@@ -89,7 +91,7 @@ export const DashboardPage: React.FC = () => {
 
  <main className="flex-1 flex flex-col overflow-hidden">
  <header className="h-16 flex items-center justify-between px-6 bg-bg-card border-b border-border-main">
- <h1 className="text-xl font-bold text-text-main hidden sm:block">Dashboard</h1>
+ <h1 className="text-xl font-bold text-text-main hidden sm:block">{t('dashboard.title')}</h1>
  <div className="flex-1 sm:ml-8">
  <SearchBar onSearch={setSearchQuery} />
  </div>
@@ -100,20 +102,22 @@ export const DashboardPage: React.FC = () => {
 
  <div className="flex-1 overflow-y-auto p-6 pb-24 sm:pb-6">
  <div className="mb-8">
- <h2 className="text-2xl font-bold text-text-main mb-2">Welcome back, {user?.name?.split(' ')[0] || 'Musician'}! 👋</h2>
- <p className="text-text-mute">Here's your recent repertoire.</p>
+ <h2 className="text-2xl font-bold text-text-main mb-2">
+ {t('dashboard.welcome', { name: user?.name?.split(' ')[0] || 'Musician' })}
+ </h2>
+ <p className="text-text-mute">{t('dashboard.subtitle')}</p>
  </div>
 
  <div className="mb-6 flex justify-between items-center">
  <h3 className="text-lg font-bold text-text-main">
- {searchQuery ? `Search Results for "${searchQuery}"` : 'Recently Added'}
+ {searchQuery ? t('dashboard.searchResults', { query: searchQuery }) : t('dashboard.recentlyAdded')}
  </h3>
  <button
  onClick={() => navigate('/songs')}
  className="text-sm font-medium text-[#aa3bff] hover:underline"
  data-testid="view-all-btn"
  >
- View all
+ {t('dashboard.viewAll')}
  </button>
  </div>
 
@@ -136,9 +140,9 @@ export const DashboardPage: React.FC = () => {
  ) : (
  <EmptyState
  icon={Music}
- title="No songs yet"
- description="Start building your repertoire by adding your first song."
- action={{ label: 'Add New Song', onClick: () => navigate('/songs/new') }}
+ title={t('dashboard.emptyTitle')}
+ description={t('dashboard.emptyDesc')}
+ action={{ label: t('dashboard.addSong'), onClick: () => navigate('/songs/new') }}
  />
  )}
  </div>

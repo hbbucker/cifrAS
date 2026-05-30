@@ -1,0 +1,74 @@
+{
+  "sidebar": {
+    "home": "Inicio",
+    "playlists": "Listas de reproducción",
+    "groups": "Grupos",
+    "shared": "Compartido",
+    "settings": "Ajustes"
+  },
+  "userMenu": {
+    "darkMode": "Modo Oscuro",
+    "logout": "Cerrar sesión",
+    "language": "Idioma"
+  },
+  "lang": {
+    "pt-BR": "Português (Brasil)",
+    "en": "English",
+    "es": "Español"
+  },
+  "dashboard": {
+    "title": "Panel",
+    "welcome": "¡Bienvenido/a de nuevo, {{name}}! 👋",
+    "subtitle": "Aquí está tu repertorio reciente.",
+    "searchResults": "Resultados para \"{{query}}\"",
+    "recentlyAdded": "Agregados Recientemente",
+    "viewAll": "Ver todos",
+    "emptyTitle": "Ninguna canción todavía",
+    "emptyDesc": "Empieza a construir tu repertorio agregando tu primera canción.",
+    "addSong": "Agregar Nueva Canción",
+    "confirmDelete": "¿Estás seguro de que quieres eliminar esta canción?",
+    "deleteSuccess": "Canción eliminada exitosamente",
+    "deleteError": "Fallo al eliminar la canción",
+    "loadError": "Fallo al cargar las canciones recientes"
+  },
+  "settings": {
+    "title": "Ajustes",
+    "musicPrefs": "Preferencias Musicales",
+    "enharmonics": "Preferencia de Enarmónicos",
+    "flats": "Bemoles (b)",
+    "sharps": "Sostenidos (#)",
+    "fontScale": "Tamaño de Fuente de los Acordes: {{scale}}%",
+    "scrollSpeed": "Velocidad Base de Desplazamiento: {{speed}}x",
+    "save": "Guardar Preferencias"
+  },
+  "playlists": {
+    "loadError": "Fallo al cargar listas de reproducción",
+    "createError": "Fallo al crear lista de reproducción",
+    "createSuccess": "Lista de reproducción creada",
+    "confirmDelete": "¿Estás seguro de que quieres eliminar esta lista?",
+    "deleteError": "Fallo al eliminar lista",
+    "deleteSuccess": "Lista de reproducción eliminada exitosamente",
+    "newPlaylist": "Nueva Lista",
+    "emptyTitle": "Ninguna lista todavía",
+    "emptyDesc": "Crea tu primera lista para organizar tus canciones.",
+    "createPlaylist": "Crear Lista",
+    "deleteTooltip": "Eliminar Lista",
+    "songsCount": "canciones",
+    "collab": "Colab",
+    "private": "Privada",
+    "modalTitle": "Crear Nueva Lista",
+    "modalPlaceholder": "ej. Boda",
+    "cancel": "Cancelar",
+    "create": "Crear"
+  },
+  "songsList": {
+    "loadError": "Fallo al cargar las canciones",
+    "title": "Mi Repertorio",
+    "addSong": "Agregar Canción",
+    "searchPlaceholder": "Buscar canciones o artistas...",
+    "clearSearch": "Limpiar búsqueda",
+    "songsCount": "canciones",
+    "emptyDesc": "Tu repertorio está vacío. Empieza agregando canciones.",
+    "addFirstSong": "Agregar Primera Canción"
+  }
+}

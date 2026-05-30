@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Sidebar } from '../components/layout/Sidebar';
 import { Save } from 'lucide-react';
 
 export const SettingsPage: React.FC = () => {
+ const { t } = useTranslation();
  const [preferences, setPreferences] = useState({
  enharmonics: 'flats',
  fontScale: 100,
@@ -14,17 +16,17 @@ export const SettingsPage: React.FC = () => {
  <Sidebar />
  <main className="flex-1 flex flex-col overflow-hidden">
  <header className="h-16 flex items-center px-6 bg-bg-card border-b border-border-main">
- <h1 className="text-xl font-bold text-text-main">Settings</h1>
+ <h1 className="text-xl font-bold text-text-main">{t('settings.title')}</h1>
  </header>
 
  <div className="flex-1 overflow-y-auto p-6 max-w-2xl">
  <div className="bg-bg-card rounded-xl border border-border-main p-6 shadow-sm">
- <h2 className="text-lg font-bold text-text-main mb-6">Music Preferences</h2>
+ <h2 className="text-lg font-bold text-text-main mb-6">{t('settings.musicPrefs')}</h2>
  
  <div className="space-y-6">
  <div>
  <label className="block text-sm font-medium text-gray-700 mb-2">
- Enharmonics Preference
+ {t('settings.enharmonics')}
  </label>
  <div className="flex gap-4">
  <label className="flex items-center gap-2 cursor-pointer">
@@ -36,7 +38,7 @@ export const SettingsPage: React.FC = () => {
  onChange={() => setPreferences({ ...preferences, enharmonics: 'flats' })}
  className="text-[#aa3bff] focus:ring-[#aa3bff]"
  />
- <span className="text-text-main">Flats (b)</span>
+ <span className="text-text-main">{t('settings.flats')}</span>
  </label>
  <label className="flex items-center gap-2 cursor-pointer">
  <input 
@@ -47,14 +49,14 @@ export const SettingsPage: React.FC = () => {
  onChange={() => setPreferences({ ...preferences, enharmonics: 'sharps' })}
  className="text-[#aa3bff] focus:ring-[#aa3bff]"
  />
- <span className="text-text-main">Sharps (#)</span>
+ <span className="text-text-main">{t('settings.sharps')}</span>
  </label>
  </div>
  </div>
 
  <div>
  <label className="block text-sm font-medium text-gray-700 mb-2">
- Chord Font Scale: {preferences.fontScale}%
+ {t('settings.fontScale', { scale: preferences.fontScale })}
  </label>
  <input 
  type="range" 
@@ -67,7 +69,7 @@ export const SettingsPage: React.FC = () => {
 
  <div>
  <label className="block text-sm font-medium text-gray-700 mb-2">
- Base Scroll Speed Multiplier: {preferences.scrollSpeedMultiplier}x
+ {t('settings.scrollSpeed', { speed: preferences.scrollSpeedMultiplier })}
  </label>
  <input 
  type="range" 
@@ -80,7 +82,7 @@ export const SettingsPage: React.FC = () => {
 
  <div className="pt-4 border-t border-border-main">
  <button className="flex items-center gap-2 bg-[#aa3bff] hover:bg-[#902be6] text-white px-5 py-2.5 rounded-lg font-bold transition-colors">
- <Save className="w-5 h-5" /> Save Preferences
+ <Save className="w-5 h-5" /> {t('settings.save')}
  </button>
  </div>
  </div>

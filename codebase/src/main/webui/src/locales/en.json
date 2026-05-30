@@ -1,0 +1,74 @@
+{
+  "sidebar": {
+    "home": "Home",
+    "playlists": "Playlists",
+    "groups": "Groups",
+    "shared": "Shared",
+    "settings": "Settings"
+  },
+  "userMenu": {
+    "darkMode": "Dark Mode",
+    "logout": "Logout",
+    "language": "Language"
+  },
+  "lang": {
+    "pt-BR": "Português (Brasil)",
+    "en": "English",
+    "es": "Español"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back, {{name}}! 👋",
+    "subtitle": "Here's your recent repertoire.",
+    "searchResults": "Search Results for \"{{query}}\"",
+    "recentlyAdded": "Recently Added",
+    "viewAll": "View all",
+    "emptyTitle": "No songs yet",
+    "emptyDesc": "Start building your repertoire by adding your first song.",
+    "addSong": "Add New Song",
+    "confirmDelete": "Are you sure you want to delete this song?",
+    "deleteSuccess": "Song deleted successfully",
+    "deleteError": "Failed to delete song",
+    "loadError": "Failed to load recent songs"
+  },
+  "settings": {
+    "title": "Settings",
+    "musicPrefs": "Music Preferences",
+    "enharmonics": "Enharmonics Preference",
+    "flats": "Flats (b)",
+    "sharps": "Sharps (#)",
+    "fontScale": "Chord Font Scale: {{scale}}%",
+    "scrollSpeed": "Base Scroll Speed Multiplier: {{speed}}x",
+    "save": "Save Preferences"
+  },
+  "playlists": {
+    "loadError": "Failed to load playlists",
+    "createError": "Failed to create playlist",
+    "createSuccess": "Playlist created",
+    "confirmDelete": "Are you sure you want to delete this playlist?",
+    "deleteError": "Failed to delete playlist",
+    "deleteSuccess": "Playlist deleted successfully",
+    "newPlaylist": "New Playlist",
+    "emptyTitle": "No playlists yet",
+    "emptyDesc": "Create your first playlist to organize your songs.",
+    "createPlaylist": "Create Playlist",
+    "deleteTooltip": "Delete Playlist",
+    "songsCount": "songs",
+    "collab": "Collab",
+    "private": "Private",
+    "modalTitle": "Create New Playlist",
+    "modalPlaceholder": "e.g. Wedding Gig",
+    "cancel": "Cancel",
+    "create": "Create"
+  },
+  "songsList": {
+    "loadError": "Failed to load songs",
+    "title": "My Repertoire",
+    "addSong": "Add Song",
+    "searchPlaceholder": "Search songs or artists...",
+    "clearSearch": "Clear search",
+    "songsCount": "songs",
+    "emptyDesc": "Your repertoire is empty. Start adding songs to build your library.",
+    "addFirstSong": "Add First Song"
+  }
+}

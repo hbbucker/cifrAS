@@ -13,6 +13,8 @@ public class UserPreference extends PanacheEntityBase {
     
     public String theme;
     
+    public String language;
+    
     public static UserPreference findByUserId(String userId) {
         return find("userId", userId).firstResult();
     }

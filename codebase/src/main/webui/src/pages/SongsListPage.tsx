@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Sidebar } from '../components/layout/Sidebar';
 import { BottomNav } from '../components/layout/BottomNav';
 import { MusicCard } from '../components/cards/MusicCard';
@@ -22,6 +23,7 @@ interface SongData {
 }
 
 export const SongsListPage: React.FC = () => {
+ const { t } = useTranslation();
  const navigate = useNavigate();
  const { logout } = useAuth();
  const { toast } = useToast();
@@ -73,7 +75,7 @@ export const SongsListPage: React.FC = () => {
  })
  .catch((err) => {
  if (err.name === 'AbortError') return;
- toast('Failed to load songs', 'error');
+ toast(t('songsList.loadError'), 'error');
  setLoading(false);
  });
 
@@ -83,7 +85,7 @@ export const SongsListPage: React.FC = () => {
  }, [debouncedQuery, logout, navigate, toast]);
 
  const handleDelete = (id: string) => {
- if (!window.confirm('Are you sure you want to delete this song?')) return;
+ if (!window.confirm(t('dashboard.confirmDelete'))) return;
  
  fetch(`/api/songs/${id}`, {
  method: 'DELETE',
@@ -97,9 +99,9 @@ export const SongsListPage: React.FC = () => {
  }
  if (!res.ok) throw new Error('Delete failed');
  setSongs(prev => prev.filter(song => song.id !== id));
- toast('Song deleted successfully', 'success');
+ toast(t('dashboard.deleteSuccess'), 'success');
  })
- .catch(() => toast('Failed to delete song', 'error'));
+ .catch(() => toast(t('dashboard.deleteError'), 'error'));
  };
 
  return (
@@ -107,13 +109,13 @@ export const SongsListPage: React.FC = () => {
  <Sidebar />
  <main className="flex-1 flex flex-col overflow-hidden">
  <header className="h-16 flex items-center justify-between px-6 bg-bg-card border-b border-border-main">
- <h1 className="text-xl font-bold text-text-main">My Repertoire</h1>
+ <h1 className="text-xl font-bold text-text-main">{t('songsList.title')}</h1>
  <Button 
  onClick={() => navigate('/songs/new')}
  data-testid="add-song-btn"
  >
  <Plus className="w-5 h-5 mr-1" />
- <span className="hidden sm:inline">Add Song</span>
+ <span className="hidden sm:inline">{t('songsList.addSong')}</span>
  </Button>
  </header>
 
@@ -122,7 +124,7 @@ export const SongsListPage: React.FC = () => {
  <div className="relative max-w-sm w-full">
  <input 
  type="text" 
- placeholder="Search songs or artists..." 
+ placeholder={t('songsList.searchPlaceholder')} 
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  className="w-full pl-4 pr-10 py-2 bg-bg-card border border-border-main rounded-lg focus:ring-2 focus:ring-[#aa3bff] outline-none "
@@ -131,7 +133,7 @@ export const SongsListPage: React.FC = () => {
  <button 
  onClick={() => setSearchQuery('')}
  className="absolute right-3 top-2.5 text-gray-400 hover:text-text-mute dark:hover:text-gray-200 focus:outline-none"
- aria-label="Clear search"
+ aria-label={t('songsList.clearSearch')}
  >
  <X className="w-5 h-5" />
  </button>
@@ -140,7 +142,7 @@ export const SongsListPage: React.FC = () => {
  )}
  </div>
  <div className="flex gap-2">
- <span className="text-sm text-text-mute">{songs.length} songs</span>
+ <span className="text-sm text-text-mute">{songs.length} {t('songsList.songsCount')}</span>
  </div>
  </div>
 
@@ -151,9 +153,9 @@ export const SongsListPage: React.FC = () => {
  ) : songs.length === 0 ? (
  <EmptyState 
  icon={Music} 
- title="No songs yet" 
- description="Your repertoire is empty. Start adding songs to build your library." 
- action={{ label: 'Add First Song', onClick: () => navigate('/songs/new') }} 
+ title={t('dashboard.emptyTitle')}
+ description={t('songsList.emptyDesc')}
+ action={{ label: t('songsList.addFirstSong'), onClick: () => navigate('/songs/new') }} 
  />
  ) : (
  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

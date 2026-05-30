@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { Sidebar } from '../components/layout/Sidebar';
 import { BottomNav } from '../components/layout/BottomNav';
@@ -17,6 +18,7 @@ interface PlaylistData {
 }
 
 export const PlaylistsPage: React.FC = () => {
+ const { t } = useTranslation();
  const navigate = useNavigate();
  const { toast } = useToast();
  const [showModal, setShowModal] = useState(false);
@@ -44,10 +46,10 @@ export const PlaylistsPage: React.FC = () => {
  setLoading(false);
  })
  .catch(() => {
- toast('Failed to load playlists', 'error');
+ toast(t('playlists.loadError'), 'error');
  setLoading(false);
  });
- }, [logout, navigate, toast]);
+ }, [logout, navigate, toast, t]);
 
  useEffect(() => {
  fetchPlaylists();
@@ -74,25 +76,25 @@ export const PlaylistsPage: React.FC = () => {
  navigate('/login');
  throw new Error('Unauthorized');
  }
- if (!res.ok) throw new Error('Failed to create playlist');
+ if (!res.ok) throw new Error(t('playlists.createError'));
  return res.json();
  })
  .then(data => {
- toast('Playlist created', 'success');
+ toast(t('playlists.createSuccess'), 'success');
  setShowModal(false);
  setNewPlaylistName('');
  setIsCreating(false);
  navigate(`/playlists/${data.id}`);
  })
  .catch(() => {
- toast('Failed to create playlist', 'error');
+ toast(t('playlists.createError'), 'error');
  setIsCreating(false);
  });
  };
 
  const handleDeletePlaylist = (e: React.MouseEvent, id: string) => {
  e.stopPropagation();
- if (!window.confirm('Tem certeza que deseja excluir esta playlist?')) return;
+ if (!window.confirm(t('playlists.confirmDelete'))) return;
  
  fetch(`/api/playlists/${id}`, {
  method: 'DELETE',
@@ -104,11 +106,11 @@ export const PlaylistsPage: React.FC = () => {
  navigate('/login');
  throw new Error('Unauthorized');
  }
- if (!res.ok) throw new Error('Failed to delete playlist');
+ if (!res.ok) throw new Error(t('playlists.deleteError'));
  setPlaylists(prev => prev.filter(p => p.id !== id));
- toast('Playlist excluída com sucesso', 'success');
+ toast(t('playlists.deleteSuccess'), 'success');
  })
- .catch(() => toast('Erro ao excluir playlist', 'error'));
+ .catch(() => toast(t('playlists.deleteError'), 'error'));
  };
 
  return (
@@ -116,13 +118,13 @@ export const PlaylistsPage: React.FC = () => {
  <Sidebar />
  <main className="flex-1 flex flex-col overflow-hidden">
  <header className="h-16 flex items-center justify-between px-6 bg-bg-card border-b border-border-main">
- <h1 className="text-xl font-bold text-text-main">Playlists</h1>
+ <h1 className="text-xl font-bold text-text-main">{t('sidebar.playlists')}</h1>
  <Button 
  onClick={() => setShowModal(true)}
  data-testid="create-playlist-btn"
  >
  <Plus className="w-5 h-5 mr-1" />
- <span className="hidden sm:inline">New Playlist</span>
+ <span className="hidden sm:inline">{t('playlists.newPlaylist')}</span>
  </Button>
  </header>
 
@@ -136,9 +138,9 @@ export const PlaylistsPage: React.FC = () => {
  <div className="col-span-full">
  <EmptyState 
  icon={ListMusic} 
- title="No playlists yet" 
- description="Create your first playlist to organize your songs." 
- action={{ label: 'Create Playlist', onClick: () => setShowModal(true) }} 
+ title={t('playlists.emptyTitle')} 
+ description={t('playlists.emptyDesc')} 
+ action={{ label: t('playlists.createPlaylist'), onClick: () => setShowModal(true) }} 
  />
  </div>
  ) : (
@@ -156,17 +158,17 @@ export const PlaylistsPage: React.FC = () => {
  <button
  onClick={(e) => handleDeletePlaylist(e, pl.id)}
  className="p-2 text-text-mute hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
- title="Excluir Playlist"
+ title={t('playlists.deleteTooltip')}
  >
  <Trash2 className="w-5 h-5" />
  </button>
  </div>
  <h3 className="text-lg font-bold text-text-main mb-1">{pl.name}</h3>
  <div className="flex items-center justify-between">
- <p className="text-sm text-text-mute">{pl.songCount} songs</p>
+ <p className="text-sm text-text-mute">{pl.songCount} {t('playlists.songsCount')}</p>
  <span className={`text-xs font-bold px-2 py-1 rounded flex items-center gap-1 ${pl.isCollaborative ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-gray-100 text-gray-700 dark:bg-gray-700 '}`}>
  {pl.isCollaborative && <Users className="w-3 h-3" />}
- {pl.isCollaborative ? 'Collab' : 'Private'}
+ {pl.isCollaborative ? t('playlists.collab') : t('playlists.private')}
  </span>
  </div>
  </div>
@@ -180,24 +182,24 @@ export const PlaylistsPage: React.FC = () => {
  {showModal && (
  <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
  <div className="bg-bg-card rounded-xl max-w-md w-full p-6 shadow-2xl">
- <h2 className="text-xl font-bold text-text-main mb-4">Create New Playlist</h2>
+ <h2 className="text-xl font-bold text-text-main mb-4">{t('playlists.modalTitle')}</h2>
  <input 
  type="text" 
  value={newPlaylistName}
  onChange={(e) => setNewPlaylistName(e.target.value)}
- placeholder="e.g. Wedding Gig"
+ placeholder={t('playlists.modalPlaceholder')}
  className="w-full px-4 py-3 bg-bg-main border border-border-main rounded-lg mb-6 text-text-main focus:ring-2 focus:ring-[#aa3bff] outline-none"
  data-testid="playlist-name-input"
  />
  <div className="flex justify-end gap-3">
- <Button onClick={() => setShowModal(false)} variant="ghost">Cancel</Button>
+ <Button onClick={() => setShowModal(false)} variant="ghost">{t('playlists.cancel')}</Button>
  <Button 
  onClick={handleCreatePlaylist} 
  disabled={!newPlaylistName.trim()}
  isLoading={isCreating}
  data-testid="save-playlist-btn"
  >
- Create
+ {t('playlists.create')}
  </Button>
  </div>
  </div>

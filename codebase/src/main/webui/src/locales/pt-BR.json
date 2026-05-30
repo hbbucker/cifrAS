@@ -1,0 +1,74 @@
+{
+  "sidebar": {
+    "home": "Início",
+    "playlists": "Playlists",
+    "groups": "Grupos",
+    "shared": "Compartilhado",
+    "settings": "Configurações"
+  },
+  "userMenu": {
+    "darkMode": "Modo Escuro",
+    "logout": "Sair",
+    "language": "Idioma"
+  },
+  "lang": {
+    "pt-BR": "Português (Brasil)",
+    "en": "English",
+    "es": "Español"
+  },
+  "dashboard": {
+    "title": "Painel",
+    "welcome": "Bem-vindo(a) de volta, {{name}}! 👋",
+    "subtitle": "Aqui está seu repertório recente.",
+    "searchResults": "Resultados para \"{{query}}\"",
+    "recentlyAdded": "Adicionados Recentemente",
+    "viewAll": "Ver todos",
+    "emptyTitle": "Nenhuma música ainda",
+    "emptyDesc": "Comece a construir seu repertório adicionando sua primeira música.",
+    "addSong": "Adicionar Nova Música",
+    "confirmDelete": "Tem certeza que deseja deletar esta música?",
+    "deleteSuccess": "Música deletada com sucesso",
+    "deleteError": "Falha ao deletar a música",
+    "loadError": "Falha ao carregar as músicas recentes"
+  },
+  "settings": {
+    "title": "Configurações",
+    "musicPrefs": "Preferências Musicais",
+    "enharmonics": "Preferência de Enarmônicos",
+    "flats": "Bemóis (b)",
+    "sharps": "Sustenidos (#)",
+    "fontScale": "Tamanho da Fonte das Cifras: {{scale}}%",
+    "scrollSpeed": "Velocidade Base da Rolagem: {{speed}}x",
+    "save": "Salvar Preferências"
+  },
+  "playlists": {
+    "loadError": "Falha ao carregar playlists",
+    "createError": "Falha ao criar playlist",
+    "createSuccess": "Playlist criada",
+    "confirmDelete": "Tem certeza que deseja excluir esta playlist?",
+    "deleteError": "Erro ao excluir playlist",
+    "deleteSuccess": "Playlist excluída com sucesso",
+    "newPlaylist": "Nova Playlist",
+    "emptyTitle": "Nenhuma playlist ainda",
+    "emptyDesc": "Crie sua primeira playlist para organizar suas músicas.",
+    "createPlaylist": "Criar Playlist",
+    "deleteTooltip": "Excluir Playlist",
+    "songsCount": "músicas",
+    "collab": "Colab",
+    "private": "Privada",
+    "modalTitle": "Criar Nova Playlist",
+    "modalPlaceholder": "ex: Repertório de Casamento",
+    "cancel": "Cancelar",
+    "create": "Criar"
+  },
+  "songsList": {
+    "loadError": "Falha ao carregar as músicas",
+    "title": "Meu Repertório",
+    "addSong": "Adicionar Música",
+    "searchPlaceholder": "Buscar músicas ou artistas...",
+    "clearSearch": "Limpar busca",
+    "songsCount": "músicas",
+    "emptyDesc": "Seu repertório está vazio. Comece adicionando músicas.",
+    "addFirstSong": "Adicionar Primeira Música"
+  }
+}

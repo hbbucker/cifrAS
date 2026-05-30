@@ -40,7 +40,12 @@ public class UserPreferenceResource {
             pref = new UserPreference();
             pref.userId = userId;
         }
-        pref.theme = newPref.theme;
+        if (newPref.theme != null) {
+            pref.theme = newPref.theme;
+        }
+        if (newPref.language != null) {
+            pref.language = newPref.language;
+        }
         pref.persist();
         return Response.ok(pref).build();
     }

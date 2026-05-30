@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { useAuth } from './AuthContext';
+import { useTranslation } from 'react-i18next';
 
 interface ThemeContextType {
   theme: 'light' | 'dark';
@@ -11,6 +12,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { user, isAuthenticated } = useAuth();
+  const { i18n } = useTranslation();
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -36,15 +38,19 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           if (data.theme === 'dark' || data.theme === 'light') {
             setTheme(data.theme);
           }
+          if (data.language) {
+            i18n.changeLanguage(data.language);
+          }
         }
       } catch (err) {
-        console.error('Failed to fetch theme preference', err);
+        console.error('Failed to fetch user preferences', err);
       } finally {
         setIsLoaded(true);
       }
     };
 
     fetchTheme();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, isAuthenticated]);
 
   useEffect(() => {
