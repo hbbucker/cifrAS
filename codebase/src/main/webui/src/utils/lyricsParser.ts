@@ -17,7 +17,7 @@ export interface LyricsStructure {
  sections: Section[];
 }
 
-const CHORD_REGEX = /^([A-G][#b]?)([mM0-9]|maj|min|dim|aug|sus|add|\+|\-|º|°)*(\([^)]+\))*(\/[A-G][#b]?([mM0-9]|maj|min|dim|aug|sus|add|\+|\-|º|°)*(\([^)]+\))*)?$/;
+const CHORD_REGEX = /^([A-G][#b]?)([mM0-9]|maj|min|dim|aug|sus|add|\+|-|º|°)*(\([^)]+\))*(\/[A-G][#b]?([mM0-9]|maj|min|dim|aug|sus|add|\+|-|º|°)*(\([^)]+\))*)?$/;
 
 function isChordToken(token: string): boolean {
  return CHORD_REGEX.test(token) || token === '|' || /^\(\d+x\)$/i.test(token);

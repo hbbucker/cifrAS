@@ -44,7 +44,7 @@ export const SongFormPage: React.FC = () => {
  toast('Failed to load song', 'error');
  });
  }
- }, [id, toast]);
+ }, [id, toast, transposedKey, transposedContent]);
 
  const handleSave = async () => {
  if (!title || !artist || !content) {

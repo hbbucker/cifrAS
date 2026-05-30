@@ -111,7 +111,7 @@ export const TheaterModePage: React.FC = () => {
  toast('Failed to load song details', 'error');
  });
  }
- }, [activeSongId, isMobile, toast]);
+ }, [activeSongId, isMobile, toast, passedState, setSpeed]);
 
  // Persist preferences
  useEffect(() => {
