@@ -2,12 +2,12 @@ package br.com.cifras.song.resource;
 
 import br.com.cifras.shared.dto.PagedResponse;
 import br.com.cifras.shared.security.SecurityUtils;
-import br.com.cifras.song.domain.EnharmonicConvention;
-import br.com.cifras.song.domain.LyricsStructure;
-import br.com.cifras.song.domain.Song;
+import br.com.cifras.song.model.EnharmonicConvention;
+import br.com.cifras.song.model.LyricsStructure;
+import br.com.cifras.song.model.Song;
 import br.com.cifras.song.dto.*;
-import br.com.cifras.song.service.SongService;
-import br.com.cifras.song.service.TranspositionService;
+import br.com.cifras.song.application.usecase.SongService;
+import br.com.cifras.song.application.usecase.TranspositionService;
 import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;

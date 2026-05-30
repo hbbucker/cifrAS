@@ -1,13 +1,13 @@
 package br.com.cifras.group.resource;
 
-import br.com.cifras.group.domain.Group;
+import br.com.cifras.group.model.Group;
 import br.com.cifras.group.dto.AddMemberRequest;
 import br.com.cifras.group.dto.CreateGroupRequest;
 import br.com.cifras.group.dto.GroupDTO;
 import br.com.cifras.group.dto.LinkPlaylistRequest;
-import br.com.cifras.playlist.domain.Playlist;
+import br.com.cifras.playlist.model.Playlist;
 import br.com.cifras.playlist.dto.PlaylistDTO;
-import br.com.cifras.group.service.GroupService;
+import br.com.cifras.group.application.usecase.GroupService;
 import br.com.cifras.shared.security.SecurityUtils;
 import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;

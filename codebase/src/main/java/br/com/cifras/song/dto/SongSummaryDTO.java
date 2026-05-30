@@ -1,6 +1,6 @@
 package br.com.cifras.song.dto;
 
-import br.com.cifras.song.domain.Song;
+import br.com.cifras.song.model.Song;
 
 import java.time.Instant;
 import java.util.UUID;

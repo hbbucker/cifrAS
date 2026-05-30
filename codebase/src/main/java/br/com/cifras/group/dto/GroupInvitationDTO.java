@@ -1,6 +1,6 @@
 package br.com.cifras.group.dto;
 
-import br.com.cifras.group.domain.GroupInvitation;
+import br.com.cifras.group.model.GroupInvitation;
 import java.util.UUID;
 
 public record GroupInvitationDTO(

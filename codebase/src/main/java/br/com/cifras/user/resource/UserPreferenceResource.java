@@ -1,6 +1,6 @@
 package br.com.cifras.user.resource;
 
-import br.com.cifras.user.domain.UserPreference;
+import br.com.cifras.user.model.UserPreference;
 import br.com.cifras.shared.security.SecurityUtils;
 import io.quarkus.security.Authenticated;
 import jakarta.transaction.Transactional;

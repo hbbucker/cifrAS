@@ -1,6 +1,6 @@
 package br.com.cifras.playlist.dto;
 
-import br.com.cifras.playlist.domain.Playlist;
+import br.com.cifras.playlist.model.Playlist;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;

@@ -1,8 +1,8 @@
 package br.com.cifras.playlist.resource;
 
-import br.com.cifras.playlist.domain.Playlist;
+import br.com.cifras.playlist.model.Playlist;
 import br.com.cifras.playlist.dto.*;
-import br.com.cifras.playlist.service.PlaylistService;
+import br.com.cifras.playlist.application.usecase.PlaylistService;
 import br.com.cifras.shared.security.SecurityUtils;
 import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;

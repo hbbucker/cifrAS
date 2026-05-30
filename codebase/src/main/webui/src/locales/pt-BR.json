@@ -1,4 +1,8 @@
 {
+  "common": {
+    "cancel": "Cancelar",
+    "save": "Salvar"
+  },
   "sidebar": {
     "home": "Início",
     "playlists": "Playlists",
@@ -9,7 +13,13 @@
   "userMenu": {
     "darkMode": "Modo Escuro",
     "logout": "Sair",
-    "language": "Idioma"
+    "language": "Idioma",
+    "preferences": "Preferências",
+    "name": "Nome",
+    "email": "E-mail",
+    "emailNotEditable": "O e-mail não pode ser alterado.",
+    "preferencesSaved": "Preferências salvas com sucesso",
+    "preferencesError": "Falha ao salvar as preferências"
   },
   "lang": {
     "pt-BR": "Português (Brasil)",

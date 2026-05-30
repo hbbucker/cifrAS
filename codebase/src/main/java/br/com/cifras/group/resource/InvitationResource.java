@@ -1,8 +1,8 @@
 package br.com.cifras.group.resource;
 
-import br.com.cifras.group.domain.GroupInvitation;
+import br.com.cifras.group.model.GroupInvitation;
 import br.com.cifras.group.dto.GroupInvitationDTO;
-import br.com.cifras.group.service.GroupService;
+import br.com.cifras.group.application.usecase.GroupService;
 import br.com.cifras.shared.security.SecurityUtils;
 import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;

@@ -2,9 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Moon, Sun } from 'lucide-react';
+import { LogOut, Moon, Sun, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { LanguageSelector } from './LanguageSelector';
+import { PreferencesModal } from '../modals/PreferencesModal';
 
 export interface UserMenuProps {
   direction?: 'up' | 'down';
@@ -16,6 +17,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ direction = 'down' }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
+  const [isPreferencesOpen, setIsPreferencesOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -62,6 +64,17 @@ export const UserMenu: React.FC<UserMenuProps> = ({ direction = 'down' }) => {
           </div>
           <div className="px-4 py-2 border-b border-border-main flex flex-col gap-2">
             <button
+              onClick={() => {
+                setIsOpen(false);
+                setIsPreferencesOpen(true);
+              }}
+              className="w-full flex items-center gap-2 text-sm text-text-main hover:text-[#aa3bff] transition-colors focus:outline-none text-left"
+              data-testid="preferences-btn"
+            >
+              <Settings className="w-4 h-4" />
+              {t('userMenu.preferences') || 'Preferences'}
+            </button>
+            <button
               onClick={toggleTheme}
               className="w-full flex items-center justify-between text-sm text-text-main hover:text-[#aa3bff] transition-colors focus:outline-none"
               data-testid="theme-toggle-btn"
@@ -88,6 +101,11 @@ export const UserMenu: React.FC<UserMenuProps> = ({ direction = 'down' }) => {
           </button>
         </div>
       )}
+      
+      <PreferencesModal 
+        isOpen={isPreferencesOpen} 
+        onClose={() => setIsPreferencesOpen(false)} 
+      />
     </div>
   );
 };

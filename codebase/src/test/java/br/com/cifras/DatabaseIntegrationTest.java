@@ -1,6 +1,6 @@
 package br.com.cifras;
 
-import br.com.cifras.group.domain.Group;
+import br.com.cifras.group.model.Group;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.transaction.Transactional;
