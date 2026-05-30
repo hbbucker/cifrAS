@@ -85,10 +85,10 @@ export const TheaterModePage: React.FC = () => {
  if (prev.title !== 'Loading...') {
  setTransposeSteps(0);
  } else if (!passedState) {
-    if (data.prefAutoScrollSpeed !== undefined) setSpeed(data.prefAutoScrollSpeed);
-    if (data.prefUseBb !== undefined) setUseBb(data.prefUseBb);
-    if (data.prefUseEb !== undefined) setUseEb(data.prefUseEb);
-    if (data.prefTransposeSteps !== undefined) setTransposeSteps(data.prefTransposeSteps);
+    if (data.prefAutoScrollSpeed != null) setSpeed(data.prefAutoScrollSpeed);
+    if (data.prefUseBb != null) setUseBb(data.prefUseBb);
+    if (data.prefUseEb != null) setUseEb(data.prefUseEb);
+    if (data.prefTransposeSteps != null) setTransposeSteps(data.prefTransposeSteps);
  }
  return {
  title: data.title,

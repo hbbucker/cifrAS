@@ -169,6 +169,22 @@ public class PlaylistService {
     }
 
     /**
+     * Soft-deletes a playlist.
+     * Only the owner can delete.
+     */
+    @Transactional
+    public void delete(UUID playlistId, String userId) {
+        Playlist playlist = playlistRepository.findActiveById(playlistId)
+            .orElseThrow(() -> new NotFoundException("Playlist not found"));
+
+        if (!canModify(playlist, userId)) {
+            throw new ForbiddenException("Access denied to playlist");
+        }
+
+        playlist.deletedAt = java.time.Instant.now();
+    }
+
+    /**
      * Checks if the user can modify this playlist (only owner).
      */
     private boolean canModify(Playlist playlist, String userId) {

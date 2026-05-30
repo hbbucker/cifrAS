@@ -56,6 +56,15 @@ public class PlaylistResource {
         return Response.ok(PlaylistDetailsDTO.from(playlist)).build();
     }
 
+    /** DELETE /playlists/{id} → 204 */
+    @DELETE
+    @Path("/{id}")
+    public Response deletePlaylist(@PathParam("id") UUID id) {
+        String userId = securityUtils.getCurrentUserId();
+        playlistService.delete(id, userId);
+        return Response.noContent().build();
+    }
+
     /** POST /playlists/{id}/songs → 204 */
     @POST
     @Path("/{id}/songs")

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Sidebar } from '../components/layout/Sidebar';
 import { BottomNav } from '../components/layout/BottomNav';
-import { Plus, ListMusic, Users } from 'lucide-react';
+import { Plus, ListMusic, Users, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../context/ToastContext';
 import { Button } from '../components/ui/Button';
@@ -90,6 +90,27 @@ export const PlaylistsPage: React.FC = () => {
  });
  };
 
+ const handleDeletePlaylist = (e: React.MouseEvent, id: string) => {
+ e.stopPropagation();
+ if (!window.confirm('Tem certeza que deseja excluir esta playlist?')) return;
+ 
+ fetch(`/api/playlists/${id}`, {
+ method: 'DELETE',
+ headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+ })
+ .then(res => {
+ if (res.status === 401) {
+ logout();
+ navigate('/login');
+ throw new Error('Unauthorized');
+ }
+ if (!res.ok) throw new Error('Failed to delete playlist');
+ setPlaylists(prev => prev.filter(p => p.id !== id));
+ toast('Playlist excluída com sucesso', 'success');
+ })
+ .catch(() => toast('Erro ao excluir playlist', 'error'));
+ };
+
  return (
  <div className="flex h-screen bg-bg-main">
  <Sidebar />
@@ -128,8 +149,17 @@ export const PlaylistsPage: React.FC = () => {
  className="bg-bg-card rounded-xl border border-border-main p-5 cursor-pointer hover:shadow-lg hover:border-[#aa3bff]/50 transition-all group"
  data-testid={`playlist-card-${pl.id}`}
  >
- <div className="w-12 h-12 bg-[#aa3bff]/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-[#aa3bff]/20 transition-colors">
+ <div className="flex items-start justify-between mb-4">
+ <div className="w-12 h-12 bg-[#aa3bff]/10 rounded-lg flex items-center justify-center group-hover:bg-[#aa3bff]/20 transition-colors">
  <ListMusic className="w-6 h-6 text-[#aa3bff]" />
+ </div>
+ <button
+ onClick={(e) => handleDeletePlaylist(e, pl.id)}
+ className="p-2 text-text-mute hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+ title="Excluir Playlist"
+ >
+ <Trash2 className="w-5 h-5" />
+ </button>
  </div>
  <h3 className="text-lg font-bold text-text-main mb-1">{pl.name}</h3>
  <div className="flex items-center justify-between">

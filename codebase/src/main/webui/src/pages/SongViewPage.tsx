@@ -46,10 +46,10 @@ export const SongViewPage: React.FC = () => {
         originalKey: key,
         content: stringifyLyrics(data.lyrics)
       });
-      if (data.prefAutoScrollSpeed !== undefined) setAutoScrollSpeed(data.prefAutoScrollSpeed);
-      if (data.prefUseBb !== undefined) setUseBb(data.prefUseBb);
-      if (data.prefUseEb !== undefined) setUseEb(data.prefUseEb);
-      if (data.prefTransposeSteps !== undefined) setTransposeSteps(data.prefTransposeSteps);
+      if (data.prefAutoScrollSpeed != null) setAutoScrollSpeed(data.prefAutoScrollSpeed);
+      if (data.prefUseBb != null) setUseBb(data.prefUseBb);
+      if (data.prefUseEb != null) setUseEb(data.prefUseEb);
+      if (data.prefTransposeSteps != null) setTransposeSteps(data.prefTransposeSteps);
     })
  .catch(() => toast('Failed to load song details', 'error'));
  }
