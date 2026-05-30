@@ -26,6 +26,7 @@ public class PlaylistRepository {
 
     public List<Playlist> findByUserIdActive(String userId) {
         return jpaRepo.find("userId = ?1 AND deletedAt IS NULL ORDER BY createdAt DESC", userId)
+            .list()
             .stream()
             .map(mapper::toDomain)
             .collect(Collectors.toList());
@@ -33,6 +34,7 @@ public class PlaylistRepository {
 
     public List<Playlist> findCollaborativeActive(String userId) {
         return jpaRepo.find("isCollaborative = true AND group.id IN (SELECT group.id FROM GroupMemberEntity WHERE userId = ?1) AND deletedAt IS NULL", userId)
+            .list()
             .stream()
             .map(mapper::toDomain)
             .collect(Collectors.toList());
@@ -44,7 +46,7 @@ public class PlaylistRepository {
     
     public void persist(Playlist playlist) {
         PlaylistEntity entity = mapper.toEntity(playlist);
-        jpaRepo.persist(entity);
+        jpaRepo.persistAndFlush(entity);
         playlist.id = entity.id;
     }
     

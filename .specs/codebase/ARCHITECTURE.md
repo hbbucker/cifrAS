@@ -15,15 +15,18 @@ graph TD
     subgraph "CifrAS Codebase"
         Quarkus -->|/| Quinoa[Quinoa Extension]
         Quinoa -->|Serves Static Files| React[React App - SPA]
-        Quarkus -->|/api/*| JAXRS[JAX-RS / Resteasy]
+        Quarkus -->|/api/*| JAXRS[JAX-RS / Resources]
         
-        JAXRS --> Services[Domain Services]
-        Services --> Panache[Hibernate with Panache]
+        JAXRS --> UseCases[Application Use Cases / Services]
+        UseCases --> Domain[Domain Models (POJOs)]
+        UseCases --> Repositories[Repository Pattern]
+        Repositories --> Mappers[Mappers]
+        Mappers --> Panache[Hibernate Panache Entities]
     end
     
     Panache -->|JDBC| PostgreSQL[(Supabase PostgreSQL)]
     React -->|Token validation| SupabaseAuth[Supabase Auth REST]
-    Services -->|JWT Validation| JWT[SmallRye JWT]
+    JAXRS -->|JWT Validation| JWT[SmallRye JWT]
 ```
 
 ## Padrão de Roteamento e Comunicação

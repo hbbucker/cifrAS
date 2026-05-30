@@ -3,14 +3,15 @@
 ## Backend (Java / Quarkus)
 
 1. **Test-Driven Development (TDD):** Prefira escrever os testes antes da implementação. Mantenha alta cobertura de testes nas regras de negócio principais (como o motor de transposição).
-2. **Panache Entity/Repository:** Usamos o padrão Repository do Panache (`PanacheRepository`) em vez do Active Record para manter a camada de serviço desacoplada e facilitar a injeção de dependências.
-3. **DTOs:** Nunca retorne Entidades Panache diretamente via JAX-RS para evitar vazamento de dados, problemas de lazy loading e acoplamento. Use classes DTO (Data Transfer Objects) simples com campos públicos ou geradas via Records do Java 14+.
-4. **Respostas da API:**
-    - Sucesso na criação: `201 Created` e retorne a URL do recurso criado no Header `Location`.
+2. **Domain-Driven Design (DDD):** A lógica de negócio deve operar unicamente em cima de Modelos de Domínio (`POJOs` puros), que são independentes do banco de dados e frameworks.
+3. **Camada de Infraestrutura e Persistência:** Usamos o padrão Repository (via `PanacheRepository`) para abstrair o acesso a dados. O repositório utiliza `Mappers` para converter os Modelos de Domínio em Entidades JPA e vice-versa, blindando a camada de serviço de dependências de infraestrutura.
+4. **DTOs e REST:** Controladores JAX-RS (`Resources`) nunca expõem Entidades ou Modelos de Domínio diretamente. Use classes DTO (Data Transfer Objects) record-based ou classes simples. O fluxo é: `Resource` recebe DTO -> Chama `Service` -> Service manipula `Model` -> `Resource` retorna DTO.
+5. **Respostas da API:**
+    - Sucesso na criação: `201 Created` e retorne o ID do recurso (preferencialmente sem body completo ou de forma padronizada).
     - Deleção com soft-delete: `204 No Content`.
-    - Falha de validação/negócio: `400 Bad Request` com mensagens descritivas tratadas pelo `GlobalExceptionMapper`.
+    - Falha de validação/negócio: `400 Bad Request` com mensagens tratadas pelo `GlobalExceptionMapper`.
     - Falha de autorização: `401 Unauthorized` ou `403 Forbidden`.
-5. **Autenticação:** Recupere o usuário autenticado via `SecurityIdentity` do Quarkus. Use a claim `"sub"` do JWT como a referência única do usuário na tabela de relação (em vez de um ID interno numérico gerado pelo banco de dados).
+6. **Autenticação:** Recupere o usuário autenticado via `SecurityIdentity` do Quarkus. Use a claim `"sub"` do JWT como referência unívoca.
 
 ## Frontend (React)
 

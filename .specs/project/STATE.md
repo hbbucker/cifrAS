@@ -2,6 +2,7 @@
 
 ## Decisions
 
+- **[2026-05-30] Arquitetura de Domínio Limpo:** Refatoração da camada de Backend (Quarkus) concluída para separar Modelos de Domínio (POJOs) das Entidades de Persistência (JPA). `Services` e `Resources` interagem apenas com abstrações de negócio limpas, enquanto `Repositories` via `Mappers` abstraem a infraestrutura e persistência no banco de dados.
 - **[2026-05-24] Arquitetura Unificada:** Frontend React e Backend Quarkus migrados para uma única pasta `codebase/` utilizando a extensão **Quarkus Quinoa**. Simplifica desenvolvimento e implantação ao servir o frontend estático e as rotas `/api` a partir do mesmo servidor Quarkus.
 - **[2026-05-23] Stack confirmada:** Quarkus (Java) + React (TypeScript) + Supabase (PostgreSQL + Auth). Sem mudança prevista para v1.
 - **[2026-05-23] Convenção enarmônica default:** sustenidos (#) — configurável por usuário em v2.

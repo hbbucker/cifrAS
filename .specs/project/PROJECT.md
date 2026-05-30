@@ -19,6 +19,7 @@ O projeto roda como um monólito onde o Quarkus gerencia tanto o servidor de bac
 **Backend (Java Quarkus):**
 - Framework: Quarkus 3.x
 - Linguagem: Java 21
+- Padrão Arquitetural: Domain-Driven Design (Separação estrita entre Modelos de Domínio puros e Entidades de Infraestrutura/JPA)
 - ORM: Panache (Hibernate Reactive ou JPA)
 - Banco de Dados: PostgreSQL via Supabase
 - Auth: Supabase Auth (JWT validation)

@@ -1,7 +1,7 @@
 package br.com.cifras.song.application.usecase;
 
 import br.com.cifras.song.model.LyricsStructure;
-import br.com.cifras.song.infra.persistence.entity.SongEntity;
+import br.com.cifras.song.model.Song;
 import br.com.cifras.song.dto.CreateSongRequest;
 import br.com.cifras.song.dto.UpdateSongRequest;
 import br.com.cifras.shared.dto.PagedResponse;
@@ -44,7 +44,7 @@ class SongServiceTest extends BaseIntegrationTest {
     void givenValidRequest_whenCreate_thenSongPersistedWithUserId() {
         CreateSongRequest req = new CreateSongRequest("Highway to Hell", "AC/DC", "A", LyricsStructure.empty());
 
-        SongEntity song = songService.create(req, USER_A);
+        Song song = songService.create(req, USER_A);
 
         assertNotNull(song.id);
         assertEquals("Highway to Hell", song.title);
@@ -58,11 +58,11 @@ class SongServiceTest extends BaseIntegrationTest {
     @Test
     @Transactional
     void givenMultipleUsers_whenListByUser_thenReturnsOnlyOwnSongs() {
-        songService.create(new CreateSongRequest("SongEntity A1", "Artist A", "C", null), USER_A);
-        songService.create(new CreateSongRequest("SongEntity A2", "Artist A", "D", null), USER_A);
-        songService.create(new CreateSongRequest("SongEntity B1", "Artist B", "E", null), USER_B);
+        songService.create(new CreateSongRequest("Song A1", "Artist A", "C", null), USER_A);
+        songService.create(new CreateSongRequest("Song A2", "Artist A", "D", null), USER_A);
+        songService.create(new CreateSongRequest("Song B1", "Artist B", "E", null), USER_B);
 
-        PagedResponse<SongEntity> response = songService.listByUser(USER_A, 1, 20, null);
+        PagedResponse<Song> response = songService.listByUser(USER_A, 1, 20, null);
 
         assertTrue(response.data().stream().allMatch(s -> USER_A.equals(s.userId)),
             "List must contain only USER_A's songs");
@@ -75,11 +75,11 @@ class SongServiceTest extends BaseIntegrationTest {
     @Test
     @Transactional
     void givenSoftDeletedSong_whenListByUser_thenNotIncluded() {
-        SongEntity song = songService.create(new CreateSongRequest("To Delete", "Artist", "G", null), USER_A);
+        Song song = songService.create(new CreateSongRequest("To Delete", "Artist", "G", null), USER_A);
 
         songService.softDelete(song.id, USER_A);
 
-        PagedResponse<SongEntity> response = songService.listByUser(USER_A, 1, 20, null);
+        PagedResponse<Song> response = songService.listByUser(USER_A, 1, 20, null);
         boolean found = response.data().stream().anyMatch(s -> s.id.equals(song.id));
         assertFalse(found, "Soft-deleted song must not appear in list");
     }
@@ -90,7 +90,7 @@ class SongServiceTest extends BaseIntegrationTest {
     @Test
     @Transactional
     void givenOtherUserSong_whenUpdate_thenThrowsForbiddenException() {
-        SongEntity song = songService.create(new CreateSongRequest("Protected SongEntity", "Artist", "C", null), USER_A);
+        Song song = songService.create(new CreateSongRequest("Protected Song", "Artist", "C", null), USER_A);
         UpdateSongRequest updateReq = new UpdateSongRequest("Hacked Title", "Hacker", "X", null);
 
         assertThrows(ForbiddenException.class,
@@ -103,7 +103,7 @@ class SongServiceTest extends BaseIntegrationTest {
     @Test
     @Transactional
     void givenExistingSong_whenSoftDelete_thenDisappearsFromActiveRecords() {
-        SongEntity song = songService.create(new CreateSongRequest("Deletable", "Artist", "D", null), USER_A);
+        Song song = songService.create(new CreateSongRequest("Deletable", "Artist", "D", null), USER_A);
         java.util.UUID songId = song.id;
 
         songService.softDelete(songId, USER_A);
@@ -118,7 +118,7 @@ class SongServiceTest extends BaseIntegrationTest {
     @Test
     @Transactional
     void givenOtherUserSong_whenFindByIdAndUser_thenThrowsNotFoundException() {
-        SongEntity song = songService.create(new CreateSongRequest("Private SongEntity", "Artist", "E", null), USER_A);
+        Song song = songService.create(new CreateSongRequest("Private Song", "Artist", "E", null), USER_A);
 
         assertThrows(NotFoundException.class,
             () -> songService.findByIdAndUser(song.id, USER_B));

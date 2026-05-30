@@ -83,18 +83,22 @@ public class PlaylistMapper {
         entity.group = playlist.group;
         entity.deletedAt = playlist.deletedAt;
         
-        // In a real application, updating the OneToMany collection robustly requires matching IDs, 
-        // removing missing ones, and adding new ones. But since Panache supports orphanRemoval=true,
-        // replacing the list or updating it carefully is needed. We will keep it simple for now, 
-        // assuming PlaylistService adds/removes songs explicitly.
-        
         if (playlist.songs != null) {
-            entity.songs.clear();
-            entity.songs.addAll(playlist.songs.stream().map(ps -> {
-                PlaylistSongEntity pse = toEntitySong(ps);
-                pse.playlist = entity;
-                return pse;
-            }).collect(Collectors.toList()));
+            // Remove missing ones
+            entity.songs.removeIf(existing -> playlist.songs.stream().noneMatch(ps -> ps.id != null && ps.id.equals(existing.id)));
+            
+            // Add or update
+            for (PlaylistSong ps : playlist.songs) {
+                if (ps.id == null) {
+                    PlaylistSongEntity pse = toEntitySong(ps);
+                    pse.playlist = entity;
+                    entity.songs.add(pse);
+                } else {
+                    entity.songs.stream().filter(e -> ps.id.equals(e.id)).findFirst().ifPresent(e -> {
+                        e.position = ps.position;
+                    });
+                }
+            }
         }
     }
 }
