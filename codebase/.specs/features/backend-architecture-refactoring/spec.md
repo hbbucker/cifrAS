@@ -55,6 +55,22 @@ Explicitly excluded. Documented to prevent scope creep.
 
 ---
 
+### P1: Model and Entity Separation ⭐ MVP
+
+**User Story**: As a system architect, I want to separate Domain Models from JPA Entities so that the domain layer is completely agnostic of the database and persistence frameworks like Panache or Hibernate.
+
+**Why P1**: Mixing JPA annotations (`@Entity`, `PanacheEntityBase`) into Domain Models creates coupling and violates the clean domain principle.
+
+**Acceptance Criteria**:
+
+1. WHEN inspecting classes in the `model` package, THEN the system SHALL NOT contain any JPA/Hibernate annotations.
+2. WHEN inspecting the `infra/persistence/entity` package, THEN the system SHALL contain the JPA Entities representing database tables.
+3. WHEN data moves between the Application layer and the Infrastructure layer, THEN the system SHALL use Mappers to translate between pure Domain Models and JPA Entities.
+
+**Independent Test**: The codebase compiles without Panache/Hibernate imports inside the `model` packages, and repositories deal with entities, while use cases deal with models.
+
+---
+
 ### P1: Application Layer Orchestration ⭐ MVP
 
 **User Story**: As a backend developer, I want the `application` layer to exclusively handle flow orchestration, transactions, and infrastructure coordination so that it remains independent of business logic.
@@ -103,8 +119,9 @@ Each requirement gets a unique ID for tracking across design, tasks, and validat
 | ARCH-02 | P1: Rich Domain Extraction | Design | Pending |
 | ARCH-03 | P1: Application Layer Orchestration | Design | Pending |
 | ARCH-04 | P1: Thin Resources | Design | Pending |
+| ARCH-05 | P1: Model and Entity Separation | Design | Pending |
 
-**Coverage:** 4 total, 0 mapped to tasks, 4 unmapped ⚠️
+**Coverage:** 5 total, 0 mapped to tasks, 5 unmapped ⚠️
 
 ---
 

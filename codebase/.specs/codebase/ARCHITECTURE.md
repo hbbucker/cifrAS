@@ -298,7 +298,7 @@ Contém:
 ```text
 model/
 
-├── Product.java
+├── Product.java (POJO puro, sem anotações JPA)
 ├── ProductPrice.java
 ├── ProductStatus.java
 ├── ProductRules.java
@@ -362,9 +362,9 @@ Responsável pelas implementações técnicas.
 infra/
 
 ├── persistence/
-│   ├── entity/
+│   ├── entity/ (Classes com @Entity, PanacheEntity)
 │   ├── repository/
-│   └── mapper/
+│   └── mapper/ (Converte Model <-> Entity)
 │
 ├── messaging/
 │   └── kafka/
@@ -376,6 +376,13 @@ infra/
 │
 └── cache/
 ```
+
+### Model vs Entity (Atenção!)
+
+**É estritamente proibido** confundir Domain Model com Persistence Entity.
+* **Model (`model/`)**: São POJOs puros que contêm invariantes formais e regras de negócio. **Não devem** possuir anotações de banco de dados (ex: `@Entity`, `@Table`, `PanacheEntityBase`).
+* **Entity (`infra/persistence/entity/`)**: São as representações do banco de dados (modelos anêmicos de dados). Pertencem exclusivamente à camada de infraestrutura.
+* **Mappers (`infra/persistence/mapper/`)**: Fazem a tradução entre as entidades do JPA e os modelos de domínio puro, para que o domínio nunca conheça a persistência.
 
 ---
 

@@ -17,7 +17,7 @@ import br.com.cifras.group.application.usecase.GroupService;
 import br.com.cifras.playlist.application.usecase.PlaylistService;
 import br.com.cifras.playlist.dto.CreatePlaylistRequest;
 import br.com.cifras.group.dto.LinkPlaylistRequest;
-import br.com.cifras.playlist.model.Playlist;
+import br.com.cifras.playlist.infra.persistence.entity.PlaylistEntity;
 import jakarta.inject.Inject;
 
 /**
@@ -113,8 +113,8 @@ class GroupResourceTest extends BaseIntegrationTest {
     @Test
     @TestSecurity(user = OWNER, roles = {"user"})
     void givenOwnerAndPlaylist_whenLinkPlaylist_thenReturns204() {
-        java.util.UUID groupId = createGroup("Band with Playlist");
-        Playlist playlist = playlistService.create(new CreatePlaylistRequest("My Songs", false, null), OWNER);
+        java.util.UUID groupId = createGroup("Band with PlaylistEntity");
+        PlaylistEntity playlist = playlistService.create(new CreatePlaylistRequest("My Songs", false, null), OWNER);
 
         given()
             .contentType(ContentType.JSON)
@@ -127,10 +127,10 @@ class GroupResourceTest extends BaseIntegrationTest {
     @Test
     @TestSecurity(user = MEMBER, roles = {"user"})
     void givenMember_whenGetPlaylists_thenReturnsList() {
-        br.com.cifras.group.model.Group group = groupService.createGroup("Band with Shared Playlists", OWNER);
+        br.com.cifras.group.infra.persistence.entity.GroupEntity group = groupService.createGroup("Band with Shared Playlists", OWNER);
         java.util.UUID groupId = group.id;
         groupService.addMember(groupId, MEMBER, OWNER);
-        Playlist playlist = playlistService.create(new CreatePlaylistRequest("Setlist", false, null), OWNER);
+        PlaylistEntity playlist = playlistService.create(new CreatePlaylistRequest("Setlist", false, null), OWNER);
         groupService.linkPlaylist(groupId, playlist.id, OWNER);
 
         given()
@@ -147,7 +147,7 @@ class GroupResourceTest extends BaseIntegrationTest {
     @TestSecurity(user = OWNER, roles = {"user"})
     void givenOwner_whenUnlinkPlaylist_thenReturns204() {
         java.util.UUID groupId = createGroup("Band for Unlink");
-        Playlist playlist = playlistService.create(new CreatePlaylistRequest("Temporary Setlist", false, null), OWNER);
+        PlaylistEntity playlist = playlistService.create(new CreatePlaylistRequest("Temporary Setlist", false, null), OWNER);
         groupService.linkPlaylist(groupId, playlist.id, OWNER);
 
         given()

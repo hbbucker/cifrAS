@@ -7,7 +7,7 @@ import br.com.cifras.song.model.Song;
 import br.com.cifras.song.dto.CreateSongRequest;
 import br.com.cifras.song.dto.UpdateSongRequest;
 import br.com.cifras.song.infra.persistence.repository.SongRepository;
-import br.com.cifras.playlist.model.PlaylistSong;
+import br.com.cifras.playlist.infra.persistence.entity.PlaylistSongEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -46,9 +46,9 @@ public class SongService {
             .orElseThrow(() -> new NotFoundException("Song not found: " + id));
 
         if (!userId.equals(song.userId)) {
-            long count = PlaylistSong.count(
+            long count = PlaylistSongEntity.count(
                 "song.id = ?1 and playlist.isCollaborative = true and playlist.group.id in " +
-                "(select gm.group.id from GroupMember gm where gm.userId = ?2)", id, userId);
+                "(select gm.group.id from GroupMemberEntity gm where gm.userId = ?2)", id, userId);
             
             if (count == 0) {
                 throw new NotFoundException("Song not found: " + id); // Don't leak existence to other users
@@ -92,6 +92,7 @@ public class SongService {
         song.artist = req.artist();
         song.originalKey = req.originalKey();
         song.lyrics = req.lyrics();
+        songRepository.update(song);
         return song;
     }
 
@@ -111,6 +112,7 @@ public class SongService {
         }
 
         song.deletedAt = Instant.now();
+        songRepository.update(song);
     }
 
     /**
@@ -129,5 +131,6 @@ public class SongService {
         song.prefUseEb = req.prefUseEb();
         song.prefAutoScrollSpeed = req.prefAutoScrollSpeed();
         song.prefTransposeSteps = req.prefTransposeSteps();
+        songRepository.update(song);
     }
 }

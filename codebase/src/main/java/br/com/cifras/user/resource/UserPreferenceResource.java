@@ -1,9 +1,9 @@
 package br.com.cifras.user.resource;
 
 import br.com.cifras.user.model.UserPreference;
+import br.com.cifras.user.application.usecase.UserPreferenceService;
 import br.com.cifras.shared.security.SecurityUtils;
 import io.quarkus.security.Authenticated;
-import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -17,36 +17,22 @@ public class UserPreferenceResource {
     @Inject
     SecurityUtils securityUtils;
 
+    @Inject
+    UserPreferenceService service;
+
     @GET
     @Authenticated
     public Response getPreferences() {
         String userId = securityUtils.getCurrentUserId();
-        UserPreference pref = UserPreference.findByUserId(userId);
-        if (pref == null) {
-            pref = new UserPreference();
-            pref.userId = userId;
-            pref.theme = "light";
-        }
+        UserPreference pref = service.getPreferences(userId);
         return Response.ok(pref).build();
     }
 
     @PUT
     @Authenticated
-    @Transactional
     public Response updatePreferences(UserPreference newPref) {
         String userId = securityUtils.getCurrentUserId();
-        UserPreference pref = UserPreference.findByUserId(userId);
-        if (pref == null) {
-            pref = new UserPreference();
-            pref.userId = userId;
-        }
-        if (newPref.theme != null) {
-            pref.theme = newPref.theme;
-        }
-        if (newPref.language != null) {
-            pref.language = newPref.language;
-        }
-        pref.persist();
+        UserPreference pref = service.updatePreferences(userId, newPref);
         return Response.ok(pref).build();
     }
 }

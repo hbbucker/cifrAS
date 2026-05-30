@@ -1,6 +1,6 @@
 package br.com.cifras;
 
-import br.com.cifras.group.model.Group;
+import br.com.cifras.group.infra.persistence.entity.GroupEntity;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.transaction.Transactional;
@@ -21,8 +21,8 @@ public class DatabaseIntegrationTest {
     @Transactional
     public void testExplicitTestcontainerDatabaseConnection() {
         // Simple write to the database to ensure our testcontainer PostgreSQL is running and mapped correctly
-        Group group = new Group();
-        group.name = "Testcontainers Group";
+        GroupEntity group = new GroupEntity();
+        group.name = "Testcontainers GroupEntity";
         group.ownerId = "user-123";
         group.persist();
 

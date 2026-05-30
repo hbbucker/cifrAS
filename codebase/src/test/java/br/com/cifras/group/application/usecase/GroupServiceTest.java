@@ -1,6 +1,6 @@
 package br.com.cifras.group.application.usecase;
 
-import br.com.cifras.group.model.Group;
+import br.com.cifras.group.infra.persistence.entity.GroupEntity;
 import br.com.cifras.shared.exception.ForbiddenException;
 import br.com.cifras.shared.exception.NotFoundException;
 import io.quarkus.test.junit.QuarkusTest;
@@ -38,7 +38,7 @@ class GroupServiceTest extends BaseIntegrationTest {
     @Test
     @Transactional
     void givenValidName_whenCreateGroup_thenGroupCreatedWithOwner() {
-        Group group = groupService.createGroup("CifrAS Band", OWNER);
+        GroupEntity group = groupService.createGroup("CifrAS Band", OWNER);
 
         assertNotNull(group.id);
         assertEquals("CifrAS Band", group.name);
@@ -53,7 +53,7 @@ class GroupServiceTest extends BaseIntegrationTest {
     @Test
     @Transactional
     void givenMemberAdded_whenIsMember_thenReturnsTrue() {
-        Group group = groupService.createGroup("Test Group", OWNER);
+        GroupEntity group = groupService.createGroup("Test GroupEntity", OWNER);
         groupService.addMember(group.id, MEMBER, OWNER);
 
         assertTrue(groupService.isMember(group.id, MEMBER));
@@ -66,7 +66,7 @@ class GroupServiceTest extends BaseIntegrationTest {
     @Test
     @Transactional
     void givenMemberAdded_whenIsOwner_thenReturnsFalseForMember() {
-        Group group = groupService.createGroup("Owner Test", OWNER);
+        GroupEntity group = groupService.createGroup("Owner Test", OWNER);
         groupService.addMember(group.id, MEMBER, OWNER);
 
         assertTrue(groupService.isOwner(group.id, OWNER));
@@ -79,7 +79,7 @@ class GroupServiceTest extends BaseIntegrationTest {
     @Test
     @Transactional
     void givenOwnerRequest_whenAddMember_thenMemberAdded() {
-        Group group = groupService.createGroup("Add Test", OWNER);
+        GroupEntity group = groupService.createGroup("Add Test", OWNER);
         groupService.addMember(group.id, MEMBER, OWNER);
 
         assertTrue(groupService.isMember(group.id, MEMBER));
@@ -91,7 +91,7 @@ class GroupServiceTest extends BaseIntegrationTest {
     @Test
     @Transactional
     void givenExistingMember_whenRemoveMember_thenMemberRemoved() {
-        Group group = groupService.createGroup("Remove Test", OWNER);
+        GroupEntity group = groupService.createGroup("Remove Test", OWNER);
         groupService.addMember(group.id, MEMBER, OWNER);
         groupService.removeMember(group.id, MEMBER, OWNER);
 
@@ -104,7 +104,7 @@ class GroupServiceTest extends BaseIntegrationTest {
     @Test
     @Transactional
     void givenNonOwner_whenRemoveMember_thenThrowsForbiddenException() {
-        Group group = groupService.createGroup("Forbidden Test", OWNER);
+        GroupEntity group = groupService.createGroup("Forbidden Test", OWNER);
         groupService.addMember(group.id, MEMBER, OWNER);
 
         assertThrows(ForbiddenException.class,
