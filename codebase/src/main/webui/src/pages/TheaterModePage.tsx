@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { TheaterControls } from '../components/theater/TheaterControls';
 import { useAutoScroll } from '../hooks/useAutoScroll';
 import { ChordSheet } from '../components/music/ChordSheet';
@@ -16,9 +16,12 @@ interface SongData {
 export const TheaterModePage: React.FC = () => {
  const navigate = useNavigate();
  const { playlistId, songId } = useParams();
+ const location = useLocation();
+ const passedState = location.state as { autoScrollSpeed?: number, useBb?: boolean, useEb?: boolean, transposeSteps?: number } | null;
  const { toast } = useToast();
  
- const { isScrolling, speed, play, pause, setSpeed, containerRef } = useAutoScroll(3);
+ const initialSpeed = passedState?.autoScrollSpeed !== undefined ? passedState.autoScrollSpeed : 1;
+ const { isScrolling, speed, play, pause, setSpeed, containerRef } = useAutoScroll(initialSpeed);
 
 
  const [song, setSong] = useState({
@@ -30,7 +33,9 @@ export const TheaterModePage: React.FC = () => {
 
  const [playlistSongs, setPlaylistSongs] = useState<SongData[]>([]);
  const [currentPlaylistIndex, setCurrentPlaylistIndex] = useState<number>(0);
- const [transposeSteps, setTransposeSteps] = useState(0);
+ const [transposeSteps, setTransposeSteps] = useState(passedState?.transposeSteps ?? 0);
+ const [useBb, setUseBb] = useState(passedState?.useBb ?? false);
+ const [useEb, setUseEb] = useState(passedState?.useEb ?? false);
  const [scrollTop, setScrollTop] = useState(0);
  const [slideDir, setSlideDir] = useState<'right'|'left'>('right');
  
@@ -76,13 +81,22 @@ export const TheaterModePage: React.FC = () => {
  })
  .then(data => {
  const key = data.originalKey || data.keySignature || 'C';
- setSong({
+ setSong(prev => {
+ if (prev.title !== 'Loading...') {
+ setTransposeSteps(0);
+ } else if (!passedState) {
+    if (data.prefAutoScrollSpeed !== undefined) setSpeed(data.prefAutoScrollSpeed);
+    if (data.prefUseBb !== undefined) setUseBb(data.prefUseBb);
+    if (data.prefUseEb !== undefined) setUseEb(data.prefUseEb);
+    if (data.prefTransposeSteps !== undefined) setTransposeSteps(data.prefTransposeSteps);
+ }
+ return {
  title: data.title,
  artist: data.artist,
  originalKey: key,
  content: stringifyLyrics(data.lyrics)
+ };
  });
- setTransposeSteps(0);
  
  // Load saved font size for this song and device
  const deviceType = isMobile ? 'mobile' : 'desktop';
@@ -98,6 +112,29 @@ export const TheaterModePage: React.FC = () => {
  });
  }
  }, [activeSongId, isMobile, toast]);
+
+ // Persist preferences
+ useEffect(() => {
+    if (song.title === 'Loading...' || !activeSongId) return;
+    
+    const handler = setTimeout(() => {
+      fetch(`/api/songs/${activeSongId}/preferences`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          prefUseBb: useBb,
+          prefUseEb: useEb,
+          prefAutoScrollSpeed: speed,
+          prefTransposeSteps: transposeSteps
+        })
+      }).catch(err => console.error('Failed to save preferences', err));
+    }, 1000);
+    
+    return () => clearTimeout(handler);
+ }, [useBb, useEb, speed, transposeSteps, activeSongId, song.title]);
 
  const handleNextSong = () => {
  if (playlistId && currentPlaylistIndex < playlistSongs.length - 1) {
@@ -128,8 +165,8 @@ export const TheaterModePage: React.FC = () => {
  setScrollTop(e.currentTarget.scrollTop);
  };
 
- const currentKey = transposeContent(song.originalKey, transposeSteps);
- const transposedContent = transposeContent(song.content, transposeSteps);
+ const currentKey = transposeContent(song.originalKey, transposeSteps, useBb, useEb);
+ const transposedContent = transposeContent(song.content, transposeSteps, useBb, useEb);
 
  // Swipe logic
  const [touchStart, setTouchStart] = useState<number | null>(null);

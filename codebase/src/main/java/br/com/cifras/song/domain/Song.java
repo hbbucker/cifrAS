@@ -42,6 +42,18 @@ public class Song extends PanacheEntityBase {
     @Column(columnDefinition = "jsonb")
     public LyricsStructure lyrics;
 
+    @Column(name = "pref_use_bb")
+    public Boolean prefUseBb = false;
+
+    @Column(name = "pref_use_eb")
+    public Boolean prefUseEb = false;
+
+    @Column(name = "pref_auto_scroll_speed")
+    public Integer prefAutoScrollSpeed = 1;
+
+    @Column(name = "pref_transpose_steps")
+    public Integer prefTransposeSteps = 0;
+
     @Column(nullable = false, updatable = false)
     public Instant createdAt;
 

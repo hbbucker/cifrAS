@@ -14,6 +14,7 @@ import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import br.com.cifras.song.dto.SongPreferencesDTO;
 
 import java.util.List;
 import java.util.UUID;
@@ -87,7 +88,7 @@ public class SongResource {
             lyrics = transpositionService.transpose(lyrics, transpose, EnharmonicConvention.SHARPS);
         }
         SongDTO dto = new SongDTO(song.id, song.title, song.artist, song.originalKey,
-            lyrics, null, song.createdAt, song.updatedAt);
+            lyrics, null, song.prefUseBb, song.prefUseEb, song.prefAutoScrollSpeed, song.prefTransposeSteps, song.createdAt, song.updatedAt);
         return Response.ok(dto).build();
     }
 
@@ -103,7 +104,7 @@ public class SongResource {
         LyricsStructure transposed = transpositionService.transpose(
             song.lyrics, request.semitones(), request.convention());
         SongDTO dto = new SongDTO(song.id, song.title, song.artist, song.originalKey,
-            transposed, null, song.createdAt, song.updatedAt);
+            transposed, null, song.prefUseBb, song.prefUseEb, song.prefAutoScrollSpeed, song.prefTransposeSteps, song.createdAt, song.updatedAt);
         return Response.ok(dto).build();
     }
 
@@ -117,6 +118,17 @@ public class SongResource {
         String userId = securityUtils.getCurrentUserId();
         Song song = songService.update(id, request, userId);
         return Response.ok(SongDTO.from(song)).build();
+    }
+
+    /**
+     * PUT /songs/{id}/preferences — update song preferences.
+     */
+    @PUT
+    @Path("/{id}/preferences")
+    public Response updatePreferences(@PathParam("id") UUID id, @Valid SongPreferencesDTO request) {
+        String userId = securityUtils.getCurrentUserId();
+        songService.updatePreferences(id, request, userId);
+        return Response.noContent().build();
     }
 
     /**

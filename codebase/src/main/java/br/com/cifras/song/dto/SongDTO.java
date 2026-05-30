@@ -16,6 +16,10 @@ public record SongDTO(
     String originalKey,
     LyricsStructure lyrics,
     String userPreferredKey,
+    Boolean prefUseBb,
+    Boolean prefUseEb,
+    Integer prefAutoScrollSpeed,
+    Integer prefTransposeSteps,
     Instant createdAt,
     Instant updatedAt
 ) {
@@ -31,6 +35,10 @@ public record SongDTO(
             song.originalKey,
             song.lyrics,
             preferredKey,
+            song.prefUseBb,
+            song.prefUseEb,
+            song.prefAutoScrollSpeed,
+            song.prefTransposeSteps,
             song.createdAt,
             song.updatedAt
         );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Sidebar } from '../components/layout/Sidebar';
 import { TransposePad } from '../components/music/TransposePad';
 import { ChordSheet } from '../components/music/ChordSheet';
@@ -14,20 +14,20 @@ export const SongViewPage: React.FC = () => {
  const { toast } = useToast();
  
  const [song, setSong] = useState({
- title: 'I Took A Pill In Ibiza',
- artist: 'Mike Posner',
- originalKey: 'G',
- content: `[Intro]
-G D Em C
-
-[Verse 1]
-G D
-I took a pill in Ibiza
- Em C
-To show Avicii I was cool`
+ title: 'Carregando...',
+ artist: '...',
+ originalKey: 'C',
+ content: ''
  });
  
  const [transposeSteps, setTransposeSteps] = useState(0);
+ 
+ // Preferences State
+ const [showSettings, setShowSettings] = useState(false);
+ const [useBb, setUseBb] = useState(false);
+ const [useEb, setUseEb] = useState(false);
+ const [autoScrollSpeed, setAutoScrollSpeed] = useState(1);
+ const scrollContainerRef = useRef<HTMLDivElement>(null);
 
  useEffect(() => {
  if (id) {
@@ -40,21 +40,74 @@ To show Avicii I was cool`
  })
  .then(data => {
  const key = data.originalKey || data.keySignature || 'C';
- setSong({ ...data, content: stringifyLyrics(data.lyrics), originalKey: key });
- setTransposeSteps(0);
- })
+ setSong({
+        title: data.title,
+        artist: data.artist,
+        originalKey: key,
+        content: stringifyLyrics(data.lyrics)
+      });
+      if (data.prefAutoScrollSpeed !== undefined) setAutoScrollSpeed(data.prefAutoScrollSpeed);
+      if (data.prefUseBb !== undefined) setUseBb(data.prefUseBb);
+      if (data.prefUseEb !== undefined) setUseEb(data.prefUseEb);
+      if (data.prefTransposeSteps !== undefined) setTransposeSteps(data.prefTransposeSteps);
+    })
  .catch(() => toast('Failed to load song details', 'error'));
  }
  }, [id, toast]);
 
- const currentKey = transposeContent(song.originalKey, transposeSteps);
- const transposedContent = transposeContent(song.content, transposeSteps);
+ // Auto-scroll effect
+ useEffect(() => {
+ if (autoScrollSpeed <= 0) return;
+ 
+ let animationFrameId: number;
+ let lastTime = performance.now();
+ 
+ const scroll = (time: number) => {
+ const delta = time - lastTime;
+ if (delta > 16) { // target roughly 60fps
+ if (scrollContainerRef.current) {
+ scrollContainerRef.current.scrollTop += (autoScrollSpeed * 15) / 60;
+ }
+ lastTime = time;
+ }
+ animationFrameId = requestAnimationFrame(scroll);
+ };
+ 
+ animationFrameId = requestAnimationFrame(scroll);
+ return () => cancelAnimationFrame(animationFrameId);
+ }, [autoScrollSpeed]);
+
+ // Persist preferences
+ useEffect(() => {
+    if (song.title === 'Carregando...' || !id) return;
+    
+    const handler = setTimeout(() => {
+      fetch(`/api/songs/${id}/preferences`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          prefUseBb: useBb,
+          prefUseEb: useEb,
+          prefAutoScrollSpeed: autoScrollSpeed,
+          prefTransposeSteps: transposeSteps
+        })
+      }).catch(err => console.error('Failed to save preferences', err));
+    }, 1000);
+    
+    return () => clearTimeout(handler);
+  }, [useBb, useEb, autoScrollSpeed, transposeSteps, id, song.title]);
+
+ const currentKey = transposeContent(song.originalKey, transposeSteps, useBb, useEb);
+ const transposedContent = transposeContent(song.content, transposeSteps, useBb, useEb);
 
  return (
  <div className="flex h-screen bg-bg-main">
  <Sidebar />
  <main className="flex-1 flex flex-col overflow-hidden">
- <header className="flex flex-col sm:flex-row sm:items-center justify-between px-4 sm:px-6 py-3 sm:py-0 sm:h-16 bg-bg-card border-b border-border-main shrink-0 gap-3 sm:gap-0">
+ <header className="flex flex-col sm:flex-row sm:items-center justify-between px-4 sm:px-6 py-3 sm:py-0 sm:h-16 bg-bg-card border-b border-border-main shrink-0 gap-3 sm:gap-0 relative z-10">
  <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto overflow-hidden">
  <button onClick={() => navigate('/songs')} className="p-2 hover:bg-bg-elevated rounded-full text-text-mute shrink-0 -ml-2 sm:ml-0">
  <ArrowLeft className="w-5 h-5" />
@@ -72,9 +125,54 @@ To show Avicii I was cool`
  onTransposeUp={() => setTransposeSteps(s => s + 1)}
  />
  
- <button className="hidden sm:flex items-center gap-2 p-2 text-text-mute hover:bg-bg-elevated rounded-lg">
- <Settings2 className="w-5 h-5" />
+ <div className="relative">
+ <button 
+ onClick={() => setShowSettings(!showSettings)}
+ className="flex items-center gap-2 p-2 text-text-mute hover:bg-bg-elevated rounded-lg transition-colors"
+ title="Preferences"
+ >
+ <Settings2 className={`w-5 h-5 ${showSettings ? 'text-[#aa3bff]' : ''}`} />
  </button>
+ 
+ {showSettings && (
+ <div className="absolute top-full right-0 mt-2 w-64 bg-bg-card border border-border-main rounded-lg shadow-xl p-4 z-50 animate-in slide-in-from-top-2">
+ <h3 className="font-semibold text-text-main mb-4">Preferences</h3>
+ 
+ <div className="space-y-4">
+ <div className="space-y-2">
+ <label className="text-sm text-text-mute flex justify-between">
+ <span>Auto-scroll Speed</span>
+ <span>{autoScrollSpeed === 0 ? 'Off' : autoScrollSpeed}</span>
+ </label>
+ <input 
+ type="range" 
+ min="0" 
+ max="10" 
+ value={autoScrollSpeed}
+ onChange={(e) => setAutoScrollSpeed(Number(e.target.value))}
+ className="w-full accent-[#aa3bff]"
+ />
+ </div>
+ 
+ <div className="flex items-center justify-between">
+ <span className="text-sm text-text-main font-medium">Use Bb</span>
+ <label className="relative inline-flex items-center cursor-pointer">
+ <input type="checkbox" className="sr-only peer" checked={useBb} onChange={(e) => setUseBb(e.target.checked)} />
+ <div className="w-11 h-6 bg-bg-elevated peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-text-main after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#aa3bff]"></div>
+ </label>
+ </div>
+ 
+ <div className="flex items-center justify-between">
+ <span className="text-sm text-text-main font-medium">Use Eb</span>
+ <label className="relative inline-flex items-center cursor-pointer">
+ <input type="checkbox" className="sr-only peer" checked={useEb} onChange={(e) => setUseEb(e.target.checked)} />
+ <div className="w-11 h-6 bg-bg-elevated peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-text-main after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#aa3bff]"></div>
+ </label>
+ </div>
+ </div>
+ </div>
+ )}
+ </div>
  
  <button 
  onClick={() => navigate(`/songs/edit/${id}`, { state: { transposedKey: currentKey, transposedContent } })}
@@ -85,7 +183,7 @@ To show Avicii I was cool`
  </button>
  
  <button 
- onClick={() => navigate(`/theater/song/${id}`)}
+ onClick={() => navigate(`/theater/song/${id}`, { state: { autoScrollSpeed, useBb, useEb, transposeSteps } })}
  className="flex items-center gap-2 bg-[#aa3bff] hover:bg-[#902be6] text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm"
  data-testid="theater-mode-btn"
  >
@@ -95,7 +193,7 @@ To show Avicii I was cool`
  </div>
  </header>
 
- <div className="flex-1 overflow-y-auto p-6 bg-bg-main/50">
+ <div className="flex-1 overflow-y-auto p-6 bg-bg-main/50" ref={scrollContainerRef}>
  <div className="max-w-3xl mx-auto h-full flex flex-col">
  <ChordSheet content={transposedContent} fontSize={20} />
  </div>

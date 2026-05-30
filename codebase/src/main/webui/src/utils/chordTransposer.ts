@@ -5,40 +5,47 @@ const FLAT_TO_SHARP: Record<string, string> = {
 
 const normalizeRoot = (root: string) => FLAT_TO_SHARP[root] || root;
 
-export const transposeChord = (chord: string, steps: number): string => {
- // Match the root note, optional accidental, and the rest
- const match = chord.match(/^([A-G][b#]?)(.*)$/);
- if (!match) return chord;
+export const transposeChord = (chord: string, steps: number, useBb: boolean = false, useEb: boolean = false): string => {
+  // Match the root note, optional accidental, and the rest
+  const match = chord.match(/^([A-G][b#]?)(.*)$/);
+  if (!match) return chord;
 
- const root = normalizeRoot(match[1]);
- const rest = match[2];
+  const originalRoot = match[1];
+  const root = normalizeRoot(originalRoot);
+  const rest = match[2];
 
- const currentIndex = CHORD_SCALE.indexOf(root);
- if (currentIndex === -1) return chord;
+  const currentIndex = CHORD_SCALE.indexOf(root);
+  if (currentIndex === -1) return chord;
 
- // Calculate new index with wrap-around
- let newIndex = (currentIndex + steps) % 12;
- if (newIndex < 0) newIndex += 12;
+  // Calculate new index with wrap-around
+  let newIndex = (currentIndex + steps) % 12;
+  if (newIndex < 0) newIndex += 12;
 
- const newRoot = CHORD_SCALE[newIndex];
- 
- // Also transpose bass notes if present (e.g., /F#)
- let newRest = rest;
- const bassMatch = rest.match(/^(\/)([A-G][b#]?)(.*)$/);
- if (bassMatch) {
- const bassRoot = normalizeRoot(bassMatch[2]);
- const bassIndex = CHORD_SCALE.indexOf(bassRoot);
- if (bassIndex !== -1) {
- let newBassIndex = (bassIndex + steps) % 12;
- if (newBassIndex < 0) newBassIndex += 12;
- newRest = `${bassMatch[1]}${CHORD_SCALE[newBassIndex]}${bassMatch[3]}`;
- }
- }
+  let newRoot = steps === 0 ? originalRoot : CHORD_SCALE[newIndex];
+  if (useBb && normalizeRoot(newRoot) === 'A#') newRoot = 'Bb';
+  if (useEb && normalizeRoot(newRoot) === 'D#') newRoot = 'Eb';
+  
+  // Also transpose bass notes if present (e.g., /F#)
+  let newRest = rest;
+  const bassMatch = rest.match(/^(\/)([A-G][b#]?)(.*)$/);
+  if (bassMatch) {
+    const bassOriginal = bassMatch[2];
+    const bassRoot = normalizeRoot(bassOriginal);
+    const bassIndex = CHORD_SCALE.indexOf(bassRoot);
+    if (bassIndex !== -1) {
+      let newBassIndex = (bassIndex + steps) % 12;
+      if (newBassIndex < 0) newBassIndex += 12;
+      let newBassRoot = steps === 0 ? bassOriginal : CHORD_SCALE[newBassIndex];
+      if (useBb && normalizeRoot(newBassRoot) === 'A#') newBassRoot = 'Bb';
+      if (useEb && normalizeRoot(newBassRoot) === 'D#') newBassRoot = 'Eb';
+      newRest = `${bassMatch[1]}${newBassRoot}${bassMatch[3]}`;
+    }
+  }
 
- return `${newRoot}${newRest}`;
+  return `${newRoot}${newRest}`;
 };
 
-export const transposeLine = (line: string, steps: number): string => {
+export const transposeLine = (line: string, steps: number, useBb: boolean = false, useEb: boolean = false): string => {
  // A simple regex to find chords in a line. 
  // It assumes words starting with A-G and optional #/b are chords if they match the chord structure.
  // The ChordSheet component uses a similar regex to colorize.
@@ -51,7 +58,7 @@ export const transposeLine = (line: string, steps: number): string => {
  
  // For now, let's just transpose everything that matches the regex, since this function 
  // should ideally only be called on lines that are known to be chord lines.
- return line.replace(chordRegex, (match) => transposeChord(match, steps));
+ return line.replace(chordRegex, (match) => transposeChord(match, steps, useBb, useEb));
 };
 
 export const isChordLineHelper = (line: string) => {
@@ -134,8 +141,8 @@ export const transposeTabLine = (line: string, steps: number): string => {
  return prefix + resultRest;
 };
 
-export const transposeContent = (content: string, steps: number): string => {
- if (steps === 0) return content;
+export const transposeContent = (content: string, steps: number, useBb: boolean = false, useEb: boolean = false): string => {
+ if (steps === 0 && !useBb && !useEb) return content;
  
  return content.split('\n').map(line => {
  if (isChordLineHelper(line)) {
@@ -149,7 +156,7 @@ export const transposeContent = (content: string, steps: number): string => {
  // Let's use a more strict chord regex for exact match on the part
  const strictChordRegex = /^[A-G][#b]?(m|M|maj|dim|aug|sus|add)?\d*(m|M|maj|dim|aug|sus|add)?(b\d+|#\d+)?(\([^)]+\))?(\/([A-G][#b]?|\d+))?$/;
  if (strictChordRegex.test(part)) {
- return transposeChord(part, steps);
+ return transposeChord(part, steps, useBb, useEb);
  }
  return part;
  }).join('');
@@ -160,7 +167,7 @@ export const transposeContent = (content: string, steps: number): string => {
  }).join('\n');
 };
 
-export const getNextKey = (currentKey: string, up: boolean): string => {
+export const getNextKey = (currentKey: string, up: boolean, useBb: boolean = false, useEb: boolean = false): string => {
  const rootMatch = currentKey.match(/^[A-G][b#]?/);
  if (!rootMatch) return currentKey;
  
@@ -171,5 +178,9 @@ export const getNextKey = (currentKey: string, up: boolean): string => {
  let newIndex = (index + (up ? 1 : -1)) % 12;
  if (newIndex < 0) newIndex += 12;
  
- return currentKey.replace(/^[A-G][b#]?/, CHORD_SCALE[newIndex]);
+ let newRoot = CHORD_SCALE[newIndex];
+ if (useBb && newRoot === 'A#') newRoot = 'Bb';
+ if (useEb && newRoot === 'D#') newRoot = 'Eb';
+
+ return currentKey.replace(/^[A-G][b#]?/, newRoot);
 };

@@ -112,4 +112,22 @@ public class SongService {
 
         song.deletedAt = Instant.now();
     }
+
+    /**
+     * Updates song preferences. Only the owner can update.
+     */
+    @Transactional
+    public void updatePreferences(UUID id, br.com.cifras.song.dto.SongPreferencesDTO req, String userId) {
+        Song song = songRepository.findActiveById(id)
+            .orElseThrow(() -> new NotFoundException("Song not found: " + id));
+
+        if (!userId.equals(song.userId)) {
+            throw new ForbiddenException("You do not own this song");
+        }
+
+        song.prefUseBb = req.prefUseBb();
+        song.prefUseEb = req.prefUseEb();
+        song.prefAutoScrollSpeed = req.prefAutoScrollSpeed();
+        song.prefTransposeSteps = req.prefTransposeSteps();
+    }
 }
