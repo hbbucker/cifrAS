@@ -82,7 +82,7 @@ export const SongsListPage: React.FC = () => {
  return () => {
  controller.abort();
  };
- }, [debouncedQuery, logout, navigate, toast]);
+ }, [debouncedQuery, logout, navigate, toast, t]);
 
  const handleDelete = (id: string) => {
  if (!window.confirm(t('dashboard.confirmDelete'))) return;
