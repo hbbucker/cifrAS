@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Sidebar } from '../components/layout/Sidebar';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Save, ArrowLeft } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import { ConfirmModal } from '../components/modals/ConfirmModal';
@@ -9,12 +9,15 @@ import { parseContentToLyrics, stringifyLyrics } from '../utils/lyricsParser';
 export const SongFormPage: React.FC = () => {
  const { id } = useParams();
  const navigate = useNavigate();
+ const location = useLocation();
  const { toast } = useToast();
+ 
+ const { transposedKey, transposedContent } = location.state || {};
  
  const [title, setTitle] = useState('');
  const [artist, setArtist] = useState('');
- const [key, setKey] = useState('C');
- const [content, setContent] = useState('');
+ const [key, setKey] = useState(transposedKey || 'C');
+ const [content, setContent] = useState(transposedContent || '');
  const [showCancelModal, setShowCancelModal] = useState(false);
  const [isDirty, setIsDirty] = useState(false);
 
@@ -32,9 +35,9 @@ export const SongFormPage: React.FC = () => {
  .then(song => {
  setTitle(song.title || '');
  setArtist(song.artist || '');
- setKey(song.originalKey || song.keySignature || 'C');
- setContent(song.content || stringifyLyrics(song.lyrics) || '');
- setIsDirty(false);
+ setKey(transposedKey || song.originalKey || song.keySignature || 'C');
+ setContent(transposedContent || song.content || stringifyLyrics(song.lyrics) || '');
+ setIsDirty(!!(transposedKey || transposedContent));
  })
  .catch(err => {
  console.error(err);
@@ -64,7 +67,11 @@ export const SongFormPage: React.FC = () => {
  
  toast(id ? 'Song updated successfully!' : 'Song created successfully!', 'success');
  setIsDirty(false);
+ if (id) {
+ navigate(-1);
+ } else {
  navigate('/songs');
+ }
  } catch (err) {
  console.error(err);
  toast('Error saving song', 'error');
@@ -75,7 +82,8 @@ export const SongFormPage: React.FC = () => {
  if (isDirty) {
  setShowCancelModal(true);
  } else {
- navigate('/songs');
+ if (id) navigate(-1);
+ else navigate('/songs');
  }
  };
 
@@ -143,7 +151,10 @@ export const SongFormPage: React.FC = () => {
  message="You have unsaved modifications. Are you sure you want to leave without saving?"
  variant="warning"
  confirmText="Discard"
- onConfirm={() => navigate('/songs')}
+ onConfirm={() => {
+ if (id) navigate(-1);
+ else navigate('/songs');
+ }}
  onCancel={() => setShowCancelModal(false)}
  />
  </div>

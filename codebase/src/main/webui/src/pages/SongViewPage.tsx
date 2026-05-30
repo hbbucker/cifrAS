@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Sidebar } from '../components/layout/Sidebar';
 import { TransposePad } from '../components/music/TransposePad';
 import { ChordSheet } from '../components/music/ChordSheet';
-import { ArrowLeft, PlayCircle, Settings2 } from 'lucide-react';
+import { ArrowLeft, PlayCircle, Settings2, Edit } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { stringifyLyrics } from '../utils/lyricsParser';
 import { transposeContent } from '../utils/chordTransposer';
@@ -74,6 +74,14 @@ To show Avicii I was cool`
  
  <button className="hidden sm:flex items-center gap-2 p-2 text-text-mute hover:bg-bg-elevated rounded-lg">
  <Settings2 className="w-5 h-5" />
+ </button>
+ 
+ <button 
+ onClick={() => navigate(`/songs/edit/${id}`, { state: { transposedKey: currentKey, transposedContent } })}
+ className="hidden sm:flex items-center gap-2 p-2 text-text-mute hover:bg-bg-elevated rounded-lg"
+ title="Edit Song"
+ >
+ <Edit className="w-5 h-5" />
  </button>
  
  <button 
