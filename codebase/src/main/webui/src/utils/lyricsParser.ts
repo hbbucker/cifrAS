@@ -17,6 +17,24 @@ export interface LyricsStructure {
  sections: Section[];
 }
 
+const CHORD_REGEX = /^([A-G][#b]?)([mM0-9]|maj|min|dim|aug|sus|add|\+|\-|º|°)*(\([^)]+\))*(\/[A-G][#b]?([mM0-9]|maj|min|dim|aug|sus|add|\+|\-|º|°)*(\([^)]+\))*)?$/;
+
+function isChordToken(token: string): boolean {
+ return CHORD_REGEX.test(token) || token === '|' || /^\(\d+x\)$/i.test(token);
+}
+
+function checkIsChordLine(trimmedLine: string): boolean {
+ if (!trimmedLine) return false;
+ const tokens = trimmedLine.split(/\s+/).filter(Boolean);
+ if (tokens.length === 0) return false;
+ 
+ let validCount = 0;
+ for (const token of tokens) {
+ if (isChordToken(token)) validCount++;
+ }
+ return (validCount / tokens.length) > 0.6;
+}
+
 export function parseContentToLyrics(content: string): LyricsStructure {
  const sections: Section[] = [];
  let currentSection: Section = { label: '', lines: [] };
@@ -41,26 +59,29 @@ export function parseContentToLyrics(content: string): LyricsStructure {
  continue;
  }
  
- // Simplistic heuristic: if it looks like chords above lyrics
- const isChordLine = trimmed.length > 0 && /^[A-G][#b]?[m]?(\s|$)/.test(trimmed);
- 
- if (isChordLine) {
- const chords: ChordPosition[] = [];
- const regex = /([A-G][A-Za-z0-9#/]*)/g;
- let match;
- while ((match = regex.exec(rawLine)) !== null) {
- chords.push({ chord: match[1], position: match.index });
- }
+  // Simplistic heuristic: if it looks like chords above lyrics
+  const isChordLine = checkIsChordLine(trimmed);
+  
+  if (isChordLine) {
+  const chords: ChordPosition[] = [];
+  const tokenRegex = /\S+/g;
+  let match;
+  while ((match = tokenRegex.exec(rawLine)) !== null) {
+  const token = match[0];
+  if (isChordToken(token)) {
+  chords.push({ chord: token, position: match.index });
+  }
+  }
  
  // Look ahead to next line for lyrics text
  let text = '';
  if (i + 1 < lines.length) {
  const nextLine = lines[i + 1];
  const nextTrimmed = nextLine.trim();
- const nextIsSection = nextTrimmed.match(/^\[(.*)\]$/);
- const nextIsChord = nextTrimmed.length > 0 && /^[A-G][#b]?[m]?(\s|$)/.test(nextTrimmed);
- 
- if (!nextIsSection && !nextIsChord && nextTrimmed.length > 0) {
+  const nextIsSection = nextTrimmed.match(/^\[(.*)\]$/);
+  const nextIsChord = checkIsChordLine(nextTrimmed);
+  
+  if (!nextIsSection && !nextIsChord && nextTrimmed.length > 0) {
  text = nextLine;
  i++; // Skip next line
  }
