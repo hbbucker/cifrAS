@@ -60,13 +60,13 @@ public class SongRepository {
     public void persist(Song song) {
         SongEntity entity = mapper.toEntity(song);
         jpaRepo.persistAndFlush(entity);
-        song.id = entity.id;
-        song.createdAt = entity.createdAt;
-        song.updatedAt = entity.updatedAt;
+        song.setId(entity.id);
+        song.setCreatedAt(entity.createdAt);
+        song.setUpdatedAt(entity.updatedAt);
     }
 
     public void update(Song song) {
-        SongEntity entity = jpaRepo.findById(song.id);
+        SongEntity entity = jpaRepo.findById(song.getId());
         if (entity != null) {
             mapper.updateEntity(song, entity);
             jpaRepo.persist(entity);

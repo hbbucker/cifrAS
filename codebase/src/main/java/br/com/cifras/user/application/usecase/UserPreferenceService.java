@@ -1,5 +1,7 @@
 package br.com.cifras.user.application.usecase;
 
+import br.com.cifras.user.model.Language;
+import br.com.cifras.user.model.Theme;
 import br.com.cifras.user.model.UserPreference;
 import br.com.cifras.user.infra.persistence.repository.UserPreferenceRepository;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -13,30 +15,22 @@ public class UserPreferenceService {
     UserPreferenceRepository repository;
 
     public UserPreference getPreferences(String userId) {
-        return repository.findByUserId(userId).orElseGet(() -> {
-            UserPreference pref = new UserPreference();
-            pref.userId = userId;
-            pref.theme = "light";
-            return pref;
-        });
+        return repository.findByUserId(userId).orElseGet(() -> UserPreference.createDefault(userId));
     }
 
     @Transactional
-    public UserPreference updatePreferences(String userId, UserPreference newPref) {
-        UserPreference pref = repository.findByUserId(userId).orElseGet(() -> {
-            UserPreference p = new UserPreference();
-            p.userId = userId;
-            return p;
-        });
+    public UserPreference updatePreferences(String userId, String themeVal, String langVal) {
+        boolean isNew = repository.findByUserId(userId).isEmpty();
+        UserPreference pref = isNew ? UserPreference.createDefault(userId) : repository.findByUserId(userId).get();
 
-        if (newPref.theme != null) {
-            pref.theme = newPref.theme;
+        if (themeVal != null) {
+            pref.updateTheme(Theme.fromString(themeVal));
         }
-        if (newPref.language != null) {
-            pref.language = newPref.language;
+        if (langVal != null) {
+            pref.updateLanguage(Language.fromString(langVal));
         }
 
-        if (repository.findByUserId(userId).isEmpty()) {
+        if (isNew) {
             repository.persist(pref);
         } else {
             repository.update(pref);

@@ -45,16 +45,10 @@ public class GroupService {
 
     @Transactional
     public Group createGroup(String name, String ownerId) {
-        Group group = new Group();
-        group.name = name;
-        group.ownerId = ownerId;
+        Group group = Group.create(name, ownerId);
         groupRepository.persist(group);
 
-        GroupMember owner = new GroupMember();
-        owner.group = group;
-        owner.userId = ownerId;
-        owner.role = GroupRole.OWNER;
-        owner.joinedAt = Instant.now();
+        GroupMember owner = GroupMember.create(group, ownerId, GroupRole.OWNER);
         groupRepository.persistMember(owner);
 
         return group;
@@ -65,11 +59,7 @@ public class GroupService {
         Group group = groupRepository.findById(groupId).orElseThrow(() -> new NotFoundException("Group not found"));
         if (!isOwner(groupId, requestingUserId)) throw new ForbiddenException("Only OWNER can add members");
 
-        GroupMember member = new GroupMember();
-        member.group = group;
-        member.userId = targetUserId;
-        member.role = GroupRole.MEMBER;
-        member.joinedAt = Instant.now();
+        GroupMember member = GroupMember.create(group, targetUserId, GroupRole.MEMBER);
         groupRepository.persistMember(member);
     }
 
@@ -87,32 +77,24 @@ public class GroupService {
             throw new IllegalArgumentException("User is already a member of this group.");
         }
 
-        GroupInvitation invite = new GroupInvitation();
-        invite.group = group;
-        invite.inviterId = requestingUserId;
-        invite.inviteeEmail = targetEmail;
-        invite.status = GroupInvitationStatus.PENDING;
+        GroupInvitation invite = GroupInvitation.create(group, requestingUserId, targetEmail);
         invitationRepository.persist(invite);
     }
 
     @Transactional
     public void acceptInvite(UUID inviteId, String currentUserEmail, String currentUserId) {
         GroupInvitation invite = invitationRepository.findById(inviteId).orElseThrow(() -> new NotFoundException("Invitation not found"));
-        if (!invite.inviteeEmail.equalsIgnoreCase(currentUserEmail)) {
+        if (!invite.getInviteeEmail().equalsIgnoreCase(currentUserEmail)) {
             throw new NotFoundException("Invitation not found");
         }
-        if (invite.status != GroupInvitationStatus.PENDING) {
+        if (invite.getStatus() != GroupInvitationStatus.PENDING) {
             throw new IllegalArgumentException("Invitation is not pending");
         }
-        invite.status = GroupInvitationStatus.ACCEPTED;
+        invite.accept();
         invitationRepository.update(invite);
         
-        if (!isMember(invite.group.id, currentUserId)) {
-            GroupMember member = new GroupMember();
-            member.group = invite.group;
-            member.userId = currentUserId;
-            member.role = GroupRole.MEMBER;
-            member.joinedAt = Instant.now();
+        if (!isMember(invite.getGroup().getId(), currentUserId)) {
+            GroupMember member = GroupMember.create(invite.getGroup(), currentUserId, GroupRole.MEMBER);
             groupRepository.persistMember(member);
         }
     }
@@ -120,13 +102,13 @@ public class GroupService {
     @Transactional
     public void declineInvite(UUID inviteId, String currentUserEmail) {
         GroupInvitation invite = invitationRepository.findById(inviteId).orElseThrow(() -> new NotFoundException("Invitation not found"));
-        if (!invite.inviteeEmail.equalsIgnoreCase(currentUserEmail)) {
+        if (!invite.getInviteeEmail().equalsIgnoreCase(currentUserEmail)) {
             throw new NotFoundException("Invitation not found");
         }
-        if (invite.status != GroupInvitationStatus.PENDING) {
+        if (invite.getStatus() != GroupInvitationStatus.PENDING) {
             throw new IllegalArgumentException("Invitation is not pending");
         }
-        invite.status = GroupInvitationStatus.DECLINED;
+        invite.reject();
         invitationRepository.update(invite);
     }
 
@@ -141,8 +123,8 @@ public class GroupService {
     @Transactional
     public void dismissInvite(UUID inviteId, String inviterId) {
         GroupInvitation invite = invitationRepository.findById(inviteId).orElse(null);
-        if (invite != null && invite.inviterId.equals(inviterId)) {
-            invitationRepository.delete(invite.id);
+        if (invite != null && invite.getInviterId().equals(inviterId)) {
+            invitationRepository.delete(invite.getId());
         }
     }
 
@@ -151,7 +133,7 @@ public class GroupService {
         if (!isOwner(groupId, requestingUserId)) throw new ForbiddenException("Only OWNER can remove members");
         GroupMember member = groupRepository.findMember(groupId, targetUserId)
             .orElseThrow(() -> new NotFoundException("Member not found"));
-        groupRepository.deleteMember(member.id);
+        groupRepository.deleteMember(member.getId());
     }
 
     public List<Group> listGroupsByUser(String userId) {
@@ -167,14 +149,9 @@ public class GroupService {
         Playlist playlist = playlistRepository.findActiveById(playlistId).orElse(null);
         if (playlist == null) throw new NotFoundException("Playlist not found");
 
-        if (!playlist.userId.equals(requestingUserId)) throw new ForbiddenException("Only the playlist owner can link it");
+        if (!playlist.getUserId().equals(requestingUserId)) throw new ForbiddenException("Only the playlist owner can link it");
 
-        // Use the mapped reference but be careful as the POJO isn't an Entity instance directly
-        br.com.cifras.group.infra.persistence.entity.GroupEntity groupEntity = new br.com.cifras.group.infra.persistence.entity.GroupEntity();
-        groupEntity.id = group.id; // Just need the ID for the foreign key reference
-        playlist.group = groupEntity;
-        
-        playlist.isCollaborative = true;
+        playlist.makeCollaborative(group);
         playlistRepository.update(playlist);
     }
 
@@ -185,12 +162,11 @@ public class GroupService {
         Playlist playlist = playlistRepository.findActiveById(playlistId).orElse(null);
         if (playlist == null) throw new NotFoundException("Playlist not found");
 
-        if (playlist.group == null || !playlist.group.id.equals(groupId)) {
+        if (playlist.getGroup() == null || !playlist.getGroup().getId().equals(groupId)) {
             throw new IllegalArgumentException("Playlist is not linked to this group");
         }
 
-        playlist.group = null;
-        playlist.isCollaborative = false;
+        playlist.removeCollaborative();
         playlistRepository.update(playlist);
     }
 
@@ -200,7 +176,7 @@ public class GroupService {
         Group group = groupRepository.findById(groupId).orElseThrow(() -> new NotFoundException("Group not found"));
 
         return playlistRepository.findCollaborativeActive(requestingUserId).stream()
-                .filter(p -> p.group != null && p.group.id.equals(groupId))
+                .filter(p -> p.getGroup() != null && p.getGroup().getId().equals(groupId))
                 .toList();
     }
 }

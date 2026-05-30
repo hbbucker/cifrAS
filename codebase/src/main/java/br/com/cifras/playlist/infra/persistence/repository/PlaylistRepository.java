@@ -47,11 +47,11 @@ public class PlaylistRepository {
     public void persist(Playlist playlist) {
         PlaylistEntity entity = mapper.toEntity(playlist);
         jpaRepo.persistAndFlush(entity);
-        playlist.id = entity.id;
+        playlist.setId(entity.id);
     }
     
     public void update(Playlist playlist) {
-        PlaylistEntity entity = jpaRepo.findById(playlist.id);
+        PlaylistEntity entity = jpaRepo.findById(playlist.getId());
         if (entity != null) {
             mapper.updateEntity(playlist, entity);
             jpaRepo.persist(entity);

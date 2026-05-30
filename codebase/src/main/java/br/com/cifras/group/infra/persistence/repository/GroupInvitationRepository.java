@@ -46,13 +46,13 @@ public class GroupInvitationRepository {
     public void persist(GroupInvitation invitation) {
         GroupInvitationEntity entity = mapper.toEntityInvitation(invitation);
         jpaRepo.persist(entity);
-        invitation.id = entity.id;
+        invitation.setId(entity.id);
     }
 
     public void update(GroupInvitation invitation) {
-        GroupInvitationEntity entity = jpaRepo.findById(invitation.id);
+        GroupInvitationEntity entity = jpaRepo.findById(invitation.getId());
         if (entity != null) {
-            entity.status = invitation.status;
+            entity.status = invitation.getStatus();
             // No complex updating needed for now, only status is changed
             jpaRepo.persist(entity);
         }

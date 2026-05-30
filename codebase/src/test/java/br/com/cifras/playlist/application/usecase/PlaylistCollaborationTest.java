@@ -39,13 +39,13 @@ class PlaylistCollaborationTest extends BaseIntegrationTest {
     @Transactional
     void givenCollaborativePlaylist_whenGroupMemberReads_thenSuccess() {
         Group group = groupService.createGroup("Collab Band", OWNER);
-        groupService.addMember(group.id, MEMBER, OWNER);
+        groupService.addMember(group.getId(), MEMBER, OWNER);
 
         Playlist playlist = playlistService.create(
             new CreatePlaylistRequest("Collab Setlist", false, null), OWNER);
-        groupService.linkPlaylist(group.id, playlist.id, OWNER);
+        groupService.linkPlaylist(group.getId(), playlist.getId(), OWNER);
 
-        assertDoesNotThrow(() -> playlistService.getById(playlist.id, MEMBER),
+        assertDoesNotThrow(() -> playlistService.getById(playlist.getId(), MEMBER),
             "Group member should be able to read a collaborative playlist");
     }
 
@@ -53,17 +53,17 @@ class PlaylistCollaborationTest extends BaseIntegrationTest {
     @Transactional
     void givenCollaborativePlaylist_whenGroupMemberAddsSong_thenThrowsForbiddenException() {
         Group group = groupService.createGroup("Collab Band Edit", OWNER);
-        groupService.addMember(group.id, MEMBER, OWNER);
+        groupService.addMember(group.getId(), MEMBER, OWNER);
 
         Playlist playlist = playlistService.create(
             new CreatePlaylistRequest("Collab Setlist Edit", false, null), OWNER);
-        groupService.linkPlaylist(group.id, playlist.id, OWNER);
+        groupService.linkPlaylist(group.getId(), playlist.getId(), OWNER);
 
         Song song = songService.create(
             new CreateSongRequest("Song 1", "Artist", "C", null), OWNER);
 
         assertThrows(br.com.cifras.shared.exception.ForbiddenException.class,
-            () -> playlistService.addSong(playlist.id, song.id, 0, MEMBER),
+            () -> playlistService.addSong(playlist.getId(), song.getId(), 0, MEMBER),
             "Group member must NOT be able to edit a collaborative playlist (read-only)");
     }
 
@@ -74,10 +74,10 @@ class PlaylistCollaborationTest extends BaseIntegrationTest {
 
         Playlist playlist = playlistService.create(
             new CreatePlaylistRequest("Exclusive Setlist", false, null), OWNER);
-        groupService.linkPlaylist(group.id, playlist.id, OWNER);
+        groupService.linkPlaylist(group.getId(), playlist.getId(), OWNER);
 
         assertThrows(br.com.cifras.shared.exception.ForbiddenException.class,
-            () -> playlistService.getById(playlist.id, STRANGER),
+            () -> playlistService.getById(playlist.getId(), STRANGER),
             "Stranger must NOT be able to read a collaborative playlist");
     }
 }

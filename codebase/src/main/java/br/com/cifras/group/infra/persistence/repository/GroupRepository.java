@@ -61,20 +61,20 @@ public class GroupRepository {
     public void persist(Group group) {
         GroupEntity entity = mapper.toEntity(group);
         jpaRepo.persistAndFlush(entity);
-        group.id = entity.id;
+        group.setId(entity.id);
     }
 
     public void persistMember(GroupMember member) {
         GroupMemberEntity entity = mapper.toEntityMember(member);
-        if (member.group != null && member.group.id != null) {
-            entity.group = jpaRepo.findById(member.group.id);
+        if (member.getGroup() != null && member.getGroup().getId() != null) {
+            entity.group = jpaRepo.findById(member.getGroup().getId());
         }
         jpaMemberRepo.persist(entity);
-        member.id = entity.id;
+        member.setId(entity.id);
     }
 
     public void update(Group group) {
-        GroupEntity entity = jpaRepo.findById(group.id);
+        GroupEntity entity = jpaRepo.findById(group.getId());
         if (entity != null) {
             mapper.updateEntity(group, entity);
             jpaRepo.persist(entity);

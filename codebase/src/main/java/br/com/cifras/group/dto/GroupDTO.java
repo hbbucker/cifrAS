@@ -9,6 +9,6 @@ public record GroupDTO(
     String ownerId
 ) {
     public static GroupDTO from(Group group) {
-        return new GroupDTO(group.id, group.name, group.ownerId);
+        return new GroupDTO(group.getId(), group.getName(), group.getOwnerId());
     }
 }

@@ -29,18 +29,18 @@ public record SongDTO(
 
     public static SongDTO from(Song song, String preferredKey) {
         return new SongDTO(
-            song.id,
-            song.title,
-            song.artist,
-            song.originalKey,
-            song.lyrics,
+            song.getId(),
+            song.getTitle(),
+            song.getArtist(),
+            song.getOriginalKey(),
+            song.getLyrics(),
             preferredKey,
-            song.prefUseBb,
-            song.prefUseEb,
-            song.prefAutoScrollSpeed,
-            song.prefTransposeSteps,
-            song.createdAt,
-            song.updatedAt
+            song.getPrefUseBb(),
+            song.getPrefUseEb(),
+            song.getPrefAutoScrollSpeed(),
+            song.getPrefTransposeSteps(),
+            song.getCreatedAt(),
+            song.getUpdatedAt()
         );
     }
 }

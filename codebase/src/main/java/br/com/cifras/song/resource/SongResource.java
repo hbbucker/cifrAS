@@ -83,12 +83,12 @@ public class SongResource {
     ) {
         String userId = securityUtils.getCurrentUserId();
         Song song = songService.findByIdAndUser(id, userId);
-        LyricsStructure lyrics = song.lyrics;
+        LyricsStructure lyrics = song.getLyrics();
         if (transpose != null && lyrics != null) {
             lyrics = transpositionService.transpose(lyrics, transpose, EnharmonicConvention.SHARPS);
         }
-        SongDTO dto = new SongDTO(song.id, song.title, song.artist, song.originalKey,
-            lyrics, null, song.prefUseBb, song.prefUseEb, song.prefAutoScrollSpeed, song.prefTransposeSteps, song.createdAt, song.updatedAt);
+        SongDTO dto = new SongDTO(song.getId(), song.getTitle(), song.getArtist(), song.getOriginalKey(),
+            lyrics, null, song.getPrefUseBb(), song.getPrefUseEb(), song.getPrefAutoScrollSpeed(), song.getPrefTransposeSteps(), song.getCreatedAt(), song.getUpdatedAt());
         return Response.ok(dto).build();
     }
 
@@ -102,9 +102,9 @@ public class SongResource {
         String userId = securityUtils.getCurrentUserId();
         Song song = songService.findByIdAndUser(id, userId);
         LyricsStructure transposed = transpositionService.transpose(
-            song.lyrics, request.semitones(), request.convention());
-        SongDTO dto = new SongDTO(song.id, song.title, song.artist, song.originalKey,
-            transposed, null, song.prefUseBb, song.prefUseEb, song.prefAutoScrollSpeed, song.prefTransposeSteps, song.createdAt, song.updatedAt);
+            song.getLyrics(), request.semitones(), request.convention());
+        SongDTO dto = new SongDTO(song.getId(), song.getTitle(), song.getArtist(), song.getOriginalKey(),
+            transposed, null, song.getPrefUseBb(), song.getPrefUseEb(), song.getPrefAutoScrollSpeed(), song.getPrefTransposeSteps(), song.getCreatedAt(), song.getUpdatedAt());
         return Response.ok(dto).build();
     }
 

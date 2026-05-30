@@ -114,7 +114,7 @@ class GroupResourceTest extends BaseIntegrationTest {
 
         given()
             .contentType(ContentType.JSON)
-            .body(new LinkPlaylistRequest(playlist.id))
+            .body(new LinkPlaylistRequest(playlist.getId()))
             .when().post("/groups/" + groupId + "/playlists")
             .then()
             .statusCode(204);
@@ -124,10 +124,10 @@ class GroupResourceTest extends BaseIntegrationTest {
     @TestSecurity(user = MEMBER, roles = {"user"})
     void givenMember_whenGetPlaylists_thenReturnsList() {
         Group group = groupService.createGroup("Band with Shared Playlists", OWNER);
-        java.util.UUID groupId = group.id;
+        java.util.UUID groupId = group.getId();
         groupService.addMember(groupId, MEMBER, OWNER);
         Playlist playlist = playlistService.create(new CreatePlaylistRequest("Setlist", false, null), OWNER);
-        groupService.linkPlaylist(groupId, playlist.id, OWNER);
+        groupService.linkPlaylist(groupId, playlist.getId(), OWNER);
 
         given()
             .when().get("/groups/" + groupId + "/playlists")
@@ -144,10 +144,10 @@ class GroupResourceTest extends BaseIntegrationTest {
     void givenOwner_whenUnlinkPlaylist_thenReturns204() {
         java.util.UUID groupId = createGroup("Band for Unlink");
         Playlist playlist = playlistService.create(new CreatePlaylistRequest("Temporary Setlist", false, null), OWNER);
-        groupService.linkPlaylist(groupId, playlist.id, OWNER);
+        groupService.linkPlaylist(groupId, playlist.getId(), OWNER);
 
         given()
-            .when().delete("/groups/" + groupId + "/playlists/" + playlist.id)
+            .when().delete("/groups/" + groupId + "/playlists/" + playlist.getId())
             .then()
             .statusCode(204);
     }

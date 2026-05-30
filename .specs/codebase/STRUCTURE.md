@@ -12,7 +12,7 @@ codebase/
 │   │   │       ├── shared/   # Código compartilhado (Exceções genéricas, DTOs globais, Security)
 │   │   │       ├── config/   # Configurações do framework (Ex. ObjectMapper, Cors)
 │   │   │       └── [feature]/# Módulos organizados por Feature (ex: song, group, playlist, user)
-│   │   │           ├── model/        # Modelos de Domínio Puros (POJOs independentes de infra)
+│   │   │           ├── model/        # Modelos de Domínio Puros (POJOs independentes de infra, contendo invariantes formais)
 │   │   │           ├── application/  # Casos de Uso (Services)
 │   │   │           ├── infra/        # Adapters de Infraestrutura (Entities JPA, Repositories, Mappers)
 │   │   │           ├── resource/     # Controladores REST (JAX-RS)

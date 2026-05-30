@@ -16,19 +16,23 @@ public class PlaylistMapper {
     @Inject
     SongMapper songMapper;
 
+    @Inject
+    br.com.cifras.group.infra.persistence.mapper.GroupMapper groupMapper;
+
     public Playlist toDomain(PlaylistEntity entity) {
         if (entity == null) return null;
-        Playlist playlist = new Playlist();
-        playlist.id = entity.id;
-        playlist.userId = entity.userId;
-        playlist.name = entity.name;
-        playlist.isCollaborative = entity.isCollaborative;
-        playlist.group = entity.group;
-        playlist.createdAt = entity.createdAt;
-        playlist.deletedAt = entity.deletedAt;
+        Playlist playlist = Playlist.restore(
+            entity.id,
+            entity.userId,
+            entity.name,
+            entity.isCollaborative,
+            groupMapper.toDomain(entity.group),
+            entity.createdAt,
+            entity.deletedAt
+        );
         
         if (entity.songs != null) {
-            playlist.songs = entity.songs.stream().map(this::toDomainSong).collect(Collectors.toList());
+            entity.songs.forEach(pse -> playlist.addSong(toDomainSong(pse)));
         }
         
         return playlist;
@@ -36,28 +40,22 @@ public class PlaylistMapper {
 
     public PlaylistSong toDomainSong(PlaylistSongEntity entity) {
         if (entity == null) return null;
-        PlaylistSong ps = new PlaylistSong();
-        ps.id = entity.id;
-        ps.song = songMapper.toDomain(entity.song);
-        ps.position = entity.position;
-        ps.version = entity.version;
-        return ps;
+        return PlaylistSong.restore(entity.id, songMapper.toDomain(entity.song), entity.position, entity.version);
     }
 
     public PlaylistEntity toEntity(Playlist playlist) {
         if (playlist == null) return null;
         PlaylistEntity entity = new PlaylistEntity();
-        entity.id = playlist.id;
-        entity.userId = playlist.userId;
-        entity.name = playlist.name;
-        entity.isCollaborative = playlist.isCollaborative;
-        entity.group = playlist.group;
-        entity.createdAt = playlist.createdAt;
-        entity.deletedAt = playlist.deletedAt;
+        entity.id = playlist.getId();
+        entity.userId = playlist.getUserId();
+        entity.name = playlist.getName();
+        entity.isCollaborative = playlist.isCollaborative();
+        entity.group = groupMapper.toEntity(playlist.getGroup());
+        entity.createdAt = playlist.getCreatedAt();
+        entity.deletedAt = playlist.getDeletedAt();
         
-        // Handling the songs list requires setting the playlist reference on each song entity
-        if (playlist.songs != null) {
-            entity.songs = playlist.songs.stream().map(ps -> {
+        if (playlist.getSongs() != null) {
+            entity.songs = playlist.getSongs().stream().map(ps -> {
                 PlaylistSongEntity pse = toEntitySong(ps);
                 pse.playlist = entity;
                 return pse;
@@ -70,32 +68,30 @@ public class PlaylistMapper {
     public PlaylistSongEntity toEntitySong(PlaylistSong ps) {
         if (ps == null) return null;
         PlaylistSongEntity entity = new PlaylistSongEntity();
-        entity.id = ps.id;
-        entity.song = songMapper.toEntity(ps.song);
-        entity.position = ps.position;
-        entity.version = ps.version;
+        entity.id = ps.getId();
+        entity.song = songMapper.toEntity(ps.getSong());
+        entity.position = ps.getPosition();
+        entity.version = ps.getVersion();
         return entity;
     }
 
     public void updateEntity(Playlist playlist, PlaylistEntity entity) {
-        entity.name = playlist.name;
-        entity.isCollaborative = playlist.isCollaborative;
-        entity.group = playlist.group;
-        entity.deletedAt = playlist.deletedAt;
+        entity.name = playlist.getName();
+        entity.isCollaborative = playlist.isCollaborative();
+        entity.group = groupMapper.toEntity(playlist.getGroup());
+        entity.deletedAt = playlist.getDeletedAt();
         
-        if (playlist.songs != null) {
-            // Remove missing ones
-            entity.songs.removeIf(existing -> playlist.songs.stream().noneMatch(ps -> ps.id != null && ps.id.equals(existing.id)));
+        if (playlist.getSongs() != null) {
+            entity.songs.removeIf(existing -> playlist.getSongs().stream().noneMatch(ps -> ps.getId() != null && ps.getId().equals(existing.id)));
             
-            // Add or update
-            for (PlaylistSong ps : playlist.songs) {
-                if (ps.id == null) {
+            for (PlaylistSong ps : playlist.getSongs()) {
+                if (ps.getId() == null) {
                     PlaylistSongEntity pse = toEntitySong(ps);
                     pse.playlist = entity;
                     entity.songs.add(pse);
                 } else {
-                    entity.songs.stream().filter(e -> ps.id.equals(e.id)).findFirst().ifPresent(e -> {
-                        e.position = ps.position;
+                    entity.songs.stream().filter(e -> ps.getId().equals(e.id)).findFirst().ifPresent(e -> {
+                        e.position = ps.getPosition();
                     });
                 }
             }

@@ -14,65 +14,51 @@ public class GroupMapper {
 
     public Group toDomain(GroupEntity entity) {
         if (entity == null) return null;
-        Group group = new Group();
-        group.id = entity.id;
-        group.name = entity.name;
-        group.ownerId = entity.ownerId;
-        return group;
+        return Group.restore(entity.id, entity.name, entity.ownerId, null, null);
     }
 
     public GroupMember toDomainMember(GroupMemberEntity entity) {
         if (entity == null) return null;
-        GroupMember member = new GroupMember();
-        member.id = entity.id;
-        member.userId = entity.userId;
-        member.role = entity.role;
-        return member;
+        return GroupMember.restore(entity.id, toDomain(entity.group), entity.userId, entity.role, null);
     }
 
     public GroupInvitation toDomainInvitation(GroupInvitationEntity entity) {
         if (entity == null) return null;
-        GroupInvitation inv = new GroupInvitation();
-        inv.id = entity.id;
-        inv.group = toDomain(entity.group);
-        inv.inviterId = entity.inviterId;
-        inv.inviteeEmail = entity.inviteeEmail;
-        inv.status = entity.status;
-        return inv;
+        return GroupInvitation.restore(entity.id, toDomain(entity.group), entity.inviterId, entity.inviteeEmail, entity.status, null, null);
     }
 
     public GroupEntity toEntity(Group group) {
         if (group == null) return null;
         GroupEntity entity = new GroupEntity();
-        entity.id = group.id;
-        entity.name = group.name;
-        entity.ownerId = group.ownerId;
+        entity.id = group.getId();
+        entity.name = group.getName();
+        entity.ownerId = group.getOwnerId();
         return entity;
     }
 
     public GroupMemberEntity toEntityMember(GroupMember member) {
         if (member == null) return null;
         GroupMemberEntity entity = new GroupMemberEntity();
-        entity.id = member.id;
-        entity.userId = member.userId;
-        entity.role = member.role;
+        entity.id = member.getId();
+        entity.userId = member.getUserId();
+        entity.role = member.getRole();
         return entity;
     }
 
     public GroupInvitationEntity toEntityInvitation(GroupInvitation inv) {
         if (inv == null) return null;
         GroupInvitationEntity entity = new GroupInvitationEntity();
-        entity.id = inv.id;
-        if (inv.group != null) {
-            entity.group = toEntity(inv.group);
+        entity.id = inv.getId();
+        if (inv.getGroup() != null) {
+            entity.group = toEntity(inv.getGroup());
         }
-        entity.inviterId = inv.inviterId;
-        entity.inviteeEmail = inv.inviteeEmail;
-        entity.status = inv.status;
+        entity.inviterId = inv.getInviterId();
+        entity.inviteeEmail = inv.getInviteeEmail();
+        entity.status = inv.getStatus();
         return entity;
     }
 
     public void updateEntity(Group group, GroupEntity entity) {
-        entity.name = group.name;
+        entity.name = group.getName();
     }
 }

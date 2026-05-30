@@ -36,18 +36,15 @@ public class PlaylistService {
 
     @Transactional
     public Playlist create(CreatePlaylistRequest req, String userId) {
-        Playlist playlist = new Playlist();
-        playlist.userId = userId;
-        playlist.name = req.name();
-        playlist.isCollaborative = req.isCollaborative();
+        Playlist playlist = Playlist.create(userId, req.name());
         
         if (req.isCollaborative() && req.groupId() != null) {
-            GroupEntity group = GroupEntity.findById(req.groupId());
+            br.com.cifras.group.model.Group group = groupRepository.findById(req.groupId()).orElse(null);
             if (group == null) throw new NotFoundException("Group not found");
             if (!groupRepository.isOwner(req.groupId(), userId)) {
                 throw new ForbiddenException("Only group owner can link a playlist to it");
             }
-            playlist.group = group;
+            playlist.makeCollaborative(group);
         }
         
         playlistRepository.persist(playlist);
@@ -79,17 +76,14 @@ public class PlaylistService {
 
         Song song = songRepository.findActiveById(songId).orElseThrow(() -> new NotFoundException("Song not found"));
 
-        for (PlaylistSong ps : playlist.songs) {
-            if (ps.position >= position) {
-                ps.position++;
+        for (PlaylistSong ps : playlist.getSongs()) {
+            if (ps.getPosition() >= position) {
+                ps.updatePosition(ps.getPosition() + 1);
             }
         }
 
-        PlaylistSong link = new PlaylistSong();
-        link.song = song;
-        link.position = position;
-
-        playlist.songs.add(link);
+        PlaylistSong link = PlaylistSong.create(song, position);
+        playlist.addSong(link);
         playlistRepository.update(playlist);
     }
 
@@ -102,17 +96,17 @@ public class PlaylistService {
             throw new ForbiddenException("Access denied to playlist");
         }
 
-        PlaylistSong toRemove = playlist.songs.stream()
-            .filter(ps -> ps.song.id.equals(songId))
+        PlaylistSong toRemove = playlist.getSongs().stream()
+            .filter(ps -> ps.getSong().getId().equals(songId))
             .findFirst()
             .orElseThrow(() -> new NotFoundException("Song not in playlist"));
 
-        int removedPosition = toRemove.position;
-        playlist.songs.remove(toRemove);
+        int removedPosition = toRemove.getPosition();
+        playlist.removeSong(toRemove);
 
-        for (PlaylistSong ps : playlist.songs) {
-            if (ps.position > removedPosition) {
-                ps.position--;
+        for (PlaylistSong ps : playlist.getSongs()) {
+            if (ps.getPosition() > removedPosition) {
+                ps.updatePosition(ps.getPosition() - 1);
             }
         }
         playlistRepository.update(playlist);
@@ -130,10 +124,10 @@ public class PlaylistService {
         for (int i = 0; i < orderedSongIds.size(); i++) {
             final int newPos = i;
             final UUID targetSongId = orderedSongIds.get(i);
-            playlist.songs.stream()
-                .filter(ps -> ps.song.id.equals(targetSongId))
+            playlist.getSongs().stream()
+                .filter(ps -> ps.getSong().getId().equals(targetSongId))
                 .findFirst()
-                .ifPresent(ps -> ps.position = newPos);
+                .ifPresent(ps -> ps.updatePosition(newPos));
         }
         playlistRepository.update(playlist);
     }
@@ -147,20 +141,20 @@ public class PlaylistService {
             throw new ForbiddenException("Access denied to playlist");
         }
 
-        playlist.deletedAt = Instant.now();
+        playlist.softDelete();
         playlistRepository.update(playlist);
     }
 
     private boolean canModify(Playlist playlist, String userId) {
-        return userId.equals(playlist.userId);
+        return userId.equals(playlist.getUserId());
     }
 
     private boolean canRead(Playlist playlist, String userId) {
         if (canModify(playlist, userId)) {
             return true;
         }
-        if (playlist.isCollaborative && playlist.group != null) {
-            return groupRepository.isMember(playlist.group.id, userId);
+        if (playlist.isCollaborative() && playlist.getGroup() != null) {
+            return groupRepository.isMember(playlist.getGroup().getId(), userId);
         }
         return false;
     }

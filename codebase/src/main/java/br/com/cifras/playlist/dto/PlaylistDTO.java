@@ -17,7 +17,7 @@ public record PlaylistDTO(
     Instant createdAt
 ) {
     public static PlaylistDTO from(Playlist p) {
-        int count = p.songs != null ? p.songs.size() : 0;
-        return new PlaylistDTO(p.id, p.name, p.isCollaborative, p.userId, count, p.createdAt);
+        int count = p.getSongs() != null ? p.getSongs().size() : 0;
+        return new PlaylistDTO(p.getId(), p.getName(), p.isCollaborative(), p.getUserId(), count, p.getCreatedAt());
     }
 }

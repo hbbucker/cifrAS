@@ -33,11 +33,11 @@ class GroupServiceTest extends BaseIntegrationTest {
     void givenValidName_whenCreateGroup_thenGroupCreatedWithOwner() {
         Group group = groupService.createGroup("CifrAS Band", OWNER);
 
-        assertNotNull(group.id);
-        assertEquals("CifrAS Band", group.name);
-        assertEquals(OWNER, group.ownerId);
-        assertTrue(groupService.isOwner(group.id, OWNER), "Creator must be OWNER");
-        assertTrue(groupService.isMember(group.id, OWNER), "Creator must be a member");
+        assertNotNull(group.getId());
+        assertEquals("CifrAS Band", group.getName());
+        assertEquals(OWNER, group.getOwnerId());
+        assertTrue(groupService.isOwner(group.getId(), OWNER), "Creator must be OWNER");
+        assertTrue(groupService.isMember(group.getId(), OWNER), "Creator must be a member");
     }
 
     /**
@@ -47,10 +47,10 @@ class GroupServiceTest extends BaseIntegrationTest {
     @Transactional
     void givenMemberAdded_whenIsMember_thenReturnsTrue() {
         Group group = groupService.createGroup("Test Group", OWNER);
-        groupService.addMember(group.id, MEMBER, OWNER);
+        groupService.addMember(group.getId(), MEMBER, OWNER);
 
-        assertTrue(groupService.isMember(group.id, MEMBER));
-        assertFalse(groupService.isMember(group.id, STRANGER));
+        assertTrue(groupService.isMember(group.getId(), MEMBER));
+        assertFalse(groupService.isMember(group.getId(), STRANGER));
     }
 
     /**
@@ -60,10 +60,10 @@ class GroupServiceTest extends BaseIntegrationTest {
     @Transactional
     void givenMemberAdded_whenIsOwner_thenReturnsFalseForMember() {
         Group group = groupService.createGroup("Owner Test", OWNER);
-        groupService.addMember(group.id, MEMBER, OWNER);
+        groupService.addMember(group.getId(), MEMBER, OWNER);
 
-        assertTrue(groupService.isOwner(group.id, OWNER));
-        assertFalse(groupService.isOwner(group.id, MEMBER));
+        assertTrue(groupService.isOwner(group.getId(), OWNER));
+        assertFalse(groupService.isOwner(group.getId(), MEMBER));
     }
 
     /**
@@ -73,9 +73,9 @@ class GroupServiceTest extends BaseIntegrationTest {
     @Transactional
     void givenOwnerRequest_whenAddMember_thenMemberAdded() {
         Group group = groupService.createGroup("Add Test", OWNER);
-        groupService.addMember(group.id, MEMBER, OWNER);
+        groupService.addMember(group.getId(), MEMBER, OWNER);
 
-        assertTrue(groupService.isMember(group.id, MEMBER));
+        assertTrue(groupService.isMember(group.getId(), MEMBER));
     }
 
     /**
@@ -85,10 +85,10 @@ class GroupServiceTest extends BaseIntegrationTest {
     @Transactional
     void givenExistingMember_whenRemoveMember_thenMemberRemoved() {
         Group group = groupService.createGroup("Remove Test", OWNER);
-        groupService.addMember(group.id, MEMBER, OWNER);
-        groupService.removeMember(group.id, MEMBER, OWNER);
+        groupService.addMember(group.getId(), MEMBER, OWNER);
+        groupService.removeMember(group.getId(), MEMBER, OWNER);
 
-        assertFalse(groupService.isMember(group.id, MEMBER));
+        assertFalse(groupService.isMember(group.getId(), MEMBER));
     }
 
     /**
@@ -98,9 +98,9 @@ class GroupServiceTest extends BaseIntegrationTest {
     @Transactional
     void givenNonOwner_whenRemoveMember_thenThrowsForbiddenException() {
         Group group = groupService.createGroup("Forbidden Test", OWNER);
-        groupService.addMember(group.id, MEMBER, OWNER);
+        groupService.addMember(group.getId(), MEMBER, OWNER);
 
         assertThrows(ForbiddenException.class,
-            () -> groupService.removeMember(group.id, MEMBER, STRANGER));
+            () -> groupService.removeMember(group.getId(), MEMBER, STRANGER));
     }
 }

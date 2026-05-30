@@ -46,10 +46,10 @@ class SongServiceTest extends BaseIntegrationTest {
 
         Song song = songService.create(req, USER_A);
 
-        assertNotNull(song.id);
-        assertEquals("Highway to Hell", song.title);
-        assertEquals(USER_A, song.userId);
-        assertNotNull(song.createdAt);
+        assertNotNull(song.getId());
+        assertEquals("Highway to Hell", song.getTitle());
+        assertEquals(USER_A, song.getUserId());
+        assertNotNull(song.getCreatedAt());
     }
 
     /**
@@ -64,7 +64,7 @@ class SongServiceTest extends BaseIntegrationTest {
 
         PagedResponse<Song> response = songService.listByUser(USER_A, 1, 20, null);
 
-        assertTrue(response.data().stream().allMatch(s -> USER_A.equals(s.userId)),
+        assertTrue(response.data().stream().allMatch(s -> USER_A.equals(s.getUserId())),
             "List must contain only USER_A's songs");
         assertTrue(response.data().size() >= 2);
     }
@@ -77,10 +77,10 @@ class SongServiceTest extends BaseIntegrationTest {
     void givenSoftDeletedSong_whenListByUser_thenNotIncluded() {
         Song song = songService.create(new CreateSongRequest("To Delete", "Artist", "G", null), USER_A);
 
-        songService.softDelete(song.id, USER_A);
+        songService.softDelete(song.getId(), USER_A);
 
         PagedResponse<Song> response = songService.listByUser(USER_A, 1, 20, null);
-        boolean found = response.data().stream().anyMatch(s -> s.id.equals(song.id));
+        boolean found = response.data().stream().anyMatch(s -> s.getId().equals(song.getId()));
         assertFalse(found, "Soft-deleted song must not appear in list");
     }
 
@@ -94,7 +94,7 @@ class SongServiceTest extends BaseIntegrationTest {
         UpdateSongRequest updateReq = new UpdateSongRequest("Hacked Title", "Hacker", "X", null);
 
         assertThrows(ForbiddenException.class,
-            () -> songService.update(song.id, updateReq, USER_B));
+            () -> songService.update(song.getId(), updateReq, USER_B));
     }
 
     /**
@@ -104,7 +104,7 @@ class SongServiceTest extends BaseIntegrationTest {
     @Transactional
     void givenExistingSong_whenSoftDelete_thenDisappearsFromActiveRecords() {
         Song song = songService.create(new CreateSongRequest("Deletable", "Artist", "D", null), USER_A);
-        java.util.UUID songId = song.id;
+        java.util.UUID songId = song.getId();
 
         songService.softDelete(songId, USER_A);
 
@@ -121,6 +121,6 @@ class SongServiceTest extends BaseIntegrationTest {
         Song song = songService.create(new CreateSongRequest("Private Song", "Artist", "E", null), USER_A);
 
         assertThrows(NotFoundException.class,
-            () -> songService.findByIdAndUser(song.id, USER_B));
+            () -> songService.findByIdAndUser(song.getId(), USER_B));
     }
 }

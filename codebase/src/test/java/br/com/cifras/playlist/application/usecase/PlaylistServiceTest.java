@@ -44,10 +44,10 @@ class PlaylistServiceTest extends BaseIntegrationTest {
         Playlist playlist = playlistService.create(
             new CreatePlaylistRequest("My Setlist", false, null), OWNER);
 
-        assertNotNull(playlist.id);
-        assertEquals("My Setlist", playlist.name);
-        assertEquals(OWNER, playlist.userId);
-        assertFalse(playlist.isCollaborative);
+        assertNotNull(playlist.getId());
+        assertEquals("My Setlist", playlist.getName());
+        assertEquals(OWNER, playlist.getUserId());
+        assertFalse(playlist.isCollaborative());
     }
 
     /**
@@ -62,12 +62,12 @@ class PlaylistServiceTest extends BaseIntegrationTest {
         Song song = songService.create(
             new CreateSongRequest("Song 1", "Artist", "C", null), OWNER);
 
-        playlistService.addSong(playlist.id, song.id, 0, OWNER);
+        playlistService.addSong(playlist.getId(), song.getId(), 0, OWNER);
 
-        Playlist refreshed = playlistRepository.findActiveById(playlist.id).orElseThrow();
-        assertEquals(1, refreshed.songs.size());
-        assertEquals(song.id, refreshed.songs.get(0).song.id);
-        assertEquals(0, refreshed.songs.get(0).position);
+        Playlist refreshed = playlistRepository.findActiveById(playlist.getId()).orElseThrow();
+        assertEquals(1, refreshed.getSongs().size());
+        assertEquals(song.getId(), refreshed.getSongs().get(0).getSong().getId());
+        assertEquals(0, refreshed.getSongs().get(0).getPosition());
     }
 
     /**
@@ -82,11 +82,11 @@ class PlaylistServiceTest extends BaseIntegrationTest {
         Song song = songService.create(
             new CreateSongRequest("To Remove", "Artist", "D", null), OWNER);
 
-        playlistService.addSong(playlist.id, song.id, 0, OWNER);
-        playlistService.removeSong(playlist.id, song.id, OWNER);
+        playlistService.addSong(playlist.getId(), song.getId(), 0, OWNER);
+        playlistService.removeSong(playlist.getId(), song.getId(), OWNER);
 
-        Playlist refreshed = playlistRepository.findActiveById(playlist.id).orElseThrow();
-        assertTrue(refreshed.songs.isEmpty(), "Song should be removed from playlist");
+        Playlist refreshed = playlistRepository.findActiveById(playlist.getId()).orElseThrow();
+        assertTrue(refreshed.getSongs().isEmpty(), "Song should be removed from playlist");
     }
 
     /**
@@ -102,7 +102,7 @@ class PlaylistServiceTest extends BaseIntegrationTest {
             new CreateSongRequest("Protected Song", "Artist", "G", null), OWNER);
 
         assertThrows(ForbiddenException.class,
-            () -> playlistService.addSong(playlist.id, song.id, 0, OTHER));
+            () -> playlistService.addSong(playlist.getId(), song.getId(), 0, OTHER));
     }
 
     /**
@@ -115,6 +115,6 @@ class PlaylistServiceTest extends BaseIntegrationTest {
             new CreateSongRequest("Orphan Song", "Artist", "A", null), OWNER);
 
         assertThrows(NotFoundException.class,
-            () -> playlistService.addSong(java.util.UUID.randomUUID(), song.id, 0, OWNER));
+            () -> playlistService.addSong(java.util.UUID.randomUUID(), song.getId(), 0, OWNER));
     }
 }

@@ -1,6 +1,7 @@
 package br.com.cifras.user.resource;
 
 import br.com.cifras.user.model.UserPreference;
+import br.com.cifras.user.resource.dto.UserPreferenceDTO;
 import br.com.cifras.user.application.usecase.UserPreferenceService;
 import br.com.cifras.shared.security.SecurityUtils;
 import io.quarkus.security.Authenticated;
@@ -25,14 +26,14 @@ public class UserPreferenceResource {
     public Response getPreferences() {
         String userId = securityUtils.getCurrentUserId();
         UserPreference pref = service.getPreferences(userId);
-        return Response.ok(pref).build();
+        return Response.ok(UserPreferenceDTO.fromDomain(pref)).build();
     }
 
     @PUT
     @Authenticated
-    public Response updatePreferences(UserPreference newPref) {
+    public Response updatePreferences(UserPreferenceDTO dto) {
         String userId = securityUtils.getCurrentUserId();
-        UserPreference pref = service.updatePreferences(userId, newPref);
-        return Response.ok(pref).build();
+        UserPreference pref = service.updatePreferences(userId, dto.theme(), dto.language());
+        return Response.ok(UserPreferenceDTO.fromDomain(pref)).build();
     }
 }

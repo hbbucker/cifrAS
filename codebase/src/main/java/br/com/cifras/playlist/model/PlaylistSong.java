@@ -6,13 +6,37 @@ import java.util.UUID;
 
 public class PlaylistSong {
 
-    public UUID id;
-    
-    // We only need the song reference and position in the domain for now
-    public Song song;
-    
-    public int position;
-    public Long version;
+    private UUID id;
+    private Song song;
+    private int position;
+    private Long version;
 
-    public PlaylistSong() {}
+    protected PlaylistSong() {}
+
+    public static PlaylistSong create(Song song, int position) {
+        PlaylistSong ps = new PlaylistSong();
+        ps.song = song;
+        ps.position = position;
+        return ps;
+    }
+
+    public static PlaylistSong restore(UUID id, Song song, int position, Long version) {
+        PlaylistSong ps = new PlaylistSong();
+        ps.id = id;
+        ps.song = song;
+        ps.position = position;
+        ps.version = version;
+        return ps;
+    }
+
+    public void updatePosition(int position) {
+        this.position = position;
+    }
+
+    public UUID getId() { return id; }
+    public Song getSong() { return song; }
+    public int getPosition() { return position; }
+    public Long getVersion() { return version; }
+
+    public void setId(UUID id) { this.id = id; }
 }

@@ -45,7 +45,7 @@ public class SongService {
         Song song = songRepository.findActiveById(id)
             .orElseThrow(() -> new NotFoundException("Song not found: " + id));
 
-        if (!userId.equals(song.userId)) {
+        if (!userId.equals(song.getUserId())) {
             long count = PlaylistSongEntity.count(
                 "song.id = ?1 and playlist.isCollaborative = true and playlist.group.id in " +
                 "(select gm.group.id from GroupMemberEntity gm where gm.userId = ?2)", id, userId);
@@ -63,12 +63,7 @@ public class SongService {
      */
     @Transactional
     public Song create(CreateSongRequest req, String userId) {
-        Song song = new Song();
-        song.userId = userId;
-        song.title = req.title();
-        song.artist = req.artist();
-        song.originalKey = req.originalKey();
-        song.lyrics = req.lyrics();
+        Song song = Song.create(userId, req.title(), req.artist(), req.originalKey(), req.lyrics());
         songRepository.persist(song);
         return song;
     }
@@ -84,14 +79,11 @@ public class SongService {
         Song song = songRepository.findActiveById(id)
             .orElseThrow(() -> new NotFoundException("Song not found: " + id));
 
-        if (!userId.equals(song.userId)) {
+        if (!userId.equals(song.getUserId())) {
             throw new ForbiddenException("You do not own this song");
         }
 
-        song.title = req.title();
-        song.artist = req.artist();
-        song.originalKey = req.originalKey();
-        song.lyrics = req.lyrics();
+        song.updateDetails(req.title(), req.artist(), req.originalKey(), req.lyrics());
         songRepository.update(song);
         return song;
     }
@@ -107,11 +99,11 @@ public class SongService {
         Song song = songRepository.findActiveById(id)
             .orElseThrow(() -> new NotFoundException("Song not found: " + id));
 
-        if (!userId.equals(song.userId)) {
+        if (!userId.equals(song.getUserId())) {
             throw new ForbiddenException("You do not own this song");
         }
 
-        song.deletedAt = Instant.now();
+        song.softDelete();
         songRepository.update(song);
     }
 
@@ -123,14 +115,11 @@ public class SongService {
         Song song = songRepository.findActiveById(id)
             .orElseThrow(() -> new NotFoundException("Song not found: " + id));
 
-        if (!userId.equals(song.userId)) {
+        if (!userId.equals(song.getUserId())) {
             throw new ForbiddenException("You do not own this song");
         }
 
-        song.prefUseBb = req.prefUseBb();
-        song.prefUseEb = req.prefUseEb();
-        song.prefAutoScrollSpeed = req.prefAutoScrollSpeed();
-        song.prefTransposeSteps = req.prefTransposeSteps();
+        song.updatePreferences(req.prefAutoScrollSpeed(), req.prefTransposeSteps(), req.prefUseBb(), req.prefUseEb());
         songRepository.update(song);
     }
 }

@@ -31,7 +31,7 @@ public class UserPreferenceRepository {
     }
 
     public void update(UserPreference pref) {
-        UserPreferenceEntity entity = jpaRepo.findById(pref.userId);
+        UserPreferenceEntity entity = jpaRepo.findById(pref.getUserId());
         if (entity != null) {
             mapper.updateEntity(pref, entity);
             jpaRepo.persist(entity);
