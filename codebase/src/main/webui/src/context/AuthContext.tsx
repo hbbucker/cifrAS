@@ -40,15 +40,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
  if (token && token !== 'mock-token' && token !== 'mock-token-reg') {
  try {
  const payload = JSON.parse(atob(token.split('.')[1]));
- setUser({ 
- id: payload.sub || 'user', 
- email: payload.email || 'user@example.com', 
- name: payload.user_metadata?.full_name || payload.email || 'Musician' 
- });
- } catch {
- // Fallback if parsing fails
- setUser({ id: 'user', email: 'user@example.com', name: 'Musician' });
- }
+          const rawName = payload.user_metadata?.full_name || payload.user_metadata?.name || payload.name;
+          let displayName = rawName;
+          if (!displayName && payload.email) {
+            const prefix = payload.email.split('@')[0];
+            displayName = prefix.charAt(0).toUpperCase() + prefix.slice(1);
+          }
+          setUser({ 
+            id: payload.sub || 'user', 
+            email: payload.email || 'user@example.com', 
+            name: displayName || 'Musician' 
+          });
+        } catch {
+          // Fallback if parsing fails
+          setUser({ id: 'user', email: 'user@example.com', name: 'Musician' });
+        }
  } else {
  logout();
  }

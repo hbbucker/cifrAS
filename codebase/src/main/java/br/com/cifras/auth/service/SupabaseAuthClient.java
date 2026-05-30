@@ -40,4 +40,10 @@ public interface SupabaseAuthClient {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     Response logout(@HeaderParam("Authorization") String authorization);
+
+    @PUT
+    @Path("/user")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    Response updateUser(@HeaderParam("Authorization") String authorization, Object body);
 }

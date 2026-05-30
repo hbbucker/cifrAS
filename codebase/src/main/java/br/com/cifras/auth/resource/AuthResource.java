@@ -35,9 +35,13 @@ public class AuthResource {
     @POST
     @Path("/register")
     public Response register(@Valid AuthRequest request) {
-        Map<String, String> body = Map.of(
-                "email", request.email(),
-                "password", request.password());
+        Map<String, Object> body = new HashMap<>();
+        body.put("email", request.email());
+        body.put("password", request.password());
+        
+        if (request.name() != null && !request.name().isBlank()) {
+            body.put("data", Map.of("full_name", request.name()));
+        }
 
         Response supabaseResponse;
         try {
@@ -196,5 +200,37 @@ public class AuthResource {
         }
 
         return Response.status(status).entity(Map.of("error", "Logout failed")).build();
+    }
+
+    @PUT
+    @Path("/profile")
+    public Response updateProfile(@HeaderParam("Authorization") String authorization, Map<String, Object> updates) {
+        if (authorization == null || authorization.isBlank()) {
+            return Response.status(401).entity(Map.of("error", "No token provided")).build();
+        }
+
+        String name = (String) updates.get("name");
+        if (name == null || name.isBlank()) {
+            return Response.status(400).entity(Map.of("error", "Name is required")).build();
+        }
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("data", Map.of("full_name", name));
+
+        Response supabaseResponse;
+        try {
+            supabaseResponse = supabaseClient.updateUser(authorization, body);
+        } catch (jakarta.ws.rs.WebApplicationException ex) {
+            supabaseResponse = ex.getResponse();
+        }
+
+        int status = supabaseResponse.getStatus();
+        if (status == 200) {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> responseBody = supabaseResponse.readEntity(Map.class);
+            return Response.ok(responseBody).build();
+        }
+
+        return Response.status(status).entity(Map.of("error", "Update profile failed")).build();
     }
 }
