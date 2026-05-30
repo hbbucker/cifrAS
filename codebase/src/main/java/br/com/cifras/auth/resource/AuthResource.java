@@ -35,9 +35,13 @@ public class AuthResource {
     @POST
     @Path("/register")
     public Response register(@Valid AuthRequest request) {
-        Map<String, String> body = Map.of(
-                "email", request.email(),
-                "password", request.password());
+        Map<String, Object> body = new HashMap<>();
+        body.put("email", request.email());
+        body.put("password", request.password());
+        
+        if (request.name() != null && !request.name().isBlank()) {
+            body.put("data", Map.of("full_name", request.name()));
+        }
 
         Response supabaseResponse;
         try {
