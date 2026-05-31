@@ -2,7 +2,10 @@ package br.com.cifras.playlist.resource;
 
 import br.com.cifras.playlist.model.Playlist;
 import br.com.cifras.playlist.dto.*;
-import br.com.cifras.playlist.application.usecase.PlaylistService;
+import br.com.cifras.playlist.application.usecase.CreatePlaylistUseCase;
+import br.com.cifras.playlist.application.usecase.ListUserPlaylistsUseCase;
+import br.com.cifras.playlist.application.usecase.GetPlaylistUseCase;
+import br.com.cifras.playlist.application.usecase.DeletePlaylistUseCase;
 import br.com.cifras.shared.security.SecurityUtils;
 import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
@@ -25,70 +28,48 @@ import java.util.UUID;
 public class PlaylistResource {
 
     @Inject
-    PlaylistService playlistService;
+    CreatePlaylistUseCase createPlaylistUseCase;
+
+    @Inject
+    ListUserPlaylistsUseCase listUserPlaylistsUseCase;
+
+    @Inject
+    GetPlaylistUseCase getPlaylistUseCase;
+
+    @Inject
+    DeletePlaylistUseCase deletePlaylistUseCase;
 
     @Inject
     SecurityUtils securityUtils;
 
-    /** POST /playlists → 201 */
     @POST
     public Response createPlaylist(@Valid CreatePlaylistRequest request) {
         String userId = securityUtils.getCurrentUserId();
-        Playlist playlist = playlistService.create(request, userId);
+        Playlist playlist = createPlaylistUseCase.execute(request, userId);
         return Response.status(Response.Status.CREATED).entity(PlaylistDTO.from(playlist)).build();
     }
 
-    /** GET /playlists → 200 list */
     @GET
     public Response listPlaylists() {
         String userId = securityUtils.getCurrentUserId();
-        List<Playlist> playlists = playlistService.listByUser(userId);
+        List<Playlist> playlists = listUserPlaylistsUseCase.execute(userId);
         List<PlaylistDTO> dtos = playlists.stream().map(PlaylistDTO::from).toList();
         return Response.ok(dtos).build();
     }
 
-    /** GET /playlists/{id} → 200 */
     @GET
     @Path("/{id}")
     public Response getPlaylist(@PathParam("id") UUID id) {
         String userId = securityUtils.getCurrentUserId();
-        Playlist playlist = playlistService.getById(id, userId);
+        Playlist playlist = getPlaylistUseCase.execute(id, userId);
         return Response.ok(PlaylistDetailsDTO.from(playlist)).build();
     }
 
-    /** DELETE /playlists/{id} → 204 */
     @DELETE
     @Path("/{id}")
     public Response deletePlaylist(@PathParam("id") UUID id) {
         String userId = securityUtils.getCurrentUserId();
-        playlistService.delete(id, userId);
-        return Response.noContent().build();
-    }
-
-    /** POST /playlists/{id}/songs → 204 */
-    @POST
-    @Path("/{id}/songs")
-    public Response addSong(@PathParam("id") UUID id, AddSongRequest request) {
-        String userId = securityUtils.getCurrentUserId();
-        playlistService.addSong(id, request.songId(), request.position(), userId);
-        return Response.noContent().build();
-    }
-
-    /** DELETE /playlists/{id}/songs/{songId} → 204 */
-    @DELETE
-    @Path("/{id}/songs/{songId}")
-    public Response removeSong(@PathParam("id") UUID id, @PathParam("songId") UUID songId) {
-        String userId = securityUtils.getCurrentUserId();
-        playlistService.removeSong(id, songId, userId);
-        return Response.noContent().build();
-    }
-
-    /** PATCH /playlists/{id}/songs/reorder → 204 */
-    @PATCH
-    @Path("/{id}/songs/reorder")
-    public Response reorderSongs(@PathParam("id") UUID id, ReorderRequest request) {
-        String userId = securityUtils.getCurrentUserId();
-        playlistService.reorder(id, request.orderedSongIds(), userId);
+        deletePlaylistUseCase.execute(id, userId);
         return Response.noContent().build();
     }
 }

@@ -28,10 +28,22 @@ import static org.junit.jupiter.api.Assertions.*;
 import br.com.cifras.BaseIntegrationTest;
 
 @QuarkusTest
-class SongServiceTest extends BaseIntegrationTest {
+class SongUseCasesTest extends BaseIntegrationTest {
 
     @Inject
-    SongService songService;
+    CreateSongUseCase createSongUseCase;
+
+    @Inject
+    ListUserSongsUseCase listUserSongsUseCase;
+
+    @Inject
+    GetSongUseCase getSongUseCase;
+
+    @Inject
+    UpdateSongUseCase updateSongUseCase;
+
+    @Inject
+    DeleteSongUseCase deleteSongUseCase;
 
     private static final String USER_A = "user-a-uuid";
     private static final String USER_B = "user-b-uuid";
@@ -44,7 +56,7 @@ class SongServiceTest extends BaseIntegrationTest {
     void givenValidRequest_whenCreate_thenSongPersistedWithUserId() {
         CreateSongRequest req = new CreateSongRequest("Highway to Hell", "AC/DC", "A", LyricsStructure.empty());
 
-        Song song = songService.create(req, USER_A);
+        Song song = createSongUseCase.execute(req, USER_A);
 
         assertNotNull(song.getId());
         assertEquals("Highway to Hell", song.getTitle());
@@ -58,11 +70,11 @@ class SongServiceTest extends BaseIntegrationTest {
     @Test
     @Transactional
     void givenMultipleUsers_whenListByUser_thenReturnsOnlyOwnSongs() {
-        songService.create(new CreateSongRequest("Song A1", "Artist A", "C", null), USER_A);
-        songService.create(new CreateSongRequest("Song A2", "Artist A", "D", null), USER_A);
-        songService.create(new CreateSongRequest("Song B1", "Artist B", "E", null), USER_B);
+        createSongUseCase.execute(new CreateSongRequest("Song A1", "Artist A", "C", null), USER_A);
+        createSongUseCase.execute(new CreateSongRequest("Song A2", "Artist A", "D", null), USER_A);
+        createSongUseCase.execute(new CreateSongRequest("Song B1", "Artist B", "E", null), USER_B);
 
-        PagedResponse<Song> response = songService.listByUser(USER_A, 1, 20, null);
+        PagedResponse<Song> response = listUserSongsUseCase.execute(USER_A, 1, 20, null);
 
         assertTrue(response.data().stream().allMatch(s -> USER_A.equals(s.getUserId())),
             "List must contain only USER_A's songs");
@@ -75,11 +87,11 @@ class SongServiceTest extends BaseIntegrationTest {
     @Test
     @Transactional
     void givenSoftDeletedSong_whenListByUser_thenNotIncluded() {
-        Song song = songService.create(new CreateSongRequest("To Delete", "Artist", "G", null), USER_A);
+        Song song = createSongUseCase.execute(new CreateSongRequest("To Delete", "Artist", "G", null), USER_A);
 
-        songService.softDelete(song.getId(), USER_A);
+        deleteSongUseCase.execute(song.getId(), USER_A);
 
-        PagedResponse<Song> response = songService.listByUser(USER_A, 1, 20, null);
+        PagedResponse<Song> response = listUserSongsUseCase.execute(USER_A, 1, 20, null);
         boolean found = response.data().stream().anyMatch(s -> s.getId().equals(song.getId()));
         assertFalse(found, "Soft-deleted song must not appear in list");
     }
@@ -90,11 +102,11 @@ class SongServiceTest extends BaseIntegrationTest {
     @Test
     @Transactional
     void givenOtherUserSong_whenUpdate_thenThrowsForbiddenException() {
-        Song song = songService.create(new CreateSongRequest("Protected Song", "Artist", "C", null), USER_A);
+        Song song = createSongUseCase.execute(new CreateSongRequest("Protected Song", "Artist", "C", null), USER_A);
         UpdateSongRequest updateReq = new UpdateSongRequest("Hacked Title", "Hacker", "X", null);
 
         assertThrows(ForbiddenException.class,
-            () -> songService.update(song.getId(), updateReq, USER_B));
+            () -> updateSongUseCase.execute(song.getId(), updateReq, USER_B));
     }
 
     /**
@@ -103,13 +115,13 @@ class SongServiceTest extends BaseIntegrationTest {
     @Test
     @Transactional
     void givenExistingSong_whenSoftDelete_thenDisappearsFromActiveRecords() {
-        Song song = songService.create(new CreateSongRequest("Deletable", "Artist", "D", null), USER_A);
+        Song song = createSongUseCase.execute(new CreateSongRequest("Deletable", "Artist", "D", null), USER_A);
         java.util.UUID songId = song.getId();
 
-        songService.softDelete(songId, USER_A);
+        deleteSongUseCase.execute(songId, USER_A);
 
         assertThrows(NotFoundException.class,
-            () -> songService.findByIdAndUser(songId, USER_A));
+            () -> getSongUseCase.execute(songId, USER_A));
     }
 
     /**
@@ -118,9 +130,9 @@ class SongServiceTest extends BaseIntegrationTest {
     @Test
     @Transactional
     void givenOtherUserSong_whenFindByIdAndUser_thenThrowsNotFoundException() {
-        Song song = songService.create(new CreateSongRequest("Private Song", "Artist", "E", null), USER_A);
+        Song song = createSongUseCase.execute(new CreateSongRequest("Private Song", "Artist", "E", null), USER_A);
 
         assertThrows(NotFoundException.class,
-            () -> songService.findByIdAndUser(song.getId(), USER_B));
+            () -> getSongUseCase.execute(song.getId(), USER_B));
     }
 }

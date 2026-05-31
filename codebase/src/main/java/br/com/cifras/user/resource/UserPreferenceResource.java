@@ -2,7 +2,8 @@ package br.com.cifras.user.resource;
 
 import br.com.cifras.user.model.UserPreference;
 import br.com.cifras.user.resource.dto.UserPreferenceDTO;
-import br.com.cifras.user.application.usecase.UserPreferenceService;
+import br.com.cifras.user.application.usecase.GetUserPreferenceUseCase;
+import br.com.cifras.user.application.usecase.UpdateUserPreferenceUseCase;
 import br.com.cifras.shared.security.SecurityUtils;
 import io.quarkus.security.Authenticated;
 import jakarta.ws.rs.*;
@@ -19,13 +20,16 @@ public class UserPreferenceResource {
     SecurityUtils securityUtils;
 
     @Inject
-    UserPreferenceService service;
+    GetUserPreferenceUseCase getUserPreferenceUseCase;
+
+    @Inject
+    UpdateUserPreferenceUseCase updateUserPreferenceUseCase;
 
     @GET
     @Authenticated
     public Response getPreferences() {
         String userId = securityUtils.getCurrentUserId();
-        UserPreference pref = service.getPreferences(userId);
+        UserPreference pref = getUserPreferenceUseCase.execute(userId);
         return Response.ok(UserPreferenceDTO.fromDomain(pref)).build();
     }
 
@@ -33,7 +37,7 @@ public class UserPreferenceResource {
     @Authenticated
     public Response updatePreferences(UserPreferenceDTO dto) {
         String userId = securityUtils.getCurrentUserId();
-        UserPreference pref = service.updatePreferences(userId, dto.theme(), dto.language());
+        UserPreference pref = updateUserPreferenceUseCase.execute(userId, dto.theme(), dto.language());
         return Response.ok(UserPreferenceDTO.fromDomain(pref)).build();
     }
 }

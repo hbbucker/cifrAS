@@ -7,7 +7,7 @@ import br.com.cifras.shared.exception.ForbiddenException;
 import br.com.cifras.shared.exception.NotFoundException;
 import br.com.cifras.song.model.Song;
 import br.com.cifras.song.dto.CreateSongRequest;
-import br.com.cifras.song.application.usecase.SongService;
+import br.com.cifras.song.application.usecase.CreateSongUseCase;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -21,16 +21,22 @@ import static org.junit.jupiter.api.Assertions.*;
 import br.com.cifras.BaseIntegrationTest;
 
 @QuarkusTest
-class PlaylistServiceTest extends BaseIntegrationTest {
+class PlaylistUseCasesTest extends BaseIntegrationTest {
 
     @Inject
-    PlaylistService playlistService;
+    CreatePlaylistUseCase createPlaylistUseCase;
+
+    @Inject
+    AddSongToPlaylistUseCase addSongToPlaylistUseCase;
+
+    @Inject
+    RemoveSongFromPlaylistUseCase removeSongFromPlaylistUseCase;
 
     @Inject
     PlaylistRepository playlistRepository;
 
     @Inject
-    SongService songService;
+    CreateSongUseCase createSongUseCase;
 
     private static final String OWNER = "playlist-owner-uuid";
     private static final String OTHER = "playlist-other-uuid";
@@ -41,7 +47,7 @@ class PlaylistServiceTest extends BaseIntegrationTest {
     @Test
     @Transactional
     void givenValidRequest_whenCreate_thenPlaylistPersisted() {
-        Playlist playlist = playlistService.create(
+        Playlist playlist = createPlaylistUseCase.execute(
             new CreatePlaylistRequest("My Setlist", false, null), OWNER);
 
         assertNotNull(playlist.getId());
@@ -56,13 +62,13 @@ class PlaylistServiceTest extends BaseIntegrationTest {
     @Test
     @Transactional
     void givenPlaylistAndSong_whenAddSong_thenSongAddedAtPosition() {
-        Playlist playlist = playlistService.create(
+        Playlist playlist = createPlaylistUseCase.execute(
             new CreatePlaylistRequest("Set A", false, null), OWNER);
 
-        Song song = songService.create(
+        Song song = createSongUseCase.execute(
             new CreateSongRequest("Song 1", "Artist", "C", null), OWNER);
 
-        playlistService.addSong(playlist.getId(), song.getId(), 0, OWNER);
+        addSongToPlaylistUseCase.execute(playlist.getId(), song.getId(), 0, OWNER);
 
         Playlist refreshed = playlistRepository.findActiveById(playlist.getId()).orElseThrow();
         assertEquals(1, refreshed.getSongs().size());
@@ -76,14 +82,14 @@ class PlaylistServiceTest extends BaseIntegrationTest {
     @Test
     @Transactional
     void givenSongInPlaylist_whenRemoveSong_thenRemovedFromPlaylist() {
-        Playlist playlist = playlistService.create(
+        Playlist playlist = createPlaylistUseCase.execute(
             new CreatePlaylistRequest("Set B", false, null), OWNER);
 
-        Song song = songService.create(
+        Song song = createSongUseCase.execute(
             new CreateSongRequest("To Remove", "Artist", "D", null), OWNER);
 
-        playlistService.addSong(playlist.getId(), song.getId(), 0, OWNER);
-        playlistService.removeSong(playlist.getId(), song.getId(), OWNER);
+        addSongToPlaylistUseCase.execute(playlist.getId(), song.getId(), 0, OWNER);
+        removeSongFromPlaylistUseCase.execute(playlist.getId(), song.getId(), OWNER);
 
         Playlist refreshed = playlistRepository.findActiveById(playlist.getId()).orElseThrow();
         assertTrue(refreshed.getSongs().isEmpty(), "Song should be removed from playlist");
@@ -95,14 +101,14 @@ class PlaylistServiceTest extends BaseIntegrationTest {
     @Test
     @Transactional
     void givenOtherUser_whenAddSong_thenThrowsForbiddenException() {
-        Playlist playlist = playlistService.create(
+        Playlist playlist = createPlaylistUseCase.execute(
             new CreatePlaylistRequest("Protected Set", false, null), OWNER);
 
-        Song song = songService.create(
+        Song song = createSongUseCase.execute(
             new CreateSongRequest("Protected Song", "Artist", "G", null), OWNER);
 
         assertThrows(ForbiddenException.class,
-            () -> playlistService.addSong(playlist.getId(), song.getId(), 0, OTHER));
+            () -> addSongToPlaylistUseCase.execute(playlist.getId(), song.getId(), 0, OTHER));
     }
 
     /**
@@ -111,10 +117,10 @@ class PlaylistServiceTest extends BaseIntegrationTest {
     @Test
     @Transactional
     void givenNonExistentPlaylist_whenAddSong_thenThrowsNotFoundException() {
-        Song song = songService.create(
+        Song song = createSongUseCase.execute(
             new CreateSongRequest("Orphan Song", "Artist", "A", null), OWNER);
 
         assertThrows(NotFoundException.class,
-            () -> playlistService.addSong(java.util.UUID.randomUUID(), song.getId(), 0, OWNER));
+            () -> addSongToPlaylistUseCase.execute(java.util.UUID.randomUUID(), song.getId(), 0, OWNER));
     }
 }

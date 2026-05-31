@@ -9,17 +9,13 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
 @ApplicationScoped
-public class UserPreferenceService {
+public class UpdateUserPreferenceUseCase {
 
     @Inject
     UserPreferenceRepository repository;
 
-    public UserPreference getPreferences(String userId) {
-        return repository.findByUserId(userId).orElseGet(() -> UserPreference.createDefault(userId));
-    }
-
     @Transactional
-    public UserPreference updatePreferences(String userId, String themeVal, String langVal) {
+    public UserPreference execute(String userId, String themeVal, String langVal) {
         boolean isNew = repository.findByUserId(userId).isEmpty();
         UserPreference pref = isNew ? UserPreference.createDefault(userId) : repository.findByUserId(userId).get();
 

@@ -6,7 +6,12 @@ import br.com.cifras.song.model.EnharmonicConvention;
 import br.com.cifras.song.model.LyricsStructure;
 import br.com.cifras.song.model.Song;
 import br.com.cifras.song.dto.*;
-import br.com.cifras.song.application.usecase.SongService;
+import br.com.cifras.song.application.usecase.ListUserSongsUseCase;
+import br.com.cifras.song.application.usecase.CreateSongUseCase;
+import br.com.cifras.song.application.usecase.GetSongUseCase;
+import br.com.cifras.song.application.usecase.UpdateSongUseCase;
+import br.com.cifras.song.application.usecase.UpdateSongPreferencesUseCase;
+import br.com.cifras.song.application.usecase.DeleteSongUseCase;
 import br.com.cifras.song.application.usecase.TranspositionService;
 import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
@@ -32,7 +37,22 @@ import java.util.UUID;
 public class SongResource {
 
     @Inject
-    SongService songService;
+    ListUserSongsUseCase listUserSongsUseCase;
+
+    @Inject
+    CreateSongUseCase createSongUseCase;
+
+    @Inject
+    GetSongUseCase getSongUseCase;
+
+    @Inject
+    UpdateSongUseCase updateSongUseCase;
+
+    @Inject
+    UpdateSongPreferencesUseCase updateSongPreferencesUseCase;
+
+    @Inject
+    DeleteSongUseCase deleteSongUseCase;
 
     @Inject
     SecurityUtils securityUtils;
@@ -40,10 +60,6 @@ public class SongResource {
     @Inject
     TranspositionService transpositionService;
 
-    /**
-     * GET /songs — list songs with optional search and pagination.
-     * Defaults: page=1, pageSize=20
-     */
     @GET
     public Response listSongs(
         @QueryParam("q") String query,
@@ -51,7 +67,7 @@ public class SongResource {
         @QueryParam("pageSize") @DefaultValue("20") int pageSize
     ) {
         String userId = securityUtils.getCurrentUserId();
-        PagedResponse<Song> songs = songService.listByUser(userId, page, pageSize, query);
+        PagedResponse<Song> songs = listUserSongsUseCase.execute(userId, page, pageSize, query);
 
         List<SongSummaryDTO> summaries = songs.data().stream()
             .map(SongSummaryDTO::from)
@@ -60,21 +76,13 @@ public class SongResource {
         return Response.ok(PagedResponse.of(summaries, songs.total(), songs.page(), songs.pageSize())).build();
     }
 
-    /**
-     * POST /songs — create a new song.
-     * Returns 201 Created with the full SongDTO.
-     */
     @POST
     public Response createSong(@Valid CreateSongRequest request) {
         String userId = securityUtils.getCurrentUserId();
-        Song song = songService.create(request, userId);
+        Song song = createSongUseCase.execute(request, userId);
         return Response.status(Response.Status.CREATED).entity(SongDTO.from(song)).build();
     }
 
-    /**
-     * GET /songs/{id} — get a specific song by ID.
-     * Returns 404 if not found or belongs to another user.
-     */
     @GET
     @Path("/{id}")
     public Response getSong(
@@ -82,7 +90,7 @@ public class SongResource {
         @QueryParam("transpose") Integer transpose
     ) {
         String userId = securityUtils.getCurrentUserId();
-        Song song = songService.findByIdAndUser(id, userId);
+        Song song = getSongUseCase.execute(id, userId);
         LyricsStructure lyrics = song.getLyrics();
         if (transpose != null && lyrics != null) {
             lyrics = transpositionService.transpose(lyrics, transpose, EnharmonicConvention.SHARPS);
@@ -92,15 +100,11 @@ public class SongResource {
         return Response.ok(dto).build();
     }
 
-    /**
-     * POST /songs/{id}/transpose — transposes song lyrics by the given semitones.
-     * Validates semitones in range [-11, 11]. Stateless — does NOT persist the transposed version.
-     */
     @POST
     @Path("/{id}/transpose")
     public Response transposeSong(@PathParam("id") UUID id, @Valid TransposeRequest request) {
         String userId = securityUtils.getCurrentUserId();
-        Song song = songService.findByIdAndUser(id, userId);
+        Song song = getSongUseCase.execute(id, userId);
         LyricsStructure transposed = transpositionService.transpose(
             song.getLyrics(), request.semitones(), request.convention());
         SongDTO dto = new SongDTO(song.getId(), song.getTitle(), song.getArtist(), song.getOriginalKey(),
@@ -108,38 +112,27 @@ public class SongResource {
         return Response.ok(dto).build();
     }
 
-    /**
-     * PUT /songs/{id} — update a song. Only the owner can update.
-     * Returns 403 if not owner, 404 if not found.
-     */
     @PUT
     @Path("/{id}")
     public Response updateSong(@PathParam("id") UUID id, @Valid UpdateSongRequest request) {
         String userId = securityUtils.getCurrentUserId();
-        Song song = songService.update(id, request, userId);
+        Song song = updateSongUseCase.execute(id, request, userId);
         return Response.ok(SongDTO.from(song)).build();
     }
 
-    /**
-     * PUT /songs/{id}/preferences — update song preferences.
-     */
     @PUT
     @Path("/{id}/preferences")
     public Response updatePreferences(@PathParam("id") UUID id, @Valid SongPreferencesDTO request) {
         String userId = securityUtils.getCurrentUserId();
-        songService.updatePreferences(id, request, userId);
+        updateSongPreferencesUseCase.execute(id, request, userId);
         return Response.noContent().build();
     }
 
-    /**
-     * DELETE /songs/{id} — soft-delete a song.
-     * Returns 204 No Content. Only the owner can delete.
-     */
     @DELETE
     @Path("/{id}")
     public Response deleteSong(@PathParam("id") UUID id) {
         String userId = securityUtils.getCurrentUserId();
-        songService.softDelete(id, userId);
+        deleteSongUseCase.execute(id, userId);
         return Response.noContent().build();
     }
 }
