@@ -18,7 +18,11 @@ public class UserPreference {
     }
 
     public static UserPreference createDefault(String userId) {
-        return new UserPreference(userId, Theme.LIGHT, Language.PT_BR);
+        return createDefault(userId, Language.PT_BR);
+    }
+
+    public static UserPreference createDefault(String userId, Language defaultLanguage) {
+        return new UserPreference(userId, Theme.LIGHT, defaultLanguage != null ? defaultLanguage : Language.PT_BR);
     }
 
     public void updateTheme(Theme theme) {

@@ -12,6 +12,10 @@ public class GetUserPreferenceUseCase {
     UserPreferenceRepository repository;
 
     public UserPreference execute(String userId) {
-        return repository.findByUserId(userId).orElseGet(() -> UserPreference.createDefault(userId));
+        return execute(userId, br.com.cifras.user.model.Language.PT_BR);
+    }
+
+    public UserPreference execute(String userId, br.com.cifras.user.model.Language defaultLanguage) {
+        return repository.findByUserId(userId).orElseGet(() -> UserPreference.createDefault(userId, defaultLanguage));
     }
 }

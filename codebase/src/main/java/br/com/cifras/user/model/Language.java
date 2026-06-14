@@ -27,6 +27,14 @@ public enum Language {
                 return b;
             }
         }
+        // Fallback to match prefixes (e.g., 'en' matches 'en-US', 'pt' matches 'pt-BR')
+        for (Language b : Language.values()) {
+            String prefix1 = b.value.split("-")[0];
+            String prefix2 = text.split("-")[0];
+            if (prefix1.equalsIgnoreCase(prefix2)) {
+                return b;
+            }
+        }
         throw new IllegalArgumentException("Idioma inválido: " + text);
     }
 }

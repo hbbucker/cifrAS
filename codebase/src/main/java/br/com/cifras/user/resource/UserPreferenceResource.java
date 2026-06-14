@@ -25,11 +25,38 @@ public class UserPreferenceResource {
     @Inject
     UpdateUserPreferenceUseCase updateUserPreferenceUseCase;
 
+    @jakarta.ws.rs.core.Context
+    jakarta.ws.rs.core.HttpHeaders headers;
+
     @GET
     @Authenticated
     public Response getPreferences() {
         String userId = securityUtils.getCurrentUserId();
-        UserPreference pref = getUserPreferenceUseCase.execute(userId);
+        
+        br.com.cifras.user.model.Language defaultLanguage = br.com.cifras.user.model.Language.PT_BR;
+        try {
+            java.util.List<java.util.Locale> locales = headers.getAcceptableLanguages();
+            if (locales != null && !locales.isEmpty()) {
+                for (java.util.Locale locale : locales) {
+                    String tag = locale.toLanguageTag();
+                    try {
+                        defaultLanguage = br.com.cifras.user.model.Language.fromString(tag);
+                        break;
+                    } catch (IllegalArgumentException e) {
+                        try {
+                            defaultLanguage = br.com.cifras.user.model.Language.fromString(locale.getLanguage());
+                            break;
+                        } catch (IllegalArgumentException ex) {
+                            // continue searching
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // Keep default PT_BR on failure
+        }
+
+        UserPreference pref = getUserPreferenceUseCase.execute(userId, defaultLanguage);
         return Response.ok(UserPreferenceDTO.fromDomain(pref)).build();
     }
 
