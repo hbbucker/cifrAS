@@ -3,6 +3,8 @@ import { describe, it, expect, vi } from 'vitest';
 import { DashboardPage } from '../pages/DashboardPage';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '../context/AuthContext';
+import { ToastProvider } from '../context/ToastContext';
+import { ThemeProvider } from '../context/ThemeContext';
 import '@testing-library/jest-dom/vitest';
 
 const mockNavigate = vi.fn();
@@ -16,13 +18,17 @@ vi.mock('react-router-dom', async () => {
 
 describe('DashboardPage Component', () => {
  it('navigates to song edit when edit action is clicked', async () => {
- render(
- <AuthProvider>
- <BrowserRouter>
- <DashboardPage />
- </BrowserRouter>
- </AuthProvider>
- );
+  render(
+  <AuthProvider>
+  <ThemeProvider>
+  <ToastProvider>
+  <BrowserRouter>
+  <DashboardPage />
+  </BrowserRouter>
+  </ToastProvider>
+  </ThemeProvider>
+  </AuthProvider>
+  );
 
  // Wait for mock data to load
  const menuBtn = await screen.findAllByTestId('menu-btn', {}, { timeout: 2000 });
@@ -35,13 +41,17 @@ describe('DashboardPage Component', () => {
  });
 
  it('navigates to song view when card is clicked', async () => {
- render(
- <AuthProvider>
- <BrowserRouter>
- <DashboardPage />
- </BrowserRouter>
- </AuthProvider>
- );
+  render(
+  <AuthProvider>
+  <ThemeProvider>
+  <ToastProvider>
+  <BrowserRouter>
+  <DashboardPage />
+  </BrowserRouter>
+  </ToastProvider>
+  </ThemeProvider>
+  </AuthProvider>
+  );
 
  const viewDivs = await screen.findAllByTestId(/view-song-/i, {}, { timeout: 2000 });
  fireEvent.click(viewDivs[0]);

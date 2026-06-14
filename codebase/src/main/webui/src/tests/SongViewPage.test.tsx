@@ -3,6 +3,8 @@ import { describe, it, expect, vi } from 'vitest';
 import { SongViewPage } from '../pages/SongViewPage';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '../context/AuthContext';
+import { ToastProvider } from '../context/ToastContext';
+import { ThemeProvider } from '../context/ThemeContext';
 import '@testing-library/jest-dom/vitest';
 
 vi.mock('react-router-dom', async () => {
@@ -15,16 +17,20 @@ vi.mock('react-router-dom', async () => {
 
 describe('SongViewPage Component', () => {
  it('loads correct mock song title based on id', async () => {
- render(
- <AuthProvider>
- <BrowserRouter>
- <SongViewPage />
- </BrowserRouter>
- </AuthProvider>
- );
+  render(
+  <AuthProvider>
+  <ThemeProvider>
+  <ToastProvider>
+  <BrowserRouter>
+  <SongViewPage />
+  </BrowserRouter>
+  </ToastProvider>
+  </ThemeProvider>
+  </AuthProvider>
+  );
  
  // The default title in the buggy code is "I Took A Pill In Ibiza"
  // ID 1 should be Wonderwall
- expect(screen.getByText('Wonderwall')).toBeInTheDocument();
+  expect(await screen.findByText('Wonderwall')).toBeInTheDocument();
  });
 });
