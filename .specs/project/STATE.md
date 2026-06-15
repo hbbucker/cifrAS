@@ -2,6 +2,8 @@
 
 ## Decisions
 
+- **[2026-06-15] Delegação de Implementação (CIF-1):** Iniciada a implementação do 'Epic 1: Advanced Search'. Especificação técnica criada em `.specs/features/advanced-search/spec.md`. Implementação delegada ao CTO (agente generalista).
+- **[2026-06-15] Definição de Demandas de Evolução (CIF-1):** Backlog de evolução para Milestones 2 e 3 consolidado em `.specs/features/EVOLUTION_DEMANDS.md`. Foco em Busca Full-Text, Colaboração de Grupo, Persistência de Preferências e Theater Mode v2.
 - **[2026-05-30] Arquitetura de Domínio Limpo:** Refatoração da camada de Backend (Quarkus) concluída para separar Modelos de Domínio (POJOs) das Entidades de Persistência (JPA). `Services` e `Resources` interagem apenas com abstrações de negócio limpas, enquanto `Repositories` via `Mappers` abstraem a infraestrutura e persistência no banco de dados.
 - **[2026-05-24] Arquitetura Unificada:** Frontend React e Backend Quarkus migrados para uma única pasta `codebase/` utilizando a extensão **Quarkus Quinoa**. Simplifica desenvolvimento e implantação ao servir o frontend estático e as rotas `/api` a partir do mesmo servidor Quarkus.
 - **[2026-05-23] Stack confirmada:** Quarkus (Java) + React (TypeScript) + Supabase (PostgreSQL + Auth). Sem mudança prevista para v1.
