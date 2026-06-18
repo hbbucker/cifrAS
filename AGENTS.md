@@ -171,7 +171,20 @@ Para economizar tokens de contexto nas interações com o terminal e o git, todo
 
 ---
 
-## 8. Guia de Trabalho para Agentes de Desenvolvimento de IA
+## 9. Equipe do Projeto (Hired Agents)
+
+Esta seção lista os especialistas contratados para o projeto e suas respectivas responsabilidades. Suas instruções completas estão em `.gemini/agents/`.
+
+- **CEO:** Líder da empresa, focado em estratégia, priorização e coordenação entre departamentos.
+- **CTO:** Responsável pela arquitetura técnica, infraestrutura, qualidade do código e liderança da equipe de engenharia.
+- **CMO (Leo Sterling):** Especialista em marketing digital, relações com desenvolvedores e crescimento da comunidade.
+- **Lead UX Designer (Maya Rivers):** Especialista em design system (Pinterest-style), pesquisa UX e interface responsiva.
+- **Product Owner (Lucas Silva):** Especialista em descoberta de produto, gestão de backlog e priorização de roadmap.
+- **Frontend Performance Engineer (Alex J. Code):** Especialista em React, Vite, profiling e otimização de performance no navegador.
+
+---
+
+## 10. Guia de Trabalho para Agentes de Desenvolvimento de IA
 
 Se você é um Agente de IA trabalhando neste projeto, siga este fluxo rigoroso para garantir a conformidade e qualidade das entregas:
 

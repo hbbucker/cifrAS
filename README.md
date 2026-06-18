@@ -45,7 +45,13 @@ O projeto adota uma arquitetura full-stack moderna, focada em performance e esca
 * **Maven** (ou utilize o wrapper `./mvnw` incluso)
 * Conta no **Supabase** (para as variáveis de ambiente do backend)
 
-### 1. Configurando o Projeto (Quarkus + Quinoa + React)
+### 1. Configurando o Ambiente
+Para utilizar ferramentas do projeto como o `rtk` diretamente, execute o seguinte comando na raiz do projeto:
+```bash
+source setup.sh
+```
+
+### 2. Configurando o Projeto (Quarkus + Quinoa + React)
 Navegue até a pasta `codebase/` e configure o arquivo de ambiente:
 ```bash
 cd codebase

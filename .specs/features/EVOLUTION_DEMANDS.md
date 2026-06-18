@@ -21,6 +21,7 @@ As a **musician**, I want to **search for songs using snippets of lyrics or spec
 
 ## Epic 2: Collaboration & Groups
 **Context:** Enabling bands and musical groups to manage shared repertoires.
+**Spec:** [spec.md](./group-shared-playlists/spec.md)
 
 ### User Story: Band Repertoire Management
 As a **group leader**, I want to **create a group and invite other musicians** so that **we can maintain a shared list of songs and playlists for our performances.**
@@ -62,6 +63,13 @@ As a **musician on stage**, I want to **resume my Theater Mode session exactly w
     - [ ] Double-tap to pause/resume auto-scroll.
 - [ ] UI: Add a "Battery Saver" mode for Theater Mode (high contrast, reduced animations).
 
+### User Story: "Lock Mode" for Live Performance
+As a **live performer**, I want a **"Lock Mode" to prevent accidental touches during a song** so that **I don't unintentionally disrupt my performance.**
+
+### Acceptance Criteria
+- [ ] Toggle to disable all non-essential buttons while active.
+- [ ] Visual indicator of locked state.
+
 ---
 
 ## Epic 5: Internationalization (i18n)
@@ -75,6 +83,32 @@ As a **non-Portuguese speaking musician**, I want to **use the application in my
 - [ ] Backend: Support `Accept-Language` headers for error messages and system notifications.
 - [ ] Persistence: Save the user's preferred language in their profile.
 - [ ] Dynamic Content: Ensure that music categories or system tags can be translated.
+
+---
+
+## Epic 6: Performance & Core Web Vitals
+**Context:** Ensuring a fast and smooth experience across all devices, especially on mobile.
+
+### User Story: Fast Loading on Mobile
+As a **musician using a mobile device with a slow connection**, I want the **app to load quickly and be interactive in under 3 seconds** so that **I can start playing without delays.**
+
+### Acceptance Criteria
+- [ ] LCP < 2.5s, TBT < 300ms.
+- [ ] Implement lazy loading for heavy components.
+- [ ] Optimize bundle size (< 200kb initial load).
+
+---
+
+## Epic 7: Accessibility (WCAG 2.1)
+**Context:** Making CifrAS inclusive for musicians with different abilities.
+
+### User Story: Screen Reader and Contrast Support
+As a **musician with visual impairments**, I want to **use screen readers and high-contrast modes** so that **I can manage my chords effectively.**
+
+### Acceptance Criteria
+- [ ] 100% compliant with WCAG 2.1 AA.
+- [ ] Proper ARIA labels on all interactive elements.
+- [ ] Keyboard-only navigation support.
 
 ---
 

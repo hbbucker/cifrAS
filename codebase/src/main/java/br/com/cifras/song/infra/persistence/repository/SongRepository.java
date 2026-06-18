@@ -26,7 +26,26 @@ public class SongRepository {
     @Inject
     SongMapper mapper;
 
+    @Inject
+    jakarta.persistence.EntityManager em;
+
     private static final String ACTIVE_FILTER = "deletedAt IS NULL";
+
+    public List<Song> searchFts(String userId, String query) {
+        String sql = "SELECT * FROM songs WHERE userId = :userId AND " + ACTIVE_FILTER + 
+                     " AND fts_vector @@ to_tsquery('portuguese', :query)" +
+                     " ORDER BY ts_rank(fts_vector, to_tsquery('portuguese', :query)) DESC";
+        
+        // This is a simplified approach, real query might need to be processed to be 'to_tsquery' compatible
+        String formattedQuery = query.replaceAll("\\s+", " & ");
+        
+        List<SongEntity> entities = em.createNativeQuery(sql, SongEntity.class)
+                .setParameter("userId", userId)
+                .setParameter("query", formattedQuery)
+                .getResultList();
+        
+        return entities.stream().map(mapper::toDomain).collect(Collectors.toList());
+    }
 
     public List<Song> findByUserIdActive(String userId, int page, int pageSize, String query) {
         String baseQuery = "userId = ?1 AND " + ACTIVE_FILTER;

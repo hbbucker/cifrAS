@@ -1,3 +1,0 @@
-#!/bin/bash
-shift # remove 'proxy' or whatever the hook adds if it does
-exec "$@"
