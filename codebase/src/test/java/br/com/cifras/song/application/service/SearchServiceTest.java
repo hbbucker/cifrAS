@@ -37,7 +37,7 @@ class SearchServiceTest {
     void search_WithValidQuery_ShouldReturnResults() {
         String query = "test query";
         String userId = "user-123";
-        List<Song> expectedSongs = Collections.singletonList(new Song());
+        List<Song> expectedSongs = Collections.singletonList(mock(Song.class));
         
         when(securityUtils.getCurrentUserId()).thenReturn(userId);
         when(songRepository.searchFts(userId, query)).thenReturn(expectedSongs);
