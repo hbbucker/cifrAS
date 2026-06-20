@@ -1,6 +1,6 @@
 package br.com.cifras.song.dto;
 
-import br.com.cifras.song.domain.LyricsStructure;
+import br.com.cifras.song.model.LyricsStructure;
 import jakarta.validation.constraints.NotBlank;
 
 /**

@@ -13,20 +13,18 @@ import static org.hamcrest.Matchers.*;
 import io.quarkus.test.InjectMock;
 import org.mockito.Mockito;
 import br.com.cifras.shared.security.UserService;
-import br.com.cifras.group.service.GroupService;
-import br.com.cifras.playlist.service.PlaylistService;
+import br.com.cifras.group.application.usecase.CreateGroupUseCase;
+import br.com.cifras.group.application.usecase.AddGroupMemberUseCase;
+import br.com.cifras.group.application.usecase.LinkGroupPlaylistUseCase;
+import br.com.cifras.group.model.Group;
+import br.com.cifras.playlist.application.usecase.CreatePlaylistUseCase;
 import br.com.cifras.playlist.dto.CreatePlaylistRequest;
 import br.com.cifras.group.dto.LinkPlaylistRequest;
-import br.com.cifras.playlist.domain.Playlist;
+import br.com.cifras.playlist.model.Playlist;
 import jakarta.inject.Inject;
 
 /**
  * T13: GroupResource REST integration tests
- * Tests: 4
- * 1. POST /groups → 201 with GroupDTO
- * 2. GET /groups → 200 list of groups
- * 3. POST /groups/{id}/members → 204 member added
- * 4. DELETE /groups/{id}/members/{targetUserId} → 204 member removed
  */
 import br.com.cifras.BaseIntegrationTest;
 
@@ -37,10 +35,16 @@ class GroupResourceTest extends BaseIntegrationTest {
     UserService userService;
 
     @Inject
-    GroupService groupService;
+    CreateGroupUseCase createGroupUseCase;
 
     @Inject
-    PlaylistService playlistService;
+    AddGroupMemberUseCase addGroupMemberUseCase;
+
+    @Inject
+    LinkGroupPlaylistUseCase linkGroupPlaylistUseCase;
+
+    @Inject
+    CreatePlaylistUseCase createPlaylistUseCase;
 
     private static final String OWNER = "group-owner-uuid";
     private static final String MEMBER = "group-member-uuid";
@@ -102,7 +106,7 @@ class GroupResourceTest extends BaseIntegrationTest {
     void givenOwnerAndExistingMember_whenRemoveMember_thenReturns204() {
         java.util.UUID groupId = createGroup("Band For Removal");
 
-        groupService.addMember(groupId, MEMBER, OWNER);
+        addGroupMemberUseCase.execute(groupId, MEMBER, OWNER);
 
         given()
             .when().delete("/groups/" + groupId + "/members/" + MEMBER)
@@ -114,11 +118,11 @@ class GroupResourceTest extends BaseIntegrationTest {
     @TestSecurity(user = OWNER, roles = {"user"})
     void givenOwnerAndPlaylist_whenLinkPlaylist_thenReturns204() {
         java.util.UUID groupId = createGroup("Band with Playlist");
-        Playlist playlist = playlistService.create(new CreatePlaylistRequest("My Songs", false, null), OWNER);
+        Playlist playlist = createPlaylistUseCase.execute(new CreatePlaylistRequest("My Songs", false, null), OWNER);
 
         given()
             .contentType(ContentType.JSON)
-            .body(new LinkPlaylistRequest(playlist.id))
+            .body(new LinkPlaylistRequest(playlist.getId()))
             .when().post("/groups/" + groupId + "/playlists")
             .then()
             .statusCode(204);
@@ -127,11 +131,11 @@ class GroupResourceTest extends BaseIntegrationTest {
     @Test
     @TestSecurity(user = MEMBER, roles = {"user"})
     void givenMember_whenGetPlaylists_thenReturnsList() {
-        br.com.cifras.group.domain.Group group = groupService.createGroup("Band with Shared Playlists", OWNER);
-        java.util.UUID groupId = group.id;
-        groupService.addMember(groupId, MEMBER, OWNER);
-        Playlist playlist = playlistService.create(new CreatePlaylistRequest("Setlist", false, null), OWNER);
-        groupService.linkPlaylist(groupId, playlist.id, OWNER);
+        Group group = createGroupUseCase.execute("Band with Shared Playlists", OWNER);
+        java.util.UUID groupId = group.getId();
+        addGroupMemberUseCase.execute(groupId, MEMBER, OWNER);
+        Playlist playlist = createPlaylistUseCase.execute(new CreatePlaylistRequest("Setlist", false, null), OWNER);
+        linkGroupPlaylistUseCase.execute(groupId, playlist.getId(), OWNER);
 
         given()
             .when().get("/groups/" + groupId + "/playlists")
@@ -147,11 +151,11 @@ class GroupResourceTest extends BaseIntegrationTest {
     @TestSecurity(user = OWNER, roles = {"user"})
     void givenOwner_whenUnlinkPlaylist_thenReturns204() {
         java.util.UUID groupId = createGroup("Band for Unlink");
-        Playlist playlist = playlistService.create(new CreatePlaylistRequest("Temporary Setlist", false, null), OWNER);
-        groupService.linkPlaylist(groupId, playlist.id, OWNER);
+        Playlist playlist = createPlaylistUseCase.execute(new CreatePlaylistRequest("Temporary Setlist", false, null), OWNER);
+        linkGroupPlaylistUseCase.execute(groupId, playlist.getId(), OWNER);
 
         given()
-            .when().delete("/groups/" + groupId + "/playlists/" + playlist.id)
+            .when().delete("/groups/" + groupId + "/playlists/" + playlist.getId())
             .then()
             .statusCode(204);
     }

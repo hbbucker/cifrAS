@@ -1,8 +1,12 @@
 package br.com.cifras.group.resource;
 
-import br.com.cifras.group.domain.GroupInvitation;
+import br.com.cifras.group.model.GroupInvitation;
 import br.com.cifras.group.dto.GroupInvitationDTO;
-import br.com.cifras.group.service.GroupService;
+import br.com.cifras.group.application.usecase.ListPendingInvitationsUseCase;
+import br.com.cifras.group.application.usecase.AcceptGroupInvitationUseCase;
+import br.com.cifras.group.application.usecase.DeclineGroupInvitationUseCase;
+import br.com.cifras.group.application.usecase.ListDeclinedInvitationsUseCase;
+import br.com.cifras.group.application.usecase.DismissGroupInvitationUseCase;
 import br.com.cifras.shared.security.SecurityUtils;
 import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
@@ -20,7 +24,19 @@ import java.util.UUID;
 public class InvitationResource {
 
     @Inject
-    GroupService groupService;
+    ListPendingInvitationsUseCase listPendingInvitationsUseCase;
+
+    @Inject
+    AcceptGroupInvitationUseCase acceptGroupInvitationUseCase;
+
+    @Inject
+    DeclineGroupInvitationUseCase declineGroupInvitationUseCase;
+
+    @Inject
+    ListDeclinedInvitationsUseCase listDeclinedInvitationsUseCase;
+
+    @Inject
+    DismissGroupInvitationUseCase dismissGroupInvitationUseCase;
 
     @Inject
     SecurityUtils securityUtils;
@@ -31,7 +47,7 @@ public class InvitationResource {
         if (email == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Email not found in token").build();
         }
-        List<GroupInvitation> invites = groupService.getPendingInvites(email);
+        List<GroupInvitation> invites = listPendingInvitationsUseCase.execute(email);
         List<GroupInvitationDTO> dtos = invites.stream().map(GroupInvitationDTO::from).toList();
         return Response.ok(dtos).build();
     }
@@ -41,7 +57,7 @@ public class InvitationResource {
     public Response acceptInvite(@PathParam("id") UUID id) {
         String email = securityUtils.getCurrentUserEmail();
         String userId = securityUtils.getCurrentUserId();
-        groupService.acceptInvite(id, email, userId);
+        acceptGroupInvitationUseCase.execute(id, email, userId);
         return Response.noContent().build();
     }
 
@@ -49,7 +65,7 @@ public class InvitationResource {
     @Path("/{id}/decline")
     public Response declineInvite(@PathParam("id") UUID id) {
         String email = securityUtils.getCurrentUserEmail();
-        groupService.declineInvite(id, email);
+        declineGroupInvitationUseCase.execute(id, email);
         return Response.noContent().build();
     }
 
@@ -57,7 +73,7 @@ public class InvitationResource {
     @Path("/declined")
     public Response listDeclinedInvites() {
         String userId = securityUtils.getCurrentUserId();
-        List<GroupInvitation> invites = groupService.getDeclinedInvites(userId);
+        List<GroupInvitation> invites = listDeclinedInvitationsUseCase.execute(userId);
         List<GroupInvitationDTO> dtos = invites.stream().map(GroupInvitationDTO::from).toList();
         return Response.ok(dtos).build();
     }
@@ -66,7 +82,7 @@ public class InvitationResource {
     @Path("/{id}")
     public Response dismissInvite(@PathParam("id") UUID id) {
         String userId = securityUtils.getCurrentUserId();
-        groupService.dismissInvite(id, userId);
+        dismissGroupInvitationUseCase.execute(id, userId);
         return Response.noContent().build();
     }
 }

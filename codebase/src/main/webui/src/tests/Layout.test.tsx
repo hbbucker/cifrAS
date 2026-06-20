@@ -3,27 +3,42 @@ import { describe, it, expect } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import { Sidebar } from '../components/layout/Sidebar';
 import { BottomNav } from '../components/layout/BottomNav';
+import { AuthProvider } from '../context/AuthContext';
+import { ThemeProvider } from '../context/ThemeContext';
+import { ToastProvider } from '../context/ToastContext';
 import '@testing-library/jest-dom/vitest';
 
 describe('Layout Components', () => {
  describe('Sidebar', () => {
  it('renders and contains ARIA navigation roles', () => {
- render(
- <MemoryRouter>
- <Sidebar />
- </MemoryRouter>
- );
+  render(
+  <AuthProvider>
+  <ThemeProvider>
+  <ToastProvider>
+  <MemoryRouter>
+  <Sidebar />
+  </MemoryRouter>
+  </ToastProvider>
+  </ThemeProvider>
+  </AuthProvider>
+  );
  
  expect(screen.getByRole('navigation', { name: 'Main sidebar navigation' })).toBeInTheDocument();
  expect(screen.getByTestId('sidebar').className).toContain('hidden sm:flex');
  });
 
  it('toggles collapse state on button click', () => {
- render(
- <MemoryRouter>
- <Sidebar />
- </MemoryRouter>
- );
+  render(
+  <AuthProvider>
+  <ThemeProvider>
+  <ToastProvider>
+  <MemoryRouter>
+  <Sidebar />
+  </MemoryRouter>
+  </ToastProvider>
+  </ThemeProvider>
+  </AuthProvider>
+  );
  
  const sidebar = screen.getByTestId('sidebar');
  expect(sidebar.className).toContain('w-64');
@@ -43,11 +58,17 @@ describe('Layout Components', () => {
 
  describe('BottomNav', () => {
  it('renders and contains ARIA roles', () => {
- render(
- <MemoryRouter>
- <BottomNav />
- </MemoryRouter>
- );
+  render(
+  <AuthProvider>
+  <ThemeProvider>
+  <ToastProvider>
+  <MemoryRouter>
+  <BottomNav />
+  </MemoryRouter>
+  </ToastProvider>
+  </ThemeProvider>
+  </AuthProvider>
+  );
  
  const nav = screen.getByTestId('bottom-nav');
  expect(nav).toBeInTheDocument();

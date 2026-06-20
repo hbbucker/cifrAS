@@ -1,6 +1,6 @@
 package br.com.cifras.group.dto;
 
-import br.com.cifras.group.domain.GroupInvitation;
+import br.com.cifras.group.model.GroupInvitation;
 import java.util.UUID;
 
 public record GroupInvitationDTO(
@@ -13,12 +13,12 @@ public record GroupInvitationDTO(
 ) {
     public static GroupInvitationDTO from(GroupInvitation invite) {
         return new GroupInvitationDTO(
-            invite.id,
-            invite.group.id,
-            invite.group.name,
-            invite.inviterId,
-            invite.inviteeEmail,
-            invite.status.name()
+            invite.getId(),
+            invite.getGroup().getId(),
+            invite.getGroup().getName(),
+            invite.getInviterId(),
+            invite.getInviteeEmail(),
+            invite.getStatus().name()
         );
     }
 }
