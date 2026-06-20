@@ -19,3 +19,9 @@
 - Replaced broken `rtk` script with a robust mock.
 - Scaffolded `.gemini/agents/` with persona definitions.
 - Updated project documentation to reflect unblocked state.
+
+## 2026-06-18 - Marco Alcançado: Estruturação de Produto
+- **Contratação:** Lucas Silva (PO) integrado ao time para liderar a visão do produto.
+- **Backlog:** Gerado documento de demandas de evolução (.specs/features/EVOLUTION_DEMANDS.md).
+- **Delegação:** Iniciada a especificação do Epic 1 (Busca Avançada) com PO e CTO.
+- **Status da Issue CIF-1:** Concluída.
