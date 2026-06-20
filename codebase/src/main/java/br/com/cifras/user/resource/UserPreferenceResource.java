@@ -1,9 +1,11 @@
 package br.com.cifras.user.resource;
 
-import br.com.cifras.user.domain.UserPreference;
+import br.com.cifras.user.model.UserPreference;
+import br.com.cifras.user.resource.dto.UserPreferenceDTO;
+import br.com.cifras.user.application.usecase.GetUserPreferenceUseCase;
+import br.com.cifras.user.application.usecase.UpdateUserPreferenceUseCase;
 import br.com.cifras.shared.security.SecurityUtils;
 import io.quarkus.security.Authenticated;
-import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -17,36 +19,52 @@ public class UserPreferenceResource {
     @Inject
     SecurityUtils securityUtils;
 
+    @Inject
+    GetUserPreferenceUseCase getUserPreferenceUseCase;
+
+    @Inject
+    UpdateUserPreferenceUseCase updateUserPreferenceUseCase;
+
+    @jakarta.ws.rs.core.Context
+    jakarta.ws.rs.core.HttpHeaders headers;
+
     @GET
     @Authenticated
     public Response getPreferences() {
         String userId = securityUtils.getCurrentUserId();
-        UserPreference pref = UserPreference.findByUserId(userId);
-        if (pref == null) {
-            pref = new UserPreference();
-            pref.userId = userId;
-            pref.theme = "light";
+        
+        br.com.cifras.user.model.Language defaultLanguage = br.com.cifras.user.model.Language.PT_BR;
+        try {
+            java.util.List<java.util.Locale> locales = headers.getAcceptableLanguages();
+            if (locales != null && !locales.isEmpty()) {
+                for (java.util.Locale locale : locales) {
+                    String tag = locale.toLanguageTag();
+                    try {
+                        defaultLanguage = br.com.cifras.user.model.Language.fromString(tag);
+                        break;
+                    } catch (IllegalArgumentException e) {
+                        try {
+                            defaultLanguage = br.com.cifras.user.model.Language.fromString(locale.getLanguage());
+                            break;
+                        } catch (IllegalArgumentException ex) {
+                            // continue searching
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // Keep default PT_BR on failure
         }
-        return Response.ok(pref).build();
+
+        UserPreference pref = getUserPreferenceUseCase.execute(userId, defaultLanguage);
+        return Response.ok(UserPreferenceDTO.fromDomain(pref)).build();
     }
 
     @PUT
     @Authenticated
-    @Transactional
-    public Response updatePreferences(UserPreference newPref) {
+    public Response updatePreferences(UserPreferenceDTO dto) {
         String userId = securityUtils.getCurrentUserId();
-        UserPreference pref = UserPreference.findByUserId(userId);
-        if (pref == null) {
-            pref = new UserPreference();
-            pref.userId = userId;
-        }
-        if (newPref.theme != null) {
-            pref.theme = newPref.theme;
-        }
-        if (newPref.language != null) {
-            pref.language = newPref.language;
-        }
-        pref.persist();
-        return Response.ok(pref).build();
+        UserPreference pref = updateUserPreferenceUseCase.execute(userId, dto.theme(), dto.language());
+        return Response.ok(UserPreferenceDTO.fromDomain(pref)).build();
     }
 }

@@ -1,6 +1,6 @@
 package br.com.cifras.song.dto;
 
-import br.com.cifras.song.domain.Song;
+import br.com.cifras.song.model.Song;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -17,11 +17,11 @@ public record SongSummaryDTO(
 ) {
     public static SongSummaryDTO from(Song song) {
         return new SongSummaryDTO(
-            song.id,
-            song.title,
-            song.artist,
-            song.originalKey,
-            song.createdAt
+            song.getId(),
+            song.getTitle(),
+            song.getArtist(),
+            song.getOriginalKey(),
+            song.getCreatedAt()
         );
     }
 }

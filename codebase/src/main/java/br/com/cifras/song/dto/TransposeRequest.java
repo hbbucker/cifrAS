@@ -1,6 +1,6 @@
 package br.com.cifras.song.dto;
 
-import br.com.cifras.song.domain.EnharmonicConvention;
+import br.com.cifras.song.model.EnharmonicConvention;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 
