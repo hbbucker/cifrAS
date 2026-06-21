@@ -5,7 +5,8 @@ import { Save, ArrowLeft } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import { ConfirmModal } from '../components/modals/ConfirmModal';
 import { parseContentToLyrics, stringifyLyrics } from '../utils/lyricsParser';
-
+import { DriveFilePicker } from '../components/DriveFilePicker';
+import { CloudDownload } from 'lucide-react';
 export const SongFormPage: React.FC = () => {
  const { id } = useParams();
  const navigate = useNavigate();
@@ -19,6 +20,7 @@ export const SongFormPage: React.FC = () => {
  const [key, setKey] = useState(transposedKey || 'C');
  const [content, setContent] = useState(transposedContent || '');
  const [showCancelModal, setShowCancelModal] = useState(false);
+ const [showDrivePicker, setShowDrivePicker] = useState(false);
  const [isDirty, setIsDirty] = useState(false);
 
  useEffect(() => {
@@ -131,7 +133,17 @@ export const SongFormPage: React.FC = () => {
  </div>
  
  <div>
- <label className="block text-sm font-medium text-gray-700 mb-1">Chords & Lyrics</label>
+ <div className="flex items-center justify-between mb-1">
+ <label className="block text-sm font-medium text-gray-700">Chords & Lyrics</label>
+ <button 
+ onClick={() => setShowDrivePicker(true)}
+ className="flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-800 transition-colors"
+ data-testid="btn-open-drive-picker"
+ >
+ <CloudDownload className="w-4 h-4" />
+ Import from Google Drive
+ </button>
+ </div>
  <p className="text-xs text-text-mute mb-2">Write chords above words or use [Chord] brackets inline.</p>
  <textarea 
  value={content} 
@@ -157,6 +169,18 @@ export const SongFormPage: React.FC = () => {
  }}
  onCancel={() => setShowCancelModal(false)}
  />
+
+ {showDrivePicker && (
+ <DriveFilePicker 
+ onClose={() => setShowDrivePicker(false)}
+ onFileSelected={(extractedText) => {
+ setContent(extractedText);
+ setIsDirty(true);
+ setShowDrivePicker(false);
+ toast('Text imported successfully. Please review the chords and lyrics.', 'success');
+ }}
+ />
+ )}
  </div>
  );
 };
