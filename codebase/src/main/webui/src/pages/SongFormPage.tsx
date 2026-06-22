@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Sidebar } from '../components/layout/Sidebar';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Save, ArrowLeft } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
@@ -95,9 +94,8 @@ export const SongFormPage: React.FC = () => {
  };
 
  return (
- <div className="flex h-screen bg-bg-main">
- <Sidebar />
- <main className="flex-1 flex flex-col overflow-hidden">
+ <>
+ <main className="flex-1 flex flex-col h-full overflow-hidden">
  <header className="h-16 flex items-center justify-between px-6 bg-bg-card border-b border-border-main">
  <div className="flex items-center gap-4">
  <button onClick={handleBack} className="p-2 hover:bg-bg-elevated rounded-full text-text-mute">
@@ -173,14 +171,16 @@ export const SongFormPage: React.FC = () => {
  {showDrivePicker && (
  <DriveFilePicker 
  onClose={() => setShowDrivePicker(false)}
- onFileSelected={(extractedText) => {
+ onFileSelected={(extractedText, importedTitle, detectedKey) => {
  setContent(extractedText);
+ if (importedTitle && !title) setTitle(importedTitle);
+ if (detectedKey && (!key || key === 'C')) setKey(detectedKey);
  setIsDirty(true);
  setShowDrivePicker(false);
  toast('Text imported successfully. Please review the chords and lyrics.', 'success');
  }}
  />
  )}
- </div>
+ </>
  );
 };

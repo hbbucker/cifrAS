@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Sidebar } from '../components/layout/Sidebar';
-import { BottomNav } from '../components/layout/BottomNav';
+
 import { SearchBar } from '../components/search/SearchBar';
 import { MusicCard } from '../components/cards/MusicCard';
 import { SkeletonCard } from '../components/ui/SkeletonCard';
@@ -86,10 +85,7 @@ export const DashboardPage: React.FC = () => {
  };
 
  return (
- <div className="flex h-screen bg-bg-main">
- <Sidebar />
-
- <main className="flex-1 flex flex-col overflow-hidden">
+  <main className="flex-1 flex flex-col h-full overflow-hidden">
  <header className="h-16 flex items-center justify-between px-6 bg-bg-card border-b border-border-main">
  <h1 className="text-xl font-bold text-text-main hidden sm:block">{t('dashboard.title')}</h1>
  <div className="flex-1 sm:ml-8">
@@ -100,7 +96,7 @@ export const DashboardPage: React.FC = () => {
  </div>
  </header>
 
- <div className="flex-1 overflow-y-auto p-6 pb-24 sm:pb-6">
+  <div className="flex-1 overflow-y-auto p-6 pb-6">
  <div className="mb-8">
  <h2 className="text-2xl font-bold text-text-main mb-2">
  {t('dashboard.welcome', { name: user?.name?.split(' ')[0] || 'Musician' })}
@@ -146,9 +142,6 @@ export const DashboardPage: React.FC = () => {
  />
  )}
  </div>
- </main>
-
- <BottomNav />
- </div>
+  </main>
  );
 };

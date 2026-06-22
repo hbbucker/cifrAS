@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Sidebar } from '../components/layout/Sidebar';
 import { TransposePad } from '../components/music/TransposePad';
 import { ChordSheet } from '../components/music/ChordSheet';
 import { ArrowLeft, PlayCircle, Settings2, Edit } from 'lucide-react';
@@ -104,9 +103,8 @@ export const SongViewPage: React.FC = () => {
  const transposedContent = transposeContent(song.content, transposeSteps, useBb, useEb);
 
  return (
- <div className="flex h-screen bg-bg-main">
- <Sidebar />
- <main className="flex-1 flex flex-col overflow-hidden">
+ <>
+ <main className="flex-1 flex flex-col h-full overflow-hidden">
  <header className="flex flex-col sm:flex-row sm:items-center justify-between px-4 sm:px-6 py-3 sm:py-0 sm:h-16 bg-bg-card border-b border-border-main shrink-0 gap-3 sm:gap-0 relative z-10">
  <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto overflow-hidden">
  <button onClick={() => navigate('/songs')} className="p-2 hover:bg-bg-elevated rounded-full text-text-mute shrink-0 -ml-2 sm:ml-0">
@@ -199,6 +197,6 @@ export const SongViewPage: React.FC = () => {
  </div>
  </div>
  </main>
- </div>
+ </>
  );
 };

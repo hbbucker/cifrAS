@@ -1,44 +1,14 @@
-export const linkPlaylist = async (groupId: string, playlistId: string): Promise<void> => {
- const token = localStorage.getItem('token');
- const res = await fetch(`/api/groups/${groupId}/playlists`, {
- method: 'POST',
- headers: {
- 'Authorization': `Bearer ${token}`,
- 'Content-Type': 'application/json'
- },
- body: JSON.stringify({ playlistId })
- });
+import { apiClient } from '../services/authService';
 
- if (!res.ok) {
- throw new Error('Failed to link playlist');
- }
+export const linkPlaylist = async (groupId: string, playlistId: string): Promise<void> => {
+  await apiClient.post(`/groups/${groupId}/playlists`, { playlistId });
 };
 
 export const getGroupPlaylists = async (groupId: string): Promise<Record<string, unknown>[]> => {
- const token = localStorage.getItem('token');
- const res = await fetch(`/api/groups/${groupId}/playlists`, {
- headers: {
- 'Authorization': `Bearer ${token}`
- }
- });
-
- if (!res.ok) {
- throw new Error('Failed to fetch group playlists');
- }
-
- return res.json();
+  const res = await apiClient.get<Record<string, unknown>[]>(`/groups/${groupId}/playlists`);
+  return res.data;
 };
 
 export const unlinkPlaylist = async (groupId: string, playlistId: string): Promise<void> => {
- const token = localStorage.getItem('token');
- const res = await fetch(`/api/groups/${groupId}/playlists/${playlistId}`, {
- method: 'DELETE',
- headers: {
- 'Authorization': `Bearer ${token}`
- }
- });
-
- if (!res.ok) {
- throw new Error('Failed to unlink playlist');
- }
+  await apiClient.delete(`/groups/${groupId}/playlists/${playlistId}`);
 };

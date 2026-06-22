@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Sidebar } from '../components/layout/Sidebar';
 import { useNavigate } from 'react-router-dom';
 import { Play } from 'lucide-react';
 import { getGroupPlaylists } from '../api/groups';
@@ -57,9 +56,8 @@ export const SharedWithMePage: React.FC = () => {
  }, [user?.id]);
 
  return (
- <div className="flex h-screen bg-bg-main">
- <Sidebar />
- <main className="flex-1 flex flex-col overflow-hidden">
+ <>
+ <main className="flex-1 flex flex-col h-full overflow-hidden">
  <header className="h-16 flex items-center px-6 bg-bg-card border-b border-border-main shrink-0">
  <h1 className="text-xl font-bold text-text-main">Shared with Me</h1>
  </header>
@@ -99,6 +97,6 @@ export const SharedWithMePage: React.FC = () => {
  )}
  </div>
  </main>
- </div>
+ </>
  );
 };

@@ -44,7 +44,7 @@ test.describe('Google Drive Import', () => {
       
       try {
         await expect(page).toHaveURL(/.*\/login/, { timeout: 10000 });
-      } catch (e) {
+      } catch {
         // ignore
       }
     }

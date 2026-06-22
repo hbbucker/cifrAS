@@ -8,12 +8,16 @@ import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.HttpRequestFactory;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.GenericUrl;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.apache.poi.extractor.ExtractorFactory;
@@ -25,6 +29,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.Arrays;
+import java.util.Map;
 
 @ApplicationScoped
 public class GoogleDriveService {
@@ -51,30 +57,45 @@ public class GoogleDriveService {
         HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
         return new GoogleAuthorizationCodeFlow.Builder(
                 httpTransport, JSON_FACTORY, clientId, clientSecret,
-                Collections.singletonList(DriveScopes.DRIVE_READONLY))
+                Arrays.asList(DriveScopes.DRIVE_READONLY, "email", "profile"))
                 .setAccessType("offline")
-                .setApprovalPrompt("force")
                 .build();
     }
 
     public String getAuthUrl() throws Exception {
-        return getFlow().newAuthorizationUrl().setRedirectUri(redirectUri).build();
+        return getFlow().newAuthorizationUrl().setRedirectUri(redirectUri).set("prompt", "select_account").build();
     }
 
     public void exchangeCode(String code, UUID userId) throws Exception {
+        HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
         TokenResponse response = getFlow().newTokenRequest(code).setRedirectUri(redirectUri).execute();
         
         String refreshToken = response.getRefreshToken();
-        // Google might not return a refresh token if the user has already authorized the app
-        if (refreshToken != null) {
-            integrationService.saveGoogleToken(userId, "drive_user@gmail.com", refreshToken);
+        
+        Credential credential = new Credential.Builder(BearerToken.authorizationHeaderAccessMethod())
+                .setTransport(httpTransport)
+                .setJsonFactory(JSON_FACTORY)
+                .build();
+        credential.setAccessToken(response.getAccessToken());
+
+        HttpRequestFactory requestFactory = httpTransport.createRequestFactory(credential);
+        GenericUrl url = new GenericUrl("https://www.googleapis.com/oauth2/v2/userinfo");
+        HttpRequest request = requestFactory.buildGetRequest(url);
+        String jsonResponse = request.execute().parseAsString();
+        
+        @SuppressWarnings("unchecked")
+        Map<String, Object> userInfo = JSON_FACTORY.fromString(jsonResponse, Map.class);
+        String email = (String) userInfo.get("email");
+
+        if (email != null && refreshToken != null) {
+            integrationService.saveGoogleToken(userId, email, refreshToken);
         }
     }
 
-    private Drive getDriveClient(UUID userId) throws Exception {
-        Optional<UserIntegration> integration = integrationService.getGoogleToken(userId);
+    private Drive getDriveClient(UUID userId, String email) throws Exception {
+        Optional<UserIntegration> integration = integrationService.getGoogleToken(userId, email);
         if (integration.isEmpty()) {
-            throw new IllegalStateException("User has no Google Drive integration");
+            throw new IllegalStateException("User has no Google Drive integration for this email");
         }
 
         HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
@@ -92,18 +113,67 @@ public class GoogleDriveService {
                 .build();
     }
 
-    public List<File> listFiles(UUID userId) throws Exception {
-        Drive drive = getDriveClient(userId);
-        FileList result = drive.files().list()
-                .setQ("mimeType='application/vnd.google-apps.document' or mimeType='application/msword' or mimeType='application/vnd.openxmlformats-officedocument.wordprocessingml.document'")
-                .setSpaces("drive")
-                .setFields("nextPageToken, files(id, name, mimeType)")
-                .execute();
-        return result.getFiles();
+    private String getFullFolderPath(Drive drive, String folderId, Map<String, String> cache) {
+        if (folderId == null) return "Meu Drive";
+        if (cache.containsKey(folderId)) return cache.get(folderId);
+
+        try {
+            File folder = drive.files().get(folderId).setFields("id, name, parents").execute();
+            String name = folder.getName();
+            String path;
+            if (folder.getParents() != null && !folder.getParents().isEmpty()) {
+                String parentId = folder.getParents().get(0);
+                String parentPath = getFullFolderPath(drive, parentId, cache);
+                if ("Meu Drive".equals(parentPath)) {
+                    path = "Meu Drive / " + name;
+                } else {
+                    path = parentPath + " / " + name;
+                }
+            } else {
+                path = "Meu Drive / " + name;
+            }
+            cache.put(folderId, path);
+            return path;
+        } catch (Exception e) {
+            return "Meu Drive";
+        }
     }
 
-    public String extractTextFromFile(UUID userId, String fileId) throws Exception {
-        Drive drive = getDriveClient(userId);
+    public List<br.com.cifras.integration.dto.DriveFileDTO> listFiles(UUID userId, String email, String searchQuery) throws Exception {
+        Drive drive = getDriveClient(userId, email);
+        
+        String query = "(mimeType='application/vnd.google-apps.document' or mimeType='application/msword' or mimeType='application/vnd.openxmlformats-officedocument.wordprocessingml.document')";
+        if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+            query += " and name contains '" + searchQuery.replace("'", "\\'") + "'";
+        }
+        
+        FileList result = drive.files().list()
+                .setQ(query)
+                .setSpaces("drive")
+                .setFields("nextPageToken, files(id, name, mimeType, parents)")
+                .execute();
+                
+        List<File> files = result.getFiles();
+        if (files == null || files.isEmpty()) {
+            return Collections.emptyList();
+        }
+        
+        java.util.Map<String, String> folderCache = new java.util.HashMap<>();
+        List<br.com.cifras.integration.dto.DriveFileDTO> dtos = new java.util.ArrayList<>();
+        for (File f : files) {
+            String parentPath = "Meu Drive";
+            if (f.getParents() != null && !f.getParents().isEmpty()) {
+                String pid = f.getParents().get(0);
+                parentPath = getFullFolderPath(drive, pid, folderCache);
+            }
+            dtos.add(new br.com.cifras.integration.dto.DriveFileDTO(f.getId(), f.getName(), f.getMimeType(), parentPath));
+        }
+        
+        return dtos;
+    }
+
+    public String extractTextFromFile(UUID userId, String fileId, String email) throws Exception {
+        Drive drive = getDriveClient(userId, email);
         
         File fileMeta = drive.files().get(fileId).setFields("mimeType").execute();
         String mimeType = fileMeta.getMimeType();

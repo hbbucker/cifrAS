@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Sidebar } from '../components/layout/Sidebar';
 import { GroupCard } from '../components/cards/GroupCard';
 import { Plus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -211,9 +210,8 @@ export const GroupsPage: React.FC = () => {
  };
 
  return (
- <div className="flex h-screen bg-bg-main">
- <Sidebar />
- <main className="flex-1 flex flex-col overflow-hidden">
+  <>
+ <main className="flex-1 flex flex-col h-full overflow-hidden">
  <header className="h-16 flex items-center justify-between px-6 bg-bg-card border-b border-border-main">
  <h1 className="text-xl font-bold text-text-main">Groups</h1>
  <button 
@@ -340,6 +338,6 @@ export const GroupsPage: React.FC = () => {
  </div>
  </div>
  )}
- </div>
- );
+  </>
+  );
 };

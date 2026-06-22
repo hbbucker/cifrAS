@@ -35,7 +35,7 @@ export const MusicCard: React.FC<MusicCardProps> = ({
  <p className="text-text-mute text-sm">{artist}</p>
  </div>
  <div className="flex items-center gap-1">
- <span className="bg-gray-100 dark:bg-gray-700 text-text-main text-xs font-bold px-2 py-1 rounded">
+ <span className="bg-gray-200 dark:bg-gray-700 text-text-main text-xs font-bold px-2 py-1 rounded">
  {keySignature}
  </span>
  <button 

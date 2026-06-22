@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Sidebar } from '../components/layout/Sidebar';
 import { Save } from 'lucide-react';
 
 export const SettingsPage: React.FC = () => {
@@ -12,9 +11,8 @@ export const SettingsPage: React.FC = () => {
  });
 
  return (
- <div className="flex h-screen bg-bg-main">
- <Sidebar />
- <main className="flex-1 flex flex-col overflow-hidden">
+ <>
+ <main className="flex-1 flex flex-col h-full overflow-hidden">
  <header className="h-16 flex items-center px-6 bg-bg-card border-b border-border-main">
  <h1 className="text-xl font-bold text-text-main">{t('settings.title')}</h1>
  </header>
@@ -89,6 +87,6 @@ export const SettingsPage: React.FC = () => {
  </div>
  </div>
  </main>
- </div>
+ </>
  );
 };

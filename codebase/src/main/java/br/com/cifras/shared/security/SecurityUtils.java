@@ -28,6 +28,9 @@ public class SecurityUtils {
         if (securityIdentity.isAnonymous()) {
             throw new IllegalStateException("No authenticated user in current context");
         }
+        if (jwt != null && jwt.getSubject() != null) {
+            return jwt.getSubject();
+        }
         return securityIdentity.getPrincipal().getName();
     }
 

@@ -6,6 +6,7 @@ import { SongsListPage } from './pages/SongsListPage';
 import { SongFormPage } from './pages/SongFormPage';
 import { SongViewPage } from './pages/SongViewPage';
 import { PrivateRoute } from './components/auth/PrivateRoute';
+import { MainLayout } from './components/layout/MainLayout';
 
 import { PlaylistsPage } from './pages/PlaylistsPage';
 import { PlaylistViewPage } from './pages/PlaylistViewPage';
@@ -15,34 +16,40 @@ import { GroupsPage } from './pages/GroupsPage';
 import { GroupDetailsPage } from './pages/GroupDetailsPage';
 import { SharedWithMePage } from './pages/SharedWithMePage';
 import { SettingsPage } from './pages/SettingsPage';
+import { GoogleCallbackPage } from './pages/settings/GoogleCallbackPage';
 
 function App() {
  return (
- <Routes>
- <Route path="/" element={<Navigate to="/dashboard" replace />} />
- <Route path="/login" element={<LoginPage />} />
- <Route path="/register" element={<RegisterPage />} />
- 
- {/* Protected Routes */}
- <Route path="/dashboard" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
- <Route path="/songs" element={<PrivateRoute><SongsListPage /></PrivateRoute>} />
- <Route path="/songs/new" element={<PrivateRoute><SongFormPage /></PrivateRoute>} />
- <Route path="/songs/edit/:id" element={<PrivateRoute><SongFormPage /></PrivateRoute>} />
- <Route path="/song/:id" element={<PrivateRoute><SongViewPage /></PrivateRoute>} />
- 
- {/* Phase 4 Routes */}
- <Route path="/playlists" element={<PrivateRoute><PlaylistsPage /></PrivateRoute>} />
- <Route path="/playlists/:id" element={<PrivateRoute><PlaylistViewPage /></PrivateRoute>} />
- <Route path="/theater/:playlistId" element={<PrivateRoute><TheaterModePage /></PrivateRoute>} />
- <Route path="/theater/song/:songId" element={<PrivateRoute><TheaterModePage /></PrivateRoute>} />
- <Route path="/search" element={<PrivateRoute><SearchPage /></PrivateRoute>} />
+  <Routes>
+  <Route path="/" element={<Navigate to="/dashboard" replace />} />
+  <Route path="/login" element={<LoginPage />} />
+  <Route path="/register" element={<RegisterPage />} />
+  
+  {/* Protected Routes wrapped in MainLayout */}
+  <Route element={<PrivateRoute><MainLayout /></PrivateRoute>}>
+    <Route path="/dashboard" element={<DashboardPage />} />
+    <Route path="/songs" element={<SongsListPage />} />
+    <Route path="/songs/new" element={<SongFormPage />} />
+    <Route path="/songs/edit/:id" element={<SongFormPage />} />
+    <Route path="/song/:id" element={<SongViewPage />} />
+    
+    {/* Phase 4 Routes */}
+    <Route path="/playlists" element={<PlaylistsPage />} />
+    <Route path="/playlists/:id" element={<PlaylistViewPage />} />
+    <Route path="/search" element={<SearchPage />} />
 
- {/* Phase 5 Routes */}
- <Route path="/groups" element={<PrivateRoute><GroupsPage /></PrivateRoute>} />
- <Route path="/groups/:id" element={<PrivateRoute><GroupDetailsPage /></PrivateRoute>} />
- <Route path="/shared" element={<PrivateRoute><SharedWithMePage /></PrivateRoute>} />
- <Route path="/settings" element={<PrivateRoute><SettingsPage /></PrivateRoute>} />
- </Routes>
+    {/* Phase 5 Routes */}
+    <Route path="/groups" element={<GroupsPage />} />
+    <Route path="/groups/:id" element={<GroupDetailsPage />} />
+    <Route path="/shared" element={<SharedWithMePage />} />
+    <Route path="/settings" element={<SettingsPage />} />
+    <Route path="/settings/integrations/google-callback" element={<GoogleCallbackPage />} />
+  </Route>
+
+  {/* Theater mode routes (no layout shell) */}
+  <Route path="/theater/:playlistId" element={<PrivateRoute><TheaterModePage /></PrivateRoute>} />
+  <Route path="/theater/song/:songId" element={<PrivateRoute><TheaterModePage /></PrivateRoute>} />
+  </Routes>
  );
 }
 

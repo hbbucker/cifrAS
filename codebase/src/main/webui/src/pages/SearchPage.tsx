@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Sidebar } from '../components/layout/Sidebar';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { MusicCard } from '../components/cards/MusicCard';
 import { Search } from 'lucide-react';
@@ -28,9 +27,8 @@ export const SearchPage: React.FC = () => {
  }, [query]);
 
  return (
- <div className="flex h-screen bg-bg-main">
- <Sidebar />
- <main className="flex-1 flex flex-col overflow-hidden">
+ <>
+ <main className="flex-1 flex flex-col h-full overflow-hidden">
  <header className="h-16 flex items-center px-6 bg-bg-card border-b border-border-main">
  <h1 className="text-xl font-bold text-text-main">
  Search Results for "{query}"
@@ -67,6 +65,6 @@ export const SearchPage: React.FC = () => {
  )}
  </div>
  </main>
- </div>
+ </>
  );
 };

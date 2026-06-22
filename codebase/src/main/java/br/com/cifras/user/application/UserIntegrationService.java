@@ -22,13 +22,12 @@ public class UserIntegrationService {
 
     @Transactional
     public void saveGoogleToken(UUID userId, String email, String refreshToken) {
-        Optional<UserIntegrationEntity> existing = repository.findByUserIdAndProvider(userId, "GOOGLE_DRIVE");
+        Optional<UserIntegrationEntity> existing = repository.findByUserIdAndProviderAndEmail(userId, "GOOGLE_DRIVE", email);
         
         if (existing.isPresent()) {
             UserIntegration domain = UserIntegrationMapper.toDomain(existing.get());
             domain.updateToken(email, refreshToken);
             UserIntegrationEntity updated = UserIntegrationMapper.toEntity(domain);
-            // JPA handles updates on attached entities, but we explicitly persist via repository pattern
             repository.getEntityManager().merge(updated);
         } else {
             UserIntegration newIntegration = UserIntegration.connect(userId, "GOOGLE_DRIVE", email, refreshToken);
@@ -36,14 +35,21 @@ public class UserIntegrationService {
         }
     }
 
-    public Optional<UserIntegration> getGoogleToken(UUID userId) {
-        return repository.findByUserIdAndProvider(userId, "GOOGLE_DRIVE")
+    public java.util.List<UserIntegration> getGoogleTokens(UUID userId) {
+        return repository.findAllByUserIdAndProvider(userId, "GOOGLE_DRIVE")
+                .stream()
+                .map(UserIntegrationMapper::toDomain)
+                .toList();
+    }
+
+    public Optional<UserIntegration> getGoogleToken(UUID userId, String email) {
+        return repository.findByUserIdAndProviderAndEmail(userId, "GOOGLE_DRIVE", email)
                 .map(UserIntegrationMapper::toDomain);
     }
     
     @Transactional
-    public void removeGoogleToken(UUID userId) {
-        repository.findByUserIdAndProvider(userId, "GOOGLE_DRIVE")
+    public void removeGoogleToken(UUID userId, String email) {
+        repository.findByUserIdAndProviderAndEmail(userId, "GOOGLE_DRIVE", email)
                 .ifPresent(repository::delete);
     }
 }

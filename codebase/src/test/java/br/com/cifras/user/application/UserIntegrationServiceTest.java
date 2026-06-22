@@ -32,7 +32,7 @@ public class UserIntegrationServiceTest {
     @Test
     public void testSaveGoogleToken_NewIntegration() {
         UUID userId = UUID.randomUUID();
-        when(repository.findByUserIdAndProvider(userId, "GOOGLE_DRIVE")).thenReturn(Optional.empty());
+        when(repository.findByUserIdAndProviderAndEmail(userId, "GOOGLE_DRIVE", "test@gmail.com")).thenReturn(Optional.empty());
 
         service.saveGoogleToken(userId, "test@gmail.com", "token123");
 
@@ -58,9 +58,9 @@ public class UserIntegrationServiceTest {
         entity.setCreatedAt(Instant.now());
         entity.setUpdatedAt(Instant.now());
 
-        when(repository.findByUserIdAndProvider(userId, "GOOGLE_DRIVE")).thenReturn(Optional.of(entity));
+        when(repository.findByUserIdAndProviderAndEmail(userId, "GOOGLE_DRIVE", "test@gmail.com")).thenReturn(Optional.of(entity));
 
-        Optional<UserIntegration> result = service.getGoogleToken(userId);
+        Optional<UserIntegration> result = service.getGoogleToken(userId, "test@gmail.com");
 
         assertTrue(result.isPresent());
         assertEquals("test@gmail.com", result.get().getEmail());

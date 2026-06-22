@@ -9,7 +9,11 @@ import java.util.UUID;
 @ApplicationScoped
 public class UserIntegrationRepository implements PanacheRepositoryBase<UserIntegrationEntity, UUID> {
 
-    public Optional<UserIntegrationEntity> findByUserIdAndProvider(UUID userId, String provider) {
-        return find("userId = ?1 and provider = ?2", userId, provider).firstResultOptional();
+    public Optional<UserIntegrationEntity> findByUserIdAndProviderAndEmail(UUID userId, String provider, String email) {
+        return find("userId = ?1 and provider = ?2 and email = ?3", userId, provider, email).firstResultOptional();
+    }
+
+    public java.util.List<UserIntegrationEntity> findAllByUserIdAndProvider(UUID userId, String provider) {
+        return find("userId = ?1 and provider = ?2", userId, provider).list();
     }
 }

@@ -24,7 +24,12 @@ export const LoginPage: React.FC = () => {
  try {
  const response = await authClient.post('/login', { email, password });
  const { accessToken, refreshToken } = response.data;
- login(accessToken, refreshToken, { id: 'user', email, name: email.split('@')[0] });
+ const payload = JSON.parse(atob(accessToken.split('.')[1]));
+ login(accessToken, refreshToken, { 
+   id: payload.sub || 'user', 
+   email, 
+   name: payload.user_metadata?.full_name || payload.name || email.split('@')[0] 
+ });
  toast('Logged in successfully!', 'success');
  navigate('/dashboard');
  } catch (error: unknown) {

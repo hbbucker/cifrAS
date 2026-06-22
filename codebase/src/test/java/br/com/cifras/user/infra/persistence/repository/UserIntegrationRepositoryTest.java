@@ -35,7 +35,7 @@ public class UserIntegrationRepositoryTest {
         
         repository.persist(entity);
 
-        Optional<UserIntegrationEntity> found = repository.findByUserIdAndProvider(userId, "GOOGLE_DRIVE");
+        Optional<UserIntegrationEntity> found = repository.findByUserIdAndProviderAndEmail(userId, "GOOGLE_DRIVE", "test@gmail.com");
         
         assertTrue(found.isPresent());
         assertEquals("test@gmail.com", found.get().getEmail());

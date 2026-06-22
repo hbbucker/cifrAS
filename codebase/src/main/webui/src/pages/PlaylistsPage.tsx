@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
-import { Sidebar } from '../components/layout/Sidebar';
-import { BottomNav } from '../components/layout/BottomNav';
 import { Plus, ListMusic, Users, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../context/ToastContext';
@@ -114,9 +112,8 @@ export const PlaylistsPage: React.FC = () => {
  };
 
  return (
- <div className="flex h-screen bg-bg-main">
- <Sidebar />
- <main className="flex-1 flex flex-col overflow-hidden">
+ <>
+ <main className="flex-1 flex flex-col h-full overflow-hidden">
  <header className="h-16 flex items-center justify-between px-6 bg-bg-card border-b border-border-main">
  <h1 className="text-xl font-bold text-text-main">{t('sidebar.playlists')}</h1>
  <Button 
@@ -206,7 +203,6 @@ export const PlaylistsPage: React.FC = () => {
  </div>
  )}
 
- <BottomNav />
- </div>
+ </>
  );
 };

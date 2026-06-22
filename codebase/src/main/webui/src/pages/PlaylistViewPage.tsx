@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Sidebar } from '../components/layout/Sidebar';
 import { ArrowLeft, PlayCircle, GripVertical, Trash2, ChevronUp, ChevronDown, Plus, Search } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useToast } from '../context/ToastContext';
@@ -128,9 +127,8 @@ export const PlaylistViewPage: React.FC = () => {
  };
 
  return (
- <div className="flex h-screen bg-bg-main">
- <Sidebar />
- <main className="flex-1 flex flex-col overflow-hidden">
+ <>
+ <main className="flex-1 flex flex-col h-full overflow-hidden">
  <header className="h-20 flex items-center justify-between px-6 bg-bg-card border-b border-border-main shrink-0">
  <div className="flex items-center gap-4">
  <button onClick={() => navigate('/playlists')} className="p-2 hover:bg-bg-elevated rounded-full text-text-mute">
@@ -244,13 +242,13 @@ export const PlaylistViewPage: React.FC = () => {
  <h3 className="font-bold text-text-main truncate">{song.title}</h3>
  <p className="text-sm text-text-mute truncate">{song.artist}</p>
  {/* Key on mobile */}
- <div className="mt-1 sm:hidden inline-block px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded font-mono text-xs text-text-main font-bold">
+ <div className="mt-1 sm:hidden inline-block px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded font-mono text-xs text-text-main font-bold">
  {song.originalKey || song.key || '?'}
  </div>
  </div>
  
  {/* Key on desktop */}
- <div className="hidden sm:block px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded font-mono text-sm text-text-main font-bold">
+ <div className="hidden sm:block px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded font-mono text-sm text-text-main font-bold">
  {song.originalKey || song.key || '?'}
  </div>
  
@@ -346,6 +344,6 @@ export const PlaylistViewPage: React.FC = () => {
  </div>
  </div>
  )}
- </div>
+ </>
  );
 };
