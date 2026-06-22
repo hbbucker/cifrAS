@@ -12,8 +12,7 @@ import org.eclipse.microprofile.jwt.JsonWebToken;
 @RequestScoped
 public class SecurityUtils {
 
-    @Inject
-    JsonWebToken jwt;
+
 
     @Inject
     SecurityIdentity securityIdentity;
@@ -28,8 +27,8 @@ public class SecurityUtils {
         if (securityIdentity.isAnonymous()) {
             throw new IllegalStateException("No authenticated user in current context");
         }
-        if (jwt != null && jwt.getSubject() != null) {
-            return jwt.getSubject();
+        if (securityIdentity.getPrincipal() instanceof JsonWebToken jwtPrincipal && jwtPrincipal.getSubject() != null) {
+            return jwtPrincipal.getSubject();
         }
         return securityIdentity.getPrincipal().getName();
     }
@@ -42,8 +41,8 @@ public class SecurityUtils {
      * Returns the email from the JWT claims, if present.
      */
     public String getCurrentUserEmail() {
-        if (jwt != null && jwt.containsClaim("email")) {
-            return jwt.getClaim("email");
+        if (securityIdentity.getPrincipal() instanceof JsonWebToken jwtPrincipal && jwtPrincipal.containsClaim("email")) {
+            return jwtPrincipal.getClaim("email");
         }
         return null;
     }
