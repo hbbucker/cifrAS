@@ -2,6 +2,11 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Google Drive Import', () => {
   test.beforeEach(async ({ page, context }) => {
+    // Event listeners to capture browser logs, errors, and failed requests in CI/CD
+    page.on('console', msg => console.log(`[Browser Console] ${msg.type()}: ${msg.text()}`));
+    page.on('pageerror', err => console.error(`[Browser PageError] ${err.stack}`));
+    page.on('requestfailed', req => console.error(`[Browser RequestFailed] ${req.url()} - ${req.failure()?.errorText}`));
+
     // Set English language for consistent E2E text matching
     await context.setExtraHTTPHeaders({ 'Accept-Language': 'en-US,en;q=0.9' });
 
@@ -10,8 +15,32 @@ test.describe('Google Drive Import', () => {
       await route.fulfill({ json: { url: 'https://mock-google-auth.com' } });
     });
 
+    // Mock Register
+    await page.route('**/api/auth/register', async (route) => {
+      await route.fulfill({ status: 200, json: {} });
+    });
+
+    // Mock Login with a valid parsed JWT structure
+    await page.route('**/api/auth/login', async (route) => {
+      const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjMiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJuYW1lIjoiVGVzdCBVc2VyIiwidXNlcl9tZXRhZGF0YSI6eyJmdWxsX25hbWUiOiJUZXN0IFVzZXIifX0=.signature';
+      await route.fulfill({
+        status: 200,
+        json: { accessToken: mockToken, refreshToken: 'mock-refresh-token' }
+      });
+    });
+
+    // Mock Songs list (Dashboard)
+    await page.route('**/api/songs', async (route) => {
+      await route.fulfill({ status: 200, json: [] });
+    });
+
+    // Mock Accounts List
+    await page.route('**/api/integrations/google/accounts', async (route) => {
+      await route.fulfill({ json: [{ email: 'test@example.com' }] });
+    });
+
     // Mock Files List
-    await page.route('**/api/integrations/google/drive/files', async (route) => {
+    await page.route('**/api/integrations/google/drive/files*', async (route) => {
       await route.fulfill({
         json: [
           { id: '123', name: 'My Worship Song.docx', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' },
@@ -21,7 +50,7 @@ test.describe('Google Drive Import', () => {
     });
 
     // Mock Extract Text
-    await page.route('**/api/integrations/google/drive/extract-text/123', async (route) => {
+    await page.route('**/api/integrations/google/drive/extract-text/123*', async (route) => {
       await route.fulfill({
         json: { text: '[C]This is the [G]extracted text\n[Am]From Google [F]Drive!' }
       });
@@ -75,8 +104,9 @@ test.describe('Google Drive Import', () => {
     await expect(page.getByText('My Worship Song.docx')).toBeVisible();
     await expect(page.getByText('Another Song.doc')).toBeVisible();
 
-    // Click on the first file
+    // Click on the first file and then import
     await page.getByText('My Worship Song.docx').click();
+    await page.getByText('Import', { exact: true }).click();
 
     // Wait for the modal to close and text to be imported
     await expect(modalHeading).toBeHidden();

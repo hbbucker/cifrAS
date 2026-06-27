@@ -26,9 +26,9 @@ export const DriveFilePicker: React.FC<DriveFilePickerProps> = ({ onClose, onFil
     } catch (err) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if ((err as any).response?.status === 403) {
-         setError('Acesso negado. A conexão com o Google Drive expirou ou é inválida.');
+         setError('Access denied. Google Drive connection expired or invalid.');
       } else {
-         setError('Falha ao buscar arquivos do Google Drive.');
+         setError('Failed to fetch Google Drive files.');
       }
     } finally {
       setLoading(false);
@@ -50,7 +50,7 @@ export const DriveFilePicker: React.FC<DriveFilePickerProps> = ({ onClose, onFil
           setLoading(false);
         }
       } catch {
-        setError('Falha ao carregar integrações do Google Drive.');
+        setError('Failed to load Google Drive integrations.');
         setLoading(false);
       }
     };
@@ -97,7 +97,7 @@ export const DriveFilePicker: React.FC<DriveFilePickerProps> = ({ onClose, onFil
         window.location.href = url;
       }
     } catch {
-      setError('Falha ao iniciar autenticação com o Google.');
+      setError('Failed to start Google authentication.');
     }
   };
 
@@ -134,7 +134,7 @@ export const DriveFilePicker: React.FC<DriveFilePickerProps> = ({ onClose, onFil
 
       onFileSelected(text, title, detectedKey);
     } catch {
-      setError('Falha ao extrair texto do documento selecionado.');
+      setError('Failed to extract text from selected document.');
     } finally {
       setImporting(null);
     }
@@ -145,7 +145,7 @@ export const DriveFilePicker: React.FC<DriveFilePickerProps> = ({ onClose, onFil
       <div className="bg-[#f6f6f3] w-full max-w-2xl rounded-[32px] overflow-hidden flex flex-col max-h-[80vh]">
         
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-ink">Selecione o Documento do Drive</h2>
+          <h2 className="text-xl font-bold text-ink">Select Document from Google Drive</h2>
           <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
             <X className="w-6 h-6 text-ink" />
           </button>
@@ -154,7 +154,7 @@ export const DriveFilePicker: React.FC<DriveFilePickerProps> = ({ onClose, onFil
         {accounts.length > 0 && !loading && (
           <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <span className="text-body font-medium">Conta:</span>
+              <span className="text-body font-medium">Account:</span>
               <select 
                 value={selectedAccount || ''} 
                 onChange={handleAccountChange}
@@ -170,7 +170,7 @@ export const DriveFilePicker: React.FC<DriveFilePickerProps> = ({ onClose, onFil
               className="text-sm flex items-center text-pinterestRed hover:underline font-medium"
             >
               <Plus className="w-4 h-4 mr-1" />
-              Adicionar outra conta
+              Add another account
             </button>
           </div>
         )}
@@ -184,7 +184,7 @@ export const DriveFilePicker: React.FC<DriveFilePickerProps> = ({ onClose, onFil
                 </div>
                 <input
                   type="text"
-                  placeholder="Pesquisar arquivos..."
+                  placeholder="Search files..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={handleSearchKeyDown}
@@ -195,7 +195,7 @@ export const DriveFilePicker: React.FC<DriveFilePickerProps> = ({ onClose, onFil
                 onClick={handleSearch}
                 className="bg-gray-100 hover:bg-gray-200 text-ink font-semibold py-2 px-4 rounded-[16px] transition-colors border border-gray-300"
               >
-                Pesquisar
+                Search
               </button>
             </div>
           </div>
@@ -211,21 +211,21 @@ export const DriveFilePicker: React.FC<DriveFilePickerProps> = ({ onClose, onFil
           {loading ? (
             <div className="flex flex-col items-center justify-center py-12">
               <Loader2 className="w-8 h-8 text-pinterestRed animate-spin mb-4" />
-              <p className="text-body">Carregando documentos...</p>
+              <p className="text-body">Loading documents...</p>
             </div>
           ) : accounts.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12">
-              <p className="text-body mb-6">Sua conta não está conectada ao Google Drive.</p>
+              <p className="text-body mb-6">Your account is not connected to Google Drive.</p>
               <button
                 onClick={handleConnect}
                 className="bg-pinterestRed hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-full transition-colors"
               >
-                Conectar ao Google Drive
+                Connect to Google Drive
               </button>
             </div>
           ) : files.length === 0 && !error ? (
             <div className="text-center py-12">
-              <p className="text-body">Nenhum documento do Word (.doc/.docx) encontrado no seu Drive.</p>
+              <p className="text-body">No Word documents (.doc/.docx) found in your Drive.</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -267,7 +267,7 @@ export const DriveFilePicker: React.FC<DriveFilePickerProps> = ({ onClose, onFil
               className="px-6 py-2 text-ink font-semibold rounded-full hover:bg-gray-200 transition-colors"
               disabled={!!importing}
             >
-              Cancelar
+              Cancel
             </button>
             <button
               onClick={() => selectedFileId && handleImport(selectedFileId)}
@@ -277,10 +277,10 @@ export const DriveFilePicker: React.FC<DriveFilePickerProps> = ({ onClose, onFil
               {importing ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Importando...
+                  Importing...
                 </>
               ) : (
-                'Importar'
+                'Import'
               )}
             </button>
           </div>
