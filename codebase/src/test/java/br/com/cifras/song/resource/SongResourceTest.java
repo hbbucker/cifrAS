@@ -22,12 +22,18 @@ import static org.hamcrest.Matchers.*;
  * 7. DELETE /songs/{id} → 204 soft delete
  */
 import br.com.cifras.BaseIntegrationTest;
+import br.com.cifras.song.application.usecase.CreateSongUseCase;
+import io.quarkus.narayana.jta.QuarkusTransaction;
+import jakarta.inject.Inject;
 
 @QuarkusTest
 class SongResourceTest extends BaseIntegrationTest {
 
     private static final String OWNER = "owner-user-uuid";
     private static final String OTHER = "other-user-uuid";
+
+    @Inject
+    CreateSongUseCase createSongUseCase;
 
     /**
      * Test 1: Unauthenticated access to /songs returns 401.
@@ -121,9 +127,17 @@ class SongResourceTest extends BaseIntegrationTest {
     @Test
     @TestSecurity(user = OTHER, roles = {"user"})
     void givenOtherUserSong_whenGetById_thenReturns404() {
-        // Song ID that doesn't belong to OTHER user — use a valid ID from OWNER if possible, else 999999
+        // Create a song belonging to OWNER using a transaction to ensure it is committed in DB
+        java.util.UUID songId = QuarkusTransaction.requiringNew().call(() -> {
+            var song = createSongUseCase.execute(
+                new br.com.cifras.song.dto.CreateSongRequest("Private Song", "Artist", "E", null),
+                OWNER
+            );
+            return song.getId();
+        });
+
         given()
-            .when().get("/songs/999999")
+            .when().get("/songs/" + songId)
             .then()
             .statusCode(404);
     }
