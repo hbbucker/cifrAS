@@ -13,6 +13,7 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.WebApplicationException;
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
 import java.util.List;
@@ -119,9 +120,14 @@ public class GoogleDriveResource {
         }
     }
 
+    @RegisterForReflection
     public record AuthUrlResponse(String url) {}
+    @RegisterForReflection
     public record CallbackRequest(String code) {}
+    @RegisterForReflection
     public record ExtractTextResponse(String text) {}
+    @RegisterForReflection
     public record ErrorResponse(String error) {}
+    @RegisterForReflection
     public record AccountResponse(String email) {}
 }
