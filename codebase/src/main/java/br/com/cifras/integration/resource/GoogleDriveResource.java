@@ -12,6 +12,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.WebApplicationException;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
 import java.util.List;
@@ -34,7 +35,15 @@ public class GoogleDriveResource {
     }
 
     private UUID getUserId() {
-        return UUID.fromString(jwt.getSubject());
+        try {
+            return UUID.fromString(jwt.getSubject());
+        } catch (IllegalArgumentException e) {
+            throw new WebApplicationException(
+                Response.status(Response.Status.UNAUTHORIZED)
+                        .entity(new ErrorResponse("Invalid token subject"))
+                        .build()
+            );
+        }
     }
 
     @GET
