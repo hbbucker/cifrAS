@@ -17,6 +17,7 @@ import { GroupDetailsPage } from './pages/GroupDetailsPage';
 import { SharedWithMePage } from './pages/SharedWithMePage';
 import { SettingsPage } from './pages/SettingsPage';
 import { GoogleCallbackPage } from './pages/settings/GoogleCallbackPage';
+import { PrivacyPage } from './pages/PrivacyPage';
 
 function App() {
  return (
@@ -24,6 +25,7 @@ function App() {
   <Route path="/" element={<Navigate to="/dashboard" replace />} />
   <Route path="/login" element={<LoginPage />} />
   <Route path="/register" element={<RegisterPage />} />
+  <Route path="/privacy" element={<PrivacyPage />} />
   
   {/* Protected Routes wrapped in MainLayout */}
   <Route element={<PrivateRoute><MainLayout /></PrivateRoute>}>
