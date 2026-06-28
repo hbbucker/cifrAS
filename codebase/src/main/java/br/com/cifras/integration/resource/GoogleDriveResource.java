@@ -1,7 +1,6 @@
 package br.com.cifras.integration.resource;
 
 import br.com.cifras.integration.application.GoogleDriveService;
-import com.google.api.services.drive.model.File;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;

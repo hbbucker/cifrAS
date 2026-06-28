@@ -35,7 +35,13 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
     br.com.cifras.group.dto.GroupInvitationDTO.class,
     
     // Auth DTOs
-    br.com.cifras.auth.dto.AuthRequest.class
+    br.com.cifras.auth.dto.AuthRequest.class,
+    
+    // Google Drive REST Client DTOs
+    br.com.cifras.integration.infra.client.dto.GoogleTokenResponse.class,
+    br.com.cifras.integration.infra.client.dto.GoogleUserInfoResponse.class,
+    br.com.cifras.integration.infra.client.dto.GoogleDriveFileResponse.class,
+    br.com.cifras.integration.infra.client.dto.GoogleDriveFileListResponse.class
 })
 public class NativeReflectionConfig {
     // This class is purely used to hint GraalVM native-image compiler 
