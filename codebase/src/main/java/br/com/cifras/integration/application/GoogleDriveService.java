@@ -89,7 +89,7 @@ public class GoogleDriveService {
                 + "&response_type=code"
                 + "&scope=" + encode(SCOPE)
                 + "&access_type=offline"
-                + "&prompt=select_account";
+                + "&prompt=" + encode("consent select_account");
     }
 
     /**
