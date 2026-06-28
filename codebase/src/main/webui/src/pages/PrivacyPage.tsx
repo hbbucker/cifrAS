@@ -12,7 +12,6 @@ export const PrivacyPage: React.FC = () => {
     const lang = searchParams.get('lang') || 'pt';
 
     useEffect(() => {
-        setIsLoading(true);
         const fileName = lang === 'en' ? '/privacy-en.md' : '/privacy-pt.md';
         fetch(fileName)
             .then(res => res.text())
@@ -28,7 +27,10 @@ export const PrivacyPage: React.FC = () => {
     }, [lang]);
 
     const handleLanguageChange = (newLang: string) => {
-        setSearchParams({ lang: newLang });
+        if (lang !== newLang) {
+            setIsLoading(true);
+            setSearchParams({ lang: newLang });
+        }
     };
 
     return (
