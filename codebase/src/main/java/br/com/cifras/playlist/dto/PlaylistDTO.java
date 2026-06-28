@@ -1,5 +1,7 @@
 package br.com.cifras.playlist.dto;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
 import br.com.cifras.playlist.model.Playlist;
 
 import java.time.Instant;
@@ -8,6 +10,7 @@ import java.util.UUID;
 /**
  * Playlist response DTO.
  */
+@RegisterForReflection
 public record PlaylistDTO(
     UUID id,
     String name,

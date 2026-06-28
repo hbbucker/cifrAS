@@ -1,5 +1,7 @@
 package br.com.cifras.song.dto;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
 import br.com.cifras.song.model.Song;
 
 import java.time.Instant;
@@ -8,6 +10,7 @@ import java.util.UUID;
 /**
  * Summary song DTO for paginated list — lighter than full SongDTO.
  */
+@RegisterForReflection
 public record SongSummaryDTO(
     UUID id,
     String title,

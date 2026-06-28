@@ -1,5 +1,7 @@
 package br.com.cifras.song.model;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
 /**
  * Value object representing a parsed musical chord.
  *
@@ -9,6 +11,7 @@ package br.com.cifras.song.model;
  *   "Bb"     → root="Bb", suffix=""
  *   "G/B"    → root="G",  suffix="" (bass note 'B' handled separately by TranspositionService)
  */
+@RegisterForReflection
 public record MusicalKey(String root, String suffix) {
 
     /**

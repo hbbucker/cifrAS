@@ -1,5 +1,7 @@
 package br.com.cifras.song.model;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
 import java.util.List;
 
 /**
@@ -20,6 +22,7 @@ import java.util.List;
  *   ]
  * }
  */
+@RegisterForReflection
 public record LyricsStructure(List<Section> sections) {
 
     public LyricsStructure withSections(List<Section> newSections) {

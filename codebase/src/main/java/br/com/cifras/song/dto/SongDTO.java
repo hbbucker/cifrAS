@@ -1,5 +1,7 @@
 package br.com.cifras.song.dto;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
 import br.com.cifras.song.model.LyricsStructure;
 import br.com.cifras.song.model.Song;
 
@@ -9,6 +11,7 @@ import java.util.UUID;
 /**
  * Full song response DTO — returned by GET /songs/{id} and POST /songs.
  */
+@RegisterForReflection
 public record SongDTO(
     UUID id,
     String title,

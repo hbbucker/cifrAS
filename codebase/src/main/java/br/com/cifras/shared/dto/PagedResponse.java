@@ -1,5 +1,7 @@
 package br.com.cifras.shared.dto;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
 import java.util.List;
 
 /**
@@ -8,6 +10,7 @@ import java.util.List;
  *
  * @param <T> the type of items in the page
  */
+@RegisterForReflection
 public record PagedResponse<T>(
     List<T> data,
     long total,
