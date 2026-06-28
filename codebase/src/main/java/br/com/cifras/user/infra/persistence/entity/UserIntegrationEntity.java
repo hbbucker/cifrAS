@@ -4,6 +4,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Convert;
+import br.com.cifras.shared.infra.persistence.converter.CryptoConverter;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -22,6 +24,7 @@ public class UserIntegrationEntity {
 
     private String email;
 
+    @Convert(converter = CryptoConverter.class)
     @Column(name = "refresh_token", nullable = false)
     private String refreshToken;
 
