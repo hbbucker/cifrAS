@@ -158,7 +158,7 @@ export const DriveFilePicker: React.FC<DriveFilePickerProps> = ({ onClose, onFil
               <select 
                 value={selectedAccount || ''} 
                 onChange={handleAccountChange}
-                className="p-2 border border-gray-300 rounded-md bg-white text-ink focus:outline-none focus:ring-2 focus:ring-pinterestRed"
+                className="p-2 border border-gray-300 rounded-md bg-white text-ink focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 {accounts.map(email => (
                   <option key={email} value={email}>{email}</option>
@@ -167,7 +167,7 @@ export const DriveFilePicker: React.FC<DriveFilePickerProps> = ({ onClose, onFil
             </div>
             <button 
               onClick={handleConnect}
-              className="text-sm flex items-center text-pinterestRed hover:underline font-medium"
+              className="text-sm flex items-center text-primary hover:underline font-medium"
             >
               <Plus className="w-4 h-4 mr-1" />
               Add another account
@@ -188,7 +188,7 @@ export const DriveFilePicker: React.FC<DriveFilePickerProps> = ({ onClose, onFil
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={handleSearchKeyDown}
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-[16px] leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pinterestRed sm:text-sm"
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-[16px] leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary sm:text-sm"
                 />
               </div>
               <button
@@ -203,14 +203,14 @@ export const DriveFilePicker: React.FC<DriveFilePickerProps> = ({ onClose, onFil
 
         <div className="flex-1 overflow-y-auto px-6 pb-6 pt-2">
           {error && (
-            <div className="bg-red-100 text-pinterestRed p-4 rounded-md mb-6">
+            <div className="bg-red-100 text-primary p-4 rounded-md mb-6">
               {error}
             </div>
           )}
 
           {loading ? (
             <div className="flex flex-col items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 text-pinterestRed animate-spin mb-4" />
+              <Loader2 className="w-8 h-8 text-primary animate-spin mb-4" />
               <p className="text-body">Loading documents...</p>
             </div>
           ) : accounts.length === 0 ? (
@@ -218,7 +218,7 @@ export const DriveFilePicker: React.FC<DriveFilePickerProps> = ({ onClose, onFil
               <p className="text-body mb-6">Your account is not connected to Google Drive.</p>
               <button
                 onClick={handleConnect}
-                className="bg-pinterestRed hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-full transition-colors"
+                className="bg-primary hover:bg-primary-pressed text-white font-semibold py-3 px-6 rounded-full transition-colors"
               >
                 Connect to Google Drive
               </button>
@@ -239,11 +239,11 @@ export const DriveFilePicker: React.FC<DriveFilePickerProps> = ({ onClose, onFil
                     disabled={!!importing}
                     className={`w-full flex items-center p-4 rounded-md transition-colors border text-left disabled:opacity-50 ${
                       isSelected 
-                        ? 'bg-red-50 border-pinterestRed' 
+                        ? 'bg-red-50 border-primary' 
                         : 'hover:bg-white border-transparent hover:border-gray-200'
                     }`}
                   >
-                    <FileText className={`w-6 h-6 mr-4 flex-shrink-0 ${isSelected ? 'text-pinterestRed' : 'text-blue-500'}`} />
+                    <FileText className={`w-6 h-6 mr-4 flex-shrink-0 ${isSelected ? 'text-primary' : 'text-blue-500'}`} />
                     <div className="flex-1 flex flex-col items-start truncate overflow-hidden">
                       {file.parentFolderName && (
                         <span className="text-xs text-gray-500 opacity-70 truncate max-w-full">
@@ -252,7 +252,7 @@ export const DriveFilePicker: React.FC<DriveFilePickerProps> = ({ onClose, onFil
                       )}
                       <span className="text-ink font-medium truncate max-w-full">{file.name}</span>
                     </div>
-                    {importing === file.id && <Loader2 className="w-5 h-5 text-pinterestRed animate-spin" />}
+                    {importing === file.id && <Loader2 className="w-5 h-5 text-primary animate-spin" />}
                   </button>
                 );
               })}
@@ -272,7 +272,7 @@ export const DriveFilePicker: React.FC<DriveFilePickerProps> = ({ onClose, onFil
             <button
               onClick={() => selectedFileId && handleImport(selectedFileId)}
               disabled={!selectedFileId || !!importing}
-              className="px-6 py-2 bg-pinterestRed hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold rounded-full transition-colors flex items-center"
+              className="px-6 py-2 bg-primary hover:bg-primary-pressed disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold rounded-full transition-colors flex items-center"
             >
               {importing ? (
                 <>

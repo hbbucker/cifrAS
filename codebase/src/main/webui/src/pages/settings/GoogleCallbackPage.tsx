@@ -51,7 +51,7 @@ export function GoogleCallbackPage() {
     <div className="flex flex-col items-center justify-center min-h-screen bg-canvas">
       {error ? (
         <div className="text-center p-8 bg-surfaceCard rounded-lg max-w-md w-full">
-          <h2 className="text-2xl font-bold text-pinterestRed mb-4">Erro na Conexão</h2>
+          <h2 className="text-2xl font-bold text-primary mb-4">Erro na Conexão</h2>
           <p className="text-body mb-6">{error}</p>
           <button
             onClick={() => {
@@ -65,7 +65,7 @@ export function GoogleCallbackPage() {
         </div>
       ) : (
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-pinterestRed animate-spin mx-auto mb-4" />
+          <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
           <h2 className="text-xl font-bold text-ink">Conectando ao Google Drive...</h2>
           <p className="text-body mt-2">Por favor, aguarde um momento.</p>
         </div>
