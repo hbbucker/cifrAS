@@ -198,7 +198,7 @@ public class AuthResource {
             System.out.println("Supabase refresh offline. Falling back to local token generation.");
             try {
                 String token = io.smallrye.jwt.build.Jwt.issuer("https://test.cifras.com")
-                        .subject("mock-refresh-subject")
+                        .subject(java.util.UUID.nameUUIDFromBytes("mock@example.com".getBytes()).toString())
                         .upn("mock@example.com")
                         .audience("authenticated")
                         .claim("email", "mock@example.com")
