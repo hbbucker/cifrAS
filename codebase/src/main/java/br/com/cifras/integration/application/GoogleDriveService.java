@@ -130,7 +130,7 @@ public class GoogleDriveService {
                 + " or mimeType='application/msword'"
                 + " or mimeType='application/vnd.openxmlformats-officedocument.wordprocessingml.document')";
         if (searchQuery != null && !searchQuery.isBlank()) {
-            String safe = searchQuery.replace("'", "\\'");
+            String safe = searchQuery.replace("\\", "\\\\").replace("'", "\\'");
             query += " and name contains '" + safe + "'";
         }
 
