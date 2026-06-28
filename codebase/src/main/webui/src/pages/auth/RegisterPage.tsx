@@ -94,6 +94,11 @@ export const RegisterPage: React.FC = () => {
  <p className="mt-6 text-center text-gray-400 text-sm">
  Already have an account? <a href="/login" className="text-[#aa3bff] hover:underline">Log in</a>
  </p>
+ <div className="mt-4 flex justify-center space-x-4 text-xs text-gray-500">
+  <a href="/privacy?lang=pt" className="hover:text-[#aa3bff] transition-colors">Política de Privacidade</a>
+  <span>•</span>
+  <a href="/privacy?lang=en" className="hover:text-[#aa3bff] transition-colors">Privacy Policy</a>
+ </div>
  </div>
  </div>
  );
