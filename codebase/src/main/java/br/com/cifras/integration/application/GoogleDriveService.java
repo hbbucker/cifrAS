@@ -83,6 +83,9 @@ public class GoogleDriveService {
      * @return fully-encoded authorization URL
      */
     public String getAuthUrl() {
+        if ("dummy-client-id".equals(clientId)) {
+            throw new IllegalStateException("Integração com Google Drive não configurada no servidor (GOOGLE_CLIENT_ID ausente)");
+        }
         return AUTH_URL
                 + "?client_id=" + encode(clientId)
                 + "&redirect_uri=" + encode(redirectUri)

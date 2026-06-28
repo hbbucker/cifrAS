@@ -96,8 +96,9 @@ export const DriveFilePicker: React.FC<DriveFilePickerProps> = ({ onClose, onFil
         localStorage.setItem('googleAuthReturnUrl', window.location.pathname);
         window.location.href = url;
       }
-    } catch {
-      setError('Failed to start Google authentication.');
+    } catch (err) {
+      const error = err as { response?: { data?: { error?: string } } };
+      setError(error.response?.data?.error || 'Failed to start Google authentication.');
     }
   };
 
