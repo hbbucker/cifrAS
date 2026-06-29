@@ -48,7 +48,9 @@ public class CryptoUtils {
             cipher.init(Cipher.DECRYPT_MODE, secretKey);
             return new String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)), StandardCharsets.UTF_8);
         } catch (Exception e) {
-            throw new RuntimeException("Error while decrypting", e);
+            // Caso falhe ao descriptografar (ex: token legado salvo em texto plano antes da criptografia existir), 
+            // assumimos que é o dado cru e retornamos.
+            return strToDecrypt;
         }
     }
 }
