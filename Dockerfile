@@ -12,7 +12,7 @@ RUN curl -fsSL https://rpm.nodesource.com/setup_20.x | bash - \
     && microdnf install -y nodejs gcc-c++ make \
     && microdnf clean all
 
-# Revert to 'quarkus' user (uid=1000, gid=1000)
+# Revert to 'quarkus' user (uid=1001, gid=1001)
 USER quarkus
 
 WORKDIR /app
@@ -26,7 +26,7 @@ COPY --chown=quarkus:quarkus codebase/.mvn .mvn
 
 # Pre-download all Maven dependencies (uses BuildKit cache mount for .m2).
 # This layer is invalidated only when pom.xml changes, not on source changes.
-RUN --mount=type=cache,target=/home/quarkus/.m2,uid=1000,gid=1000 \
+RUN --mount=type=cache,target=/home/quarkus/.m2,uid=1001,gid=1001 \
     ./mvnw dependency:go-offline -q
 
 # Copy the source code (only invalidates build layer, not dependency layer)
@@ -37,8 +37,8 @@ COPY --chown=quarkus:quarkus codebase/src src
 #   - .m2      → Maven local repo (avoids re-downloading JARs between builds)
 #   - .npm     → npm/node cache (avoids re-downloading frontend packages)
 # Cache mounts are NOT included in the final image layer — zero size overhead.
-RUN --mount=type=cache,target=/home/quarkus/.m2,uid=1000,gid=1000 \
-    --mount=type=cache,target=/home/quarkus/.npm,uid=1000,gid=1000 \
+RUN --mount=type=cache,target=/home/quarkus/.m2,uid=1001,gid=1001 \
+    --mount=type=cache,target=/home/quarkus/.npm,uid=1001,gid=1001 \
     ./mvnw clean package -Dnative -DskipTests -Dquarkus.native.native-image-xmx=8g
 
 # Stage 2: Create the minimal runtime micro-image

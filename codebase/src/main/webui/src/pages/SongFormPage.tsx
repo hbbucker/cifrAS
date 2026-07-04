@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Save, ArrowLeft } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import { ConfirmModal } from '../components/modals/ConfirmModal';
 import { parseContentToLyrics, stringifyLyrics } from '../utils/lyricsParser';
 import { DriveFilePicker } from '../components/DriveFilePicker';
+import { Button } from '../components/ui/Button';
 import { CloudDownload } from 'lucide-react';
 export const SongFormPage: React.FC = () => {
  const { id } = useParams();
@@ -21,6 +22,24 @@ export const SongFormPage: React.FC = () => {
  const [showCancelModal, setShowCancelModal] = useState(false);
  const [showDrivePicker, setShowDrivePicker] = useState(false);
  const [isDirty, setIsDirty] = useState(false);
+ const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+ const insertText = (text: string) => {
+ const textarea = textareaRef.current;
+ if (!textarea) return;
+
+ const start = textarea.selectionStart;
+ const end = textarea.selectionEnd;
+ const newContent = content.substring(0, start) + text + content.substring(end);
+ 
+ setContent(newContent);
+ setIsDirty(true);
+
+ setTimeout(() => {
+ textarea.focus();
+ textarea.setSelectionRange(start + text.length, start + text.length);
+ }, 0);
+ };
 
  useEffect(() => {
  if (id) {
@@ -103,51 +122,66 @@ export const SongFormPage: React.FC = () => {
  </button>
  <h1 className="text-xl font-bold text-text-main">{id ? 'Edit Song' : 'New Song'}</h1>
  </div>
- <button 
+ <Button 
  onClick={handleSave}
- className="flex items-center gap-2 bg-[#aa3bff] hover:bg-[#902be6] text-white px-4 py-2 rounded-lg font-medium transition-colors"
  data-testid="save-song-btn"
  >
  <Save className="w-5 h-5" />
  <span className="hidden sm:inline">Save</span>
- </button>
+ </Button>
  </header>
 
- <div className="flex-1 overflow-y-auto p-6">
- <div className="max-w-4xl mx-auto space-y-6">
- <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
- <div>
- <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
- <input type="text" value={title} onChange={handleChange(setTitle)} className="w-full px-4 py-2 bg-bg-card border border-border-main rounded-lg text-text-main focus:ring-2 focus:ring-[#aa3bff]" data-testid="song-title-input" />
+ <div className="flex-1 overflow-y-auto p-4 md:p-6 flex flex-col bg-bg-main">
+ <div className="max-w-5xl mx-auto w-full flex-1 flex flex-col space-y-6">
+ <div className="flex flex-col md:flex-row gap-4 bg-bg-card p-4 rounded-[16px] border border-border-main">
+ <div className="flex-1">
+ <label className="block text-xs font-semibold text-text-mute mb-1 uppercase tracking-wider">Title</label>
+ <input type="text" value={title} onChange={handleChange(setTitle)} className="w-full px-3 py-2 bg-transparent border-b border-border-main focus:border-primary text-text-main font-bold text-lg focus:outline-none transition-colors" data-testid="song-title-input" placeholder="Song Title" />
  </div>
- <div>
- <label className="block text-sm font-medium text-gray-700 mb-1">Artist</label>
- <input type="text" value={artist} onChange={handleChange(setArtist)} className="w-full px-4 py-2 bg-bg-card border border-border-main rounded-lg text-text-main focus:ring-2 focus:ring-[#aa3bff]" data-testid="song-artist-input" />
+ <div className="flex-1">
+ <label className="block text-xs font-semibold text-text-mute mb-1 uppercase tracking-wider">Artist</label>
+ <input type="text" value={artist} onChange={handleChange(setArtist)} className="w-full px-3 py-2 bg-transparent border-b border-border-main focus:border-primary text-text-main font-bold text-lg focus:outline-none transition-colors" data-testid="song-artist-input" placeholder="Artist Name" />
  </div>
- <div>
- <label className="block text-sm font-medium text-gray-700 mb-1">Key Signature</label>
- <input type="text" value={key} onChange={handleChange(setKey)} className="w-full px-4 py-2 bg-bg-card border border-border-main rounded-lg text-text-main focus:ring-2 focus:ring-[#aa3bff]" />
+ <div className="w-full md:w-24">
+ <label className="block text-xs font-semibold text-text-mute mb-1 uppercase tracking-wider">Tom</label>
+ <input type="text" value={key} onChange={handleChange(setKey)} maxLength={5} className="w-full px-3 py-2 bg-transparent border-b border-border-main focus:border-primary text-text-main font-bold text-lg text-center focus:outline-none transition-colors" placeholder="C#" />
  </div>
  </div>
  
- <div>
- <div className="flex items-center justify-between mb-1">
- <label className="block text-sm font-medium text-gray-700">Chords & Lyrics</label>
- <button 
+ <div className="flex-1 flex flex-col bg-bg-card p-4 rounded-[16px] border border-border-main">
+ <div className="flex flex-wrap items-center justify-between gap-4 mb-4 border-b border-border-main pb-4">
+ <div className="flex flex-wrap items-center gap-4">
+ <span className="text-sm font-semibold text-text-main">Chords & Lyrics</span>
+ <div className="flex items-center gap-2 bg-bg-main p-1.5 rounded-lg border border-border-main">
+ <button onClick={() => insertText('[Refrão]\n')} className="px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-md hover:bg-bg-elevated transition-colors">Refrão</button>
+ <button onClick={() => insertText('\n\n')} className="px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-md hover:bg-bg-elevated transition-colors">Quebra</button>
+ <button onClick={() => insertText('\n---\n')} className="px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-md hover:bg-bg-elevated transition-colors">Separador</button>
+ <button onClick={() => insertText('\ne|---\nB|---\nG|---\nD|---\nA|---\nE|---\n')} className="px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-md hover:bg-bg-elevated transition-colors">Tablatura</button>
+ </div>
+ </div>
+ <Button 
  onClick={() => setShowDrivePicker(true)}
- className="flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-800 transition-colors"
+ variant="ghost"
+ size="sm"
+ className="text-primary hover:bg-primary/10"
  data-testid="btn-open-drive-picker"
  >
- <CloudDownload className="w-4 h-4" />
- Import from Google Drive
- </button>
+ <CloudDownload className="w-4 h-4 mr-2" />
+ Import from Drive
+ </Button>
  </div>
- <p className="text-xs text-text-mute mb-2">Write chords above words or use [Chord] brackets inline.</p>
  <textarea 
+ ref={textareaRef}
  value={content} 
  onChange={handleChange(setContent)} 
- className="w-full h-96 px-4 py-3 bg-bg-card border border-border-main rounded-lg font-mono text-text-main focus:ring-2 focus:ring-[#aa3bff] resize-y"
- placeholder="[C]Hello [G]world..."
+ onKeyDown={(e) => {
+ if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+ e.preventDefault();
+ handleSave();
+ }
+ }}
+ className="w-full flex-1 min-h-[50vh] bg-transparent text-text-main font-mono text-sm focus:outline-none resize-none leading-relaxed"
+ placeholder="[C]Hello [G]world... (Use os botões acima ou Ctrl+S para salvar)"
  data-testid="song-content-input"
  />
  </div>

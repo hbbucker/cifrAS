@@ -118,7 +118,8 @@ A transposição de acordes ocorre *stateless* e *on-the-fly* ao passar o query 
 O CifrAS adota uma interface limpa baseada no design do Pinterest: o foco visual é a cifra, e a interface recua de forma elegante.
 
 - **Cores Principais:**
-  - **Pinterest Red (`#e60023`):** Usado estritamente para o botão de CTA principal ("Sign up", "Entrar", "Salvar"), indicador de aba ativa e marca.
+  - **Purple Primary (`#aa3bff`):** Usado para o botão de CTA principal ("Salvar", "Criar", "Sign up"). Deve-se priorizar o uso do componente padrão `<Button variant="primary">`.
+  - **Pinterest Red (`#e60023`):** Usado apenas para a marca, indicadores de abas ativas e detalhes pontuais.
   - **Canvas (`#ffffff`) & Soft Surface (`#fbfbf9`):** Superfícies claras dominantes.
   - **Surface Card (`#f6f6f3`):** Cor de fundo creme para cards de música, botão secundário e barra de busca.
   - **Textos:** Ink (`#000000`) para títulos fortes e Body (`#33332e`) para parágrafos.

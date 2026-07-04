@@ -23,3 +23,7 @@ Thumbs.db
 .env.*
 !.env.example
 !.env.test
+
+# Ignore custom tool data
+headroom_memory.db
+musicas-doc/
