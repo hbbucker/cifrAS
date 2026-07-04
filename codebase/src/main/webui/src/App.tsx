@@ -1,6 +1,6 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { LoginPage } from './pages/auth/LoginPage';
-import { RegisterPage } from './pages/auth/RegisterPage';
+import { AuthCallbackPage } from './pages/auth/AuthCallbackPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { SongsListPage } from './pages/SongsListPage';
 import { SongFormPage } from './pages/SongFormPage';
@@ -25,7 +25,8 @@ function App() {
   <Routes>
   <Route path="/" element={<LandingPage />} />
   <Route path="/login" element={<LoginPage />} />
-  <Route path="/register" element={<RegisterPage />} />
+  <Route path="/register" element={<Navigate to="/login" replace />} />
+  <Route path="/auth/callback" element={<AuthCallbackPage />} />
   <Route path="/privacy" element={<PrivacyPage />} />
   
   {/* Protected Routes wrapped in MainLayout */}

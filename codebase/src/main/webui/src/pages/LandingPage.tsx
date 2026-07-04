@@ -27,7 +27,7 @@ export const LandingPage: React.FC = () => {
                     ) : (
                         <div className="flex space-x-3">
                             <Link to="/login" className="px-5 py-2 rounded-lg font-medium hover:bg-gray-800 transition-colors">{t('landing.login')}</Link>
-                            <Link to="/register" className="bg-[#aa3bff] hover:bg-[#902be6] px-5 py-2 rounded-lg font-medium transition-colors">{t('landing.signUp')}</Link>
+                            <Link to="/login" className="bg-[#aa3bff] hover:bg-[#902be6] px-5 py-2 rounded-lg font-medium transition-colors">{t('landing.signUp')}</Link>
                         </div>
                     )}
                 </nav>
@@ -50,7 +50,7 @@ export const LandingPage: React.FC = () => {
                                 <span>{t('landing.goDashboard')}</span>
                             </Link>
                         ) : (
-                            <Link to="/register" className="w-full sm:w-auto bg-[#aa3bff] hover:bg-[#902be6] text-white font-bold py-4 px-8 rounded-full transition-colors text-lg">
+                            <Link to="/login" className="w-full sm:w-auto bg-[#aa3bff] hover:bg-[#902be6] text-white font-bold py-4 px-8 rounded-full transition-colors text-lg">
                                 {t('landing.getStarted')}
                             </Link>
                         )}

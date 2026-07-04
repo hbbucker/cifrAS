@@ -12,6 +12,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 /**
  * AuthResource — proxies authentication requests to Supabase Auth.
@@ -26,6 +27,20 @@ public class AuthResource {
     @Inject
     @RestClient
     SupabaseAuthClient supabaseClient;
+
+    @ConfigProperty(name = "quarkus.rest-client.supabase-auth.url")
+    String supabaseUrl;
+
+    @GET
+    @Path("/google-url")
+    public Response getGoogleLoginUrl(@QueryParam("redirectTo") String redirectTo) {
+        String baseUrl = supabaseUrl;
+        if (baseUrl.endsWith("/")) {
+            baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+        }
+        String url = baseUrl + "/auth/v1/authorize?provider=google&redirect_to=" + redirectTo;
+        return Response.ok(Map.of("url", url)).build();
+    }
 
     @POST
     @Path("/register")
