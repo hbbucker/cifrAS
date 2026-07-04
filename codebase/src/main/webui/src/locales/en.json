@@ -33,6 +33,7 @@
     "subtitle": "Here's your recent repertoire.",
     "searchResults": "Search Results for \"{{query}}\"",
     "recentlyAdded": "Recently Added",
+    "favorites": "Favorites",
     "viewAll": "View all",
     "emptyTitle": "No songs yet",
     "emptyDesc": "Start building your repertoire by adding your first song.",

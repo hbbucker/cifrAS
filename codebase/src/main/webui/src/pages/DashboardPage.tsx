@@ -49,7 +49,8 @@ export const DashboardPage: React.FC = () => {
  })
  .then(data => {
  const items = Array.isArray(data) ? data : (data.data || []);
- const mappedSongs = items.slice(0, 3).map((song: Record<string, unknown>) => ({
+ const favoriteItems = items.filter((song: Record<string, unknown>) => song.isFavorite);
+ const mappedSongs = favoriteItems.slice(0, 3).map((song: Record<string, unknown>) => ({
  ...song,
  keySignature: (song.originalKey as string) || (song.keySignature as string) || 'C',
  isFavorite: song.isFavorite || false,
@@ -106,7 +107,7 @@ export const DashboardPage: React.FC = () => {
 
  <div className="mb-6 flex justify-between items-center">
  <h3 className="text-lg font-bold text-text-main">
- {searchQuery ? t('dashboard.searchResults', { query: searchQuery }) : t('dashboard.recentlyAdded')}
+ {searchQuery ? t('dashboard.searchResults', { query: searchQuery }) : t('dashboard.favorites')}
  </h3>
  <button
  onClick={() => navigate('/songs')}
