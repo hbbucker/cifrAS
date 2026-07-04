@@ -56,7 +56,7 @@ export const GroupPlaylistsSection: React.FC<GroupPlaylistsSectionProps> = ({ gr
  };
 
  const handleUnlink = async (playlistId: string) => {
- if (!window.confirm('Are you sure you want to remove this playlist from the group?')) return;
+ if (!window.confirm(t('group.confirmRemovePlaylist'))) return;
  try {
  await unlinkPlaylist(groupId, playlistId);
  fetchPlaylists();

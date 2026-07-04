@@ -111,7 +111,7 @@ export const PlaylistViewPage: React.FC = () => {
  };
 
  const removeSong = (songId: string) => {
- if (!window.confirm('Remove this song from the playlist?')) return;
+ if (!window.confirm(t('playlistView.confirmRemoveSong'))) return;
  
  fetch(`/api/playlists/${id}/songs/${songId}`, {
  method: 'DELETE',

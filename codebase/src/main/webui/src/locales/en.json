@@ -1,7 +1,8 @@
 {
   "common": {
     "cancel": "Cancel",
-    "save": "Save"
+    "save": "Save",
+    "confirm": "Confirm"
   },
   "sidebar": {
     "home": "Home",
@@ -128,7 +129,9 @@
     "titlePlaceholder": "Song Title",
     "artistPlaceholder": "Artist Name",
     "contentPlaceholder": "[C]Hello [G]world... (Use os botões acima ou Ctrl+S para salvar)",
-    "discard": "Discard changes?"
+    "discard": "Discard changes?",
+    "unsavedMessage": "You have unsaved modifications. Are you sure you want to leave without saving?",
+    "discardBtn": "Discard"
   },
   "songView": {
     "preferences": "Preferences",
@@ -149,7 +152,8 @@
     "add": "Add",
     "moveUp": "Move up",
     "moveDown": "Move down",
-    "searchPlaceholder": "Search by title or artist..."
+    "searchPlaceholder": "Search by title or artist...",
+    "confirmRemoveSong": "Remove this song from the playlist?"
   },
   "sharedWithMe": {
     "noPlaylists": "No playlists shared with you yet.",
@@ -182,7 +186,8 @@
     "leave": "Leave Group",
     "invite": "Invite Member",
     "remove": "Remove from Group",
-    "noSharedPlaylists": "No shared playlists"
+    "noSharedPlaylists": "No shared playlists",
+    "confirmRemovePlaylist": "Are you sure you want to remove this playlist from the group?"
   },
   "musicCard": {
     "delete": "Delete",

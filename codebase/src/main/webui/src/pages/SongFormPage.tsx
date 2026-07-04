@@ -194,9 +194,9 @@ export const SongFormPage: React.FC = () => {
  <ConfirmModal 
  isOpen={showCancelModal}
  title={t('songForm.discard')}
- message="You have unsaved modifications. Are you sure you want to leave without saving?"
+ message={t('songForm.unsavedMessage')}
  variant="warning"
- confirmText="Discard"
+ confirmText={t('songForm.discardBtn')}
  onConfirm={() => {
  if (id) navigate(-1);
  else navigate('/songs');

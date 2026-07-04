@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type ConfirmVariant = 'danger' | 'warning';
 
@@ -18,11 +19,13 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
  title,
  message,
  variant = 'danger',
- confirmText = 'Confirm',
- cancelText = 'Cancel',
+ confirmText,
+ cancelText,
  onConfirm,
  onCancel,
 }) => {
+ const { t } = useTranslation();
+
  useEffect(() => {
  const handleKeyDown = (e: KeyboardEvent) => {
  if (e.key === 'Escape' && isOpen) {
@@ -47,13 +50,13 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
  onClick={onCancel}
  className="px-4 py-2 rounded font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors"
  >
- {cancelText}
+ {cancelText || t('common.cancel')}
  </button>
  <button
  onClick={onConfirm}
  className={`px-4 py-2 rounded font-medium text-white transition-colors ${btnBg}`}
  >
- {confirmText}
+ {confirmText || t('common.confirm')}
  </button>
  </div>
  </div>

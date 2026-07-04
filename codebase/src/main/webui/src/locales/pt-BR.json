@@ -1,7 +1,8 @@
 {
   "common": {
     "cancel": "Cancelar",
-    "save": "Salvar"
+    "save": "Salvar",
+    "confirm": "Confirmar"
   },
   "sidebar": {
     "home": "Início",
@@ -128,7 +129,9 @@
     "titlePlaceholder": "Título da Música",
     "artistPlaceholder": "Nome do Artista",
     "contentPlaceholder": "[C]Olá [G]mundo... (Use os botões acima ou Ctrl+S para salvar)",
-    "discard": "Descartar alterações?"
+    "discard": "Descartar alterações?",
+    "unsavedMessage": "Você tem modificações não salvas. Tem certeza de que deseja sair sem salvar?",
+    "discardBtn": "Descartar"
   },
   "songView": {
     "preferences": "Preferências",
@@ -149,7 +152,8 @@
     "add": "Adicionar",
     "moveUp": "Mover para cima",
     "moveDown": "Mover para baixo",
-    "searchPlaceholder": "Buscar por título ou artista..."
+    "searchPlaceholder": "Buscar por título ou artista...",
+    "confirmRemoveSong": "Remover esta música da playlist?"
   },
   "sharedWithMe": {
     "noPlaylists": "Nenhuma playlist compartilhada com você ainda.",
@@ -182,7 +186,8 @@
     "leave": "Sair do Grupo",
     "invite": "Convidar Membro",
     "remove": "Remover do Grupo",
-    "noSharedPlaylists": "Nenhuma playlist compartilhada"
+    "noSharedPlaylists": "Nenhuma playlist compartilhada",
+    "confirmRemovePlaylist": "Tem certeza de que deseja remover esta playlist do grupo?"
   },
   "musicCard": {
     "delete": "Deletar",
