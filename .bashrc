@@ -1,1 +1,0 @@
-export PAPERCLIP_API_URL=http://127.0.0.1:3100
