@@ -69,7 +69,7 @@ O backend (REST API) estará disponível em `http://localhost:8080/api` e o fron
 O projeto possui uma pipeline automatizada configurada via **GitHub Actions** (`.github/workflows/ci.yml`).
 A cada *Pull Request* ou *Push* na branch principal, o GitHub automaticamente:
 1. Sobe o ambiente Java 21, compila o código e executa todos os testes do Quarkus.
-2. Sobe o ambiente Node 20, verifica o código via Linter (ESLint), faz o build do React e roda os testes End-to-End (E2E) do Playwright.
+2. Sobe o ambiente Node 20, verifica o código via Linter (ESLint), faz o build do React e roda os testes End-to-End (E2E) do Playwright. Os testes de E2E rodam sob o profile `-Dquarkus.profile=e2e` para burlar o OAuth e autenticar localmente usando tokens simulados (Mock JWT).
 
 ---
 

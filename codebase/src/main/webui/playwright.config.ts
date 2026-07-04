@@ -27,7 +27,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'cd ../../.. && ./mvnw compile quarkus:dev -Dquarkus.http.port=8080',
+    command: 'cd ../../.. && ./mvnw compile quarkus:dev -Dquarkus.http.port=8080 -Dquarkus.profile=e2e',
     url: 'http://localhost:8080',
     reuseExistingServer: true,
     timeout: 120000,

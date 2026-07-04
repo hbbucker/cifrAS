@@ -199,6 +199,7 @@ Se você é um Agente de IA trabalhando neste projeto, siga este fluxo rigoroso 
    - Não submeta código de backend sem o correspondente teste de integração utilizando `REST Assured` e/ou `Testcontainers` se houver persistência.
 3. **Validação E2E com Playwright:**
    - Ao alterar telas ou fluxos visuais do React, certifique-se de executar os testes E2E do Playwright (`npx playwright test`) a partir do diretório `src/main/webui` para validar que nenhum fluxo foi quebrado.
+   - **Autenticação E2E (Bypass):** Os testes contornam a UI de login do Google injetando um mock JWT e navegando direto para `/auth/callback`. O backend (Quarkus) precisa rodar com o perfil `e2e` ativado (`-Dquarkus.profile=e2e`), que suporta validação local do algoritmo `RS256`. Use o script `generate_jwt.py` caso precise emitir novos tokens de teste com claims atualizadas (`iat`, `exp`).
 4. **Preservação do Legado:**
    - Preserve integralmente todos os comentários, JSDoc e documentação existente no código que não forem alvo direto da alteração.
 5. **Verificação de Portão Final (`cy-final-verify`):**
