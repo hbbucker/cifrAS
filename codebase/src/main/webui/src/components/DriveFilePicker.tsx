@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FileText, Loader2, X, Plus, Search } from 'lucide-react';
 import { googleDriveApi, type DriveFile } from '../api/googleDrive';
 
@@ -8,6 +9,7 @@ interface DriveFilePickerProps {
 }
 
 export const DriveFilePicker: React.FC<DriveFilePickerProps> = ({ onClose, onFileSelected }) => {
+  const { t } = useTranslation();
   const [accounts, setAccounts] = useState<string[]>([]);
   const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
 
@@ -268,7 +270,7 @@ export const DriveFilePicker: React.FC<DriveFilePickerProps> = ({ onClose, onFil
               className="px-6 py-2 text-ink font-semibold rounded-full hover:bg-gray-200 transition-colors"
               disabled={!!importing}
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               onClick={() => selectedFileId && handleImport(selectedFileId)}

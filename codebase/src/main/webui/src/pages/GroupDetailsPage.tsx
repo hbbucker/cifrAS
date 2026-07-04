@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Users, UserPlus } from 'lucide-react';
 import { GroupPlaylistsSection } from '../components/groups/GroupPlaylistsSection';
@@ -16,6 +17,7 @@ interface GroupDetailsData {
 }
 
 export const GroupDetailsPage: React.FC = () => {
+  const { t } = useTranslation();
  const { id } = useParams<{ id: string }>();
  const navigate = useNavigate();
  const { user, logout } = useAuth();
@@ -133,7 +135,7 @@ export const GroupDetailsPage: React.FC = () => {
  className="flex items-center gap-2 bg-[#aa3bff] hover:bg-[#902be6] text-white px-4 py-2 rounded-lg font-medium transition-colors"
  >
  <UserPlus className="w-4 h-4" />
- <span className="hidden sm:inline">Invite Member</span>
+ <span className="hidden sm:inline">{t('group.invite')}</span>
  </button>
  </div>
  )}
@@ -161,7 +163,7 @@ export const GroupDetailsPage: React.FC = () => {
  {showInviteModal && (
  <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
  <div className="bg-bg-card rounded-xl max-w-md w-full p-6 shadow-2xl">
- <h2 className="text-xl font-bold text-text-main mb-4">Invite to Group</h2>
+ <h2 className="text-xl font-bold text-text-main mb-4">{t('groups.inviteToGroup')}</h2>
  
  {inviteError && (
  <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg">
@@ -173,18 +175,18 @@ export const GroupDetailsPage: React.FC = () => {
  type="email" 
  value={inviteEmail}
  onChange={(e) => { setInviteEmail(e.target.value); setInviteError(''); }}
- placeholder="member@example.com"
+ placeholder={t('groups.memberEmail')}
  className="w-full px-4 py-3 bg-bg-main border border-border-main rounded-lg mb-6 text-text-main focus:ring-2 focus:ring-[#aa3bff] outline-none"
  data-testid="invite-email-input"
  />
  <div className="flex justify-end gap-3">
- <button onClick={() => { setShowInviteModal(false); setInviteError(''); }} className="px-4 py-2 font-medium text-text-mute hover:bg-bg-elevated rounded-lg transition-colors">Cancel</button>
+ <button onClick={() => { setShowInviteModal(false); setInviteError(''); }} className="px-4 py-2 font-medium text-text-mute hover:bg-bg-elevated rounded-lg transition-colors">{t('common.cancel')}</button>
  <button 
  onClick={handleInvite} 
  className="px-4 py-2 font-medium bg-[#aa3bff] hover:bg-[#902be6] text-white rounded-lg transition-colors" 
  data-testid="send-invite-btn"
  >
- Send Invite
+ {t('groups.sendInvite')}
  </button>
  </div>
  </div>

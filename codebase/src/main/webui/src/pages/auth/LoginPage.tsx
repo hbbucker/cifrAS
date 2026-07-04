@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
@@ -6,6 +7,7 @@ import authClient from '../../services/authService';
 import { Music } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
+  const { t } = useTranslation();
  const [email, setEmail] = useState('');
  const [password, setPassword] = useState('');
  const [isLoading, setIsLoading] = useState(false);
@@ -48,25 +50,25 @@ export const LoginPage: React.FC = () => {
  <div className="w-16 h-16 bg-[#aa3bff]/20 rounded-full flex items-center justify-center mb-4">
  <Music className="w-8 h-8 text-[#aa3bff]" />
  </div>
- <h2 className="text-3xl font-bold text-white text-center">Welcome to CifrAS</h2>
- <p className="text-gray-400 mt-2 text-center">Your modern chord & repertoire manager</p>
+ <h2 className="text-3xl font-bold text-white text-center">{t('auth.welcome')}</h2>
+ <p className="text-gray-400 mt-2 text-center">{t('auth.subtitle')}</p>
  </div>
 
  <form onSubmit={handleSubmit} className="space-y-6">
  <div>
- <label className="block text-sm font-medium text-gray-300 mb-1" htmlFor="email">Email</label>
+ <label className="block text-sm font-medium text-gray-300 mb-1" htmlFor="email">{t('auth.email')}</label>
  <input 
  id="email"
  type="email" 
  value={email}
  onChange={(e) => setEmail(e.target.value)}
  className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-[#aa3bff] focus:border-transparent transition-all"
- placeholder="you@example.com"
+ placeholder={t('auth.emailPlaceholder')}
  data-testid="email-input"
  />
  </div>
  <div>
- <label className="block text-sm font-medium text-gray-300 mb-1" htmlFor="password">Password</label>
+ <label className="block text-sm font-medium text-gray-300 mb-1" htmlFor="password">{t('auth.password')}</label>
  <input 
  id="password"
  type="password" 
@@ -87,12 +89,12 @@ export const LoginPage: React.FC = () => {
  </button>
  </form>
  <p className="mt-6 text-center text-gray-400 text-sm">
- Don't have an account? <a href="/register" className="text-[#aa3bff] hover:underline">Register</a>
+ {t('auth.noAccount')} <a href="/register" className="text-[#aa3bff] hover:underline">{t('auth.register')}</a>
  </p>
  <div className="mt-4 flex justify-center space-x-4 text-xs text-gray-500">
-  <a href="/privacy?lang=pt" className="hover:text-[#aa3bff] transition-colors">Política de Privacidade</a>
+  <a href="/privacy?lang=pt" className="hover:text-[#aa3bff] transition-colors">{t('landing.privacy')}</a>
   <span>•</span>
-  <a href="/privacy?lang=en" className="hover:text-[#aa3bff] transition-colors">Privacy Policy</a>
+  <a href="/privacy?lang=en" className="hover:text-[#aa3bff] transition-colors">{t('landing.privacy')}</a>
  </div>
  </div>
  </div>

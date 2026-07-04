@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { AlertCircle } from 'lucide-react';
 import { Button } from './Button';
 
@@ -15,6 +16,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
  onRetry,
  className = '',
 }) => {
+  const { t } = useTranslation();
  return (
  <div className={`flex flex-col items-center justify-center p-8 text-center bg-red-50 dark:bg-red-900/10 rounded-xl border border-red-100 dark:border-red-900/30 ${className}`}>
  <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
@@ -22,7 +24,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
  <p className="text-text-mute max-w-md mb-6">{message}</p>
  {onRetry && (
  <Button onClick={onRetry} variant="secondary">
- Try Again
+ {t('errorState.tryAgain')}
  </Button>
  )}
  </div>

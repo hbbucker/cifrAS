@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { ArrowLeft, PlayCircle, GripVertical, Trash2, ChevronUp, ChevronDown, Plus, Search } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -22,6 +23,7 @@ interface PlaylistData {
 }
 
 export const PlaylistViewPage: React.FC = () => {
+  const { t } = useTranslation();
  const navigate = useNavigate();
  const { id } = useParams();
  const { user, logout } = useAuth();
@@ -162,7 +164,7 @@ export const PlaylistViewPage: React.FC = () => {
  className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-text-main px-4 py-2.5 rounded-lg font-bold transition-colors"
  >
  <Plus className="w-5 h-5" />
- <span className="hidden sm:inline">Add Song</span>
+ <span className="hidden sm:inline">{t('playlistView.addSong')}</span>
  </button>
  )}
  <button 
@@ -171,18 +173,18 @@ export const PlaylistViewPage: React.FC = () => {
  data-testid="start-theater-btn"
  >
  <PlayCircle className="w-6 h-6" />
- <span className="hidden sm:inline">Start Theater Mode</span>
+ <span className="hidden sm:inline">{t('playlistView.startTheater')}</span>
  </button>
  </div>
  </header>
 
  <div className="flex-1 overflow-y-auto p-6 max-w-4xl mx-auto w-full">
  {loading ? (
- <div className="text-center py-8 text-text-mute">Loading songs...</div>
+ <div className="text-center py-8 text-text-mute">{t('playlistView.loading')}</div>
  ) : songs.length === 0 ? (
  <div className="text-center py-12 bg-bg-card rounded-xl border border-dashed border-gray-300 ">
- <h3 className="text-lg font-medium text-text-main mb-2">No songs in this playlist</h3>
- <p className="text-text-mute">Add songs from the library to build your repertoire.</p>
+ <h3 className="text-lg font-medium text-text-main mb-2">{t('playlistView.noSongs')}</h3>
+ <p className="text-text-mute">{t('playlistView.addDesc')}</p>
  </div>
  ) : (
  <div className="bg-bg-card rounded-xl border border-border-main shadow-sm overflow-hidden">
@@ -215,7 +217,7 @@ export const PlaylistViewPage: React.FC = () => {
  onClick={() => moveSong(index, 'up')} 
  className="p-2 sm:p-1.5 text-text-mute hover:text-[#aa3bff] bg-gray-100 hover:bg-[#aa3bff]/10 rounded-lg transition-colors active:scale-95" 
  data-testid={`move-up-${song.id}`}
- aria-label="Move up"
+ aria-label={t('playlistView.moveUp')}
  >
  <ChevronUp className="w-6 h-6 sm:w-5 sm:h-5" />
  </button>
@@ -223,7 +225,7 @@ export const PlaylistViewPage: React.FC = () => {
  onClick={() => moveSong(index, 'down')} 
  className="p-2 sm:p-1.5 text-text-mute hover:text-[#aa3bff] bg-gray-100 hover:bg-[#aa3bff]/10 rounded-lg transition-colors active:scale-95" 
  data-testid={`move-down-${song.id}`}
- aria-label="Move down"
+ aria-label={t('playlistView.moveDown')}
  >
  <ChevronDown className="w-6 h-6 sm:w-5 sm:h-5" />
  </button>
@@ -276,8 +278,8 @@ export const PlaylistViewPage: React.FC = () => {
  <ArrowLeft className="w-6 h-6" />
  </button>
  <div>
- <h2 className="text-xl font-bold text-text-main">Add Songs</h2>
- <p className="text-sm text-text-mute">Select songs to add to your playlist</p>
+ <h2 className="text-xl font-bold text-text-main">{t('playlistView.addSongs')}</h2>
+ <p className="text-sm text-text-mute">{t('playlistView.selectSongs')}</p>
  </div>
  </div>
  </header>
@@ -287,7 +289,7 @@ export const PlaylistViewPage: React.FC = () => {
  <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
  <input
  type="text"
- placeholder="Search by title or artist..."
+ placeholder={t('playlistView.searchPlaceholder')}
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
  className="w-full pl-12 pr-4 py-3 bg-bg-card border border-border-main rounded-xl text-text-main focus:ring-2 focus:ring-[#aa3bff] outline-none shadow-sm"
@@ -334,7 +336,7 @@ export const PlaylistViewPage: React.FC = () => {
  className="flex items-center gap-1 px-4 py-2 bg-gray-100 hover:bg-[#aa3bff] hover:text-white dark:bg-gray-700 dark:hover:bg-[#aa3bff] text-gray-700 rounded-lg font-bold transition-colors"
  >
  <Plus className="w-4 h-4" />
- <span>Add</span>
+ <span>{t('playlistView.add')}</span>
  </button>
  </div>
  </div>

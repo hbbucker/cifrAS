@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { MusicCard } from '../components/cards/MusicCard';
 import { Search } from 'lucide-react';
 
 export const SearchPage: React.FC = () => {
+  const { t } = useTranslation();
  const [searchParams] = useSearchParams();
  const query = searchParams.get('q') || '';
  const navigate = useNavigate();
@@ -57,7 +59,7 @@ export const SearchPage: React.FC = () => {
  ) : (
  <div className="flex flex-col items-center justify-center h-64 text-center">
  <Search className="w-16 h-16 text-gray-300 dark:text-text-mute mb-4" />
- <h3 className="text-xl font-bold text-text-main mb-2">No results found</h3>
+ <h3 className="text-xl font-bold text-text-main mb-2">{t('search.noResults')}</h3>
  <p className="text-text-mute">
  We couldn't find anything matching "{query}". Try checking for typos.
  </p>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Play } from 'lucide-react';
 import { getGroupPlaylists } from '../api/groups';
@@ -13,6 +14,7 @@ interface Playlist {
 }
 
 export const SharedWithMePage: React.FC = () => {
+  const { t } = useTranslation();
  const { user } = useAuth();
  const [playlists, setPlaylists] = useState<Playlist[]>([]);
  const [loading, setLoading] = useState(true);
@@ -59,15 +61,15 @@ export const SharedWithMePage: React.FC = () => {
  <>
  <main className="flex-1 flex flex-col h-full overflow-hidden">
  <header className="h-16 flex items-center px-6 bg-bg-card border-b border-border-main shrink-0">
- <h1 className="text-xl font-bold text-text-main">Shared with Me</h1>
+ <h1 className="text-xl font-bold text-text-main">{t('sharedWithMe.title')}</h1>
  </header>
 
  <div className="flex-1 overflow-y-auto p-6">
  {loading ? (
- <div className="text-center py-8 text-text-mute">Loading shared playlists...</div>
+ <div className="text-center py-8 text-text-mute">{t('sharedWithMe.loading')}</div>
  ) : playlists.length === 0 ? (
  <div className="text-center py-12 text-text-mute bg-bg-card rounded-xl border border-dashed border-border-main">
- No playlists shared with you yet.
+ {t('sharedWithMe.noPlaylists')}
  </div>
  ) : (
  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -81,7 +83,7 @@ export const SharedWithMePage: React.FC = () => {
  <button 
  onClick={() => navigate(`/theater/${playlist.id}`)}
  className="p-2 bg-[#aa3bff]/10 text-[#aa3bff] hover:bg-[#aa3bff]/20 rounded-full transition-colors ml-4 shrink-0"
- title="Play in Theater Mode"
+ title={t('sharedWithMe.playTheater')}
  >
  <Play className="w-5 h-5 fill-current" />
  </button>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Search, Loader2, X } from 'lucide-react';
 
@@ -15,6 +16,7 @@ interface SearchBarProps {
 }
 
 export const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
+  const { t } = useTranslation();
  const [query, setQuery] = useState('');
  const [debouncedQuery, setDebouncedQuery] = useState('');
  const [results, setResults] = useState<SearchResult[]>([]);
@@ -130,7 +132,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
  value={query}
  onChange={(e) => setQuery(e.target.value)}
  onKeyDown={handleKeyDown}
- placeholder="Search songs, artists..."
+ placeholder={t('search.placeholder')}
  className="w-full pl-10 pr-10 py-2 bg-bg-elevated border-none rounded-lg focus:ring-2 focus:ring-[#aa3bff] focus:outline-none transition-all "
  data-testid="search-input"
  />

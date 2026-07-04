@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X, ListMusic } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
 import { Button } from '../ui/Button';
@@ -16,6 +17,7 @@ interface LinkPlaylistModalProps {
 }
 
 export const LinkPlaylistModal: React.FC<LinkPlaylistModalProps> = ({ onClose, onLink }) => {
+  const { t } = useTranslation();
  const [playlists, setPlaylists] = useState<Playlist[]>([]);
  const [loading, setLoading] = useState(true);
  const [linking, setLinking] = useState<number | null>(null);
@@ -61,8 +63,8 @@ export const LinkPlaylistModal: React.FC<LinkPlaylistModalProps> = ({ onClose, o
  >
  <X className="w-6 h-6" />
  </button>
- <h2 className="text-xl font-bold text-text-main mb-4">Share a Playlist</h2>
- <p className="text-sm text-text-mute mb-6">Select one of your personal playlists to share with this group. Members will be able to view and play it.</p>
+ <h2 className="text-xl font-bold text-text-main mb-4">{t('linkPlaylist.shareTitle')}</h2>
+ <p className="text-sm text-text-mute mb-6">{t('linkPlaylist.shareDesc')}</p>
  
  {loading ? (
  <div className="flex justify-center py-8">
@@ -71,7 +73,7 @@ export const LinkPlaylistModal: React.FC<LinkPlaylistModalProps> = ({ onClose, o
  ) : playlists.length === 0 ? (
  <EmptyState 
  icon={ListMusic} 
- title="No personal playlists" 
+ title={t('linkPlaylist.noPlaylists')} 
  description="You don't have any playlists yet." 
  />
  ) : (
@@ -85,7 +87,7 @@ export const LinkPlaylistModal: React.FC<LinkPlaylistModalProps> = ({ onClose, o
  disabled={linking !== null}
  size="sm"
  >
- Share
+ {t('musicCard.share')}
  </Button>
  </div>
  ))}

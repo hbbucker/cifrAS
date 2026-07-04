@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { useToast } from '../../context/ToastContext';
@@ -6,6 +7,7 @@ import authClient from '../../services/authService';
 import { Music } from 'lucide-react';
 
 export const RegisterPage: React.FC = () => {
+  const { t } = useTranslation();
  const [name, setName] = useState('');
  const [email, setEmail] = useState('');
  const [password, setPassword] = useState('');
@@ -47,28 +49,28 @@ export const RegisterPage: React.FC = () => {
  <div className="w-16 h-16 bg-[#aa3bff]/20 rounded-full flex items-center justify-center mb-4">
  <Music className="w-8 h-8 text-[#aa3bff]" />
  </div>
- <h2 className="text-3xl font-bold text-white text-center">Create an Account</h2>
+ <h2 className="text-3xl font-bold text-white text-center">{t('auth.createAccount')}</h2>
  </div>
 
  <form onSubmit={handleSubmit} className="space-y-4">
  <div>
- <label className="block text-sm font-medium text-gray-300 mb-1" htmlFor="name">Full Name</label>
+ <label className="block text-sm font-medium text-gray-300 mb-1" htmlFor="name">{t('auth.fullName')}</label>
  <input 
  id="name" type="text" value={name} onChange={(e) => setName(e.target.value)}
  className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-[#aa3bff] focus:border-transparent transition-all"
- placeholder="John Doe" data-testid="name-input"
+ placeholder={t('auth.namePlaceholder')} data-testid="name-input"
  />
  </div>
  <div>
- <label className="block text-sm font-medium text-gray-300 mb-1" htmlFor="email">Email</label>
+ <label className="block text-sm font-medium text-gray-300 mb-1" htmlFor="email">{t('auth.email')}</label>
  <input 
  id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)}
  className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-[#aa3bff] focus:border-transparent transition-all"
- placeholder="you@example.com" data-testid="reg-email-input"
+ placeholder={t('auth.emailPlaceholder')} data-testid="reg-email-input"
  />
  </div>
  <div>
- <label className="block text-sm font-medium text-gray-300 mb-1" htmlFor="password">Password</label>
+ <label className="block text-sm font-medium text-gray-300 mb-1" htmlFor="password">{t('auth.password')}</label>
  <input 
  id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)}
  className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-[#aa3bff] focus:border-transparent transition-all"
@@ -76,7 +78,7 @@ export const RegisterPage: React.FC = () => {
  />
  </div>
  <div>
- <label className="block text-sm font-medium text-gray-300 mb-1" htmlFor="confirmPassword">Confirm Password</label>
+ <label className="block text-sm font-medium text-gray-300 mb-1" htmlFor="confirmPassword">{t('auth.confirmPassword')}</label>
  <input 
  id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
  className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-[#aa3bff] focus:border-transparent transition-all"
@@ -92,12 +94,12 @@ export const RegisterPage: React.FC = () => {
  </button>
  </form>
  <p className="mt-6 text-center text-gray-400 text-sm">
- Already have an account? <a href="/login" className="text-[#aa3bff] hover:underline">Log in</a>
+ {t('auth.hasAccount')} <a href="/login" className="text-[#aa3bff] hover:underline">{t('landing.login')}</a>
  </p>
  <div className="mt-4 flex justify-center space-x-4 text-xs text-gray-500">
-  <a href="/privacy?lang=pt" className="hover:text-[#aa3bff] transition-colors">Política de Privacidade</a>
+  <a href="/privacy?lang=pt" className="hover:text-[#aa3bff] transition-colors">{t('landing.privacy')}</a>
   <span>•</span>
-  <a href="/privacy?lang=en" className="hover:text-[#aa3bff] transition-colors">Privacy Policy</a>
+  <a href="/privacy?lang=en" className="hover:text-[#aa3bff] transition-colors">{t('landing.privacy')}</a>
  </div>
  </div>
  </div>

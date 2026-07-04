@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Heart, MoreVertical, Edit2, Share2, Trash2 } from 'lucide-react';
 
 export interface MusicCardProps {
@@ -18,6 +19,7 @@ export const MusicCard: React.FC<MusicCardProps> = ({
  id, title, artist, keySignature, isFavorite: initialIsFavorite, categories,
  onToggleFavorite, onEdit, onShare, onDelete
 }) => {
+  const { t } = useTranslation();
  const [menuOpen, setMenuOpen] = useState(false);
  const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
 
@@ -62,7 +64,7 @@ export const MusicCard: React.FC<MusicCardProps> = ({
  <button 
  onClick={(e) => { e.stopPropagation(); setMenuOpen(!menuOpen); }}
  className="w-12 h-12 flex items-center justify-center rounded-full hover:bg-bg-elevated text-text-mute"
- aria-label="Actions menu"
+ aria-label={t('musicCard.actions')}
  aria-expanded={menuOpen}
  data-testid="menu-btn"
  >
@@ -72,13 +74,13 @@ export const MusicCard: React.FC<MusicCardProps> = ({
  {menuOpen && (
  <div className="absolute right-0 top-12 w-48 bg-bg-card rounded-md shadow-lg border border-border-main z-10 py-1" data-testid="dropdown-menu">
  <button onClick={(e) => { e.stopPropagation(); onEdit(id); setMenuOpen(false); }} className="w-full text-left px-4 py-3 hover:bg-bg-elevated flex items-center gap-2 text-sm text-gray-700 ">
- <Edit2 className="w-4 h-4" /> Edit
+ <Edit2 className="w-4 h-4" /> {t('musicCard.edit')}
  </button>
  <button onClick={(e) => { e.stopPropagation(); onShare(id); setMenuOpen(false); }} className="w-full text-left px-4 py-3 hover:bg-bg-elevated flex items-center gap-2 text-sm text-gray-700 ">
- <Share2 className="w-4 h-4" /> Share
+ <Share2 className="w-4 h-4" /> {t('musicCard.share')}
  </button>
  <button onClick={(e) => { e.stopPropagation(); onDelete(id); setMenuOpen(false); }} className="w-full text-left px-4 py-3 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 flex items-center gap-2 text-sm">
- <Trash2 className="w-4 h-4" /> Delete
+ <Trash2 className="w-4 h-4" /> {t('musicCard.delete')}
  </button>
  </div>
  )}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Save, ArrowLeft } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
@@ -8,6 +9,7 @@ import { DriveFilePicker } from '../components/DriveFilePicker';
 import { Button } from '../components/ui/Button';
 import { CloudDownload } from 'lucide-react';
 export const SongFormPage: React.FC = () => {
+  const { t } = useTranslation();
  const { id } = useParams();
  const navigate = useNavigate();
  const location = useLocation();
@@ -127,7 +129,7 @@ export const SongFormPage: React.FC = () => {
  data-testid="save-song-btn"
  >
  <Save className="w-5 h-5" />
- <span className="hidden sm:inline">Save</span>
+ <span className="hidden sm:inline">{t('common.save')}</span>
  </Button>
  </header>
 
@@ -135,15 +137,15 @@ export const SongFormPage: React.FC = () => {
  <div className="max-w-5xl mx-auto w-full flex-1 flex flex-col space-y-6">
  <div className="flex flex-col md:flex-row gap-4 bg-bg-card p-4 rounded-[16px] border border-border-main">
  <div className="flex-1">
- <label className="block text-xs font-semibold text-text-mute mb-1 uppercase tracking-wider">Title</label>
- <input type="text" value={title} onChange={handleChange(setTitle)} className="w-full px-3 py-2 bg-transparent border-b border-border-main focus:border-primary text-text-main font-bold text-lg focus:outline-none transition-colors" data-testid="song-title-input" placeholder="Song Title" />
+ <label className="block text-xs font-semibold text-text-mute mb-1 uppercase tracking-wider">{t('songForm.title')}</label>
+ <input type="text" value={title} onChange={handleChange(setTitle)} className="w-full px-3 py-2 bg-transparent border-b border-border-main focus:border-primary text-text-main font-bold text-lg focus:outline-none transition-colors" data-testid="song-title-input" placeholder={t('songForm.titlePlaceholder')} />
  </div>
  <div className="flex-1">
- <label className="block text-xs font-semibold text-text-mute mb-1 uppercase tracking-wider">Artist</label>
- <input type="text" value={artist} onChange={handleChange(setArtist)} className="w-full px-3 py-2 bg-transparent border-b border-border-main focus:border-primary text-text-main font-bold text-lg focus:outline-none transition-colors" data-testid="song-artist-input" placeholder="Artist Name" />
+ <label className="block text-xs font-semibold text-text-mute mb-1 uppercase tracking-wider">{t('songForm.artist')}</label>
+ <input type="text" value={artist} onChange={handleChange(setArtist)} className="w-full px-3 py-2 bg-transparent border-b border-border-main focus:border-primary text-text-main font-bold text-lg focus:outline-none transition-colors" data-testid="song-artist-input" placeholder={t('songForm.artistPlaceholder')} />
  </div>
  <div className="w-full md:w-24">
- <label className="block text-xs font-semibold text-text-mute mb-1 uppercase tracking-wider">Tom</label>
+ <label className="block text-xs font-semibold text-text-mute mb-1 uppercase tracking-wider">{t('songForm.tom')}</label>
  <input type="text" value={key} onChange={handleChange(setKey)} maxLength={5} className="w-full px-3 py-2 bg-transparent border-b border-border-main focus:border-primary text-text-main font-bold text-lg text-center focus:outline-none transition-colors" placeholder="C#" />
  </div>
  </div>
@@ -151,12 +153,12 @@ export const SongFormPage: React.FC = () => {
  <div className="flex-1 flex flex-col bg-bg-card p-4 rounded-[16px] border border-border-main">
  <div className="flex flex-wrap items-center justify-between gap-4 mb-4 border-b border-border-main pb-4">
  <div className="flex flex-wrap items-center gap-4">
- <span className="text-sm font-semibold text-text-main">Chords & Lyrics</span>
+ <span className="text-sm font-semibold text-text-main">{t('songForm.chordsLyrics')}</span>
  <div className="flex items-center gap-2 bg-bg-main p-1.5 rounded-lg border border-border-main">
- <button onClick={() => insertText('[Refrão]\n')} className="px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-md hover:bg-bg-elevated transition-colors">Refrão</button>
- <button onClick={() => insertText('\n\n')} className="px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-md hover:bg-bg-elevated transition-colors">Quebra</button>
- <button onClick={() => insertText('\n---\n')} className="px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-md hover:bg-bg-elevated transition-colors">Separador</button>
- <button onClick={() => insertText('\ne|---\nB|---\nG|---\nD|---\nA|---\nE|---\n')} className="px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-md hover:bg-bg-elevated transition-colors">Tablatura</button>
+ <button onClick={() => insertText('[Refrão]\n')} className="px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-md hover:bg-bg-elevated transition-colors">{t('songForm.refrao')}</button>
+ <button onClick={() => insertText('\n\n')} className="px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-md hover:bg-bg-elevated transition-colors">{t('songForm.quebra')}</button>
+ <button onClick={() => insertText('\n---\n')} className="px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-md hover:bg-bg-elevated transition-colors">{t('songForm.separador')}</button>
+ <button onClick={() => insertText('\ne|---\nB|---\nG|---\nD|---\nA|---\nE|---\n')} className="px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-md hover:bg-bg-elevated transition-colors">{t('songForm.tablatura')}</button>
  </div>
  </div>
  <Button 
@@ -167,7 +169,7 @@ export const SongFormPage: React.FC = () => {
  data-testid="btn-open-drive-picker"
  >
  <CloudDownload className="w-4 h-4 mr-2" />
- Import from Drive
+ {t('songForm.importDrive')}
  </Button>
  </div>
  <textarea 
@@ -181,7 +183,7 @@ export const SongFormPage: React.FC = () => {
  }
  }}
  className="w-full flex-1 min-h-[50vh] bg-transparent text-text-main font-mono text-sm focus:outline-none resize-none leading-relaxed"
- placeholder="[C]Hello [G]world... (Use os botões acima ou Ctrl+S para salvar)"
+ placeholder={t('songForm.contentPlaceholder')}
  data-testid="song-content-input"
  />
  </div>
@@ -191,7 +193,7 @@ export const SongFormPage: React.FC = () => {
 
  <ConfirmModal 
  isOpen={showCancelModal}
- title="Discard changes?"
+ title={t('songForm.discard')}
  message="You have unsaved modifications. Are you sure you want to leave without saving?"
  variant="warning"
  confirmText="Discard"

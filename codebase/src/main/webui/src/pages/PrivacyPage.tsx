@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { Shield, ArrowLeft } from 'lucide-react';
 
 export const PrivacyPage: React.FC = () => {
+  const { t } = useTranslation();
     const [searchParams, setSearchParams] = useSearchParams();
     const [content, setContent] = useState('');
     const [isLoading, setIsLoading] = useState(true);
@@ -47,7 +49,7 @@ export const PrivacyPage: React.FC = () => {
                         </button>
                         <div className="flex items-center space-x-2">
                             <Shield className="w-6 h-6 text-[#aa3bff]" />
-                            <h1 className="text-xl font-bold text-white">Privacy Policy</h1>
+                            <h1 className="text-xl font-bold text-white">{t('landing.privacy')}</h1>
                         </div>
                     </div>
                     <div className="flex space-x-2">
@@ -77,7 +79,7 @@ export const PrivacyPage: React.FC = () => {
                 </div>
                 
                 <div className="bg-gray-850 px-6 py-4 border-t border-gray-700 text-center">
-                    <p className="text-sm text-gray-500">© 2026 CifrAS. All rights reserved.</p>
+                    <p className="text-sm text-gray-500">{t('landing.rights')}</p>
                 </div>
             </div>
         </div>

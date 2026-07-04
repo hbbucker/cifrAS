@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Play, Pause, ChevronLeft, ChevronRight, Maximize, X } from 'lucide-react';
 import { TransposePad } from '../music/TransposePad';
 
@@ -25,6 +26,7 @@ interface TheaterControlsProps {
  onNextSong, onPrevSong, onToggleFullscreen, onExit,
  onFontSizeIncrease, onFontSizeDecrease, className = ''
 }) => {
+  const { t } = useTranslation();
  return (
  <div className={`fixed bottom-28 md:bottom-6 left-1/2 -translate-x-1/2 bg-bg-card/95 backdrop-blur-xl text-text-main px-4 md:px-6 py-4 rounded-3xl shadow-2xl border border-border-main flex flex-col md:flex-row items-center gap-4 md:gap-6 z-40 transition-all hover:bg-bg-card w-[92%] md:w-auto ${className}`} data-testid="theater-controls">
  
@@ -46,8 +48,8 @@ interface TheaterControlsProps {
  <div className="flex items-center gap-3 md:gap-4 flex-1 justify-end md:justify-start">
  <div className="flex flex-col gap-1 w-24 md:w-32">
  <div className="flex justify-between text-[10px] md:text-xs text-text-mute font-medium px-1">
- <span>Slow</span>
- <span>Fast</span>
+ <span>{t('theater.slow')}</span>
+ <span>{t('theater.fast')}</span>
  </div>
  <input 
  type="range" min="1" max="10" step="1" 
@@ -82,11 +84,11 @@ interface TheaterControlsProps {
  
  {/* Font Size */}
  <div className="flex items-center gap-0.5 shrink-0">
- <button onClick={onFontSizeDecrease} className="p-2 hover:bg-bg-elevated rounded-lg transition-colors text-text-mute hover:text-text-main font-bold" title="Decrease Font">
- A-
+ <button onClick={onFontSizeDecrease} className="p-2 hover:bg-bg-elevated rounded-lg transition-colors text-text-mute hover:text-text-main font-bold" title={t('theater.decreaseFont')}>
+ {t('theater.aMinus')}
  </button>
- <button onClick={onFontSizeIncrease} className="p-2 hover:bg-bg-elevated rounded-lg transition-colors text-text-mute hover:text-text-main font-bold text-lg" title="Increase Font">
- A+
+ <button onClick={onFontSizeIncrease} className="p-2 hover:bg-bg-elevated rounded-lg transition-colors text-text-mute hover:text-text-main font-bold text-lg" title={t('theater.increaseFont')}>
+ {t('theater.aPlus')}
  </button>
  </div>
 
@@ -94,11 +96,11 @@ interface TheaterControlsProps {
 
  {/* Display Options */}
  <div className="flex items-center gap-1 shrink-0">
- <button onClick={onToggleFullscreen} className="p-2.5 md:p-3 hover:bg-bg-elevated rounded-full transition-colors text-text-mute hover:text-text-main" title="Fullscreen" data-testid="fullscreen-btn">
+ <button onClick={onToggleFullscreen} className="p-2.5 md:p-3 hover:bg-bg-elevated rounded-full transition-colors text-text-mute hover:text-text-main" title={t('theater.fullscreen')} data-testid="fullscreen-btn">
  <Maximize className="w-5 h-5" />
  </button>
 
- <button onClick={onExit} className="p-2.5 md:p-3 hover:bg-red-500/20 rounded-full transition-colors text-text-mute hover:text-red-500" title="Exit Theater" data-testid="exit-theater-btn">
+ <button onClick={onExit} className="p-2.5 md:p-3 hover:bg-red-500/20 rounded-full transition-colors text-text-mute hover:text-red-500" title={t('theater.exit')} data-testid="exit-theater-btn">
  <X className="w-5 h-5" />
  </button>
  </div>

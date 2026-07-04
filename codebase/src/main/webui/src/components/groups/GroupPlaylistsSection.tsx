@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { getGroupPlaylists, unlinkPlaylist } from '../../api/groups';
 import { useNavigate } from 'react-router-dom';
 import { Play, Trash2, Plus, ListMusic } from 'lucide-react';
@@ -21,6 +22,7 @@ interface GroupPlaylistsSectionProps {
 }
 
 export const GroupPlaylistsSection: React.FC<GroupPlaylistsSectionProps> = ({ groupId, role, onLinkNew }) => {
+  const { t } = useTranslation();
  const [playlists, setPlaylists] = useState<PlaylistData[]>([]);
  const [loading, setLoading] = useState(true);
  const navigate = useNavigate();
@@ -67,10 +69,10 @@ export const GroupPlaylistsSection: React.FC<GroupPlaylistsSectionProps> = ({ gr
  return (
  <div className="bg-bg-card rounded-xl border border-border-main p-6">
  <div className="flex justify-between items-center mb-6">
- <h2 className="text-xl font-bold text-text-main">Shared Playlists</h2>
+ <h2 className="text-xl font-bold text-text-main">{t('group.sharedPlaylists')}</h2>
  {role === 'Admin' && (
  <Button onClick={onLinkNew} size="sm">
- <Plus className="w-4 h-4 mr-1" /> Share Playlist
+ <Plus className="w-4 h-4 mr-1" /> {t('group.sharePlaylist')}
  </Button>
  )}
  </div>
@@ -82,7 +84,7 @@ export const GroupPlaylistsSection: React.FC<GroupPlaylistsSectionProps> = ({ gr
  ) : playlists.length === 0 ? (
  <EmptyState 
  icon={ListMusic} 
- title="No shared playlists" 
+ title={t('group.noSharedPlaylists')} 
  description="No playlists shared with this group yet." 
  />
  ) : (
@@ -109,7 +111,7 @@ export const GroupPlaylistsSection: React.FC<GroupPlaylistsSectionProps> = ({ gr
  <button 
  onClick={() => handleUnlink(playlist.id.toString())}
  className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
- title="Remove from Group"
+ title={t('group.remove')}
  >
  <Trash2 className="w-5 h-5" />
  </button>

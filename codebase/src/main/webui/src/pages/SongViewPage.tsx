@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { TransposePad } from '../components/music/TransposePad';
 import { ChordSheet } from '../components/music/ChordSheet';
 import { ArrowLeft, PlayCircle, Settings2, Edit } from 'lucide-react';
@@ -8,6 +9,7 @@ import { transposeContent } from '../utils/chordTransposer';
 import { useToast } from '../context/ToastContext';
 
 export const SongViewPage: React.FC = () => {
+  const { t } = useTranslation();
  const navigate = useNavigate();
  const { id } = useParams();
  const { toast } = useToast();
@@ -134,12 +136,12 @@ export const SongViewPage: React.FC = () => {
  
  {showSettings && (
  <div className="absolute top-full right-0 mt-2 w-64 bg-bg-card border border-border-main rounded-lg shadow-xl p-4 z-50 animate-in slide-in-from-top-2">
- <h3 className="font-semibold text-text-main mb-4">Preferences</h3>
+ <h3 className="font-semibold text-text-main mb-4">{t('songView.preferences')}</h3>
  
  <div className="space-y-4">
  <div className="space-y-2">
  <label className="text-sm text-text-mute flex justify-between">
- <span>Auto-scroll Speed</span>
+ <span>{t('songView.autoScroll')}</span>
  <span>{autoScrollSpeed === 0 ? 'Off' : autoScrollSpeed}</span>
  </label>
  <input 
@@ -153,7 +155,7 @@ export const SongViewPage: React.FC = () => {
  </div>
  
  <div className="flex items-center justify-between">
- <span className="text-sm text-text-main font-medium">Use Bb</span>
+ <span className="text-sm text-text-main font-medium">{t('songView.useBb')}</span>
  <label className="relative inline-flex items-center cursor-pointer">
  <input type="checkbox" className="sr-only peer" checked={useBb} onChange={(e) => setUseBb(e.target.checked)} />
  <div className="w-11 h-6 bg-bg-elevated peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-text-main after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#aa3bff]"></div>
@@ -161,7 +163,7 @@ export const SongViewPage: React.FC = () => {
  </div>
  
  <div className="flex items-center justify-between">
- <span className="text-sm text-text-main font-medium">Use Eb</span>
+ <span className="text-sm text-text-main font-medium">{t('songView.useEb')}</span>
  <label className="relative inline-flex items-center cursor-pointer">
  <input type="checkbox" className="sr-only peer" checked={useEb} onChange={(e) => setUseEb(e.target.checked)} />
  <div className="w-11 h-6 bg-bg-elevated peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-text-main after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#aa3bff]"></div>
@@ -175,7 +177,7 @@ export const SongViewPage: React.FC = () => {
  <button 
  onClick={() => navigate(`/songs/edit/${id}`, { state: { transposedKey: currentKey, transposedContent } })}
  className="hidden sm:flex items-center gap-2 p-2 text-text-mute hover:bg-bg-elevated rounded-lg"
- title="Edit Song"
+ title={t('songView.editSong')}
  >
  <Edit className="w-5 h-5" />
  </button>
@@ -186,7 +188,7 @@ export const SongViewPage: React.FC = () => {
  data-testid="theater-mode-btn"
  >
  <PlayCircle className="w-5 h-5" />
- <span className="hidden sm:inline">Perform</span>
+ <span className="hidden sm:inline">{t('songView.perform')}</span>
  </button>
  </div>
  </header>

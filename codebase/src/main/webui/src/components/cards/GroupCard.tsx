@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Users, MoreVertical, UserPlus, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -14,6 +15,7 @@ interface GroupCardProps {
 export const GroupCard: React.FC<GroupCardProps> = ({
  id, name, memberCount, role, onInvite, onLeave
 }) => {
+  const { t } = useTranslation();
  const [menuOpen, setMenuOpen] = useState(false);
  const navigate = useNavigate();
 
@@ -43,14 +45,14 @@ export const GroupCard: React.FC<GroupCardProps> = ({
  onClick={() => { setMenuOpen(false); onInvite(id); }}
  className="w-full text-left px-4 py-2 hover:bg-bg-elevated flex items-center gap-2 text-sm text-gray-700 "
  >
- <UserPlus className="w-4 h-4" /> Invite Member
+ <UserPlus className="w-4 h-4" /> {t('group.invite')}
  </button>
  )}
  <button 
  onClick={() => { setMenuOpen(false); onLeave(id); }}
  className="w-full text-left px-4 py-2 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 flex items-center gap-2 text-sm"
  >
- <LogOut className="w-4 h-4" /> Leave Group
+ <LogOut className="w-4 h-4" /> {t('group.leave')}
  </button>
  </div>
  )}
