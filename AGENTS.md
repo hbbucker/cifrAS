@@ -93,6 +93,8 @@ codebase/
 2. **Estilização Exclusiva com TailwindCSS:** Não adicione estilos CSS customizados a não ser para animações complexas ou hacks de scroll muito específicos.
 3. **Avisos de Lint:** A pipeline do GitHub Actions falha em qualquer warning do ESLint (variáveis não utilizadas, dependências ausentes em `useEffect`).
 4. **Chamadas de API:** Centralize chamadas no diretório `src/api/` organizadas por domínio, utilizando a instância do Axios pré-configurada.
+5. **Autenticação, Refresh Token e Redirecionamento (ADR):** O Axios deve interceptar erros `401`. No fluxo de refresh silencioso, é mandatório atualizar o header `Authorization` da requisição original (`originalRequest.headers.Authorization = 'Bearer ' + novoToken`) antes do retry para evitar loop de falhas. Caso o refresh falhe (token inválido/expirado), deve-se limpar o localStorage e forçar o redirecionamento imediato para o login via `window.location.href = '/login'`, evitando que o usuário fique preso em telas com erro.
+6. **Internacionalização (i18n - ADR Tradução):** É estritamente proibido o uso de strings hardcoded (textos fixos) nos componentes React para mensagens de interface. Toda string voltada para o usuário deve ser extraída e consumida via hooks de tradução (ex: `useTranslation` do `react-i18next`), garantindo o suporte e consistência multi-idioma em toda a plataforma.
 
 ---
 
