@@ -131,7 +131,9 @@
     "contentPlaceholder": "[C]Hello [G]world... (Use os botões acima ou Ctrl+S para salvar)",
     "discard": "Discard changes?",
     "unsavedMessage": "You have unsaved modifications. Are you sure you want to leave without saving?",
-    "discardBtn": "Discard"
+    "discardBtn": "Discard",
+    "editTitle": "Edit Song",
+    "newTitle": "New Song"
   },
   "songView": {
     "preferences": "Preferences",

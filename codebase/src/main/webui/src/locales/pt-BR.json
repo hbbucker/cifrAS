@@ -131,7 +131,9 @@
     "contentPlaceholder": "[C]Olá [G]mundo... (Use os botões acima ou Ctrl+S para salvar)",
     "discard": "Descartar alterações?",
     "unsavedMessage": "Você tem modificações não salvas. Tem certeza de que deseja sair sem salvar?",
-    "discardBtn": "Descartar"
+    "discardBtn": "Descartar",
+    "editTitle": "Editar Música",
+    "newTitle": "Nova Música"
   },
   "songView": {
     "preferences": "Preferências",

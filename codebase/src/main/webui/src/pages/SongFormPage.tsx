@@ -122,7 +122,7 @@ export const SongFormPage: React.FC = () => {
  <button onClick={handleBack} className="p-2 hover:bg-bg-elevated rounded-full text-text-mute">
  <ArrowLeft className="w-5 h-5" />
  </button>
- <h1 className="text-xl font-bold text-text-main">{id ? 'Edit Song' : 'New Song'}</h1>
+ <h1 className="text-xl font-bold text-text-main">{id ? t('songForm.editTitle') : t('songForm.newTitle')}</h1>
  </div>
  <Button 
  onClick={handleSave}
