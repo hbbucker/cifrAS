@@ -1,20 +1,8 @@
 import { test, expect } from '@playwright/test';
 
 test('create group and verify admin buttons', async ({ page }) => {
-  const testEmail = `test_group_${Date.now()}@example.com`;
-  const testPassword = 'password123';
-
-  await page.goto('/register');
-  await page.getByTestId('name-input').fill('Test User Groups');
-  await page.getByTestId('reg-email-input').fill(testEmail);
-  await page.getByTestId('reg-password-input').fill(testPassword);
-  await page.getByTestId('reg-confirm-password-input').fill(testPassword);
-  await page.getByTestId('register-btn').click();
-  await expect(page).toHaveURL(/.*\/login/, { timeout: 10000 });
-
-  await page.getByTestId('email-input').fill(testEmail);
-  await page.getByTestId('password-input').fill(testPassword);
-  await page.getByTestId('login-btn').click();
+  const mockJwt = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL3Rlc3QuY2lmcmFzLmNvbSIsInN1YiI6ImUyZS11c2VyLTEyMzQiLCJ1cG4iOiJlMmUtdXNlci0xMjM0IiwiZ3JvdXBzIjpbInVzZXIiXSwiYXVkIjoiYXV0aGVudGljYXRlZCIsImV4cCI6MjA5ODU2ODQwMiwiaWF0IjoxNzgzMjA4NDAyfQ.ZRS-0Wf1Ws6j7PjQGc4lmVQ2H3UbK6616HNp4QZJEBMcO3bNdwEfn05SgXm5gp95knBSpNlS3M8wM0Iqtpthcpmh2JmzL9CfcssJSQPWgEzKGDP4rDt522-LFKAyOd8tLsyJQGt8cgRiY8rbW1Vkaohsl3YG6eIDaOJcnuzKhxfMCOSdEI4D9DCBJojre3xbLON8hqvEDX9WNZ_f86_P58Ttf479hJyjriLAlaGN2uvref3UkPvizALB0pgLovz6H3Vg7MP26LfjnIdwYOjZ8i_wislXNxS7vxfP9XXo3r36tv-A6ivstLXLO8ajivXzfNEBNRSz5ZwLP79d7EMQOQ';
+  await page.goto(`/auth/callback#access_token=${mockJwt}&refresh_token=dummy`);
   await expect(page).toHaveURL(/.*\/dashboard/);
 
   await page.getByTestId('sidebar').getByText('Groups').click();

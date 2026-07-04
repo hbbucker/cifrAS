@@ -58,30 +58,9 @@ test.describe('Google Drive Import', () => {
   });
 
   test('Should import song from Google Drive successfully', async ({ page }) => {
-    // 1. Perform UI Login
-    const testEmail = process.env.E2E_USER || `test_${Date.now()}@example.com`;
-    const testPassword = process.env.E2E_PASSWORD || 'password123';
-
-    // Register first if needed
-    if (!process.env.E2E_USER) {
-      await page.goto('/register');
-      await page.getByTestId('name-input').fill('Test User');
-      await page.getByTestId('reg-email-input').fill(testEmail);
-      await page.getByTestId('reg-password-input').fill(testPassword);
-      await page.getByTestId('reg-confirm-password-input').fill(testPassword);
-      await page.getByTestId('register-btn').click();
-      
-      try {
-        await expect(page).toHaveURL(/.*\/login/, { timeout: 10000 });
-      } catch {
-        // ignore
-      }
-    }
-
-    await page.goto('/login');
-    await page.getByTestId('email-input').fill(testEmail);
-    await page.getByTestId('password-input').fill(testPassword);
-    await page.getByTestId('login-btn').click();
+    // 1. Perform UI Login bypass
+    const mockJwt = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL3Rlc3QuY2lmcmFzLmNvbSIsInN1YiI6ImUyZS11c2VyLTEyMzQiLCJ1cG4iOiJlMmUtdXNlci0xMjM0IiwiZ3JvdXBzIjpbInVzZXIiXSwiYXVkIjoiYXV0aGVudGljYXRlZCIsImV4cCI6MjA5ODU2ODQwMiwiaWF0IjoxNzgzMjA4NDAyfQ.ZRS-0Wf1Ws6j7PjQGc4lmVQ2H3UbK6616HNp4QZJEBMcO3bNdwEfn05SgXm5gp95knBSpNlS3M8wM0Iqtpthcpmh2JmzL9CfcssJSQPWgEzKGDP4rDt522-LFKAyOd8tLsyJQGt8cgRiY8rbW1Vkaohsl3YG6eIDaOJcnuzKhxfMCOSdEI4D9DCBJojre3xbLON8hqvEDX9WNZ_f86_P58Ttf479hJyjriLAlaGN2uvref3UkPvizALB0pgLovz6H3Vg7MP26LfjnIdwYOjZ8i_wislXNxS7vxfP9XXo3r36tv-A6ivstLXLO8ajivXzfNEBNRSz5ZwLP79d7EMQOQ';
+    await page.goto(`/auth/callback#access_token=${mockJwt}&refresh_token=dummy`);
 
     await expect(page).toHaveURL(/.*\/dashboard/);
 
