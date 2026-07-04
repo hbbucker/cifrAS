@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
@@ -51,7 +52,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({ isOpen, onCl
     }
   };
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
       <div className="bg-bg-card border border-border-main rounded-2xl w-full max-w-md shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
         <div className="flex items-center justify-between p-4 border-b border-border-main">
@@ -114,6 +115,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({ isOpen, onCl
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

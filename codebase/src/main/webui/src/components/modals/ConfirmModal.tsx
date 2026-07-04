@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 
 export type ConfirmVariant = 'danger' | 'warning';
@@ -40,7 +41,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
 
  const btnBg = variant === 'danger' ? 'bg-[#EF4444] hover:bg-red-600' : 'bg-[#F59E0B] hover:bg-yellow-600';
 
- return (
+ return createPortal(
  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" role="dialog" aria-modal="true">
  <div className="bg-bg-card rounded-lg shadow-xl max-w-sm w-full p-6 text-center">
  <h3 className="text-xl font-bold mb-2 text-text-main">{title}</h3>
@@ -60,6 +61,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
  </button>
  </div>
  </div>
- </div>
+ </div>,
+ document.body
  );
 };

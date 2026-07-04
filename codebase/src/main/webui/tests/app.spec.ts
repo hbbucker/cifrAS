@@ -32,7 +32,7 @@ test('full application flow including registration and song CRUD', async ({ page
 
   // Redirect to dashboard
   await expect(page).toHaveURL(/.*\/dashboard/);
-  await expect(page.getByText('Recently Added')).toBeVisible();
+  await expect(page.getByText('Favorites')).toBeVisible();
 
   // 2. Navigate to Songs List (My Repertoire) via Dashboard
   await page.getByTestId('view-all-btn').click();

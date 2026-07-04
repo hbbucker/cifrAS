@@ -13,6 +13,7 @@ import br.com.cifras.song.application.usecase.UpdateSongUseCase;
 import br.com.cifras.song.application.usecase.UpdateSongPreferencesUseCase;
 import br.com.cifras.song.application.usecase.DeleteSongUseCase;
 import br.com.cifras.song.application.usecase.TranspositionService;
+import br.com.cifras.song.application.usecase.ToggleSongFavoriteUseCase;
 import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -53,6 +54,9 @@ public class SongResource {
 
     @Inject
     DeleteSongUseCase deleteSongUseCase;
+
+    @Inject
+    ToggleSongFavoriteUseCase toggleSongFavoriteUseCase;
 
     @Inject
     SecurityUtils securityUtils;
@@ -96,7 +100,7 @@ public class SongResource {
             lyrics = transpositionService.transpose(lyrics, transpose, EnharmonicConvention.SHARPS);
         }
         SongDTO dto = new SongDTO(song.getId(), song.getTitle(), song.getArtist(), song.getOriginalKey(),
-            lyrics, null, song.getPrefUseBb(), song.getPrefUseEb(), song.getPrefAutoScrollSpeed(), song.getPrefTransposeSteps(), song.getCreatedAt(), song.getUpdatedAt());
+            lyrics, null, song.getIsFavorite(), song.getPrefUseBb(), song.getPrefUseEb(), song.getPrefAutoScrollSpeed(), song.getPrefTransposeSteps(), song.getCreatedAt(), song.getUpdatedAt());
         return Response.ok(dto).build();
     }
 
@@ -108,7 +112,7 @@ public class SongResource {
         LyricsStructure transposed = transpositionService.transpose(
             song.getLyrics(), request.semitones(), request.convention());
         SongDTO dto = new SongDTO(song.getId(), song.getTitle(), song.getArtist(), song.getOriginalKey(),
-            transposed, null, song.getPrefUseBb(), song.getPrefUseEb(), song.getPrefAutoScrollSpeed(), song.getPrefTransposeSteps(), song.getCreatedAt(), song.getUpdatedAt());
+            transposed, null, song.getIsFavorite(), song.getPrefUseBb(), song.getPrefUseEb(), song.getPrefAutoScrollSpeed(), song.getPrefTransposeSteps(), song.getCreatedAt(), song.getUpdatedAt());
         return Response.ok(dto).build();
     }
 
@@ -134,5 +138,14 @@ public class SongResource {
         String userId = securityUtils.getCurrentUserId();
         deleteSongUseCase.execute(id, userId);
         return Response.noContent().build();
+    }
+
+    @PATCH
+    @Path("/{id}/favorite")
+    public Response toggleFavorite(@PathParam("id") UUID id) {
+        String userId = securityUtils.getCurrentUserId();
+        Song song = toggleSongFavoriteUseCase.execute(id, userId);
+        SongSummaryDTO dto = SongSummaryDTO.from(song);
+        return Response.ok(dto).build();
     }
 }

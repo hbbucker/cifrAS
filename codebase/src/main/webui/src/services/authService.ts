@@ -74,13 +74,14 @@ const setupInterceptors = (client: AxiosInstance) => {
           authClient.defaults.headers.common.Authorization = `Bearer ${data.accessToken}`;
           apiClient.defaults.headers.common.Authorization = `Bearer ${data.accessToken}`;
           
+          originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
           processQueue(null, data.accessToken);
           return client(originalRequest);
         } catch (err) {
           processQueue(err, null);
           localStorage.removeItem('token');
           localStorage.removeItem('refreshToken');
-          // Optionally trigger a logout event here if needed
+          window.location.href = '/login';
           return Promise.reject(err);
         } finally {
           isRefreshing = false;

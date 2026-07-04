@@ -43,6 +43,9 @@ public class SongEntity extends PanacheEntityBase {
     @Column(columnDefinition = "jsonb")
     public LyricsStructure lyrics;
 
+    @Column(name = "is_favorite")
+    public Boolean isFavorite = false;
+
     @Column(name = "pref_use_bb")
     public Boolean prefUseBb = false;
 

@@ -10,5 +10,5 @@ We have transitioned from roadmap generation to the execution of the first Epic.
 
 ## Quick Tasks
 
-- **008-dashboard-favorites:** Filtered dashboard songs to only display favorites and updated translation labels.
+- **008-dashboard-favorites:** Filtered dashboard songs to only display favorites and updated translation labels. Implemented backend support for `isFavorite` persistence (SongEntity, Song model, DTOs, PATCH endpoint) and integrated it with the frontend `onToggleFavorite` handler.
 

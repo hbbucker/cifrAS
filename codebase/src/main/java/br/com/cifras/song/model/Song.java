@@ -11,6 +11,7 @@ public class Song {
     private String artist;
     private String originalKey;
     private LyricsStructure lyrics;
+    private Boolean isFavorite = false;
     
     private Boolean prefUseBb = false;
     private Boolean prefUseEb = false;
@@ -36,7 +37,7 @@ public class Song {
     }
 
     public static Song restore(UUID id, String userId, String title, String artist, String originalKey, 
-                               LyricsStructure lyrics, Boolean prefUseBb, Boolean prefUseEb, 
+                               LyricsStructure lyrics, Boolean isFavorite, Boolean prefUseBb, Boolean prefUseEb, 
                                Integer prefAutoScrollSpeed, Integer prefTransposeSteps, 
                                Instant createdAt, Instant updatedAt, Instant deletedAt) {
         Song song = new Song();
@@ -46,6 +47,7 @@ public class Song {
         song.artist = artist;
         song.originalKey = originalKey;
         song.lyrics = lyrics;
+        song.isFavorite = isFavorite;
         song.prefUseBb = prefUseBb;
         song.prefUseEb = prefUseEb;
         song.prefAutoScrollSpeed = prefAutoScrollSpeed;
@@ -83,6 +85,12 @@ public class Song {
     public String getArtist() { return artist; }
     public String getOriginalKey() { return originalKey; }
     public LyricsStructure getLyrics() { return lyrics; }
+    public Boolean getIsFavorite() { return isFavorite; }
+    
+    public void toggleFavorite() {
+        this.isFavorite = !this.isFavorite;
+        this.updatedAt = Instant.now();
+    }
     public Boolean getPrefUseBb() { return prefUseBb; }
     public Boolean getPrefUseEb() { return prefUseEb; }
     public Integer getPrefAutoScrollSpeed() { return prefAutoScrollSpeed; }

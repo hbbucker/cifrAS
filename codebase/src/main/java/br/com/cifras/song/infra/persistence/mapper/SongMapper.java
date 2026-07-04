@@ -11,7 +11,7 @@ public class SongMapper {
         if (entity == null) return null;
         return Song.restore(
             entity.id, entity.userId, entity.title, entity.artist, entity.originalKey, entity.lyrics,
-            entity.prefUseBb, entity.prefUseEb, entity.prefAutoScrollSpeed, entity.prefTransposeSteps,
+            entity.isFavorite != null ? entity.isFavorite : false, entity.prefUseBb, entity.prefUseEb, entity.prefAutoScrollSpeed, entity.prefTransposeSteps,
             entity.createdAt, entity.updatedAt, entity.deletedAt
         );
     }
@@ -25,6 +25,7 @@ public class SongMapper {
         entity.artist = song.getArtist();
         entity.originalKey = song.getOriginalKey();
         entity.lyrics = song.getLyrics();
+        entity.isFavorite = song.getIsFavorite();
         entity.prefUseBb = song.getPrefUseBb();
         entity.prefUseEb = song.getPrefUseEb();
         entity.prefAutoScrollSpeed = song.getPrefAutoScrollSpeed();
@@ -40,6 +41,7 @@ public class SongMapper {
         entity.artist = song.getArtist();
         entity.originalKey = song.getOriginalKey();
         entity.lyrics = song.getLyrics();
+        entity.isFavorite = song.getIsFavorite();
         entity.prefUseBb = song.getPrefUseBb();
         entity.prefUseEb = song.getPrefUseEb();
         entity.prefAutoScrollSpeed = song.getPrefAutoScrollSpeed();

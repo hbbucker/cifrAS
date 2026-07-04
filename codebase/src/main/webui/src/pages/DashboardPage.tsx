@@ -85,6 +85,30 @@ export const DashboardPage: React.FC = () => {
  .catch(() => toast(t('dashboard.deleteError'), 'error'));
  };
 
+  const handleToggleFavorite = (id: string) => {
+    fetch(`/api/songs/${id}/favorite`, {
+      method: 'PATCH',
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    })
+    .then(res => {
+      if (res.status === 401) {
+        logout();
+        navigate('/login');
+        throw new Error('Unauthorized');
+      }
+      if (!res.ok) throw new Error('Toggle favorite failed');
+      return res.json();
+    })
+    .then((updatedSong) => {
+      // In Dashboard, we want to remove the song if it's no longer favorite.
+      setSongs(prev => {
+        const newSongs = prev.map(song => song.id === id ? { ...song, isFavorite: updatedSong.isFavorite } : song);
+        return newSongs.filter(song => song.isFavorite);
+      });
+    })
+    .catch(() => toast('Error toggling favorite', 'error'));
+  };
+
  return (
   <main className="flex-1 flex flex-col h-full overflow-hidden">
  <header className="h-16 flex items-center justify-between px-6 bg-bg-card border-b border-border-main">
@@ -126,7 +150,7 @@ export const DashboardPage: React.FC = () => {
  <div key={song.id} onClick={() => navigate(`/song/${song.id}`)} className="cursor-pointer" data-testid={`view-song-${song.id}`}>
  <MusicCard
  {...song}
- onToggleFavorite={() => { }}
+ onToggleFavorite={handleToggleFavorite}
  onEdit={(id) => navigate(`/songs/edit/${id}`)}
  onShare={() => { }}
  onDelete={handleDelete}

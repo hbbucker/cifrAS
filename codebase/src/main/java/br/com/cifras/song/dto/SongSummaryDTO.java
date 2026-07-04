@@ -16,6 +16,7 @@ public record SongSummaryDTO(
     String title,
     String artist,
     String originalKey,
+    Boolean isFavorite,
     Instant createdAt
 ) {
     public static SongSummaryDTO from(Song song) {
@@ -24,6 +25,7 @@ public record SongSummaryDTO(
             song.getTitle(),
             song.getArtist(),
             song.getOriginalKey(),
+            song.getIsFavorite(),
             song.getCreatedAt()
         );
     }
