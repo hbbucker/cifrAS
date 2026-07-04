@@ -33,7 +33,7 @@ O projeto adota uma arquitetura full-stack moderna, focada em performance e esca
 * Testes integrados com **Testcontainers**
 
 ### Banco de Dados e Autenticação
-* **Supabase** gerenciando toda a autenticação de usuários (JWT) e fornecendo a base de dados relacional (**PostgreSQL**).
+* **Supabase** gerenciando toda a autenticação de usuários via OAuth (Login Social exclusivo com Google) e fornecendo a base de dados relacional (**PostgreSQL**).
 
 ---
 

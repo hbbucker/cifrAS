@@ -21,7 +21,7 @@ O **CifrAS** é uma plataforma moderna e responsiva projetada para músicos (ama
 ### Backend
 - **Linguagem & Framework:** Java 21 + Quarkus 3.10+
 - **Acesso a Dados:** Hibernate ORM com Panache (Padrão Repository) sobre PostgreSQL.
-- **Banco de Dados & Autenticação:** **Supabase** (PostgreSQL na nuvem e autenticação via JWT).
+- **Banco de Dados & Autenticação:** **Supabase** (PostgreSQL na nuvem e autenticação via OAuth/Google exclusivo emitindo JWT).
 - **Validação:** Hibernate Validator (Bean Validation) e serialização Jackson.
 - **Testes:** JUnit 5 + REST Assured + Testcontainers (para instâncias Postgres isoladas nos testes de integração).
 
