@@ -80,5 +80,140 @@
     "songsCount": "músicas",
     "emptyDesc": "Seu repertório está vazio. Comece adicionando músicas.",
     "addFirstSong": "Adicionar Primeira Música"
+  },
+  "landing": {
+    "getStarted": "Comece de Graça",
+    "goDashboard": "Ir para o Painel",
+    "signUp": "Cadastre-se",
+    "login": "Entrar",
+    "dashboard": "Painel",
+    "learnMore": "Saiba Mais",
+    "yourUltimate": "Seu gerenciador definitivo de",
+    "chordRepertoire": "cifras e repertórios",
+    "manager": ".",
+    "instantTrans": "Transposição Instantânea",
+    "desc3": "Mude de tom em segundos. Nunca mais sofra com acordes complexos durante um show ou ensaio.",
+    "theaterMode": "Modo Teatro",
+    "desc4": "Visualização em tela cheia livre de distrações e rolagem automática, otimizada para apresentações ao vivo.",
+    "collab": "Playlists Colaborativas",
+    "desc2": "Crie grupos, compartilhe setlists com seus companheiros de banda e mantenha todos sincronizados sem esforço.",
+    "desc1": "O CifrAS ajuda músicos a gerenciar, transpor e organizar suas cifras e setlists para shows ao vivo e ensaios.",
+    "rights": "© 2026 CifrAS. Todos os direitos reservados.",
+    "privacy": "Política de Privacidade"
+  },
+  "auth": {
+    "welcome": "Bem-vindo ao CifrAS",
+    "subtitle": "Seu gerenciador moderno de cifras e repertórios",
+    "email": "E-mail",
+    "password": "Senha",
+    "register": "Cadastrar-se",
+    "noAccount": "Não tem uma conta?",
+    "fullName": "Nome Completo",
+    "confirmPassword": "Confirmar Senha",
+    "createAccount": "Criar uma Conta",
+    "hasAccount": "Já tem uma conta?",
+    "emailPlaceholder": "voce@exemplo.com",
+    "namePlaceholder": "João Silva"
+  },
+  "songForm": {
+    "chordsLyrics": "Cifras e Letra",
+    "quebra": "Quebra",
+    "importDrive": "Importar do Drive",
+    "title": "Título",
+    "artist": "Artista",
+    "tom": "Tom",
+    "refrao": "Refrão",
+    "separador": "Separador",
+    "tablatura": "Tablatura",
+    "titlePlaceholder": "Título da Música",
+    "artistPlaceholder": "Nome do Artista",
+    "contentPlaceholder": "[C]Olá [G]mundo... (Use os botões acima ou Ctrl+S para salvar)",
+    "discard": "Descartar alterações?"
+  },
+  "songView": {
+    "preferences": "Preferências",
+    "perform": "Tocar",
+    "autoScroll": "Velocidade da Rolagem",
+    "useEb": "Usar Eb",
+    "useBb": "Usar Bb",
+    "editSong": "Editar Música"
+  },
+  "playlistView": {
+    "addSongs": "Adicionar Músicas",
+    "noSongs": "Nenhuma música nesta playlist",
+    "addSong": "Adicionar Música",
+    "loading": "Carregando músicas...",
+    "selectSongs": "Selecione músicas para adicionar à sua playlist",
+    "startTheater": "Iniciar Modo Teatro",
+    "addDesc": "Adicione músicas da biblioteca para montar seu repertório.",
+    "add": "Adicionar",
+    "moveUp": "Mover para cima",
+    "moveDown": "Mover para baixo",
+    "searchPlaceholder": "Buscar por título ou artista..."
+  },
+  "sharedWithMe": {
+    "noPlaylists": "Nenhuma playlist compartilhada com você ainda.",
+    "title": "Compartilhado Comigo",
+    "loading": "Carregando playlists compartilhadas...",
+    "playTheater": "Tocar no Modo Teatro"
+  },
+  "groups": {
+    "loadingGroups": "Carregando grupos...",
+    "newGroup": "Novo Grupo",
+    "createNewGroup": "Criar Novo Grupo",
+    "groups": "Grupos",
+    "invitedToJoin": "Convidado(a) a entrar",
+    "declinedInvitation": "recusou seu convite para entrar",
+    "accept": "Aceitar",
+    "decline": "Recusar",
+    "create": "Criar",
+    "sendInvite": "Enviar Convite",
+    "noGroups": "Nenhum grupo encontrado.",
+    "dismiss": "Dispensar",
+    "declinedInvitations": "Convites Recusados",
+    "pendingInvitations": "Convites Pendentes",
+    "inviteToGroup": "Convidar para o Grupo",
+    "groupName": "Nome do Grupo",
+    "memberEmail": "membro@exemplo.com"
+  },
+  "group": {
+    "sharePlaylist": "Compartilhar Playlist",
+    "sharedPlaylists": "Playlists Compartilhadas",
+    "leave": "Sair do Grupo",
+    "invite": "Convidar Membro",
+    "remove": "Remover do Grupo",
+    "noSharedPlaylists": "Nenhuma playlist compartilhada"
+  },
+  "musicCard": {
+    "delete": "Deletar",
+    "edit": "Editar",
+    "share": "Compartilhar",
+    "actions": "Menu de ações"
+  },
+  "theater": {
+    "aPlus": "A+",
+    "fast": "Rápido",
+    "slow": "Lento",
+    "aMinus": "A-",
+    "exit": "Sair do Modo Teatro",
+    "fullscreen": "Tela Cheia",
+    "decreaseFont": "Diminuir Fonte",
+    "increaseFont": "Aumentar Fonte"
+  },
+  "linkPlaylist": {
+    "shareTitle": "Compartilhar uma Playlist",
+    "shareDesc": "Selecione uma de suas playlists pessoais para compartilhar com este grupo. Membros poderão visualizá-la e tocá-la.",
+    "noPlaylists": "Nenhuma playlist pessoal"
+  },
+  "search": {
+    "noResults": "Nenhum resultado encontrado",
+    "placeholder": "Buscar músicas, artistas..."
+  },
+  "errorState": {
+    "tryAgain": "Tentar Novamente"
+  },
+  "transposePad": {
+    "up": "Transpor para cima",
+    "down": "Transpor para baixo"
   }
 }

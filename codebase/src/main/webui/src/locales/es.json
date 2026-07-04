@@ -80,5 +80,140 @@
     "songsCount": "canciones",
     "emptyDesc": "Tu repertorio está vacío. Empieza agregando canciones.",
     "addFirstSong": "Agregar Primera Canción"
+  },
+  "landing": {
+    "getStarted": "Get Started for Free",
+    "goDashboard": "Go to Dashboard",
+    "signUp": "Sign Up",
+    "login": "Log in",
+    "dashboard": "Dashboard",
+    "learnMore": "Learn More",
+    "yourUltimate": "Your ultimate",
+    "chordRepertoire": "chord & repertoire",
+    "manager": "manager.",
+    "instantTrans": "Instant Transposition",
+    "desc3": "Change keys in seconds. Never struggle with complex chords during a gig or rehearsal again.",
+    "theaterMode": "Theater Mode",
+    "desc4": "Distraction-free, full-screen auto-scrolling view optimized for live stage performances.",
+    "collab": "Collaborative Playlists",
+    "desc2": "Create groups, share setlists with your bandmates, and keep everyone in sync effortlessly.",
+    "desc1": "CifrAS helps musicians manage, transpose, and organize their chord charts and setlists for live performances and rehearsals.",
+    "rights": "© 2026 CifrAS. All rights reserved.",
+    "privacy": "Privacy Policy"
+  },
+  "auth": {
+    "welcome": "Welcome to CifrAS",
+    "subtitle": "Your modern chord & repertoire manager",
+    "email": "Email",
+    "password": "Password",
+    "register": "Register",
+    "noAccount": "Don't have an account?",
+    "fullName": "Full Name",
+    "confirmPassword": "Confirm Password",
+    "createAccount": "Create an Account",
+    "hasAccount": "Already have an account?",
+    "emailPlaceholder": "you@example.com",
+    "namePlaceholder": "John Doe"
+  },
+  "songForm": {
+    "chordsLyrics": "Chords & Lyrics",
+    "quebra": "Quebra",
+    "importDrive": "Import from Drive",
+    "title": "Title",
+    "artist": "Artist",
+    "tom": "Tom",
+    "refrao": "Refrão",
+    "separador": "Separador",
+    "tablatura": "Tablatura",
+    "titlePlaceholder": "Song Title",
+    "artistPlaceholder": "Artist Name",
+    "contentPlaceholder": "[C]Hello [G]world... (Use os botões acima ou Ctrl+S para salvar)",
+    "discard": "Discard changes?"
+  },
+  "songView": {
+    "preferences": "Preferences",
+    "perform": "Perform",
+    "autoScroll": "Auto-scroll Speed",
+    "useEb": "Use Eb",
+    "useBb": "Use Bb",
+    "editSong": "Edit Song"
+  },
+  "playlistView": {
+    "addSongs": "Add Songs",
+    "noSongs": "No songs in this playlist",
+    "addSong": "Add Song",
+    "loading": "Loading songs...",
+    "selectSongs": "Select songs to add to your playlist",
+    "startTheater": "Start Theater Mode",
+    "addDesc": "Add songs from the library to build your repertoire.",
+    "add": "Add",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "searchPlaceholder": "Search by title or artist..."
+  },
+  "sharedWithMe": {
+    "noPlaylists": "No playlists shared with you yet.",
+    "title": "Shared with Me",
+    "loading": "Loading shared playlists...",
+    "playTheater": "Play in Theater Mode"
+  },
+  "groups": {
+    "loadingGroups": "Loading groups...",
+    "newGroup": "New Group",
+    "createNewGroup": "Create New Group",
+    "groups": "Groups",
+    "invitedToJoin": "Invited to join",
+    "declinedInvitation": "declined your invitation to join",
+    "accept": "Accept",
+    "decline": "Decline",
+    "create": "Create",
+    "sendInvite": "Send Invite",
+    "noGroups": "No groups found.",
+    "dismiss": "Dismiss",
+    "declinedInvitations": "Declined Invitations",
+    "pendingInvitations": "Pending Invitations",
+    "inviteToGroup": "Invite to Group",
+    "groupName": "Group Name",
+    "memberEmail": "member@example.com"
+  },
+  "group": {
+    "sharePlaylist": "Share Playlist",
+    "sharedPlaylists": "Shared Playlists",
+    "leave": "Leave Group",
+    "invite": "Invite Member",
+    "remove": "Remove from Group",
+    "noSharedPlaylists": "No shared playlists"
+  },
+  "musicCard": {
+    "delete": "Delete",
+    "edit": "Edit",
+    "share": "Share",
+    "actions": "Actions menu"
+  },
+  "theater": {
+    "aPlus": "A+",
+    "fast": "Fast",
+    "slow": "Slow",
+    "aMinus": "A-",
+    "exit": "Exit Theater",
+    "fullscreen": "Fullscreen",
+    "decreaseFont": "Decrease Font",
+    "increaseFont": "Increase Font"
+  },
+  "linkPlaylist": {
+    "shareTitle": "Share a Playlist",
+    "shareDesc": "Select one of your personal playlists to share with this group. Members will be able to view and play it.",
+    "noPlaylists": "No personal playlists"
+  },
+  "search": {
+    "noResults": "No results found",
+    "placeholder": "Search songs, artists..."
+  },
+  "errorState": {
+    "tryAgain": "Try Again"
+  },
+  "transposePad": {
+    "up": "Transpose up",
+    "down": "Transpose down"
   }
 }
