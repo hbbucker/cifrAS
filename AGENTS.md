@@ -176,18 +176,19 @@ Para economizar tokens de contexto nas interações com o terminal e o git, todo
 
 ## 9. Equipe do Projeto e StartupOS
 
-Este projeto opera sob uma arquitetura de **Sistema Operacional para Startups (StartupOS)**. A tomada de decisão é orquestrada pelo CEO AI, que conta com um time expansível de especialistas. Suas instruções completas estão em `.gemini/agents/`.
+Este projeto opera sob uma arquitetura de **Sistema Operacional para Startups (StartupOS)**. A tomada de decisão é orquestrada pelo CEO AI, que conta com um time expansível de especialistas. 
 
-- **CEO AI (Founder):** Orquestrador principal. Focado em estratégia, priorização, tomada de decisão e aumento do valor da empresa.
-- **Chief of Staff AI:** Transforma decisões em planos operacionais, acompanha execução e prepara pautas/reuniões.
-- **CTO AI:** Arquitetura técnica, infraestrutura, qualidade do código e liderança da equipe de engenharia.
-- **CPO AI (Lucas Silva / Maya Rivers):** Descoberta de produto, roadmap, UX (Pinterest-style), validação de hipóteses e ativação.
-- **CMO AI (Leo Sterling):** Marketing digital, relações com desenvolvedores, SEO, redes sociais, aquisição e comunidade.
-- **CRO AI:** Receita, vendas, conversão, pricing e monetização.
-- **CFO AI:** Finanças, acompanhamento de runway, burn rate, MRR, margem e projeções.
-- **COO AI:** Operações sistêmicas, eliminação de gargalos e automações (Frontend Performance Engineer Alex J. Code pode atuar aqui a nível de otimização de entrega).
-- **Research AI:** Monitoramento de mercado, concorrentes, novas tecnologias e regulamentações.
-- **Data AI / QA Critic:** Criação de métricas, análise de dados, desafio de decisões (advogado do diabo) e identificação de anomalias/vieses.
+As definições e system prompts estão consolidados como **Agentes Antigravity Persistentes** (Subagents). Eles são inicializados por meio do plugin local configurado em `.gemini/plugins/startupos/agents/`.
+
+Para invocar um dos agentes abaixo em suas tarefas, os agentes do conselho devem utilizar a tool `invoke_subagent` indicando o respectivo nome (ex: `TypeName: "ceo"`).
+
+- **ceo (CEO AI / Founder):** Orquestrador principal. Focado em estratégia, priorização, tomada de decisão e aumento do valor da empresa. (Permissões: Subagents, Código, MCP).
+- **cto (CTO AI):** Arquitetura técnica, infraestrutura, qualidade do código e liderança da equipe de engenharia. (Permissões: Subagents, Código, MCP).
+- **maya-rivers (CPO AI):** Descoberta de produto, roadmap, UX (Pinterest-style), validação de hipóteses e ativação.
+- **po (Product Owner AI):** Tradução de requisitos, detalhamento de sprints e acompanhamento de tarefas granulares.
+- **leo-sterling (CMO AI):** Marketing digital, relações com desenvolvedores, SEO, redes sociais, aquisição e comunidade.
+- **alex-j-code (Frontend Performance Engineer):** Otimizações pesadas de front-end, Web Vitals e refinamento de interface.
+- **Demais Especialistas (CRO, CFO, COO, QA, Research):** Podem ser definidos sob demanda ou agregados futuramente via plugin.
 
 ---
 
