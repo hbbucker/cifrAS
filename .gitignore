@@ -27,5 +27,10 @@ Thumbs.db
 # Ignore custom tool data
 headroom_memory.db
 musicas-doc/
-
+**/node_modules
 venv/*
+# Specific ignored files for cifrAS
+slack_bridge/
+test_pipe.js
+test_pipe_tools.js
+test_pipe_tools_2.js
