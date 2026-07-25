@@ -16,11 +16,12 @@ public record PlaylistDTO(
     String name,
     boolean isCollaborative,
     String userId,
+    String shareToken,
     int songCount,
     Instant createdAt
 ) {
     public static PlaylistDTO from(Playlist p) {
         int count = p.getSongs() != null ? p.getSongs().size() : 0;
-        return new PlaylistDTO(p.getId(), p.getName(), p.isCollaborative(), p.getUserId(), count, p.getCreatedAt());
+        return new PlaylistDTO(p.getId(), p.getName(), p.isCollaborative(), p.getUserId(), p.getShareToken(), count, p.getCreatedAt());
     }
 }

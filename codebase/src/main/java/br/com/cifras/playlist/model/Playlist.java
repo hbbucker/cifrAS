@@ -13,6 +13,7 @@ public class Playlist {
     private String name;
     private boolean isCollaborative = false;
     private Group group;
+    private String shareToken;
     
     private List<PlaylistSong> songs = new ArrayList<>();
     
@@ -29,13 +30,14 @@ public class Playlist {
         return playlist;
     }
 
-    public static Playlist restore(UUID id, String userId, String name, boolean isCollaborative, Group group, Instant createdAt, Instant deletedAt) {
+    public static Playlist restore(UUID id, String userId, String name, boolean isCollaborative, Group group, String shareToken, Instant createdAt, Instant deletedAt) {
         Playlist playlist = new Playlist();
         playlist.id = id;
         playlist.userId = userId;
         playlist.name = name;
         playlist.isCollaborative = isCollaborative;
         playlist.group = group;
+        playlist.shareToken = shareToken;
         playlist.createdAt = createdAt;
         playlist.deletedAt = deletedAt;
         return playlist;
@@ -63,6 +65,13 @@ public class Playlist {
         this.deletedAt = null;
     }
 
+    public String generateShareToken() {
+        if (this.shareToken == null) {
+            this.shareToken = java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 16);
+        }
+        return this.shareToken;
+    }
+
     public void addSong(PlaylistSong song) {
         this.songs.add(song);
     }
@@ -76,6 +85,7 @@ public class Playlist {
     public String getName() { return name; }
     public boolean isCollaborative() { return isCollaborative; }
     public Group getGroup() { return group; }
+    public String getShareToken() { return shareToken; }
     public List<PlaylistSong> getSongs() { return songs; }
     public Instant getCreatedAt() { return createdAt; }
     public Instant getDeletedAt() { return deletedAt; }

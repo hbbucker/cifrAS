@@ -36,6 +36,9 @@ public class PlaylistEntity extends PanacheEntityBase {
     @JoinColumn(name = "group_id")
     public GroupEntity group;
 
+    @Column(unique = true)
+    public String shareToken;
+
     @OneToMany(mappedBy = "playlist", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("position ASC")
     public List<PlaylistSongEntity> songs = new ArrayList<>();

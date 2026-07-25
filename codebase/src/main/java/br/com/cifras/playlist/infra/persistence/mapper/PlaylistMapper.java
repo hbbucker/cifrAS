@@ -27,6 +27,7 @@ public class PlaylistMapper {
             entity.name,
             entity.isCollaborative,
             groupMapper.toDomain(entity.group),
+            entity.shareToken,
             entity.createdAt,
             entity.deletedAt
         );
@@ -51,6 +52,7 @@ public class PlaylistMapper {
         entity.name = playlist.getName();
         entity.isCollaborative = playlist.isCollaborative();
         entity.group = groupMapper.toEntity(playlist.getGroup());
+        entity.shareToken = playlist.getShareToken();
         entity.createdAt = playlist.getCreatedAt();
         entity.deletedAt = playlist.getDeletedAt();
         
@@ -79,6 +81,7 @@ public class PlaylistMapper {
         entity.name = playlist.getName();
         entity.isCollaborative = playlist.isCollaborative();
         entity.group = groupMapper.toEntity(playlist.getGroup());
+        entity.shareToken = playlist.getShareToken();
         entity.deletedAt = playlist.getDeletedAt();
         
         if (playlist.getSongs() != null) {

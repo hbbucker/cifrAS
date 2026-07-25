@@ -14,6 +14,7 @@ public record PlaylistDetailsDTO(
     String name,
     boolean isCollaborative,
     String userId,
+    String shareToken,
     Instant createdAt,
     List<PlaylistSongDTO> songs
 ) {
@@ -22,6 +23,6 @@ public record PlaylistDetailsDTO(
             ? p.getSongs().stream().map(PlaylistSongDTO::from).collect(Collectors.toList())
             : List.of();
             
-        return new PlaylistDetailsDTO(p.getId(), p.getName(), p.isCollaborative(), p.getUserId(), p.getCreatedAt(), songDTOs);
+        return new PlaylistDetailsDTO(p.getId(), p.getName(), p.isCollaborative(), p.getUserId(), p.getShareToken(), p.getCreatedAt(), songDTOs);
     }
 }

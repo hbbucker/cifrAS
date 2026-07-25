@@ -43,6 +43,10 @@ public class PlaylistRepository {
     public Optional<Playlist> findActiveById(UUID id) {
         return jpaRepo.find("id = ?1 AND deletedAt IS NULL", id).firstResultOptional().map(mapper::toDomain);
     }
+
+    public Optional<Playlist> findByShareToken(String shareToken) {
+        return jpaRepo.find("shareToken = ?1 AND deletedAt IS NULL", shareToken).firstResultOptional().map(mapper::toDomain);
+    }
     
     public void persist(Playlist playlist) {
         PlaylistEntity entity = mapper.toEntity(playlist);
