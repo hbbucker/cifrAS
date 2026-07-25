@@ -29,11 +29,11 @@ export const LoginPage: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4">
       <div className="max-w-md w-full bg-gray-800 rounded-xl shadow-2xl p-8 border border-gray-700">
         <div className="flex flex-col items-center mb-8">
-          <div className="w-16 h-16 bg-[#aa3bff]/20 rounded-full flex items-center justify-center mb-4">
-            <Music className="w-8 h-8 text-[#aa3bff]" />
+          <div className="w-16 h-16 bg-[#8629cc]/20 rounded-full flex items-center justify-center mb-4">
+            <Music className="w-8 h-8 text-[#8629cc]" />
           </div>
           <h2 className="text-3xl font-bold text-white text-center">{t('auth.welcome')}</h2>
-          <p className="text-gray-400 mt-2 text-center">{t('auth.subtitle')}</p>
+          <p className="text-gray-500 mt-2 text-center">{t('auth.subtitle')}</p>
         </div>
 
         <div className="space-y-6">
@@ -66,9 +66,9 @@ export const LoginPage: React.FC = () => {
         </div>
 
         <div className="mt-8 flex justify-center space-x-4 text-xs text-gray-500">
-          <a href="/privacy?lang=pt" className="hover:text-[#aa3bff] transition-colors">{t('landing.privacy')}</a>
+          <a href="/privacy?lang=pt" className="hover:text-[#8629cc] transition-colors">{t('landing.privacy')}</a>
           <span>•</span>
-          <a href="/privacy?lang=en" className="hover:text-[#aa3bff] transition-colors">{t('landing.privacy')}</a>
+          <a href="/privacy?lang=en" className="hover:text-[#8629cc] transition-colors">{t('landing.privacy')}</a>
         </div>
       </div>
     </div>

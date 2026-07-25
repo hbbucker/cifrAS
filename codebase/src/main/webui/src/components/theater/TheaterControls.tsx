@@ -54,14 +54,14 @@ interface TheaterControlsProps {
  <input 
  type="range" min="1" max="10" step="1" 
  value={speed} onChange={(e) => onSpeedChange(Number(e.target.value))}
- className="w-full accent-[#aa3bff]"
+ className="w-full accent-[#8629cc]"
  data-testid="speed-slider"
  />
  </div>
 
  <button 
  onClick={onPlayPause}
- className="w-12 h-12 md:w-14 md:h-14 bg-[#aa3bff] hover:bg-[#902be6] flex items-center justify-center rounded-full transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-[#aa3bff]/20 shrink-0"
+ className="w-12 h-12 md:w-14 md:h-14 bg-[#8629cc] hover:bg-[#721eb8] flex items-center justify-center rounded-full transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-[#8629cc]/20 shrink-0"
  data-testid="play-pause-btn"
  >
  {isScrolling ? <Pause className="w-6 h-6 md:w-7 md:h-7 fill-white text-white" /> : <Play className="w-6 h-6 md:w-7 md:h-7 fill-white text-white ml-1" />}

@@ -51,7 +51,7 @@ export const LanguageSelector: React.FC<{ direction?: 'up' | 'down'; compact?: b
       <button
         onClick={(e) => { e.stopPropagation(); setIsOpen(!isOpen); }}
         disabled={isLoading}
-        className="flex items-center gap-2 p-2 rounded-lg text-text-mute hover:text-[#aa3bff] hover:bg-bg-elevated transition-colors focus:outline-none disabled:opacity-50"
+        className="flex items-center gap-2 p-2 rounded-lg text-text-mute hover:text-[#8629cc] hover:bg-bg-elevated transition-colors focus:outline-none disabled:opacity-50"
         aria-label="Select Language"
       >
         {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Globe className="w-5 h-5" />}
@@ -70,7 +70,7 @@ export const LanguageSelector: React.FC<{ direction?: 'up' | 'down'; compact?: b
               onClick={(e) => changeLanguage(lng.code, e)}
               className={`w-full text-left px-4 py-2 text-sm transition-colors ${
                 i18n.language === lng.code || (i18n.language && i18n.language.startsWith(lng.code.split('-')[0]) && i18n.language.includes(lng.code))
-                  ? 'text-[#aa3bff] bg-[#aa3bff]/10' 
+                  ? 'text-[#8629cc] bg-[#8629cc]/10' 
                   : 'text-text-main hover:bg-bg-elevated'
               }`}
             >

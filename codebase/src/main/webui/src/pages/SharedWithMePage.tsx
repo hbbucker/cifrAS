@@ -59,7 +59,7 @@ export const SharedWithMePage: React.FC = () => {
 
  return (
  <>
- <main className="flex-1 flex flex-col h-full overflow-hidden">
+ <div className="flex-1 flex flex-col h-full overflow-hidden">
  <header className="h-16 flex items-center px-6 bg-bg-card border-b border-border-main shrink-0">
  <h1 className="text-xl font-bold text-text-main">{t('sharedWithMe.title')}</h1>
  </header>
@@ -82,7 +82,7 @@ export const SharedWithMePage: React.FC = () => {
  </div>
  <button 
  onClick={() => navigate(`/theater/${playlist.id}`)}
- className="p-2 bg-[#aa3bff]/10 text-[#aa3bff] hover:bg-[#aa3bff]/20 rounded-full transition-colors ml-4 shrink-0"
+ className="p-2 bg-[#8629cc]/10 text-[#8629cc] hover:bg-[#8629cc]/20 rounded-full transition-colors ml-4 shrink-0"
  title={t('sharedWithMe.playTheater')}
  >
  <Play className="w-5 h-5 fill-current" />
@@ -98,7 +98,7 @@ export const SharedWithMePage: React.FC = () => {
  </div>
  )}
  </div>
- </main>
+ </div>
  </>
  );
 };

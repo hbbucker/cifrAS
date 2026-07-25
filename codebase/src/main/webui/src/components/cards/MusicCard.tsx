@@ -30,7 +30,7 @@ export const MusicCard: React.FC<MusicCardProps> = ({
  };
 
  return (
- <div className="relative bg-bg-card rounded-lg border border-border-main p-4 transition-all hover:shadow-md hover:border-[#aa3bff]/50 flex flex-col group">
+ <div className="relative bg-bg-card rounded-lg border border-border-main p-4 transition-all hover:shadow-md hover:border-[#8629cc]/50 flex flex-col group">
  <div className="flex justify-between items-start mb-2">
  <div className="flex-1">
  <h3 className="font-bold text-lg text-text-main line-clamp-1">{title}</h3>
@@ -42,7 +42,7 @@ export const MusicCard: React.FC<MusicCardProps> = ({
  </span>
  <button 
  onClick={handleToggleFavorite}
- className="w-12 h-12 flex items-center justify-center rounded-full text-gray-400 hover:text-[#EC4899] hover:bg-bg-elevated transition-colors"
+ className="w-12 h-12 flex items-center justify-center rounded-full text-gray-500 hover:text-[#EC4899] hover:bg-bg-elevated transition-colors"
  aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
  data-testid="favorite-btn"
  >
@@ -53,7 +53,7 @@ export const MusicCard: React.FC<MusicCardProps> = ({
 
  <div className="flex flex-wrap gap-2 mt-2 mb-4">
  {categories.map((cat) => (
- <span key={cat} className="text-xs bg-[#aa3bff]/10 text-[#aa3bff] px-2 py-0.5 rounded-full font-medium">
+ <span key={cat} className="text-xs bg-[#8629cc]/10 text-[#8629cc] px-2 py-0.5 rounded-full font-medium">
  {cat}
  </span>
  ))}

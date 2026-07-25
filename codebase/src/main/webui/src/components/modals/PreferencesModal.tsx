@@ -74,7 +74,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({ isOpen, onCl
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-3 bg-bg-main border border-border-main rounded-xl text-text-main focus:ring-2 focus:ring-[#aa3bff] focus:border-transparent transition-all outline-none"
+              className="w-full px-4 py-3 bg-bg-main border border-border-main rounded-xl text-text-main focus:ring-2 focus:ring-[#8629cc] focus:border-transparent transition-all outline-none"
               placeholder="Your name"
               required
             />
@@ -104,7 +104,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({ isOpen, onCl
             <button
               type="submit"
               disabled={isLoading || name === user?.name || !name.trim()}
-              className="px-6 py-2 bg-[#aa3bff] hover:bg-[#902be6] text-white rounded-xl font-medium transition-colors disabled:opacity-50 flex items-center justify-center min-w-[100px]"
+              className="px-6 py-2 bg-[#8629cc] hover:bg-[#721eb8] text-white rounded-xl font-medium transition-colors disabled:opacity-50 flex items-center justify-center min-w-[100px]"
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

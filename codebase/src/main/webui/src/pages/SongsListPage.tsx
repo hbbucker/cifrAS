@@ -124,7 +124,7 @@ export const SongsListPage: React.FC = () => {
 
  return (
  <>
- <main className="flex-1 flex flex-col h-full overflow-hidden">
+ <div className="flex-1 flex flex-col h-full overflow-hidden">
  <header className="h-16 flex items-center justify-between px-6 bg-bg-card border-b border-border-main">
  <h1 className="text-xl font-bold text-text-main">{t('songsList.title')}</h1>
  <Button 
@@ -144,18 +144,18 @@ export const SongsListPage: React.FC = () => {
  placeholder={t('songsList.searchPlaceholder')} 
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
- className="w-full pl-4 pr-10 py-2 bg-bg-card border border-border-main rounded-lg focus:ring-2 focus:ring-[#aa3bff] outline-none "
+ className="w-full pl-4 pr-10 py-2 bg-bg-card border border-border-main rounded-lg focus:ring-2 focus:ring-[#8629cc] outline-none "
  />
  {searchQuery ? (
  <button 
  onClick={() => setSearchQuery('')}
- className="absolute right-3 top-2.5 text-gray-400 hover:text-text-mute dark:hover:text-gray-200 focus:outline-none"
+ className="absolute right-3 top-2.5 text-gray-500 hover:text-text-mute dark:hover:text-gray-200 focus:outline-none"
  aria-label={t('songsList.clearSearch')}
  >
  <X className="w-5 h-5" />
  </button>
  ) : (
- <Filter className="absolute right-3 top-2.5 w-5 h-5 text-gray-400" />
+ <Filter className="absolute right-3 top-2.5 w-5 h-5 text-gray-500" />
  )}
  </div>
  <div className="flex gap-2">
@@ -190,7 +190,7 @@ export const SongsListPage: React.FC = () => {
  </div>
  )}
  </div>
- </main>
+ </div>
  </>
  );
 };

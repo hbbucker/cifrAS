@@ -106,7 +106,7 @@ export const SongViewPage: React.FC = () => {
 
  return (
  <>
- <main className="flex-1 flex flex-col h-full overflow-hidden">
+ <div className="flex-1 flex flex-col h-full overflow-hidden">
  <header className="flex flex-col sm:flex-row sm:items-center justify-between px-4 sm:px-6 py-3 sm:py-0 sm:h-16 bg-bg-card border-b border-border-main shrink-0 gap-3 sm:gap-0 relative z-10">
  <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto overflow-hidden">
  <button onClick={() => navigate('/songs')} className="p-2 hover:bg-bg-elevated rounded-full text-text-mute shrink-0 -ml-2 sm:ml-0">
@@ -131,7 +131,7 @@ export const SongViewPage: React.FC = () => {
  className="flex items-center gap-2 p-2 text-text-mute hover:bg-bg-elevated rounded-lg transition-colors"
  title="Preferences"
  >
- <Settings2 className={`w-5 h-5 ${showSettings ? 'text-[#aa3bff]' : ''}`} />
+ <Settings2 className={`w-5 h-5 ${showSettings ? 'text-[#8629cc]' : ''}`} />
  </button>
  
  {showSettings && (
@@ -150,7 +150,7 @@ export const SongViewPage: React.FC = () => {
  max="10" 
  value={autoScrollSpeed}
  onChange={(e) => setAutoScrollSpeed(Number(e.target.value))}
- className="w-full accent-[#aa3bff]"
+ className="w-full accent-[#8629cc]"
  />
  </div>
  
@@ -158,7 +158,7 @@ export const SongViewPage: React.FC = () => {
  <span className="text-sm text-text-main font-medium">{t('songView.useBb')}</span>
  <label className="relative inline-flex items-center cursor-pointer">
  <input type="checkbox" className="sr-only peer" checked={useBb} onChange={(e) => setUseBb(e.target.checked)} />
- <div className="w-11 h-6 bg-bg-elevated peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-text-main after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#aa3bff]"></div>
+ <div className="w-11 h-6 bg-bg-elevated peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-text-main after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#8629cc]"></div>
  </label>
  </div>
  
@@ -166,7 +166,7 @@ export const SongViewPage: React.FC = () => {
  <span className="text-sm text-text-main font-medium">{t('songView.useEb')}</span>
  <label className="relative inline-flex items-center cursor-pointer">
  <input type="checkbox" className="sr-only peer" checked={useEb} onChange={(e) => setUseEb(e.target.checked)} />
- <div className="w-11 h-6 bg-bg-elevated peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-text-main after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#aa3bff]"></div>
+ <div className="w-11 h-6 bg-bg-elevated peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-text-main after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#8629cc]"></div>
  </label>
  </div>
  </div>
@@ -184,7 +184,7 @@ export const SongViewPage: React.FC = () => {
  
  <button 
  onClick={() => navigate(`/theater/song/${id}`, { state: { autoScrollSpeed, useBb, useEb, transposeSteps } })}
- className="flex items-center gap-2 bg-[#aa3bff] hover:bg-[#902be6] text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm"
+ className="flex items-center gap-2 bg-[#8629cc] hover:bg-[#721eb8] text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm"
  data-testid="theater-mode-btn"
  >
  <PlayCircle className="w-5 h-5" />
@@ -198,7 +198,7 @@ export const SongViewPage: React.FC = () => {
  <ChordSheet content={transposedContent} fontSize={20} />
  </div>
  </div>
- </main>
+ </div>
  </>
  );
 };

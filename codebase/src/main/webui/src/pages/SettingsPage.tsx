@@ -12,7 +12,7 @@ export const SettingsPage: React.FC = () => {
 
  return (
  <>
- <main className="flex-1 flex flex-col h-full overflow-hidden">
+ <div className="flex-1 flex flex-col h-full overflow-hidden">
  <header className="h-16 flex items-center px-6 bg-bg-card border-b border-border-main">
  <h1 className="text-xl font-bold text-text-main">{t('settings.title')}</h1>
  </header>
@@ -34,7 +34,7 @@ export const SettingsPage: React.FC = () => {
  value="flats"
  checked={preferences.enharmonics === 'flats'}
  onChange={() => setPreferences({ ...preferences, enharmonics: 'flats' })}
- className="text-[#aa3bff] focus:ring-[#aa3bff]"
+ className="text-[#8629cc] focus:ring-[#8629cc]"
  />
  <span className="text-text-main">{t('settings.flats')}</span>
  </label>
@@ -45,7 +45,7 @@ export const SettingsPage: React.FC = () => {
  value="sharps"
  checked={preferences.enharmonics === 'sharps'}
  onChange={() => setPreferences({ ...preferences, enharmonics: 'sharps' })}
- className="text-[#aa3bff] focus:ring-[#aa3bff]"
+ className="text-[#8629cc] focus:ring-[#8629cc]"
  />
  <span className="text-text-main">{t('settings.sharps')}</span>
  </label>
@@ -61,7 +61,7 @@ export const SettingsPage: React.FC = () => {
  min="80" max="150" step="10"
  value={preferences.fontScale}
  onChange={(e) => setPreferences({ ...preferences, fontScale: Number(e.target.value) })}
- className="w-full accent-[#aa3bff]"
+ className="w-full accent-[#8629cc]"
  />
  </div>
 
@@ -74,19 +74,19 @@ export const SettingsPage: React.FC = () => {
  min="0.5" max="2.0" step="0.1"
  value={preferences.scrollSpeedMultiplier}
  onChange={(e) => setPreferences({ ...preferences, scrollSpeedMultiplier: Number(e.target.value) })}
- className="w-full accent-[#aa3bff]"
+ className="w-full accent-[#8629cc]"
  />
  </div>
 
  <div className="pt-4 border-t border-border-main">
- <button className="flex items-center gap-2 bg-[#aa3bff] hover:bg-[#902be6] text-white px-5 py-2.5 rounded-lg font-bold transition-colors">
+ <button className="flex items-center gap-2 bg-[#8629cc] hover:bg-[#721eb8] text-white px-5 py-2.5 rounded-lg font-bold transition-colors">
  <Save className="w-5 h-5" /> {t('settings.save')}
  </button>
  </div>
  </div>
  </div>
  </div>
- </main>
+ </div>
  </>
  );
 };

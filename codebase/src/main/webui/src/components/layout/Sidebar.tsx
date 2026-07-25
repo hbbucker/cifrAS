@@ -26,10 +26,10 @@ export const Sidebar: React.FC = () => {
         data-testid="sidebar"
       >
         <div className="flex items-center justify-between p-4 border-b border-border-main h-16">
-          {!collapsed && <span className="font-bold text-xl text-[#aa3bff]">CifrAS</span>}
+          {!collapsed && <span className="font-bold text-xl text-[#8629cc]">CifrAS</span>}
           <button 
             onClick={() => setCollapsed(!collapsed)} 
-            className="p-1 rounded hover:bg-bg-elevated focus:outline-none focus:ring-2 focus:ring-[#aa3bff]"
+            className="p-1 rounded hover:bg-bg-elevated focus:outline-none focus:ring-2 focus:ring-[#8629cc]"
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             aria-expanded={!collapsed}
           >
@@ -45,7 +45,7 @@ export const Sidebar: React.FC = () => {
               className={({ isActive }) => 
                 `flex items-center gap-4 px-3 py-3 rounded-lg transition-colors ${
                   isActive 
-                    ? 'bg-[#aa3bff]/10 text-[#aa3bff]' 
+                    ? 'bg-[#8629cc]/10 text-[#8629cc]' 
                     : 'text-text-mute hover:bg-bg-elevated'
                 } ${collapsed ? 'justify-center' : ''}`
               }

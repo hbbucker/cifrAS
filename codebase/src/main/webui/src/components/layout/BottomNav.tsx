@@ -26,7 +26,7 @@ export const BottomNav: React.FC = () => {
  to={link.to}
  className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${
  isActive 
- ? 'text-[#aa3bff]' 
+ ? 'text-[#8629cc]' 
  : 'text-text-mute hover:text-text-main dark:hover:text-gray-100'
  }`}
  aria-label={link.label}

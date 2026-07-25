@@ -213,12 +213,12 @@ export const GroupsPage: React.FC = () => {
 
  return (
   <>
- <main className="flex-1 flex flex-col h-full overflow-hidden">
+ <div className="flex-1 flex flex-col h-full overflow-hidden">
  <header className="h-16 flex items-center justify-between px-6 bg-bg-card border-b border-border-main">
  <h1 className="text-xl font-bold text-text-main">{t('groups.groups')}</h1>
  <button 
  onClick={() => setShowCreateModal(true)}
- className="flex items-center gap-2 bg-[#aa3bff] hover:bg-[#902be6] text-white px-4 py-2 rounded-lg font-medium transition-colors"
+ className="flex items-center gap-2 bg-[#8629cc] hover:bg-[#721eb8] text-white px-4 py-2 rounded-lg font-medium transition-colors"
  >
  <Plus className="w-5 h-5" />
  <span className="hidden sm:inline">{t('groups.newGroup')}</span>
@@ -253,7 +253,7 @@ export const GroupsPage: React.FC = () => {
  <h3 className="text-lg font-bold text-text-main mb-1">{invite.groupName}</h3>
  <p className="text-sm text-text-mute mb-4">{t('groups.invitedToJoin')}</p>
  <div className="flex gap-2">
- <button onClick={() => handleAcceptInvite(invite.id)} className="flex-1 py-2 bg-[#aa3bff] hover:bg-[#902be6] text-white rounded-lg font-medium transition-colors">{t('groups.accept')}</button>
+ <button onClick={() => handleAcceptInvite(invite.id)} className="flex-1 py-2 bg-[#8629cc] hover:bg-[#721eb8] text-white rounded-lg font-medium transition-colors">{t('groups.accept')}</button>
  <button onClick={() => handleDeclineInvite(invite.id)} className="flex-1 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 rounded-lg font-medium transition-colors">{t('groups.decline')}</button>
  </div>
  </div>
@@ -279,7 +279,7 @@ export const GroupsPage: React.FC = () => {
  </div>
  )}
  </div>
- </main>
+ </div>
 
  {/* Create Modal */}
  {showCreateModal && (
@@ -291,14 +291,14 @@ export const GroupsPage: React.FC = () => {
  value={newGroupName}
  onChange={(e) => setNewGroupName(e.target.value)}
  placeholder={t('groups.groupName')}
- className="w-full px-4 py-3 bg-bg-main border border-border-main rounded-lg mb-6 text-text-main focus:ring-2 focus:ring-[#aa3bff] outline-none"
+ className="w-full px-4 py-3 bg-bg-main border border-border-main rounded-lg mb-6 text-text-main focus:ring-2 focus:ring-[#8629cc] outline-none"
  data-testid="create-group-name-input"
  />
  <div className="flex justify-end gap-3">
  <button onClick={() => setShowCreateModal(false)} className="px-4 py-2 font-medium text-text-mute hover:bg-bg-elevated rounded-lg transition-colors">{t('common.cancel')}</button>
  <button 
  onClick={handleCreateGroup} 
- className="px-4 py-2 font-medium bg-[#aa3bff] hover:bg-[#902be6] text-white rounded-lg transition-colors"
+ className="px-4 py-2 font-medium bg-[#8629cc] hover:bg-[#721eb8] text-white rounded-lg transition-colors"
  >
  {t('groups.create')}
  </button>
@@ -324,14 +324,14 @@ export const GroupsPage: React.FC = () => {
  value={inviteEmail}
  onChange={(e) => { setInviteEmail(e.target.value); setInviteError(''); }}
  placeholder={t('groups.memberEmail')}
- className="w-full px-4 py-3 bg-bg-main border border-border-main rounded-lg mb-6 text-text-main focus:ring-2 focus:ring-[#aa3bff] outline-none"
+ className="w-full px-4 py-3 bg-bg-main border border-border-main rounded-lg mb-6 text-text-main focus:ring-2 focus:ring-[#8629cc] outline-none"
  data-testid="invite-email-input"
  />
  <div className="flex justify-end gap-3">
  <button onClick={() => { setShowInviteModal(false); setInviteError(''); }} className="px-4 py-2 font-medium text-text-mute hover:bg-bg-elevated rounded-lg transition-colors">{t('common.cancel')}</button>
  <button 
  onClick={handleInvite} 
- className="px-4 py-2 font-medium bg-[#aa3bff] hover:bg-[#902be6] text-white rounded-lg transition-colors" 
+ className="px-4 py-2 font-medium bg-[#8629cc] hover:bg-[#721eb8] text-white rounded-lg transition-colors" 
  data-testid="send-invite-btn"
  >
  {t('groups.sendInvite')}

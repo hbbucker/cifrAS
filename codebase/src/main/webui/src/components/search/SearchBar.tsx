@@ -126,27 +126,27 @@ export const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
  return (
  <div className="relative w-full max-w-md" ref={dropdownRef} data-testid="search-bar-container">
  <div className="relative flex items-center">
- <Search className="absolute left-3 w-5 h-5 text-gray-400" />
+ <Search className="absolute left-3 w-5 h-5 text-gray-500" />
  <input
  type="text"
  value={query}
  onChange={(e) => setQuery(e.target.value)}
  onKeyDown={handleKeyDown}
  placeholder={t('search.placeholder')}
- className="w-full pl-10 pr-10 py-2 bg-bg-elevated border-none rounded-lg focus:ring-2 focus:ring-[#aa3bff] focus:outline-none transition-all "
+ className="w-full pl-10 pr-10 py-2 bg-bg-elevated border-none rounded-lg focus:ring-2 focus:ring-[#8629cc] focus:outline-none transition-all "
  data-testid="search-input"
  />
  {query && !isLoading && (
  <button
  onClick={handleClear}
- className="absolute right-3 p-1 rounded-full hover:bg-gray-200 text-gray-400 hover:text-text-mute transition-colors"
+ className="absolute right-3 p-1 rounded-full hover:bg-gray-200 text-gray-500 hover:text-text-mute transition-colors"
  data-testid="search-clear"
  >
  <X className="w-4 h-4" />
  </button>
  )}
  {isLoading && (
- <Loader2 className="absolute right-3 w-5 h-5 text-gray-400 animate-spin" data-testid="search-loader" />
+ <Loader2 className="absolute right-3 w-5 h-5 text-gray-500 animate-spin" data-testid="search-loader" />
  )}
  </div>
 
@@ -163,7 +163,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
  <p className="font-medium text-text-main line-clamp-1">{result.title}</p>
  <p className="text-sm text-text-mute line-clamp-1">{result.artist}</p>
  </div>
- <span className="text-xs font-bold text-[#aa3bff] bg-[#aa3bff]/10 px-2 py-1 rounded">
+ <span className="text-xs font-bold text-[#8629cc] bg-[#8629cc]/10 px-2 py-1 rounded">
  {result.keySignature}
  </span>
  </button>

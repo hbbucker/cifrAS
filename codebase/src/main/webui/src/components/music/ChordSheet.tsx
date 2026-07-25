@@ -57,14 +57,14 @@ export const ChordSheet: React.FC<ChordSheetProps> = ({
  return (
  <>
  {spaces}
- <span className="text-[#aa3bff] font-bold">{prefix}</span>
+ <span className="text-[#8629cc] font-bold">{prefix}</span>
  {chunks.map((chunk, i) => {
  if (/[0-9hpsx/\\b~v^]+/i.test(chunk)) {
  return <span key={i} className="text-text-main font-bold">{chunk}</span>;
  } else if (chunk.includes('-')) {
  return <span key={i} className="text-gray-300 dark:text-text-mute font-light">{chunk}</span>;
  } else {
- return <span key={i} className="text-gray-400 dark:text-text-mute">{chunk}</span>;
+ return <span key={i} className="text-gray-500 dark:text-text-mute">{chunk}</span>;
  }
  })}
  </>
@@ -87,7 +87,7 @@ export const ChordSheet: React.FC<ChordSheetProps> = ({
  
  let lineClasses = transparent ? 'text-inherit' : 'text-text-main';
  if (isChordLine) {
- lineClasses = 'text-[#aa3bff] font-bold';
+ lineClasses = 'text-[#8629cc] font-bold';
  } else if (isSectionHeader) {
  lineClasses = 'text-text-main font-bold bg-bg-elevated inline-block px-3 py-1 rounded-md mt-6 mb-2 text-sm tracking-wider uppercase shadow-sm border border-border-main';
  } else if (isStrumLine) {

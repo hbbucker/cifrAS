@@ -14,7 +14,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   use: {
-    baseURL: 'http://localhost:8082',
+    baseURL: 'http://localhost:8080',
     trace: 'on-first-retry',
   },
   projects: [
@@ -22,13 +22,17 @@ export default defineConfig({
       name: 'chromium',
       use: { 
         ...devices['Desktop Chrome'],
-        locale: 'en-US'
+        locale: 'en-US',
+        channel: 'chrome',
+        launchOptions: {
+          args: ['--disable-blink-features=AutomationControlled']
+        }
       },
     },
   ],
   webServer: {
-    command: 'cd ../../.. && ./mvnw compile quarkus:dev -Dquarkus.http.port=8082 -Dquarkus.profile=e2e',
-    url: 'http://localhost:8082',
+    command: 'cd ../../.. && ./mvnw compile quarkus:dev -Dquarkus.http.port=8080 -Dquarkus.profile=e2e',
+    url: 'http://localhost:8080',
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
   },

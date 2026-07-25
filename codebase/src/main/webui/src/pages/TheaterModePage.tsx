@@ -275,7 +275,7 @@ export const TheaterModePage: React.FC = () => {
  <div className="md:hidden fixed bottom-6 left-6 z-50">
  <button 
  onClick={() => setShowControls(!showControls)}
- className={`w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 ${showControls ? 'bg-bg-elevated text-text-mute' : 'bg-[#aa3bff] text-white'}`}
+ className={`w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 ${showControls ? 'bg-bg-elevated text-text-mute' : 'bg-[#8629cc] text-white'}`}
  >
  <Settings2 className="w-6 h-6" />
  </button>

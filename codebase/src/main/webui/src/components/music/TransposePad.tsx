@@ -25,7 +25,7 @@ export const TransposePad: React.FC<TransposePadProps> = ({
  <Minus className="w-5 h-5" />
  </button>
  
- <div className="w-16 h-12 flex items-center justify-center font-bold text-lg text-[#aa3bff]" aria-live="polite" data-testid="current-key">
+ <div className="w-16 h-12 flex items-center justify-center font-bold text-lg text-[#8629cc]" aria-live="polite" data-testid="current-key">
  {currentKey}
  </div>
  

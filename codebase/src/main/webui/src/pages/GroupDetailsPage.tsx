@@ -111,7 +111,7 @@ export const GroupDetailsPage: React.FC = () => {
 
  return (
   <>
-  <main className="flex-1 flex flex-col h-full overflow-hidden">
+  <div className="flex-1 flex flex-col h-full overflow-hidden">
  <header className="h-16 flex items-center px-6 bg-bg-card border-b border-border-main gap-4">
  <button onClick={() => navigate('/groups')} className="p-2 hover:bg-bg-elevated rounded-full text-text-mute transition-colors">
  <ArrowLeft className="w-5 h-5" />
@@ -122,7 +122,7 @@ export const GroupDetailsPage: React.FC = () => {
  </div>
  <div>
  <h1 className="text-xl font-bold text-text-main leading-tight">{group.name}</h1>
- <span className={`text-xs font-bold px-2 py-0.5 rounded ${group.role === 'Admin' ? 'bg-[#aa3bff]/10 text-[#aa3bff]' : 'bg-gray-100 text-gray-700 dark:bg-gray-700 '}`}>
+ <span className={`text-xs font-bold px-2 py-0.5 rounded ${group.role === 'Admin' ? 'bg-[#8629cc]/10 text-[#8629cc]' : 'bg-gray-100 text-gray-700 dark:bg-gray-700 '}`}>
  {group.role}
  </span>
  </div>
@@ -132,7 +132,7 @@ export const GroupDetailsPage: React.FC = () => {
  <div className="ml-auto">
  <button 
  onClick={() => setShowInviteModal(true)}
- className="flex items-center gap-2 bg-[#aa3bff] hover:bg-[#902be6] text-white px-4 py-2 rounded-lg font-medium transition-colors"
+ className="flex items-center gap-2 bg-[#8629cc] hover:bg-[#721eb8] text-white px-4 py-2 rounded-lg font-medium transition-colors"
  >
  <UserPlus className="w-4 h-4" />
  <span className="hidden sm:inline">{t('group.invite')}</span>
@@ -150,7 +150,7 @@ export const GroupDetailsPage: React.FC = () => {
  onLinkNew={() => setShowLinkModal(true)} 
  />
  </div>
- </main>
+ </div>
 
  {showLinkModal && (
  <LinkPlaylistModal 
@@ -176,14 +176,14 @@ export const GroupDetailsPage: React.FC = () => {
  value={inviteEmail}
  onChange={(e) => { setInviteEmail(e.target.value); setInviteError(''); }}
  placeholder={t('groups.memberEmail')}
- className="w-full px-4 py-3 bg-bg-main border border-border-main rounded-lg mb-6 text-text-main focus:ring-2 focus:ring-[#aa3bff] outline-none"
+ className="w-full px-4 py-3 bg-bg-main border border-border-main rounded-lg mb-6 text-text-main focus:ring-2 focus:ring-[#8629cc] outline-none"
  data-testid="invite-email-input"
  />
  <div className="flex justify-end gap-3">
  <button onClick={() => { setShowInviteModal(false); setInviteError(''); }} className="px-4 py-2 font-medium text-text-mute hover:bg-bg-elevated rounded-lg transition-colors">{t('common.cancel')}</button>
  <button 
  onClick={handleInvite} 
- className="px-4 py-2 font-medium bg-[#aa3bff] hover:bg-[#902be6] text-white rounded-lg transition-colors" 
+ className="px-4 py-2 font-medium bg-[#8629cc] hover:bg-[#721eb8] text-white rounded-lg transition-colors" 
  data-testid="send-invite-btn"
  >
  {t('groups.sendInvite')}

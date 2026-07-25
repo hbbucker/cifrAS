@@ -62,7 +62,7 @@ export const GroupCard: React.FC<GroupCardProps> = ({
  <h3 className="text-lg font-bold text-text-main mb-1">{name}</h3>
  <div className="flex items-center justify-between mt-4">
  <p className="text-sm text-text-mute">{memberCount} members</p>
- <span className={`text-xs font-bold px-2 py-1 rounded ${role === 'Admin' ? 'bg-[#aa3bff]/10 text-[#aa3bff]' : 'bg-gray-100 text-gray-700 dark:bg-gray-700 '}`}>
+ <span className={`text-xs font-bold px-2 py-1 rounded ${role === 'Admin' ? 'bg-[#8629cc]/10 text-[#8629cc]' : 'bg-gray-100 text-gray-700 dark:bg-gray-700 '}`}>
  {role}
  </span>
  </div>

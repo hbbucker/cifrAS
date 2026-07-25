@@ -113,7 +113,7 @@ export const PlaylistsPage: React.FC = () => {
 
  return (
  <>
- <main className="flex-1 flex flex-col h-full overflow-hidden">
+ <div className="flex-1 flex flex-col h-full overflow-hidden">
  <header className="h-16 flex items-center justify-between px-6 bg-bg-card border-b border-border-main">
  <h1 className="text-xl font-bold text-text-main">{t('sidebar.playlists')}</h1>
  <Button 
@@ -145,12 +145,12 @@ export const PlaylistsPage: React.FC = () => {
  <div 
  key={pl.id} 
  onClick={() => navigate(`/playlists/${pl.id}`)}
- className="bg-bg-card rounded-xl border border-border-main p-5 cursor-pointer hover:shadow-lg hover:border-[#aa3bff]/50 transition-all group"
+ className="bg-bg-card rounded-xl border border-border-main p-5 cursor-pointer hover:shadow-lg hover:border-[#8629cc]/50 transition-all group"
  data-testid={`playlist-card-${pl.id}`}
  >
  <div className="flex items-start justify-between mb-4">
- <div className="w-12 h-12 bg-[#aa3bff]/10 rounded-lg flex items-center justify-center group-hover:bg-[#aa3bff]/20 transition-colors">
- <ListMusic className="w-6 h-6 text-[#aa3bff]" />
+ <div className="w-12 h-12 bg-[#8629cc]/10 rounded-lg flex items-center justify-center group-hover:bg-[#8629cc]/20 transition-colors">
+ <ListMusic className="w-6 h-6 text-[#8629cc]" />
  </div>
  <button
  onClick={(e) => handleDeletePlaylist(e, pl.id)}
@@ -173,7 +173,7 @@ export const PlaylistsPage: React.FC = () => {
  )}
  </div>
  </div>
- </main>
+ </div>
 
  {/* Create Modal */}
  {showModal && (
@@ -185,7 +185,7 @@ export const PlaylistsPage: React.FC = () => {
  value={newPlaylistName}
  onChange={(e) => setNewPlaylistName(e.target.value)}
  placeholder={t('playlists.modalPlaceholder')}
- className="w-full px-4 py-3 bg-bg-main border border-border-main rounded-lg mb-6 text-text-main focus:ring-2 focus:ring-[#aa3bff] outline-none"
+ className="w-full px-4 py-3 bg-bg-main border border-border-main rounded-lg mb-6 text-text-main focus:ring-2 focus:ring-[#8629cc] outline-none"
  data-testid="playlist-name-input"
  />
  <div className="flex justify-end gap-3">

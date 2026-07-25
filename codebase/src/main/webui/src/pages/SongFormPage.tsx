@@ -116,7 +116,7 @@ export const SongFormPage: React.FC = () => {
 
  return (
  <>
- <main className="flex-1 flex flex-col h-full overflow-hidden">
+ <div className="flex-1 flex flex-col h-full overflow-hidden">
  <header className="h-16 flex items-center justify-between px-6 bg-bg-card border-b border-border-main">
  <div className="flex items-center gap-4">
  <button onClick={handleBack} className="p-2 hover:bg-bg-elevated rounded-full text-text-mute">
@@ -189,7 +189,7 @@ export const SongFormPage: React.FC = () => {
  </div>
  </div>
  </div>
- </main>
+ </div>
 
  <ConfirmModal 
  isOpen={showCancelModal}

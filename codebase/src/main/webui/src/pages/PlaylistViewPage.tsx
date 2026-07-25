@@ -130,7 +130,7 @@ export const PlaylistViewPage: React.FC = () => {
 
  return (
  <>
- <main className="flex-1 flex flex-col h-full overflow-hidden">
+ <div className="flex-1 flex flex-col h-full overflow-hidden">
  <header className="h-20 flex items-center justify-between px-6 bg-bg-card border-b border-border-main shrink-0">
  <div className="flex items-center gap-4">
  <button onClick={() => navigate('/playlists')} className="p-2 hover:bg-bg-elevated rounded-full text-text-mute">
@@ -215,7 +215,7 @@ export const PlaylistViewPage: React.FC = () => {
  <div className="flex flex-col sm:flex-row gap-1 items-center justify-center">
  <button 
  onClick={() => moveSong(index, 'up')} 
- className="p-2 sm:p-1.5 text-text-mute hover:text-[#aa3bff] bg-gray-100 hover:bg-[#aa3bff]/10 rounded-lg transition-colors active:scale-95" 
+ className="p-2 sm:p-1.5 text-text-mute hover:text-[#8629cc] bg-gray-100 hover:bg-[#8629cc]/10 rounded-lg transition-colors active:scale-95" 
  data-testid={`move-up-${song.id}`}
  aria-label={t('playlistView.moveUp')}
  >
@@ -223,7 +223,7 @@ export const PlaylistViewPage: React.FC = () => {
  </button>
  <button 
  onClick={() => moveSong(index, 'down')} 
- className="p-2 sm:p-1.5 text-text-mute hover:text-[#aa3bff] bg-gray-100 hover:bg-[#aa3bff]/10 rounded-lg transition-colors active:scale-95" 
+ className="p-2 sm:p-1.5 text-text-mute hover:text-[#8629cc] bg-gray-100 hover:bg-[#8629cc]/10 rounded-lg transition-colors active:scale-95" 
  data-testid={`move-down-${song.id}`}
  aria-label={t('playlistView.moveDown')}
  >
@@ -233,12 +233,12 @@ export const PlaylistViewPage: React.FC = () => {
  )}
  
  {isOwner && (
- <div className="text-gray-400 cursor-grab active:cursor-grabbing hover:text-[#aa3bff]">
+ <div className="text-gray-500 cursor-grab active:cursor-grabbing hover:text-[#8629cc]">
  <GripVertical className="w-5 h-5 pointer-events-none" />
  </div>
  )}
  
- <div className="w-8 text-center text-gray-400 font-medium">{index + 1}</div>
+ <div className="w-8 text-center text-gray-500 font-medium">{index + 1}</div>
  
  <div className="flex-1 min-w-0">
  <h3 className="font-bold text-text-main truncate">{song.title}</h3>
@@ -257,7 +257,7 @@ export const PlaylistViewPage: React.FC = () => {
  {isOwner && (
  <button 
  onClick={() => removeSong(song.id)}
- className="p-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity rounded-full hover:bg-red-50 dark:hover:bg-red-900/20"
+ className="p-2 text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity rounded-full hover:bg-red-50 dark:hover:bg-red-900/20"
  >
  <Trash2 className="w-5 h-5" />
  </button>
@@ -267,7 +267,7 @@ export const PlaylistViewPage: React.FC = () => {
  </div>
  )}
  </div>
- </main>
+ </div>
 
  {/* Add Song Modal (Full Screen) */}
  {showAddModal && (
@@ -286,13 +286,13 @@ export const PlaylistViewPage: React.FC = () => {
 
  <div className="flex-1 flex flex-col max-w-3xl mx-auto w-full p-6 overflow-hidden">
  <div className="relative mb-6 shrink-0">
- <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+ <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
  <input
  type="text"
  placeholder={t('playlistView.searchPlaceholder')}
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
- className="w-full pl-12 pr-4 py-3 bg-bg-card border border-border-main rounded-xl text-text-main focus:ring-2 focus:ring-[#aa3bff] outline-none shadow-sm"
+ className="w-full pl-12 pr-4 py-3 bg-bg-card border border-border-main rounded-xl text-text-main focus:ring-2 focus:ring-[#8629cc] outline-none shadow-sm"
  />
  </div>
 
@@ -333,7 +333,7 @@ export const PlaylistViewPage: React.FC = () => {
  })
  .catch(() => toast('Failed to add song', 'error'));
  }}
- className="flex items-center gap-1 px-4 py-2 bg-gray-100 hover:bg-[#aa3bff] hover:text-white dark:bg-gray-700 dark:hover:bg-[#aa3bff] text-gray-700 rounded-lg font-bold transition-colors"
+ className="flex items-center gap-1 px-4 py-2 bg-gray-100 hover:bg-[#8629cc] hover:text-white dark:bg-gray-700 dark:hover:bg-[#8629cc] text-gray-700 rounded-lg font-bold transition-colors"
  >
  <Plus className="w-4 h-4" />
  <span>{t('playlistView.add')}</span>

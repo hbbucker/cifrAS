@@ -42,36 +42,36 @@ export const PrivacyPage: React.FC = () => {
                     <div className="flex items-center space-x-3">
                         <button 
                             onClick={() => navigate(-1)}
-                            className="p-2 hover:bg-gray-700 rounded-full transition-colors text-gray-400 hover:text-white"
+                            className="p-2 hover:bg-gray-700 rounded-full transition-colors text-gray-500 hover:text-white"
                             aria-label="Go back"
                         >
                             <ArrowLeft className="w-5 h-5" />
                         </button>
                         <div className="flex items-center space-x-2">
-                            <Shield className="w-6 h-6 text-[#aa3bff]" />
+                            <Shield className="w-6 h-6 text-[#8629cc]" />
                             <h1 className="text-xl font-bold text-white">{t('landing.privacy')}</h1>
                         </div>
                     </div>
                     <div className="flex space-x-2">
                         <button 
                             onClick={() => handleLanguageChange('pt')}
-                            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${lang === 'pt' ? 'bg-[#aa3bff] text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
+                            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${lang === 'pt' ? 'bg-[#8629cc] text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
                         >
                             PT
                         </button>
                         <button 
                             onClick={() => handleLanguageChange('en')}
-                            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${lang === 'en' ? 'bg-[#aa3bff] text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
+                            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${lang === 'en' ? 'bg-[#8629cc] text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
                         >
                             EN
                         </button>
                     </div>
                 </div>
                 
-                <div className="p-8 prose prose-invert prose-p:text-gray-300 prose-headings:text-white prose-a:text-[#aa3bff] max-w-none">
+                <div className="p-8 prose prose-invert prose-p:text-gray-300 prose-headings:text-white prose-a:text-[#8629cc] max-w-none">
                     {isLoading ? (
                         <div className="flex justify-center items-center h-64">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#aa3bff]"></div>
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#8629cc]"></div>
                         </div>
                     ) : (
                         <ReactMarkdown>{content}</ReactMarkdown>

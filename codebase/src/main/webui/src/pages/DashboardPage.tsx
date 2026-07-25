@@ -110,9 +110,9 @@ export const DashboardPage: React.FC = () => {
   };
 
  return (
-  <main className="flex-1 flex flex-col h-full overflow-hidden">
+  <div className="flex-1 flex flex-col h-full overflow-hidden">
  <header className="h-16 flex items-center justify-between px-6 bg-bg-card border-b border-border-main">
- <h1 className="text-xl font-bold text-text-main hidden sm:block">{t('dashboard.title')}</h1>
+ <h1 className="text-xl font-bold text-text-main sr-only sm:not-sr-only sm:block">{t('dashboard.title')}</h1>
  <div className="flex-1 sm:ml-8">
  <SearchBar onSearch={setSearchQuery} />
  </div>
@@ -135,7 +135,7 @@ export const DashboardPage: React.FC = () => {
  </h3>
  <button
  onClick={() => navigate('/songs')}
- className="text-sm font-medium text-[#aa3bff] hover:underline"
+ className="text-sm font-medium text-[#8629cc] hover:underline"
  data-testid="view-all-btn"
  >
  {t('dashboard.viewAll')}
@@ -167,6 +167,6 @@ export const DashboardPage: React.FC = () => {
  />
  )}
  </div>
-  </main>
+  </div>
  );
 };

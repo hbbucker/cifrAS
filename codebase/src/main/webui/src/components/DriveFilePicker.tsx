@@ -183,7 +183,7 @@ export const DriveFilePicker: React.FC<DriveFilePickerProps> = ({ onClose, onFil
             <div className="flex space-x-2">
               <div className="relative flex-1">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search className="h-5 w-5 text-gray-400" />
+                  <Search className="h-5 w-5 text-gray-500" />
                 </div>
                 <input
                   type="text"
