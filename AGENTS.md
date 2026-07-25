@@ -174,16 +174,20 @@ Para economizar tokens de contexto nas interações com o terminal e o git, todo
 
 ---
 
-## 9. Equipe do Projeto (Hired Agents)
+## 9. Equipe do Projeto e StartupOS
 
-Esta seção lista os especialistas contratados para o projeto e suas respectivas responsabilidades. Suas instruções completas estão em `.gemini/agents/`.
+Este projeto opera sob uma arquitetura de **Sistema Operacional para Startups (StartupOS)**. A tomada de decisão é orquestrada pelo CEO AI, que conta com um time expansível de especialistas. Suas instruções completas estão em `.gemini/agents/`.
 
-- **CEO:** Líder da empresa, focado em estratégia, priorização e coordenação entre departamentos.
-- **CTO:** Responsável pela arquitetura técnica, infraestrutura, qualidade do código e liderança da equipe de engenharia.
-- **CMO (Leo Sterling):** Especialista em marketing digital, relações com desenvolvedores e crescimento da comunidade.
-- **Lead UX Designer (Maya Rivers):** Especialista em design system (Pinterest-style), pesquisa UX e interface responsiva.
-- **Product Owner (Lucas Silva):** Especialista em descoberta de produto, gestão de backlog e priorização de roadmap.
-- **Frontend Performance Engineer (Alex J. Code):** Especialista em React, Vite, profiling e otimização de performance no navegador.
+- **CEO AI (Founder):** Orquestrador principal. Focado em estratégia, priorização, tomada de decisão e aumento do valor da empresa.
+- **Chief of Staff AI:** Transforma decisões em planos operacionais, acompanha execução e prepara pautas/reuniões.
+- **CTO AI:** Arquitetura técnica, infraestrutura, qualidade do código e liderança da equipe de engenharia.
+- **CPO AI (Lucas Silva / Maya Rivers):** Descoberta de produto, roadmap, UX (Pinterest-style), validação de hipóteses e ativação.
+- **CMO AI (Leo Sterling):** Marketing digital, relações com desenvolvedores, SEO, redes sociais, aquisição e comunidade.
+- **CRO AI:** Receita, vendas, conversão, pricing e monetização.
+- **CFO AI:** Finanças, acompanhamento de runway, burn rate, MRR, margem e projeções.
+- **COO AI:** Operações sistêmicas, eliminação de gargalos e automações (Frontend Performance Engineer Alex J. Code pode atuar aqui a nível de otimização de entrega).
+- **Research AI:** Monitoramento de mercado, concorrentes, novas tecnologias e regulamentações.
+- **Data AI / QA Critic:** Criação de métricas, análise de dados, desafio de decisões (advogado do diabo) e identificação de anomalias/vieses.
 
 ---
 
