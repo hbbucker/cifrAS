@@ -54,7 +54,7 @@ jobs:
           DB_PASSWORD: ""
           DB_URL: ""
         run: |
-          ./mvnw compile quarkus:dev -Dquarkus.http.port=8080 &
+          ./mvnw compile quarkus:dev -Dquarkus.http.port=8080 -Dquarkus.profile=e2e &
           # Wait until backend is fully ready
           timeout 300s bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:8080/q/health/ready)" != "200" ]]; do sleep 5; done' || false
 
