@@ -28,7 +28,9 @@ Thumbs.db
 headroom_memory.db
 musicas-doc/
 **/node_modules
-venv/*
+venv/*app
+venv
+
 # Specific ignored files for cifrAS
 slack_bridge/
 test_pipe.js

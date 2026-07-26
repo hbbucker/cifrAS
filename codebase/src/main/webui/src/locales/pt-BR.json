@@ -41,7 +41,16 @@
     "confirmDelete": "Tem certeza que deseja deletar esta música?",
     "deleteSuccess": "Música deletada com sucesso",
     "deleteError": "Falha ao deletar a música",
-    "loadError": "Falha ao carregar as músicas recentes"
+    "loadError": "Falha ao carregar as músicas recentes",
+    "educationalEmptyTitle": "Bem-vindo ao CifrAS!",
+    "educationalEmptyStep1": "1. Clique no botão de adicionar",
+    "educationalEmptyStep2": "2. Cole a letra e a cifra da música",
+    "educationalEmptyStep3": "3. Salve e comece a tocar em qualquer tom!"
+  },
+  "onboarding": {
+    "tooltipTitle": "Comece por aqui",
+    "tooltipDesc": "Adicione sua primeira música para construir seu repertório.",
+    "gotIt": "Entendi"
   },
   "settings": {
     "title": "Configurações",

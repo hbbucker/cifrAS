@@ -7,6 +7,8 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { Button } from '../components/ui/Button';
 import { EmptyState } from '../components/ui/EmptyState';
+import { EducationalEmptyState } from '../components/ui/EducationalEmptyState';
+import { OnboardingTooltip } from '../components/ui/OnboardingTooltip';
 import { Spinner } from '../components/ui/Spinner';
 
 interface SongData {
@@ -126,15 +128,17 @@ export const SongsListPage: React.FC = () => {
  <>
  <div className="flex-1 flex flex-col h-full overflow-hidden">
  <header className="h-16 flex items-center justify-between px-6 bg-bg-card border-b border-border-main">
- <h1 className="text-xl font-bold text-text-main">{t('songsList.title')}</h1>
- <Button 
- onClick={() => navigate('/songs/new')}
- data-testid="add-song-btn"
- >
- <Plus className="w-5 h-5 mr-1" />
- <span className="hidden sm:inline">{t('songsList.addSong')}</span>
- </Button>
- </header>
+        <h1 className="text-xl font-bold text-text-main">{t('songsList.title')}</h1>
+        <OnboardingTooltip tooltipId="add_song_btn">
+          <Button 
+            onClick={() => navigate('/songs/new')}
+            data-testid="add-song-btn"
+          >
+            <Plus className="w-5 h-5 mr-1" />
+            <span className="hidden sm:inline">{t('songsList.addSong')}</span>
+          </Button>
+        </OnboardingTooltip>
+      </header>
 
  <div className="flex-1 overflow-y-auto p-6 pb-24 sm:pb-6">
  <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
@@ -168,12 +172,25 @@ export const SongsListPage: React.FC = () => {
  <Spinner size="lg" />
  </div>
  ) : songs.length === 0 ? (
- <EmptyState 
- icon={Music} 
- title={t('dashboard.emptyTitle')}
- description={t('songsList.emptyDesc')}
- action={{ label: t('songsList.addFirstSong'), onClick: () => navigate('/songs/new') }} 
- />
+          debouncedQuery.trim() === '' ? (
+            <EducationalEmptyState 
+              icon={Music} 
+              title={t('dashboard.educationalEmptyTitle')}
+              steps={[
+                t('dashboard.educationalEmptyStep1'),
+                t('dashboard.educationalEmptyStep2'),
+                t('dashboard.educationalEmptyStep3')
+              ]}
+              action={{ label: t('songsList.addFirstSong'), onClick: () => navigate('/songs/new') }} 
+            />
+          ) : (
+            <EmptyState 
+              icon={Music} 
+              title={t('dashboard.emptyTitle')}
+              description={t('songsList.emptyDesc')}
+              action={{ label: t('songsList.addSong'), onClick: () => navigate('/songs/new') }} 
+            />
+          )
  ) : (
  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
  {songs.map(song => (

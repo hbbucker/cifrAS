@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useToast } from '../context/ToastContext';
 import { UserMenu } from '../components/layout/UserMenu';
 import { EmptyState } from '../components/ui/EmptyState';
+import { EducationalEmptyState } from '../components/ui/EducationalEmptyState';
 import { Music } from 'lucide-react';
 
 interface SongData {
@@ -29,6 +30,7 @@ export const DashboardPage: React.FC = () => {
  const { toast } = useToast();
  const [loading, setLoading] = useState(true);
  const [songs, setSongs] = useState<SongData[]>([]);
+ const [totalSongsCount, setTotalSongsCount] = useState(0);
  const [searchQuery, setSearchQuery] = useState('');
 
  useEffect(() => {
@@ -49,6 +51,7 @@ export const DashboardPage: React.FC = () => {
  })
  .then(data => {
  const items = Array.isArray(data) ? data : (data.data || []);
+ setTotalSongsCount(items.length);
  const favoriteItems = items.filter((song: Record<string, unknown>) => song.isFavorite);
  const mappedSongs = favoriteItems.slice(0, 3).map((song: Record<string, unknown>) => ({
  ...song,
@@ -158,6 +161,17 @@ export const DashboardPage: React.FC = () => {
  </div>
  ))}
  </div>
+ ) : totalSongsCount === 0 ? (
+ <EducationalEmptyState
+   icon={Music}
+   title={t('dashboard.educationalEmptyTitle')}
+   steps={[
+     t('dashboard.educationalEmptyStep1'),
+     t('dashboard.educationalEmptyStep2'),
+     t('dashboard.educationalEmptyStep3')
+   ]}
+   action={{ label: t('dashboard.addSong'), onClick: () => navigate('/songs/new') }}
+ />
  ) : (
  <EmptyState
  icon={Music}

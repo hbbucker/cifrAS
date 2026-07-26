@@ -41,6 +41,7 @@
 
 - [ ] `THEATER-01` — Estado de sessão do Modo Teatro no backend
 - [x] `FE-SETTINGS-01` — Configurações de usuário (velocidade, convenção de tom, fonte)
+- [x] `FE-ONBOARDING-01` — Empty State Educativo e Tooltips de primeiro uso
 - [ ] Observabilidade: logs estruturados, tracing, health checks
 - [ ] CI/CD: pipeline automatizado com testes e deploy
 - [x] Deploy: Fly.io (monolito Quarkus + Quinoa)

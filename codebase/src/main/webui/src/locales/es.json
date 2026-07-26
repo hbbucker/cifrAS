@@ -41,7 +41,16 @@
     "confirmDelete": "¿Estás seguro de que quieres eliminar esta canción?",
     "deleteSuccess": "Canción eliminada exitosamente",
     "deleteError": "Fallo al eliminar la canción",
-    "loadError": "Fallo al cargar las canciones recientes"
+    "loadError": "Fallo al cargar las canciones recientes",
+    "educationalEmptyTitle": "¡Bienvenido a CifrAS!",
+    "educationalEmptyStep1": "1. Haz clic en el botón de añadir",
+    "educationalEmptyStep2": "2. Pega la letra y los acordes de la canción",
+    "educationalEmptyStep3": "3. ¡Guarda y empieza a tocar en cualquier tono!"
+  },
+  "onboarding": {
+    "tooltipTitle": "Empieza por aquí",
+    "tooltipDesc": "Añade tu primera canción para construir tu repertorio.",
+    "gotIt": "Entendido"
   },
   "settings": {
     "title": "Ajustes",

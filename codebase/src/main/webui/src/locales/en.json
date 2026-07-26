@@ -41,7 +41,16 @@
     "confirmDelete": "Are you sure you want to delete this song?",
     "deleteSuccess": "Song deleted successfully",
     "deleteError": "Failed to delete song",
-    "loadError": "Failed to load recent songs"
+    "loadError": "Failed to load recent songs",
+    "educationalEmptyTitle": "Welcome to CifrAS!",
+    "educationalEmptyStep1": "1. Click on the add button",
+    "educationalEmptyStep2": "2. Paste the song lyrics and chords",
+    "educationalEmptyStep3": "3. Save and start playing in any key!"
+  },
+  "onboarding": {
+    "tooltipTitle": "Start here",
+    "tooltipDesc": "Add your first song to build your repertoire.",
+    "gotIt": "Got it"
   },
   "settings": {
     "title": "Settings",
