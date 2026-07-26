@@ -7,6 +7,7 @@ import { transposeContent } from '../utils/chordTransposer';
 import { stringifyLyrics } from '../utils/lyricsParser';
 import { Settings2 } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
+import { apiClient } from '../services/authService';
 
 interface SongData {
  id: string;
@@ -46,13 +47,8 @@ export const TheaterModePage: React.FC = () => {
  // Fetch playlist queue if playlistId is provided
  useEffect(() => {
  if (playlistId) {
- fetch(`/api/playlists/${playlistId}`, {
- headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
- })
- .then(res => {
- if (!res.ok) throw new Error('Failed to fetch playlist');
- return res.json();
- })
+ apiClient.get(`/playlists/${playlistId}`)
+ .then(res => res.data)
  .then(data => {
  if (data.songs && data.songs.length > 0) {
  setPlaylistSongs(data.songs);
@@ -72,13 +68,8 @@ export const TheaterModePage: React.FC = () => {
 
  useEffect(() => {
  if (activeSongId) {
- fetch(`/api/songs/${activeSongId}`, {
- headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
- })
- .then(res => {
- if (!res.ok) throw new Error('Fetch failed');
- return res.json();
- })
+ apiClient.get(`/songs/${activeSongId}`)
+ .then(res => res.data)
  .then(data => {
  const key = data.originalKey || data.keySignature || 'C';
  setSong(prev => {
@@ -118,18 +109,11 @@ export const TheaterModePage: React.FC = () => {
     if (song.title === 'Loading...' || !activeSongId) return;
     
     const handler = setTimeout(() => {
-      fetch(`/api/songs/${activeSongId}/preferences`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          prefUseBb: useBb,
-          prefUseEb: useEb,
-          prefAutoScrollSpeed: speed,
-          prefTransposeSteps: transposeSteps
-        })
+      apiClient.put(`/songs/${activeSongId}/preferences`, {
+        prefUseBb: useBb,
+        prefUseEb: useEb,
+        prefAutoScrollSpeed: speed,
+        prefTransposeSteps: transposeSteps
       }).catch(err => console.error('Failed to save preferences', err));
     }, 1000);
     
