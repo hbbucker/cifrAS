@@ -25,12 +25,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
  const login = useCallback((token: string, refreshToken: string, userData: User) => {
  localStorage.setItem('token', token);
  localStorage.setItem('refreshToken', refreshToken);
+ localStorage.setItem('user', JSON.stringify(userData));
  setUser(userData);
  }, []);
 
  const logout = useCallback(() => {
  localStorage.removeItem('token');
  localStorage.removeItem('refreshToken');
+ localStorage.removeItem('user');
  setUser(null);
  }, []);
 
@@ -39,18 +41,23 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
  const token = localStorage.getItem('token');
  if (token && token !== 'mock-token' && token !== 'mock-token-reg') {
  try {
- const payload = JSON.parse(atob(token.split('.')[1]));
-          const rawName = payload.user_metadata?.full_name || payload.user_metadata?.name || payload.name;
-          let displayName = rawName;
-          if (!displayName && payload.email) {
-            const prefix = payload.email.split('@')[0];
-            displayName = prefix.charAt(0).toUpperCase() + prefix.slice(1);
+          const storedUser = localStorage.getItem('user');
+          if (storedUser) {
+            setUser(JSON.parse(storedUser));
+          } else {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const rawName = payload.user_metadata?.full_name || payload.user_metadata?.name || payload.name;
+            let displayName = rawName;
+            if (!displayName && payload.email) {
+              const prefix = payload.email.split('@')[0];
+              displayName = prefix.charAt(0).toUpperCase() + prefix.slice(1);
+            }
+            setUser({ 
+              id: payload.sub || 'user', 
+              email: payload.email || 'user@example.com', 
+              name: displayName || 'Musician' 
+            });
           }
-          setUser({ 
-            id: payload.sub || 'user', 
-            email: payload.email || 'user@example.com', 
-            name: displayName || 'Musician' 
-          });
         } catch {
           // Fallback if parsing fails
           setUser({ id: 'user', email: 'user@example.com', name: 'Musician' });
