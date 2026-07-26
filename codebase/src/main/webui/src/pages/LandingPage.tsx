@@ -19,7 +19,7 @@ export const LandingPage: React.FC = () => {
                     <span className="text-2xl font-bold">CifrAS</span>
                 </div>
                 <nav className="flex items-center space-x-4">
-                    <Link to="/privacy" className="text-sm text-gray-500 hover:text-white transition-colors">{t('landing.privacy')}</Link>
+                    <Link to="/privacy" className="text-sm text-gray-400 hover:text-white transition-colors">{t('landing.privacy')}</Link>
                     {isAuthenticated ? (
                         <Link to="/dashboard" className="bg-[#721eb8] hover:bg-[#7a1ab8] px-5 py-2 rounded-lg font-medium transition-colors">
                             {t('landing.dashboard')}
@@ -39,7 +39,7 @@ export const LandingPage: React.FC = () => {
                     <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight">
                         {t('landing.yourUltimate')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8629cc] to-[#d980ff]">{t('landing.chordRepertoire')}</span> {t('landing.manager')}
                     </h1>
-                    <p className="text-xl text-gray-500 max-w-2xl mx-auto">
+                    <p className="text-xl text-gray-400 max-w-2xl mx-auto">
                         {t('landing.desc1')}
                     </p>
                     
@@ -67,27 +67,27 @@ export const LandingPage: React.FC = () => {
                             <Guitar className="w-6 h-6 text-[#8629cc]" />
                         </div>
                         <h2 className="text-xl font-bold mb-3">{t('landing.instantTrans')}</h2>
-                        <p className="text-gray-500">{t('landing.desc3')}</p>
+                        <p className="text-gray-400">{t('landing.desc3')}</p>
                     </div>
                     <div className="bg-gray-800/50 p-8 rounded-2xl border border-gray-700">
                         <div className="w-12 h-12 bg-[#8629cc]/20 rounded-xl flex items-center justify-center mb-6">
                             <FileText className="w-6 h-6 text-[#8629cc]" />
                         </div>
                         <h2 className="text-xl font-bold mb-3">{t('landing.theaterMode')}</h2>
-                        <p className="text-gray-500">{t('landing.desc4')}</p>
+                        <p className="text-gray-400">{t('landing.desc4')}</p>
                     </div>
                     <div className="bg-gray-800/50 p-8 rounded-2xl border border-gray-700">
                         <div className="w-12 h-12 bg-[#8629cc]/20 rounded-xl flex items-center justify-center mb-6">
                             <Mic className="w-6 h-6 text-[#8629cc]" />
                         </div>
                         <h2 className="text-xl font-bold mb-3">{t('landing.collab')}</h2>
-                        <p className="text-gray-500">{t('landing.desc2')}</p>
+                        <p className="text-gray-400">{t('landing.desc2')}</p>
                     </div>
                 </div>
             </main>
 
             {/* Footer */}
-            <footer className="border-t border-gray-800 py-8 text-center text-gray-500 text-sm">
+            <footer className="border-t border-gray-800 py-8 text-center text-gray-400 text-sm">
                 <p>{t('landing.rights')}</p>
                 <div className="mt-2 space-x-4">
                     <Link to="/privacy?lang=pt" className="hover:text-gray-200">{t('landing.privacy')}</Link>
