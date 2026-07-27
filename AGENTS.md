@@ -86,13 +86,13 @@ codebase/
 2. **Padrão Repository & Mappers:** Toda a persistência é feita via `PanacheRepository` e isolada na pasta `infra/`. As entidades JPA e as tabelas do banco de dados não vazam para a camada de domínio. Mappers (MapStruct ou manuais) convertem de/para Modelos de Domínio e Entidades JPA.
 3. **DTOs Estritos:** Controladores JAX-RS (`Resources`) devem usar apenas records DTO para entrada e saída de dados, nunca expondo entidades JPA ou modelos de domínio diretamente.
 4. **Segurança & JWT:** O usuário autenticado deve ser obtido de forma stateless usando a `SecurityIdentity` do Quarkus. O token JWT emitido pelo Supabase é validado offline usando a URL JWKS do Supabase configurada na propriedade `mp.jwt.verify.publickey.issuer` no `application.properties`. A claim `"sub"` (UUID) é usada como o ID único do usuário.
-5. **Soft Delete:** A deleção de músicas e playlists deve usar soft delete para auditoria e prevenção de perda de dados.
+5. **Soft Delete:** A deleção de músicas e playlists deve usar soft delete para auditoria e prevenção de perda de dados. (Utilize anotações como `@SQLRestriction` do Hibernate para filtrar automaticamente entidades deletadas e `@SQLDelete` para sobrescrever a deleção padrão).
 
 ### Frontend (React)
 1. **TypeScript Rígido:** Sem uso de `any`. Toda resposta de API deve ter seu respectivo tipo em `src/types/` ou no diretório da feature correspondente.
 2. **Estilização Exclusiva com TailwindCSS:** Não adicione estilos CSS customizados a não ser para animações complexas ou hacks de scroll muito específicos.
 3. **Avisos de Lint:** A pipeline do GitHub Actions falha em qualquer warning do ESLint (variáveis não utilizadas, dependências ausentes em `useEffect`).
-4. **Chamadas de API:** Centralize chamadas no diretório `src/api/` organizadas por domínio, utilizando a instância do Axios pré-configurada.
+4. **Chamadas de API:** Centralize chamadas no diretório `src/main/webui/src/api/` organizadas por domínio, utilizando a instância do Axios pré-configurada.
 5. **Autenticação, Refresh Token e Redirecionamento (ADR):** O Axios deve interceptar erros `401`. No fluxo de refresh silencioso, é mandatório atualizar o header `Authorization` da requisição original (`originalRequest.headers.Authorization = 'Bearer ' + novoToken`) antes do retry para evitar loop de falhas. Caso o refresh falhe (token inválido/expirado), deve-se limpar o localStorage e forçar o redirecionamento imediato para o login via `window.location.href = '/login'`, evitando que o usuário fique preso em telas com erro.
 6. **Internacionalização (i18n - ADR Tradução):** É estritamente proibido o uso de strings hardcoded (textos fixos) nos componentes React para mensagens de interface. Toda string voltada para o usuário deve ser extraída e consumida via hooks de tradução (ex: `useTranslation` do `react-i18next`), garantindo o suporte e consistência multi-idioma em toda a plataforma.
 
@@ -110,7 +110,7 @@ Isso permite renderizar e transpor acordes de forma atômica no backend e no fro
 A transposição de acordes ocorre *stateless* e *on-the-fly* ao passar o query param `?transpose=N` no endpoint `GET /songs/{id}` ou ao chamar `POST /songs/{id}/transpose`.
 - **Ciclo Cromático:** `C → C# → D → D# → E → F → F# → G → G# → A → A# → B → C`.
 - **Sufixos Suportados:** `m`, `7`, `m7`, `add9`, `sus2`, `dim`, `aug`, `/baixo` (apenas a nota raiz é transposta, o sufixo é mantido intacto).
-- **Substituições Enarmônicas (Configurações de Exibição):** O sistema deve respeitar preferências de enarmonia do usuário (ex: "Usar Bb" para trocar A# por Bb, "Usar Eb" para trocar D# por Eb) na renderização e na transposição.
+- **Substituições Enarmônicas (Configurações de Exibição):** O sistema deve respeitar preferências de enarmonia do usuário (ex: "Usar Bb" para trocar A# por Bb, "Usar Eb" para trocar D# por Eb) na renderização e na transposição. Essa preferência já é persistida nas configurações de usuário no sistema.
 - **Transposição de Tablaturas:** Ao transpor cifras que contenham tablaturas estruturadas, o motor deve recalcular as casas numéricas das cordas sem alterar a largura dos traços (`-`) para manter o alinhamento estrito.
 
 ---
@@ -140,7 +140,7 @@ O CifrAS adota uma interface limpa baseada no design do Pinterest: o foco visual
 
 ### Regra Crítica: RTK (Rust Token Killer) ⚠️
 Para economizar tokens de contexto nas interações com o terminal e o git, todos os comandos executados no shell do sistema devem ser rodados usando o proxy `rtk`.
-- O hook automático do terminal reescreve os comandos comuns (ex: `git status` vira `rtk git status`).
+- O hook automático do terminal reescreve os comandos comuns (ex: `git status` vira `rtk git status`). Se o hook automático não estiver presente em seu ambiente de agente, envolva os comandos manualmente com `rtk proxy` (ex: `rtk proxy git status`).
 - Comandos analíticos podem ser invocados diretamente:
   - `rtk gain` (exibe estatísticas de economia de tokens).
   - `rtk gain --history` (histórico de comandos e savings).
@@ -174,7 +174,7 @@ Para economizar tokens de contexto nas interações com o terminal e o git, todo
 
 ---
 
-## 9. Equipe do Projeto e StartupOS
+## 8. Equipe do Projeto e StartupOS
 
 Este projeto opera sob uma arquitetura de **Sistema Operacional para Startups (StartupOS)**. A tomada de decisão é orquestrada pelo CEO AI, que conta com um time expansível de especialistas. 
 
@@ -192,20 +192,35 @@ Para invocar um dos agentes abaixo em suas tarefas, os agentes do conselho devem
 
 ---
 
-## 10. Guia de Trabalho para Agentes de Desenvolvimento de IA
+## 9. Guia de Trabalho para Agentes de Desenvolvimento de IA
 
 Se você é um Agente de IA trabalhando neste projeto, siga este fluxo rigoroso para garantir a conformidade e qualidade das entregas:
 
 1. **Abordagem Orientada a Specs (Spec-driven workflow):**
    - Antes de implementar qualquer código, valide o escopo nos arquivos de especificação correspondentes dentro de `.specs/features/[feature]/spec.md`.
-   - Se a especificação não existir ou precisar de alterações, planeje a criação/atualização de um documento de design técnico antes de começar a codificar.
+   - Se a especificação não existir ou precisar de alterações, utilize a skill tlc-spec-driven para planejar a criação/atualização de um documento de design técnico antes de começar a codificar.
 2. **Abordagem TDD (Test-Driven Development):**
-   - Escreva testes unitários para validar a lógica de domínio enriquecida e o motor de transposição. A cobertura deve ser de no mínimo 80%.
+   - Escreva testes unitários para validar a lógica de domínio enriquecida e o motor de transposição. A cobertura deve ser de no mínimo 95%.
    - Não submeta código de backend sem o correspondente teste de integração utilizando `REST Assured` e/ou `Testcontainers` se houver persistência.
 3. **Validação E2E com Playwright:**
    - Ao alterar telas ou fluxos visuais do React, certifique-se de executar os testes E2E do Playwright (`npx playwright test`) a partir do diretório `src/main/webui` para validar que nenhum fluxo foi quebrado.
    - **Autenticação E2E (Bypass):** Os testes contornam a UI de login do Google injetando um mock JWT e navegando direto para `/auth/callback`. O backend (Quarkus) precisa rodar com o perfil `e2e` ativado (`-Dquarkus.profile=e2e`), que suporta validação local do algoritmo `RS256`. Use o script `generate_jwt.py` caso precise emitir novos tokens de teste com claims atualizadas (`iat`, `exp`).
 4. **Preservação do Legado:**
    - Preserve integralmente todos os comentários, JSDoc e documentação existente no código que não forem alvo direto da alteração.
-5. **Verificação de Portão Final (`cy-final-verify`):**
-   - Sempre execute a verificação final (`cy-final-verify` ou testes locais) antes de declarar uma tarefa como concluída, propor commits ou abrir Pull Requests. Garanta que o projeto compila localmente com sucesso.
+5. **Verificação de Portão Final e Playwright:**
+   - Sempre execute a verificação final (testes locais, build, e `npx playwright test` no diretório webui) antes de declarar uma tarefa como concluída, propor commits ou abrir Pull Requests. Garanta que o projeto compila localmente com sucesso. Utilize a CLI do GitHub (`gh pr create`) para abrir PRs de forma autônoma, se aplicável.
+
+## 10. Workflow de implementação
+
+Todas as atividades seja planejamento, execução ou correção, devem utilizar a skill `tlc-spec-driven` seguindo o seguinte workflows.
+
+**SE SKILL TLC-SPEC-DRIVEN NÃO ESTIVER DISPONÍVEL CANCELAR AÇÃO E REPORTAR**
+
+1. **Análise:** Primeira etapa, pode ser uma feature, correção de bug ou quick-fix;
+2. **Spec:** Especificação técnica para a atividade analisada;
+3. **Tasks:** Definição das tasks que serão executadas;
+4. **Execução:** Implementação das tasks criadas utilizando TDD, para qualquer tipo de implementação;
+5. **Validação de Testes:** Build, Lints e cobertura devem atender os critérios já especificados;
+6. **Worktree:** Trabalhar com branches e worktrees não conflitantes;
+7. **Commit/Push:** Utilização de commits atômicos e padrão conventional commits. Um novo PR deve ser aberto no GitHub (usando `gh pr create` por exemplo) e **SEMPRE VERIFIQUE SE A PIPELINE PASSOU**;
+8. **Deploy:** Report final de todo o fluxo para a decisão do humano para autorizar o Merge do PR e deploy no Fly.io

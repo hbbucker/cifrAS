@@ -35,8 +35,8 @@ export const TheaterModePage: React.FC = () => {
  const [playlistSongs, setPlaylistSongs] = useState<SongData[]>([]);
  const [currentPlaylistIndex, setCurrentPlaylistIndex] = useState<number>(0);
  const [transposeSteps, setTransposeSteps] = useState(passedState?.transposeSteps ?? 0);
- const [useBb, setUseBb] = useState(passedState?.useBb ?? false);
- const [useEb, setUseEb] = useState(passedState?.useEb ?? false);
+ const useBb = passedState?.useBb ?? false;
+ const useEb = passedState?.useEb ?? false;
  const [scrollTop, setScrollTop] = useState(0);
  const [slideDir, setSlideDir] = useState<'right'|'left'>('right');
  
@@ -63,62 +63,63 @@ export const TheaterModePage: React.FC = () => {
  }
  }, [playlistId, toast]);
 
- // Fetch full song details for the active song ID
- const activeSongId = playlistId && playlistSongs.length > 0 ? playlistSongs[currentPlaylistIndex].id : songId;
+  // Fetch full song details and preferences for the active song ID
+  const activeSongId = playlistId && playlistSongs.length > 0 ? playlistSongs[currentPlaylistIndex].id : songId;
 
- useEffect(() => {
- if (activeSongId) {
- apiClient.get(`/songs/${activeSongId}`)
- .then(res => res.data)
- .then(data => {
- const key = data.originalKey || data.keySignature || 'C';
- setSong(prev => {
- if (prev.title !== 'Loading...') {
- setTransposeSteps(0);
- } else if (!passedState) {
-    if (data.prefAutoScrollSpeed != null) setSpeed(data.prefAutoScrollSpeed);
-    if (data.prefUseBb != null) setUseBb(data.prefUseBb);
-    if (data.prefUseEb != null) setUseEb(data.prefUseEb);
-    if (data.prefTransposeSteps != null) setTransposeSteps(data.prefTransposeSteps);
- }
- return {
- title: data.title,
- artist: data.artist,
- originalKey: key,
- content: stringifyLyrics(data.lyrics)
- };
- });
- 
- // Load saved font size for this song and device
- const deviceType = isMobile ? 'mobile' : 'desktop';
- const savedFontSize = localStorage.getItem(`cifras_fontsize_${deviceType}_${activeSongId}`);
- if (savedFontSize) {
- setFontSize(parseInt(savedFontSize));
- } else {
- setFontSize(isMobile ? 24 : 32); // defaults
- }
- })
- .catch(() => {
- toast('Failed to load song details', 'error');
- });
- }
- }, [activeSongId, isMobile, toast, passedState, setSpeed]);
+  useEffect(() => {
+    if (activeSongId) {
+      // First fetch the song details
+      apiClient.get(`/songs/${activeSongId}`)
+        .then(res => res.data)
+        .then(data => {
+          const key = data.originalKey || data.keySignature || 'C';
+          setSong(prev => {
+            if (prev.title !== 'Loading...') {
+              setTransposeSteps(0);
+            }
+            return {
+              title: data.title,
+              artist: data.artist,
+              originalKey: key,
+              content: stringifyLyrics(data.lyrics)
+            };
+          });
+        })
+        .catch(() => toast('Failed to load song details', 'error'));
 
- // Persist preferences
- useEffect(() => {
+      // Then fetch the theater preferences for this specific song
+      if (!passedState) {
+        apiClient.get(`/theater/song-preferences/${activeSongId}`)
+          .then(res => {
+            if (res.status === 200 && res.data) {
+              const pref = res.data;
+              if (pref.autoScrollSpeed != null) setSpeed(pref.autoScrollSpeed);
+              if (pref.transposeSteps != null) setTransposeSteps(pref.transposeSteps);
+              if (pref.fontSize != null) setFontSize(pref.fontSize);
+            } else {
+              setFontSize(isMobile ? 24 : 32); // defaults if no preference
+            }
+          })
+          .catch(() => setFontSize(isMobile ? 24 : 32));
+      }
+    }
+  }, [activeSongId, isMobile, toast, passedState, setSpeed]);
+
+  // Persist preferences
+  useEffect(() => {
     if (song.title === 'Loading...' || !activeSongId) return;
     
     const handler = setTimeout(() => {
-      apiClient.put(`/songs/${activeSongId}/preferences`, {
-        prefUseBb: useBb,
-        prefUseEb: useEb,
-        prefAutoScrollSpeed: speed,
-        prefTransposeSteps: transposeSteps
-      }).catch(err => console.error('Failed to save preferences', err));
+      apiClient.put(`/theater/session`, {
+        songId: activeSongId,
+        autoScrollSpeed: speed,
+        transposeSteps: transposeSteps,
+        fontSize: fontSize
+      }).catch(err => console.error('Failed to save theater session preferences', err));
     }, 1000);
     
     return () => clearTimeout(handler);
- }, [useBb, useEb, speed, transposeSteps, activeSongId, song.title]);
+  }, [speed, transposeSteps, fontSize, activeSongId, song.title]);
 
  const handleNextSong = () => {
  if (playlistId && currentPlaylistIndex < playlistSongs.length - 1) {
@@ -134,16 +135,9 @@ export const TheaterModePage: React.FC = () => {
  }
  };
 
- const handleFontSizeChange = (delta: number) => {
- setFontSize(prev => {
- const newSize = Math.max(14, Math.min(60, prev + delta));
- if (activeSongId) {
- const deviceType = isMobile ? 'mobile' : 'desktop';
- localStorage.setItem(`cifras_fontsize_${deviceType}_${activeSongId}`, newSize.toString());
- }
- return newSize;
- });
- };
+  const handleFontSizeChange = (delta: number) => {
+    setFontSize(prev => Math.max(14, Math.min(60, prev + delta)));
+  };
 
  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
  setScrollTop(e.currentTarget.scrollTop);
