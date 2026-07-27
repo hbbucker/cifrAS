@@ -208,7 +208,7 @@ Se você é um Agente de IA trabalhando neste projeto, siga este fluxo rigoroso 
 4. **Preservação do Legado:**
    - Preserve integralmente todos os comentários, JSDoc e documentação existente no código que não forem alvo direto da alteração.
 5. **Verificação de Portão Final e Playwright:**
-   - Sempre execute a verificação final (testes locais, build, e `npx playwright test` no diretório webui) antes de declarar uma tarefa como concluída, propor commits ou abrir Pull Requests. Garanta que o projeto compila localmente com sucesso. Utilize a CLI do GitHub (`gh pr create`) para abrir PRs de forma autônoma, se aplicável.
+   - Sempre execute a verificação final (testes locais, build, e `npx playwright test` no diretório webui) antes de declarar uma tarefa como concluída, propor commits ou abrir Pull Requests. Garanta que o projeto compila localmente com sucesso. Utilize a CLI do GitHub (`gh pr create`) para abrir PRs de forma autônoma, se aplicável. Em seguida, é OBRIGATÓRIO executar `gh pr checks --watch` para aguardar a conclusão (Status OK/Verde) de todas as actions (CI/CD) do GitHub. Nunca declare a tarefa como concluída se o CI falhar ou estiver em andamento.
 
 ## 10. Workflow de implementação
 
@@ -222,5 +222,5 @@ Todas as atividades seja planejamento, execução ou correção, devem utilizar 
 4. **Execução:** Implementação das tasks criadas utilizando TDD, para qualquer tipo de implementação;
 5. **Validação de Testes:** Build, Lints e cobertura devem atender os critérios já especificados;
 6. **Worktree:** Trabalhar com branches e worktrees não conflitantes;
-7. **Commit/Push:** Utilização de commits atômicos e padrão conventional commits. Um novo PR deve ser aberto no GitHub (usando `gh pr create` por exemplo) e **SEMPRE VERIFIQUE SE A PIPELINE PASSOU**;
-8. **Deploy:** Report final de todo o fluxo para a decisão do humano para autorizar o Merge do PR e deploy no Fly.io
+7. **Commit/Push:** Utilização de commits atômicos e padrão conventional commits. Um novo PR deve ser aberto no GitHub (usando `gh pr create` por exemplo). Logo após a criação, é OBRIGATÓRIO aguardar a conclusão da pipeline com o comando `gh pr checks --watch`;
+8. **Deploy & Merge:** O Report final apresentado para a decisão do humano deve, obrigatoriamente, conter a confirmação de que as actions do GitHub (CI/CD) finalizaram com status OK (verde). É estritamente proibido solicitar ou executar o merge do PR se a pipeline ainda estiver em andamento ou com erros.
