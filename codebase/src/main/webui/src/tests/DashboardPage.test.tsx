@@ -20,7 +20,7 @@ const mockSongs = [
   { id: '1', title: 'Song 1', artist: 'Artist 1', isFavorite: true, categories: [] }
 ];
 
-global.fetch = vi.fn(() =>
+globalThis.fetch = vi.fn(() =>
   Promise.resolve({
     ok: true,
     status: 200,
