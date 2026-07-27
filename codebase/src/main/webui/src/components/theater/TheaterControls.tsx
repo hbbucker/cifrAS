@@ -84,10 +84,10 @@ interface TheaterControlsProps {
  
  {/* Font Size */}
  <div className="flex items-center gap-0.5 shrink-0">
- <button onClick={onFontSizeDecrease} className="p-2 hover:bg-bg-elevated rounded-lg transition-colors text-text-mute hover:text-text-main font-bold" title={t('theater.decreaseFont')}>
+ <button onClick={onFontSizeDecrease} className="p-2 hover:bg-bg-elevated rounded-lg transition-colors text-text-mute hover:text-text-main font-bold" title={t('theater.decreaseFont')} data-testid="decrease-font-btn">
  {t('theater.aMinus')}
  </button>
- <button onClick={onFontSizeIncrease} className="p-2 hover:bg-bg-elevated rounded-lg transition-colors text-text-mute hover:text-text-main font-bold text-lg" title={t('theater.increaseFont')}>
+ <button onClick={onFontSizeIncrease} className="p-2 hover:bg-bg-elevated rounded-lg transition-colors text-text-mute hover:text-text-main font-bold text-lg" title={t('theater.increaseFont')} data-testid="increase-font-btn">
  {t('theater.aPlus')}
  </button>
  </div>

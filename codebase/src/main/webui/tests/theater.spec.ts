@@ -37,7 +37,7 @@ test('theater mode session state is preserved', async ({ page }) => {
   await expect(page.getByTestId('current-key')).toHaveText('D');
 
   // Change font size (simulate changing config)
-  await page.getByTitle('Increase Font Size', { exact: false }).click();
+  await page.getByTestId('increase-font-btn').click();
 
   // Wait for debounce to save state to backend
   await page.waitForTimeout(1500);
