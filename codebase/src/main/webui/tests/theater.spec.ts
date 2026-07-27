@@ -40,7 +40,7 @@ test('theater mode session state is preserved', async ({ page }) => {
   await page.getByTestId('increase-font-btn').click();
 
   // Wait for debounce to save state to backend
-  await page.waitForTimeout(1500);
+  await page.waitForResponse(response => response.url().includes('/theater/session') && response.request().method() === 'PUT');
 
   // 6. Exit Theater Mode
   await page.getByTestId('exit-theater-btn').click();

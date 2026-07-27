@@ -51,6 +51,22 @@ export const SongViewPage: React.FC = () => {
       if (data.prefUseBb != null) setUseBb(data.prefUseBb);
       if (data.prefUseEb != null) setUseEb(data.prefUseEb);
       if (data.prefTransposeSteps != null) setTransposeSteps(data.prefTransposeSteps);
+
+      // Fetch user's session preferences to override song defaults
+      fetch(`/api/theater/song-preferences/${id}`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      })
+      .then(prefRes => {
+        if (prefRes.ok) return prefRes.json();
+        return null;
+      })
+      .then(prefData => {
+        if (prefData) {
+          if (prefData.autoScrollSpeed != null) setAutoScrollSpeed(prefData.autoScrollSpeed);
+          if (prefData.transposeSteps != null) setTransposeSteps(prefData.transposeSteps);
+        }
+      })
+      .catch(() => {});
     })
  .catch(() => toast('Failed to load song details', 'error'));
  }
