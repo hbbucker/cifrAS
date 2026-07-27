@@ -41,6 +41,10 @@ jobs:
         working-directory: ./codebase/src/main/webui
         run: npm run lint
 
+      - name: Run Frontend Unit Tests
+        working-directory: ./codebase/src/main/webui
+        run: npm run test
+
       - name: Build and Test Backend (includes Quinoa Frontend Build)
         run: ./mvnw clean verify
 

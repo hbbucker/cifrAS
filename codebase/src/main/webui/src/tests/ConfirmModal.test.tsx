@@ -17,11 +17,11 @@ describe('ConfirmModal Component', () => {
  />
  );
  
- fireEvent.click(screen.getByText('Confirm'));
+ fireEvent.click(screen.getByText('common.confirm'));
  expect(onConfirmMock).toHaveBeenCalledTimes(1);
  
  // Check variant color rendering
- expect(screen.getByText('Confirm').className).toContain('bg-[#EF4444]');
+ expect(screen.getByText('common.confirm').className).toContain('bg-[#EF4444]');
  });
 
  it('triggers onCancel callback correctly', () => {
@@ -36,7 +36,7 @@ describe('ConfirmModal Component', () => {
  />
  );
  
- fireEvent.click(screen.getByText('Cancel'));
+ fireEvent.click(screen.getByText('common.cancel'));
  expect(onCancelMock).toHaveBeenCalledTimes(1);
  });
 

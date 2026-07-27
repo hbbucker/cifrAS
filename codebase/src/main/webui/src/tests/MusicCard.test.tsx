@@ -40,24 +40,24 @@ describe('MusicCard Component', () => {
  expect(screen.queryByTestId('dropdown-menu')).not.toBeInTheDocument();
  fireEvent.click(menuBtn);
  expect(screen.getByTestId('dropdown-menu')).toBeInTheDocument();
- expect(screen.getByText('Edit')).toBeInTheDocument();
- expect(screen.getByText('Share')).toBeInTheDocument();
- expect(screen.getByText('Delete')).toBeInTheDocument();
+ expect(screen.getByText('musicCard.edit')).toBeInTheDocument();
+ expect(screen.getByText('musicCard.share')).toBeInTheDocument();
+ expect(screen.getByText('musicCard.delete')).toBeInTheDocument();
  });
 
  it('triggers action callbacks from dropdown', () => {
  render(<MusicCard {...mockProps} />);
  fireEvent.click(screen.getByTestId('menu-btn'));
  
- fireEvent.click(screen.getByText('Edit'));
+ fireEvent.click(screen.getByText('musicCard.edit'));
  expect(mockProps.onEdit).toHaveBeenCalledWith('1');
  
  fireEvent.click(screen.getByTestId('menu-btn'));
- fireEvent.click(screen.getByText('Share'));
+ fireEvent.click(screen.getByText('musicCard.share'));
  expect(mockProps.onShare).toHaveBeenCalledWith('1');
  
  fireEvent.click(screen.getByTestId('menu-btn'));
- fireEvent.click(screen.getByText('Delete'));
+ fireEvent.click(screen.getByText('musicCard.delete'));
  expect(mockProps.onDelete).toHaveBeenCalledWith('1');
  });
 
@@ -74,7 +74,7 @@ describe('MusicCard Component', () => {
  expect(mockClick).not.toHaveBeenCalled();
  
  // Click Edit
- fireEvent.click(screen.getByText('Edit'));
+ fireEvent.click(screen.getByText('musicCard.edit'));
  expect(mockClick).not.toHaveBeenCalled();
  });
 });

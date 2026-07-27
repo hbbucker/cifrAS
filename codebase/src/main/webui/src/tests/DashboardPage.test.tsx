@@ -16,6 +16,18 @@ vi.mock('react-router-dom', async () => {
  };
 });
 
+const mockSongs = [
+  { id: '1', title: 'Song 1', artist: 'Artist 1', isFavorite: true, categories: [] }
+];
+
+globalThis.fetch = vi.fn(() =>
+  Promise.resolve({
+    ok: true,
+    status: 200,
+    json: () => Promise.resolve(mockSongs),
+  } as Response)
+);
+
 describe('DashboardPage Component', () => {
  it('navigates to song edit when edit action is clicked', async () => {
   render(
@@ -34,7 +46,7 @@ describe('DashboardPage Component', () => {
  const menuBtn = await screen.findAllByTestId('menu-btn', {}, { timeout: 2000 });
  fireEvent.click(menuBtn[0]);
  
- const editBtn = screen.getAllByText('Edit')[0];
+ const editBtn = screen.getAllByText('musicCard.edit')[0];
  fireEvent.click(editBtn);
  
  expect(mockNavigate).toHaveBeenCalledWith(expect.stringContaining('/songs/edit/'));
