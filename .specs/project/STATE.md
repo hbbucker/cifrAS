@@ -8,9 +8,10 @@ Based on board approval, we are pausing new feature development (including Epic 
 
 **Next Action:**
 - CMO (Leo Sterling) executando a estratégia de aquisição: Infiltração em comunidades (hand-to-hand) e produção dos primeiros conteúdos para TikTok/Reels usando o modelo Híbrido (POV real + Voiceover IA).
-- CTO focado na observabilidade no Fly.io.
+- CTO focado na especificação e implementação do `THEATER-01` (Sessões do modo teatro).
 ## Quick Tasks
 
+- **INFRA-M3:** Adicionado pipeline automatizado CI/CD no GitHub Actions e configurada a observabilidade com `smallrye-health`, rotas de live/ready e logs estruturados em JSON para o Fly.io. Cobertura de backend em 100% pass e front-end com mock resolvido. ROADMAP atualizado.
 - **008-dashboard-favorites:** Filtered dashboard songs to only display favorites and updated translation labels. Implemented backend support for `isFavorite` persistence (SongEntity, Song model, DTOs, PATCH endpoint) and integrated it with the frontend `onToggleFavorite` handler.
 - **FE-ONBOARDING-01:** Implementado Empty State Educativo (`EducationalEmptyState.tsx`) com 3 passos orientativos e o botão call-to-action. Adicionado o componente `OnboardingTooltip.tsx` para guiar os novos usuários nas páginas `DashboardPage` e `SongsListPage`. Incluídas traduções de onboarding no i18n (pt-BR, en, es). Feature finalizada via `tlc-spec-driven`.
 - **BUG-PREFS-01:** Correção do reset do nome nas preferências ao recarregar a página (optimistic UI update). Modificado o `AuthContext.tsx` para persistir o `user` no `localStorage`, evitando que o frontend leia o token JWT antigo do Supabase que ainda contém metadados desatualizados. Correção finalizada e comitada.
