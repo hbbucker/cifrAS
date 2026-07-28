@@ -172,6 +172,12 @@ Para economizar tokens de contexto nas interações com o terminal e o git, todo
   npx playwright test
   ```
 
+### Deploy
+**Executar o deploy dentro da pasta `codebase`
+```bash
+fly deploy --local-only --verbose
+```
+
 ---
 
 ## 8. Equipe do Projeto e StartupOS
