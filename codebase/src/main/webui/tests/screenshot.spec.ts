@@ -31,6 +31,6 @@ test('Evidencia - Aviso de Transposicao', async ({ page }) => {
   // 7. Verify we are on edit page and the warning is visible
   await expect(page).toHaveURL(/.*\/songs\/edit\/.*/);
   
-  // Capture screenshot directly into the artifact directory!
-  await page.screenshot({ path: '/home/bucker/.gemini/antigravity-cli/brain/1488ad00-a5ea-4760-b4cc-6e04ba21bbea/evidence-warning.png' });
+  // Capture screenshot (relative path for CI compatibility)
+  await page.screenshot({ path: 'test-results/evidence-warning.png' });
 });
