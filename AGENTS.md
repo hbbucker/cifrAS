@@ -173,7 +173,7 @@ Para economizar tokens de contexto nas interações com o terminal e o git, todo
   ```
 
 ### Deploy
-**Executar o deploy dentro da pasta `codebase`
+**Executar o deploy na raiz do projeto
 ```bash
 fly deploy --local-only --verbose
 ```
