@@ -74,9 +74,6 @@ export const TheaterModePage: React.FC = () => {
         .then(data => {
           const key = data.originalKey || data.keySignature || 'C';
           setSong(prev => {
-            if (prev.title !== 'Loading...') {
-              setTransposeSteps(0);
-            }
             return {
               title: data.title,
               artist: data.artist,
@@ -97,10 +94,16 @@ export const TheaterModePage: React.FC = () => {
               if (pref.transposeSteps != null) setTransposeSteps(pref.transposeSteps);
               if (pref.fontSize != null) setFontSize(pref.fontSize);
             } else {
+              setTransposeSteps(0);
+              setSpeed(1);
               setFontSize(isMobile ? 24 : 32); // defaults if no preference
             }
           })
-          .catch(() => setFontSize(isMobile ? 24 : 32));
+          .catch(() => {
+            setTransposeSteps(0);
+            setSpeed(1);
+            setFontSize(isMobile ? 24 : 32);
+          });
       }
     }
   }, [activeSongId, isMobile, toast, passedState, setSpeed]);

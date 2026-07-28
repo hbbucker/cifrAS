@@ -58,7 +58,11 @@ export const SongViewPage: React.FC = () => {
 
       // Fetch user's session preferences to override song defaults
       fetch(`/api/theater/song-preferences/${id}`, {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        headers: { 
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Cache-Control': 'no-cache, no-store'
+        },
+        cache: 'no-store'
       })
       .then(prefRes => {
         if (prefRes.ok) return prefRes.json();

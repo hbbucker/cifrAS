@@ -47,7 +47,8 @@ test('theater mode session state is preserved', async ({ page }) => {
   await page.getByTestId('exit-theater-btn').click();
   await expect(page).toHaveURL(/.*\/song\/[a-zA-Z0-9-]+/);
   await responsePromise;
-
+  
+  await page.waitForTimeout(1000);
 
   // 7. Disaster Recovery: Re-enter theater mode (or reload tab)
   await page.getByTestId('theater-mode-btn').click();
