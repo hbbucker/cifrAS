@@ -116,6 +116,13 @@ export const TheaterModePage: React.FC = () => {
         transposeSteps: transposeSteps,
         fontSize: fontSize
       }).catch(err => console.error('Failed to save theater session preferences', err));
+
+      apiClient.put(`/songs/${activeSongId}/preferences`, {
+        prefUseBb: useBb,
+        prefUseEb: useEb,
+        prefAutoScrollSpeed: speed,
+        prefTransposeSteps: transposeSteps
+      }).catch(err => console.error('Failed to save song preferences', err));
     }, 1000);
     
     return () => clearTimeout(handler);

@@ -33,7 +33,11 @@ export const SongViewPage: React.FC = () => {
  useEffect(() => {
  if (id) {
  fetch(`/api/songs/${id}`, {
- headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+ headers: { 
+   'Authorization': `Bearer ${localStorage.getItem('token')}`,
+   'Cache-Control': 'no-cache, no-store'
+ },
+ cache: 'no-store'
  })
  .then(res => {
  if (!res.ok) throw new Error('Fetch failed');

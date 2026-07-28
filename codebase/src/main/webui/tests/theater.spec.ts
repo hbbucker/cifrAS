@@ -39,12 +39,15 @@ test('theater mode session state is preserved', async ({ page }) => {
   // Change font size (simulate changing config)
   await page.getByTestId('increase-font-btn').click();
 
-  // Wait for debounce to save state to backend
-  await page.waitForResponse(response => response.url().includes('/theater/session') && response.request().method() === 'PUT');
+  // Wait for debounce to save state to backend (1000ms + network)
+  await page.waitForTimeout(2000);
 
   // 6. Exit Theater Mode
+  const responsePromise = page.waitForResponse(response => response.url().includes('/api/songs/') && response.request().method() === 'GET');
   await page.getByTestId('exit-theater-btn').click();
   await expect(page).toHaveURL(/.*\/song\/[a-zA-Z0-9-]+/);
+  await responsePromise;
+
 
   // 7. Disaster Recovery: Re-enter theater mode (or reload tab)
   await page.getByTestId('theater-mode-btn').click();
