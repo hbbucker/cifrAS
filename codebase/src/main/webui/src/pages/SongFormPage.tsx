@@ -15,12 +15,12 @@ export const SongFormPage: React.FC = () => {
  const location = useLocation();
  const { toast } = useToast();
  
- const { transposedKey, transposedContent } = location.state || {};
+ const { wasTransposed, originalKey } = location.state || {};
  
  const [title, setTitle] = useState('');
  const [artist, setArtist] = useState('');
- const [key, setKey] = useState(transposedKey || 'C');
- const [content, setContent] = useState(transposedContent || '');
+ const [key, setKey] = useState('C');
+ const [content, setContent] = useState('');
  const [showCancelModal, setShowCancelModal] = useState(false);
  const [showDrivePicker, setShowDrivePicker] = useState(false);
  const [isDirty, setIsDirty] = useState(false);
@@ -57,16 +57,16 @@ export const SongFormPage: React.FC = () => {
  .then(song => {
  setTitle(song.title || '');
  setArtist(song.artist || '');
- setKey(transposedKey || song.originalKey || song.keySignature || 'C');
- setContent(transposedContent || song.content || stringifyLyrics(song.lyrics) || '');
- setIsDirty(!!(transposedKey || transposedContent));
+ setKey(song.originalKey || song.keySignature || 'C');
+ setContent(song.content || stringifyLyrics(song.lyrics) || '');
+ setIsDirty(false);
  })
  .catch(err => {
  console.error(err);
  toast('Failed to load song', 'error');
  });
  }
- }, [id, toast, transposedKey, transposedContent]);
+ }, [id, toast]);
 
  const handleSave = async () => {
  if (!title || !artist || !content) {
@@ -135,6 +135,11 @@ export const SongFormPage: React.FC = () => {
 
  <div className="flex-1 overflow-y-auto p-4 md:p-6 flex flex-col bg-bg-main">
  <div className="max-w-5xl mx-auto w-full flex-1 flex flex-col space-y-6">
+ {wasTransposed && (
+ <div className="bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-sm p-3 rounded-lg flex items-center gap-2">
+ {t('songForm.editingOriginalKeyWarning', { key: originalKey || key })}
+ </div>
+ )}
  <div className="flex flex-col md:flex-row gap-4 bg-bg-card p-4 rounded-[16px] border border-border-main">
  <div className="flex-1">
  <label className="block text-xs font-semibold text-text-mute mb-1 uppercase tracking-wider">{t('songForm.title')}</label>

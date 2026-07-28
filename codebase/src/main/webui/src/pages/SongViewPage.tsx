@@ -199,7 +199,7 @@ export const SongViewPage: React.FC = () => {
  </div>
  
  <button 
- onClick={() => navigate(`/songs/edit/${id}`, { state: { transposedKey: currentKey, transposedContent } })}
+ onClick={() => navigate(`/songs/edit/${id}`, { state: { wasTransposed: transposeSteps !== 0, originalKey: song.originalKey } })}
  className="hidden sm:flex items-center gap-2 p-2 text-text-mute hover:bg-bg-elevated rounded-lg"
  title={t('songView.editSong')}
  >

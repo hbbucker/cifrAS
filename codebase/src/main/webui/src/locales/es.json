@@ -143,7 +143,8 @@
     "unsavedMessage": "You have unsaved modifications. Are you sure you want to leave without saving?",
     "discardBtn": "Discard",
     "editTitle": "Editar Canción",
-    "newTitle": "Nueva Canción"
+    "newTitle": "Nueva Canción",
+    "editingOriginalKeyWarning": "Estás editando la canción en su tono original ({{key}}). Tus preferencias de transposición se mantendrán al visualizar."
   },
   "songView": {
     "preferences": "Preferences",
