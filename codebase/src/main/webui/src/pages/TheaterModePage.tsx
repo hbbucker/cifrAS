@@ -73,13 +73,11 @@ export const TheaterModePage: React.FC = () => {
         .then(res => res.data)
         .then(data => {
           const key = data.originalKey || data.keySignature || 'C';
-          setSong(prev => {
-            return {
-              title: data.title,
-              artist: data.artist,
-              originalKey: key,
-              content: stringifyLyrics(data.lyrics)
-            };
+          setSong({
+            title: data.title,
+            artist: data.artist,
+            originalKey: key,
+            content: stringifyLyrics(data.lyrics)
           });
         })
         .catch(() => toast('Failed to load song details', 'error'));
@@ -129,7 +127,7 @@ export const TheaterModePage: React.FC = () => {
     }, 1000);
     
     return () => clearTimeout(handler);
-  }, [speed, transposeSteps, fontSize, activeSongId, song.title]);
+  }, [speed, transposeSteps, fontSize, activeSongId, song.title, useBb, useEb]);
 
  const handleNextSong = () => {
  if (playlistId && currentPlaylistIndex < playlistSongs.length - 1) {
