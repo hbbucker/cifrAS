@@ -143,7 +143,8 @@
     "unsavedMessage": "Você tem modificações não salvas. Tem certeza de que deseja sair sem salvar?",
     "discardBtn": "Descartar",
     "editTitle": "Editar Música",
-    "newTitle": "Nova Música"
+    "newTitle": "Nova Música",
+    "editingOriginalKeyWarning": "Você está editando a cifra no tom original ({{key}}). Suas preferências de transposição serão mantidas ao visualizar."
   },
   "songView": {
     "preferences": "Preferências",
