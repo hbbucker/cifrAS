@@ -88,7 +88,6 @@ public class SongRepository {
         SongEntity entity = jpaRepo.findById(song.getId());
         if (entity != null) {
             mapper.updateEntity(song, entity);
-            jpaRepo.persist(entity);
         }
     }
 }

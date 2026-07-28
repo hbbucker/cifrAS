@@ -8,7 +8,7 @@ payload = {
     "iss": "https://test.cifras.com",
     "sub": "e2e-user-1234",
     "upn": "e2e-user-1234",
-    "groups": ["user"],
+    "role": ["user", "authenticated"],
     "aud": "authenticated",
     "exp": int(time.time()) + 3600 * 24 * 365 * 10,
     "iat": int(time.time())

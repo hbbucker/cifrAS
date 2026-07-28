@@ -20,13 +20,16 @@ public class UpdateTheaterSessionUseCase {
             entity = new UserSongPreferenceEntity();
             entity.userId = userId;
             entity.songId = req.songId();
+            entity.transposeSteps = req.transposeSteps();
+            entity.autoScrollSpeed = req.autoScrollSpeed();
+            entity.fontSize = req.fontSize();
+            entity.updatedAt = Instant.now();
+            entity.persist();
+        } else {
+            entity.transposeSteps = req.transposeSteps();
+            entity.autoScrollSpeed = req.autoScrollSpeed();
+            entity.fontSize = req.fontSize();
+            entity.updatedAt = Instant.now();
         }
-        
-        entity.transposeSteps = req.transposeSteps();
-        entity.autoScrollSpeed = req.autoScrollSpeed();
-        entity.fontSize = req.fontSize();
-        entity.updatedAt = Instant.now();
-        
-        entity.persist();
     }
 }

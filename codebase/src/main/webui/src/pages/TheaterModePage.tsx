@@ -73,16 +73,11 @@ export const TheaterModePage: React.FC = () => {
         .then(res => res.data)
         .then(data => {
           const key = data.originalKey || data.keySignature || 'C';
-          setSong(prev => {
-            if (prev.title !== 'Loading...') {
-              setTransposeSteps(0);
-            }
-            return {
-              title: data.title,
-              artist: data.artist,
-              originalKey: key,
-              content: stringifyLyrics(data.lyrics)
-            };
+          setSong({
+            title: data.title,
+            artist: data.artist,
+            originalKey: key,
+            content: stringifyLyrics(data.lyrics)
           });
         })
         .catch(() => toast('Failed to load song details', 'error'));
@@ -97,10 +92,16 @@ export const TheaterModePage: React.FC = () => {
               if (pref.transposeSteps != null) setTransposeSteps(pref.transposeSteps);
               if (pref.fontSize != null) setFontSize(pref.fontSize);
             } else {
+              setTransposeSteps(0);
+              setSpeed(1);
               setFontSize(isMobile ? 24 : 32); // defaults if no preference
             }
           })
-          .catch(() => setFontSize(isMobile ? 24 : 32));
+          .catch(() => {
+            setTransposeSteps(0);
+            setSpeed(1);
+            setFontSize(isMobile ? 24 : 32);
+          });
       }
     }
   }, [activeSongId, isMobile, toast, passedState, setSpeed]);
@@ -116,10 +117,17 @@ export const TheaterModePage: React.FC = () => {
         transposeSteps: transposeSteps,
         fontSize: fontSize
       }).catch(err => console.error('Failed to save theater session preferences', err));
+
+      apiClient.put(`/songs/${activeSongId}/preferences`, {
+        prefUseBb: useBb,
+        prefUseEb: useEb,
+        prefAutoScrollSpeed: speed,
+        prefTransposeSteps: transposeSteps
+      }).catch(err => console.error('Failed to save song preferences', err));
     }, 1000);
     
     return () => clearTimeout(handler);
-  }, [speed, transposeSteps, fontSize, activeSongId, song.title]);
+  }, [speed, transposeSteps, fontSize, activeSongId, song.title, useBb, useEb]);
 
  const handleNextSong = () => {
  if (playlistId && currentPlaylistIndex < playlistSongs.length - 1) {

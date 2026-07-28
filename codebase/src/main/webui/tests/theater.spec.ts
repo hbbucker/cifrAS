@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test('theater mode session state is preserved', async ({ page }) => {
-  const mockJwt = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL3Rlc3QuY2lmcmFzLmNvbSIsInN1YiI6ImUyZS11c2VyLTEyMzQiLCJ1cG4iOiJlMmUtdXNlci0xMjM0IiwiZ3JvdXBzIjpbInVzZXIiXSwiYXVkIjoiYXV0aGVudGljYXRlZCIsImV4cCI6MjA5ODU2ODQwMiwiaWF0IjoxNzgzMjA4NDAyfQ.ZRS-0Wf1Ws6j7PjQGc4lmVQ2H3UbK6616HNp4QZJEBMcO3bNdwEfn05SgXm5gp95knBSpNlS3M8wM0Iqtpthcpmh2JmzL9CfcssJSQPWgEzKGDP4rDt522-LFKAyOd8tLsyJQGt8cgRiY8rbW1Vkaohsl3YG6eIDaOJcnuzKhxfMCOSdEI4D9DCBJojre3xbLON8hqvEDX9WNZ_f86_P58Ttf479hJyjriLAlaGN2uvref3UkPvizALB0pgLovz6H3Vg7MP26LfjnIdwYOjZ8i_wislXNxS7vxfP9XXo3r36tv-A6ivstLXLO8ajivXzfNEBNRSz5ZwLP79d7EMQOQ';
+  const mockJwt = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL3Rlc3QuY2lmcmFzLmNvbSIsInN1YiI6ImUyZS11c2VyLTEyMzQiLCJ1cG4iOiJlMmUtdXNlci0xMjM0Iiwicm9sZSI6WyJ1c2VyIiwiYXV0aGVudGljYXRlZCJdLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoyMTAwNTU1MzkwLCJpYXQiOjE3ODUxOTUzOTB9.UtbyLMnxY8d0t7MsyIoizRwjKoQyZUC0TdHE-wAJSYkAzFnH1AIXDcbWTAEz4l_wTc6QiXEbC3JfkYQ80GSlbwWpmEuPnLNTseqej712FywzFPHz-SptzffIyVN7YIHlvEtm-EXrFJT5OPo8Nuqpj_qn_fxUgD_S_FaxH44ASGVu_qUbopMcYBA87waWD-sZlvIf94RSCJbMTlNyO-nboLhi23tAwhBQqs-AXJxcbUp1R_XRDtBsEno4e-YgNkpy0LpT10nBqzTuiE1pu-UxjFOOmhYRHIgJ5LlPbF-NIHWiBh4L_c3M_HTw7RLDTzcQHdfesdCLXkOUIsJOnawGDQ';
   
   // 1. Login Flow
   await page.goto(`/auth/callback#access_token=${mockJwt}&refresh_token=dummy`);
@@ -37,14 +37,18 @@ test('theater mode session state is preserved', async ({ page }) => {
   await expect(page.getByTestId('current-key')).toHaveText('D');
 
   // Change font size (simulate changing config)
-  await page.getByTitle('Increase Font Size', { exact: false }).click();
+  await page.getByTestId('increase-font-btn').click();
 
-  // Wait for debounce to save state to backend
-  await page.waitForTimeout(1500);
+  // Wait for debounce to save state to backend (1000ms + network)
+  await page.waitForTimeout(2000);
 
   // 6. Exit Theater Mode
+  const responsePromise = page.waitForResponse(response => response.url().includes('/api/songs/') && response.request().method() === 'GET');
   await page.getByTestId('exit-theater-btn').click();
   await expect(page).toHaveURL(/.*\/song\/[a-zA-Z0-9-]+/);
+  await responsePromise;
+  
+  await page.waitForTimeout(1000);
 
   // 7. Disaster Recovery: Re-enter theater mode (or reload tab)
   await page.getByTestId('theater-mode-btn').click();
