@@ -2,56 +2,9 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Feature Discovery Modal', () => {
   test.beforeEach(async ({ page }) => {
-    // We do NOT set feature_discovery_02_seen to true here!
+    // Ensure we see the modal
     await page.addInitScript(() => {
       localStorage.removeItem('feature_discovery_02_seen');
-    });
-
-    // Mock API responses for Dashboard
-    await page.route('**/api/songs', async route => {
-      if (route.request().method() === 'OPTIONS') {
-         await route.fulfill({ status: 200, headers: { 'Access-Control-Allow-Origin': '*' }});
-         return;
-      }
-      await route.fulfill({
-        status: 200,
-        json: [{
-          id: '1',
-          title: 'Test Song',
-          artist: 'Test Artist',
-          originalKey: 'C',
-          keySignature: 'C',
-          isFavorite: false,
-          categories: []
-        }]
-      });
-    });
-
-    // Mock API responses for Song View
-    await page.route('**/api/songs/1', async route => {
-      if (route.request().method() === 'OPTIONS') {
-         await route.fulfill({ status: 200, headers: { 'Access-Control-Allow-Origin': '*' }});
-         return;
-      }
-      await route.fulfill({
-        status: 200,
-        json: {
-          id: '1',
-          title: 'Test Song',
-          artist: 'Test Artist',
-          originalKey: 'C',
-          content: '[C]Hello [G]World'
-        }
-      });
-    });
-
-    await page.route('**/api/theater/song-preferences/*', async route => {
-      await route.fulfill({ status: 200, json: {} });
-    });
-    
-    // Catch-all for preferences PUT
-    await page.route('**/api/songs/1/preferences', async route => {
-      await route.fulfill({ status: 200, json: {} });
     });
   });
 
@@ -62,12 +15,23 @@ test.describe('Feature Discovery Modal', () => {
     await page.goto(`/auth/callback#access_token=${mockJwt}&refresh_token=dummy`);
     await expect(page).toHaveURL(/.*\/dashboard/);
 
-    // Wait for dashboard to load the song
-    await expect(page.getByText('Test Song')).toBeVisible();
-
-    // Navigate to the song page via client-side routing
-    await page.getByText('Test Song').first().click();
-    await expect(page).toHaveURL(/.*\/songs\/view\/1/);
+    // Create a new song to view (since DB is fresh)
+    await page.getByTestId('add-song-btn').click();
+    await expect(page).toHaveURL(/.*\/songs\/new/);
+    
+    const uniqueTitle = 'Feature Discovery Song ' + Date.now();
+    await page.getByTestId('song-title-input').fill(uniqueTitle);
+    await page.getByTestId('song-artist-input').fill('Artist');
+    await page.getByTestId('song-key-input').fill('C');
+    await page.getByTestId('song-content-input').fill('[C]Hello World');
+    
+    await page.getByTestId('save-song-btn').click();
+    
+    // Wait for redirect to dashboard after saving
+    await expect(page).toHaveURL(/.*\/dashboard/);
+    
+    // Now click the song on the dashboard!
+    await page.getByText(uniqueTitle).first().click();
     
     // Wait for the modal timeout
     await page.waitForTimeout(1500);
