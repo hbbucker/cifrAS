@@ -43,6 +43,24 @@ export const TheaterModePage: React.FC = () => {
  const [scrollTop, setScrollTop] = useState(0);
  const [slideDir, setSlideDir] = useState<'right'|'left'>('right');
  const [isLocked, setIsLocked] = useState(false);
+ const wakeLockRef = React.useRef<any>(null);
+ 
+ useEffect(() => {
+ if (isLocked && 'wakeLock' in navigator) {
+ (navigator as any).wakeLock.request('screen')
+ .then((lock: any) => { wakeLockRef.current = lock; })
+ .catch(console.error);
+ } else if (!isLocked && wakeLockRef.current) {
+ wakeLockRef.current.release();
+ wakeLockRef.current = null;
+ }
+ return () => {
+ if (wakeLockRef.current) {
+ wakeLockRef.current.release();
+ wakeLockRef.current = null;
+ }
+ };
+ }, [isLocked]);
  
  const { activeSession, saveProgress, clearSession } = usePerformanceSession();
  const [showResumePrompt, setShowResumePrompt] = useState(false);
@@ -51,6 +69,13 @@ export const TheaterModePage: React.FC = () => {
  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
  const [showControls, setShowControls] = useState(!isMobile);
  const [fontSize, setFontSize] = useState<number>(isMobile ? 24 : 32);
+
+ useEffect(() => {
+ if (showControls) {
+ const timer = setTimeout(() => setShowControls(false), 4000);
+ return () => clearTimeout(timer);
+ }
+ }, [showControls]);
 
  // Fetch playlist queue if playlistId is provided
  useEffect(() => {
@@ -175,6 +200,7 @@ export const TheaterModePage: React.FC = () => {
 
  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
  setScrollTop(e.currentTarget.scrollTop);
+ if (showControls) setShowControls(false);
  };
 
  const currentKey = transposeContent(song.originalKey, transposeSteps, useBb, useEb);
@@ -195,7 +221,7 @@ export const TheaterModePage: React.FC = () => {
  setTouchEnd(e.targetTouches[0].clientX);
  };
 
- const onTouchEnd = () => {
+ const onTouchEnd = (e: React.TouchEvent) => {
  if (!touchStart || !touchEnd) return;
  const distance = touchStart - touchEnd;
  const isLeftSwipe = distance > minSwipeDistance;
@@ -203,10 +229,10 @@ export const TheaterModePage: React.FC = () => {
 
  if (isLeftSwipe) {
  handleNextSong();
- }
- if (isRightSwipe) {
+ } else if (isRightSwipe) {
  handlePrevSong();
  }
+ // Tap is handled by onClick
  };
 
  // Fake full screen logic
@@ -244,6 +270,19 @@ export const TheaterModePage: React.FC = () => {
  onTouchStart={onTouchStart}
  onTouchMove={onTouchMove}
  onTouchEnd={onTouchEnd}
+ onClick={(e) => {
+ // Desktop/mouse tap zones
+ if (e.target instanceof HTMLElement && e.target.closest('button, a, input')) return;
+ const clientX = e.clientX;
+ const width = window.innerWidth;
+ if (clientX < width * 0.3) {
+ if (playlistId) handlePrevSong();
+ } else if (clientX > width * 0.7) {
+ if (playlistId) handleNextSong();
+ } else {
+ setShowControls(prev => !prev);
+ }
+ }}
  >
  {/* Header becomes semi-transparent when scrolling */}
  <header 
@@ -328,7 +367,7 @@ export const TheaterModePage: React.FC = () => {
   )}
 
  <TheaterControls 
- className={!showControls && isMobile ? 'translate-y-48 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}
+ className={!showControls ? 'translate-y-48 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}
  isScrolling={isScrolling}
  speed={speed}
  currentKey={currentKey}

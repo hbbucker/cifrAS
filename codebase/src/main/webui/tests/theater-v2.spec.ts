@@ -49,4 +49,15 @@ test('theater mode lock functionality', async ({ page }) => {
 
   await expect(page.getByTestId('transpose-up')).toBeVisible();
   await expect(page.getByTestId('play-pause-btn')).toBeEnabled();
+
+  // Test Auto-hide / tap to hide
+  // Wait for 4s auto-hide timeout? No, let's just tap to hide.
+  const { width, height } = page.viewportSize() || { width: 1024, height: 768 };
+  // Tap center
+  await page.mouse.click(width / 2, height / 2);
+  await expect(page.getByTestId('theater-controls')).toHaveClass(/opacity-0/);
+
+  // Tap again to show
+  await page.mouse.click(width / 2, height / 2);
+  await expect(page.getByTestId('theater-controls')).toHaveClass(/opacity-100/);
 });
