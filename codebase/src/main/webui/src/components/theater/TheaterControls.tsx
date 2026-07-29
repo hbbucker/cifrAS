@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Play, Pause, ChevronLeft, ChevronRight, Maximize, X } from 'lucide-react';
+import { Play, Pause, ChevronLeft, ChevronRight, Maximize, X, Lock, Unlock } from 'lucide-react';
 import { TransposePad } from '../music/TransposePad';
 
 interface TheaterControlsProps {
@@ -30,7 +30,7 @@ interface TheaterControlsProps {
  isLocked = false, onLockToggle
 }) => {
   const { t } = useTranslation();
-  const [lockPressTimer, setLockPressTimer] = React.useState<NodeJS.Timeout | null>(null);
+  const [lockPressTimer, setLockPressTimer] = React.useState<ReturnType<typeof setTimeout> | null>(null);
 
   const handleLockTouchStart = () => {
     const timer = setTimeout(() => {

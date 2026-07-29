@@ -10,7 +10,7 @@ export interface PerformanceSession {
 
 export const usePerformanceSession = () => {
   const [activeSession, setActiveSession] = useState<PerformanceSession | null>(null);
-  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchActiveSession = useCallback(async () => {
     try {
