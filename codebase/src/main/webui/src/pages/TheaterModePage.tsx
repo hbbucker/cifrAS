@@ -72,7 +72,7 @@ export const TheaterModePage: React.FC = () => {
  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
  const [showControls, setShowControls] = useState(!isMobile);
  const [fontSize, setFontSize] = useState<number>(isMobile ? 24 : 32);
- const [lastInteraction, setLastInteraction] = useState(Date.now());
+ const [lastInteraction, setLastInteraction] = useState<number>(0);
 
  useEffect(() => {
    if (showControls) {
