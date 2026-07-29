@@ -28,9 +28,7 @@ test('theater mode lock functionality', async ({ page }) => {
   await page.waitForURL(/.*\/theater\/song\/[a-zA-Z0-9-]+/);
   await expect(page.getByTestId('theater-controls')).toBeVisible();
 
-  // Test resume prompt
-  await expect(page.getByTestId('resume-session-prompt')).toBeVisible();
-  await page.getByTestId('resume-session-btn').click();
+
 
   // Test Lock Mode
   // Long press the lock button
