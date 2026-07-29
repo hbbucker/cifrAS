@@ -1,5 +1,11 @@
 import { test, expect } from '@playwright/test';
 
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('feature_discovery_02_seen', 'true');
+  });
+});
+
 test('Theme toggle should change to dark mode and persist', async ({ page }) => {
   page.on('console', msg => console.log('Browser:', msg.text()));
   page.on('pageerror', err => console.log('Browser Error:', err.message));

@@ -1,5 +1,11 @@
 import { test, expect } from '@playwright/test';
 
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('feature_discovery_02_seen', 'true');
+  });
+});
+
 test.describe('Google Drive Import', () => {
   test.beforeEach(async ({ page, context }) => {
     // Event listeners to capture browser logs, errors, and failed requests in CI/CD

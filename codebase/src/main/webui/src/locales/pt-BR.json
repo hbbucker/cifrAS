@@ -237,5 +237,11 @@
   "transposePad": {
     "up": "Transpor para cima",
     "down": "Transpor para baixo"
+  },
+  "featureDiscovery": {
+    "title": "Novidades no CifrAS!",
+    "pitchPersistence": "Persistência de Tom: os tons agora ficam salvos no seu browser.",
+    "theaterMode": "Modo Teatro: maximize a letra para usar no palco.",
+    "button": "Entendi!"
   }
 }

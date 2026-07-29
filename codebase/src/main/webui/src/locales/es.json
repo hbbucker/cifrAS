@@ -237,5 +237,11 @@
   "transposePad": {
     "up": "Transpose up",
     "down": "Transpose down"
+  },
+  "featureDiscovery": {
+    "title": "¡Novedades en CifrAS!",
+    "pitchPersistence": "Persistencia de Tono: los tonos ahora se guardan en tu navegador.",
+    "theaterMode": "Modo Teatro: maximiza la letra para usar en el escenario.",
+    "button": "¡Entendido!"
   }
 }

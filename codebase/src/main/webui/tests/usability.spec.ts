@@ -1,4 +1,10 @@
 import { test, expect } from '@playwright/test';
+
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('feature_discovery_02_seen', 'true');
+  });
+});
 import AxeBuilder from '@axe-core/playwright';
 
 const TARGET_URL = 'http://localhost:8080'; 
