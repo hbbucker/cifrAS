@@ -72,13 +72,14 @@ export const TheaterModePage: React.FC = () => {
  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
  const [showControls, setShowControls] = useState(!isMobile);
  const [fontSize, setFontSize] = useState<number>(isMobile ? 24 : 32);
+ const [lastInteraction, setLastInteraction] = useState(Date.now());
 
  useEffect(() => {
- if (showControls) {
- const timer = setTimeout(() => setShowControls(false), 4000);
- return () => clearTimeout(timer);
- }
- }, [showControls]);
+   if (showControls) {
+     const timer = setTimeout(() => setShowControls(false), 4000);
+     return () => clearTimeout(timer);
+   }
+ }, [showControls, lastInteraction]);
 
  // Fetch playlist queue if playlistId is provided
  useEffect(() => {
@@ -202,8 +203,11 @@ export const TheaterModePage: React.FC = () => {
   };
 
  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
- setScrollTop(e.currentTarget.scrollTop);
+ const newScrollTop = e.currentTarget.scrollTop;
+ if (Math.abs(newScrollTop - scrollTop) > 5) {
  if (showControls) setShowControls(false);
+ }
+ setScrollTop(newScrollTop);
  };
 
  const currentKey = transposeContent(song.originalKey, transposeSteps, useBb, useEb);
@@ -216,6 +220,7 @@ export const TheaterModePage: React.FC = () => {
  const minSwipeDistance = 50;
 
  const onTouchStart = (e: React.TouchEvent) => {
+ setLastInteraction(Date.now());
  setTouchEnd(null); // otherwise the swipe is fired even with usual touch events
  setTouchStart(e.targetTouches[0].clientX);
  };
@@ -274,8 +279,9 @@ export const TheaterModePage: React.FC = () => {
  onTouchMove={onTouchMove}
  onTouchEnd={onTouchEnd}
  onClick={(e) => {
+ setLastInteraction(Date.now());
  // Desktop/mouse tap zones
- if (e.target instanceof HTMLElement && e.target.closest('button, a, input')) return;
+ if (e.target instanceof Element && e.target.closest('button, a, input, [role="button"]')) return;
  const clientX = e.clientX;
  const width = window.innerWidth;
  if (clientX < width * 0.3) {

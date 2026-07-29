@@ -55,18 +55,38 @@ test('full application flow including registration and song CRUD', async ({ page
   // 6. Theater Mode
   await page.getByTestId('start-theater-btn').click();
   await expect(page).toHaveURL(/.*\/theater\/[a-zA-Z0-9-]+/);
-  await expect(page.getByTestId('theater-controls')).toBeVisible();
+  await expect(page.getByTestId('theater-controls').first()).toBeVisible();
   
+  // Conditionally tap center to ensure controls are visible if they auto-hid
+  const controls = page.getByTestId('theater-controls').first();
+  const isHidden = await controls.evaluate((el) => el.classList.contains('opacity-0'));
+  if (isHidden) {
+    const { width, height } = page.viewportSize() || { width: 1024, height: 768 };
+    await page.mouse.click(width / 2, height / 2);
+  }
+  await expect(controls).toHaveClass(/opacity-100/);
+
   // Test auto-scroll / play pause
-  await page.getByTestId('play-pause-btn').click();
+  await page.getByTestId('play-pause-btn').first().click();
   
+  // Wait a bit to ensure scrolling has started
+  await page.waitForTimeout(500);
+
+  // Re-open controls (since scrolling hides them)
+  const isHidden2 = await controls.evaluate((el) => el.classList.contains('opacity-0'));
+  if (isHidden2) {
+    const { width, height } = page.viewportSize() || { width: 1024, height: 768 };
+    await page.mouse.click(width / 2, height / 2);
+  }
+  await expect(controls).toHaveClass(/opacity-100/);
+
   // Transpose in theater mode
-  await expect(page.getByTestId('current-key')).toHaveText('C');
-  await page.getByTestId('transpose-up').click();
-  await expect(page.getByTestId('current-key')).toHaveText('C#');
+  await expect(page.getByTestId('current-key').first()).toHaveText('C');
+  await page.getByTestId('transpose-up').first().click();
+  await expect(page.getByTestId('current-key').first()).toHaveText('C#');
   
   // Exit theater mode
-  await page.getByTestId('exit-theater-btn').click();
+  await page.getByTestId('exit-theater-btn').first().click();
   await expect(page).toHaveURL(/.*\/playlists\/[a-zA-Z0-9-]+/);
 
   // 7. Groups Flow

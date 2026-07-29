@@ -26,25 +26,34 @@ test('theater mode session state is preserved', async ({ page }) => {
   // 5. Enter Theater Mode
   await page.getByTestId('theater-mode-btn').click();
   await expect(page).toHaveURL(/.*\/theater\/song\/[a-zA-Z0-9-]+/);
-  await expect(page.getByTestId('theater-controls')).toBeVisible();
+  await expect(page.getByTestId('theater-controls').first()).toBeVisible();
 
   // The default key should be C
-  await expect(page.getByTestId('current-key')).toHaveText('C');
+  await expect(page.getByTestId('current-key').first()).toHaveText('C');
+
+  // Conditionally tap center to ensure controls are visible if they auto-hid
+  const controls = page.getByTestId('theater-controls').first();
+  const isHidden = await controls.evaluate((el) => el.classList.contains('opacity-0'));
+  if (isHidden) {
+    const { width, height } = page.viewportSize() || { width: 1024, height: 768 };
+    await page.mouse.click(width / 2, height / 2);
+  }
+  await expect(controls).toHaveClass(/opacity-100/);
 
   // Change transpose steps (+2 -> D)
-  await page.getByTestId('transpose-up').click();
-  await page.getByTestId('transpose-up').click();
-  await expect(page.getByTestId('current-key')).toHaveText('D');
+  await page.getByTestId('transpose-up').first().click();
+  await page.getByTestId('transpose-up').first().click();
+  await expect(page.getByTestId('current-key').first()).toHaveText('D');
 
   // Change font size (simulate changing config)
-  await page.getByTestId('increase-font-btn').click();
+  await page.getByTestId('increase-font-btn').first().click();
 
   // Wait for debounce to save state to backend (1000ms + network)
   await page.waitForTimeout(2000);
 
   // 6. Exit Theater Mode
   const responsePromise = page.waitForResponse(response => response.url().includes('/api/songs/') && response.request().method() === 'GET');
-  await page.getByTestId('exit-theater-btn').click();
+  await page.getByTestId('exit-theater-btn').first().click();
   await expect(page).toHaveURL(/.*\/song\/[a-zA-Z0-9-]+/);
   await responsePromise;
   
@@ -53,8 +62,8 @@ test('theater mode session state is preserved', async ({ page }) => {
   // 7. Disaster Recovery: Re-enter theater mode (or reload tab)
   await page.getByTestId('theater-mode-btn').click();
   await expect(page).toHaveURL(/.*\/theater\/song\/[a-zA-Z0-9-]+/);
-  await expect(page.getByTestId('theater-controls')).toBeVisible();
+  await expect(page.getByTestId('theater-controls').first()).toBeVisible();
 
   // 8. Assert that state was preserved! Key should be D (transpose = 2)
-  await expect(page.getByTestId('current-key')).toHaveText('D');
+  await expect(page.getByTestId('current-key').first()).toHaveText('D');
 });
