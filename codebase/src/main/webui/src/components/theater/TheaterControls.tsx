@@ -30,21 +30,7 @@ interface TheaterControlsProps {
  isLocked = false, onLockToggle
 }) => {
   const { t } = useTranslation();
-  const [lockPressTimer, setLockPressTimer] = React.useState<ReturnType<typeof setTimeout> | null>(null);
 
-  const handleLockTouchStart = () => {
-    const timer = setTimeout(() => {
-      if (onLockToggle) onLockToggle();
-    }, 1000); // 1 second long press
-    setLockPressTimer(timer);
-  };
-
-  const handleLockTouchEnd = () => {
-    if (lockPressTimer) {
-      clearTimeout(lockPressTimer);
-      setLockPressTimer(null);
-    }
-  };
   return (
  <div className={`fixed bottom-28 md:bottom-6 left-1/2 -translate-x-1/2 bg-bg-card/95 backdrop-blur-xl text-text-main px-4 md:px-6 py-4 rounded-3xl shadow-2xl border border-border-main flex flex-col md:flex-row items-center gap-4 md:gap-6 z-40 transition-all hover:bg-bg-card w-[92%] md:w-auto ${className}`} data-testid="theater-controls">
  
@@ -124,13 +110,9 @@ interface TheaterControlsProps {
  {/* Display Options */}
  <div className="flex items-center gap-1 shrink-0">
  <button 
- onTouchStart={handleLockTouchStart}
- onTouchEnd={handleLockTouchEnd}
- onMouseDown={handleLockTouchStart}
- onMouseUp={handleLockTouchEnd}
- onMouseLeave={handleLockTouchEnd}
+ onClick={onLockToggle}
  className={`p-2.5 md:p-3 hover:bg-bg-elevated rounded-full transition-colors ${isLocked ? 'text-[#8629cc]' : 'text-text-mute hover:text-text-main'}`}
- title="Lock (Long Press)" 
+ title={isLocked ? t('theater.unlock') : t('theater.lock')} 
  data-testid="lock-mode-btn"
  >
  {/* Using lucide icons, Lock / Unlock */}

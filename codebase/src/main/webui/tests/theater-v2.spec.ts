@@ -31,11 +31,9 @@ test('theater mode lock functionality', async ({ page }) => {
 
 
   // Test Lock Mode
-  // Long press the lock button
+  // Click the lock button
   const lockBtn = page.getByTestId('lock-mode-btn');
-  await lockBtn.dispatchEvent('mousedown');
-  await page.waitForTimeout(1200);
-  await lockBtn.dispatchEvent('mouseup');
+  await lockBtn.click();
 
   // Verify other buttons are hidden/disabled
   await expect(page.getByTestId('transpose-up')).not.toBeVisible();
@@ -43,9 +41,7 @@ test('theater mode lock functionality', async ({ page }) => {
   await expect(page.getByTestId('play-pause-btn')).toBeDisabled();
 
   // Unlock
-  await lockBtn.dispatchEvent('mousedown');
-  await page.waitForTimeout(1200);
-  await lockBtn.dispatchEvent('mouseup');
+  await lockBtn.click();
 
   await expect(page.getByTestId('transpose-up')).toBeVisible();
   await expect(page.getByTestId('play-pause-btn')).toBeEnabled();
