@@ -43,11 +43,14 @@ export const TheaterModePage: React.FC = () => {
  const [scrollTop, setScrollTop] = useState(0);
  const [slideDir, setSlideDir] = useState<'right'|'left'>('right');
  const [isLocked, setIsLocked] = useState(false);
+ // eslint-disable-next-line @typescript-eslint/no-explicit-any
  const wakeLockRef = React.useRef<any>(null);
  
  useEffect(() => {
  if (isLocked && 'wakeLock' in navigator) {
+ // eslint-disable-next-line @typescript-eslint/no-explicit-any
  (navigator as any).wakeLock.request('screen')
+ // eslint-disable-next-line @typescript-eslint/no-explicit-any
  .then((lock: any) => { wakeLockRef.current = lock; })
  .catch(console.error);
  } else if (!isLocked && wakeLockRef.current) {
@@ -94,7 +97,7 @@ export const TheaterModePage: React.FC = () => {
  toast('Failed to load playlist queue', 'error');
  });
  }
- }, [playlistId, toast]);
+ }, [playlistId, toast, t]);
 
   // Fetch full song details and preferences for the active song ID
   const activeSongId = playlistId && playlistSongs.length > 0 ? playlistSongs[currentPlaylistIndex].id : songId;
@@ -160,7 +163,7 @@ export const TheaterModePage: React.FC = () => {
     }, 1000);
     
     return () => clearTimeout(handler);
-  }, [speed, transposeSteps, fontSize, activeSongId, song.title, useBb, useEb]);
+  }, [speed, transposeSteps, fontSize, activeSongId, song.title, useBb, useEb, t]);
 
   useEffect(() => {
     if (activeSession && playlistId && !hasPrompted) {
@@ -178,7 +181,7 @@ export const TheaterModePage: React.FC = () => {
     if (playlistId && activeSongId && song.title !== t('playlistView.loading')) {
       saveProgress(playlistId, currentPlaylistIndex, scrollTop);
     }
-  }, [playlistId, currentPlaylistIndex, scrollTop, saveProgress, activeSongId, song.title]);
+  }, [playlistId, currentPlaylistIndex, scrollTop, saveProgress, activeSongId, song.title, t]);
 
  const handleNextSong = () => {
  if (playlistId && currentPlaylistIndex < playlistSongs.length - 1) {
@@ -221,7 +224,7 @@ export const TheaterModePage: React.FC = () => {
  setTouchEnd(e.targetTouches[0].clientX);
  };
 
- const onTouchEnd = (e: React.TouchEvent) => {
+ const onTouchEnd = () => {
  if (!touchStart || !touchEnd) return;
  const distance = touchStart - touchEnd;
  const isLeftSwipe = distance > minSwipeDistance;
