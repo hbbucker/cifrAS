@@ -41,8 +41,8 @@ test.describe('Feature Discovery Modal', () => {
     
     await page.waitForTimeout(1500);
 
-    // We check for the Sparkles container or the black overlay
-    const overlay = page.locator('div.fixed.bg-black\\/50');
+    // We check for the text
+    const overlay = page.locator('text=Novidades no CifrAS!').or(page.locator('text=What is new in CifrAS!').or(page.locator('text=¡Novedades en CifrAS!')));
     await expect(overlay).toBeVisible({ timeout: 5000 });
     
     // Check localStorage before click
@@ -50,11 +50,11 @@ test.describe('Feature Discovery Modal', () => {
     expect(seenState).toBeNull();
     
     // Click the button to dismiss
-    const dismissButton = overlay.locator('button');
+    const dismissButton = page.locator('button', { hasText: /Entendi!|Got it!|¡Entendido!/ });
     await dismissButton.click();
     
     // Modal should be gone
-    await expect(overlay).toBeHidden();
+    await expect(overlay).toBeHidden({ timeout: 2000 });
     
     // Check localStorage after click
     seenState = await page.evaluate(() => localStorage.getItem('feature_discovery_02_seen'));
