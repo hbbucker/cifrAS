@@ -8,6 +8,7 @@ import { stringifyLyrics } from '../utils/lyricsParser';
 import { Settings2 } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import { apiClient } from '../services/authService';
+import { usePerformanceSession } from '../hooks/usePerformanceSession';
 
 interface SongData {
  id: string;
@@ -39,6 +40,11 @@ export const TheaterModePage: React.FC = () => {
  const useEb = passedState?.useEb ?? false;
  const [scrollTop, setScrollTop] = useState(0);
  const [slideDir, setSlideDir] = useState<'right'|'left'>('right');
+ const [isLocked, setIsLocked] = useState(false);
+ 
+ const { activeSession, saveProgress, clearSession } = usePerformanceSession();
+ const [showResumePrompt, setShowResumePrompt] = useState(false);
+ const [hasPrompted, setHasPrompted] = useState(false);
  
  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
  const [showControls, setShowControls] = useState(!isMobile);
@@ -128,6 +134,24 @@ export const TheaterModePage: React.FC = () => {
     
     return () => clearTimeout(handler);
   }, [speed, transposeSteps, fontSize, activeSongId, song.title, useBb, useEb]);
+
+  useEffect(() => {
+    if (activeSession && playlistId && !hasPrompted) {
+      if (activeSession.playlistId === playlistId) {
+        if (activeSession.currentSongIndex !== currentPlaylistIndex || activeSession.scrollPosition > 0) {
+          // eslint-disable-next-line react-hooks/set-state-in-effect
+          setShowResumePrompt(true);
+        }
+      }
+      setHasPrompted(true);
+    }
+  }, [activeSession, playlistId, currentPlaylistIndex, hasPrompted]);
+
+  useEffect(() => {
+    if (playlistId && activeSongId && song.title !== 'Loading...') {
+      saveProgress(playlistId, currentPlaylistIndex, scrollTop);
+    }
+  }, [playlistId, currentPlaylistIndex, scrollTop, saveProgress, activeSongId, song.title]);
 
  const handleNextSong = () => {
  if (playlistId && currentPlaylistIndex < playlistSongs.length - 1) {
@@ -267,6 +291,40 @@ export const TheaterModePage: React.FC = () => {
  </button>
  </div>
 
+ {showResumePrompt && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" data-testid="resume-prompt">
+    <div className="bg-bg-card p-6 rounded-2xl shadow-xl border border-border-main max-w-sm w-full mx-4">
+      <h3 className="text-xl font-bold mb-2">Resume Session?</h3>
+      <p className="text-text-mute mb-6">You have an active performance session for this playlist. Would you like to resume where you left off?</p>
+      <div className="flex justify-end gap-3">
+        <button 
+          onClick={() => {
+            setShowResumePrompt(false);
+            clearSession();
+          }}
+          className="px-4 py-2 rounded-lg font-medium text-text-mute hover:bg-bg-elevated transition-colors"
+          data-testid="resume-no-btn"
+        >
+          Start Fresh
+        </button>
+        <button 
+          onClick={() => {
+            setShowResumePrompt(false);
+            setCurrentPlaylistIndex(activeSession?.currentSongIndex || 0);
+            if (containerRef.current) {
+              containerRef.current.scrollTop = activeSession?.scrollPosition || 0;
+            }
+          }}
+          className="px-4 py-2 rounded-lg font-medium bg-[#8629cc] text-white hover:bg-[#721eb8] transition-colors shadow-lg shadow-[#8629cc]/20"
+          data-testid="resume-yes-btn"
+        >
+          Resume
+        </button>
+      </div>
+    </div>
+  </div>
+  )}
+
  <TheaterControls 
  className={!showControls && isMobile ? 'translate-y-48 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}
  isScrolling={isScrolling}
@@ -282,6 +340,8 @@ export const TheaterModePage: React.FC = () => {
  onExit={handleExit}
  onFontSizeIncrease={() => handleFontSizeChange(2)}
  onFontSizeDecrease={() => handleFontSizeChange(-2)}
+ isLocked={isLocked}
+ onLockToggle={() => setIsLocked(!isLocked)}
  />
  </div>
  );
