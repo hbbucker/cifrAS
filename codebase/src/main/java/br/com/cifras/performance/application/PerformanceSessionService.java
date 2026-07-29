@@ -24,15 +24,17 @@ public class PerformanceSessionService {
     @Transactional
     public void upsertSession(String userId, PerformanceSessionRequest request) {
         Optional<PerformanceSessionEntity> existingEntity = repository.findByUserId(userId);
-        if (existingEntity.isPresent()) {
-            PerformanceSession session = mapper.toDomain(existingEntity.get());
-            session.updateProgress(request.playlistId(), request.currentSongIndex(), request.scrollPosition());
-            mapper.updateEntity(session, existingEntity.get());
-            repository.persist(existingEntity.get());
-        } else {
+        
+        if (existingEntity.isEmpty()) {
             PerformanceSession session = PerformanceSession.create(userId, request.playlistId(), request.currentSongIndex(), request.scrollPosition());
             repository.persist(mapper.toEntity(session));
+            return;
         }
+
+        PerformanceSession session = mapper.toDomain(existingEntity.get());
+        session.updateProgress(request.playlistId(), request.currentSongIndex(), request.scrollPosition());
+        mapper.updateEntity(session, existingEntity.get());
+        repository.persist(existingEntity.get());
     }
     
     public Optional<PerformanceSessionResponse> getActiveSession(String userId) {
