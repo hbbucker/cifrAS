@@ -9,7 +9,7 @@ test.describe('Avaliação de Usabilidade e Acessibilidade no Contexto CifrAS', 
     await page.goto(TARGET_URL);
 
     // 2. Executa a validação de regras de acessibilidade e usabilidade básicas
-    const accessibilityScanResults = await new AxeBuilder({ page }).disableRules(['color-contrast']).analyze();
+    const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
 
     // 3. O teste falhará se houver violações graves (contraste, labels ausentes, etc.)
     expect(accessibilityScanResults.violations).toEqual([]);
