@@ -9,12 +9,16 @@ test.describe('Feature Discovery Modal', () => {
   });
 
   test('displays after 1 second and persists state on close', async ({ page }) => {
-    const mockJwt = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL3Rlc3QuY2lmcmFzLmNvbSIsInN1YiI6ImUyZS11c2VyLTEyMzQiLCJ1cG4iOiJlMmUtdXNlci0xMjM0Iiwicm9sZSI6WyJ1c2VyIiwiYXV0aGVudGljYXRlZCJdLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoyMTAwNTU1MzkwLCJpYXQiOjE3ODUxOTUzOTB9.dummy';
+    const mockJwt = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL3Rlc3QuY2lmcmFzLmNvbSIsInN1YiI6ImUyZS11c2VyLTEyMzQiLCJ1cG4iOiJlMmUtdXNlci0xMjM0Iiwicm9sZSI6WyJ1c2VyIiwiYXV0aGVudGljYXRlZCJdLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoyMTAwNTU1MzkwLCJpYXQiOjE3ODUxOTUzOTB9.UtbyLMnxY8d0t7MsyIoizRwjKoQyZUC0TdHE-wAJSYkAzFnH1AIXDcbWTAEz4l_wTc6QiXEbC3JfkYQ80GSlbwWpmEuPnLNTseqej712FywzFPHz-SptzffIyVN7YIHlvEtm-EXrFJT5OPo8Nuqpj_qn_fxUgD_S_FaxH44ASGVu_qUbopMcYBA87waWD-sZlvIf94RSCJbMTlNyO-nboLhi23tAwhBQqs-AXJxcbUp1R_XRDtBsEno4e-YgNkpy0LpT10nBqzTuiE1pu-UxjFOOmhYRHIgJ5LlPbF-NIHWiBh4L_c3M_HTw7RLDTzcQHdfesdCLXkOUIsJOnawGDQ';
     
     // Login
     await page.goto(`/auth/callback#access_token=${mockJwt}&refresh_token=dummy`);
     await expect(page).toHaveURL(/.*\/dashboard/);
     
+    // Wait for the dashboard to load fully
+    await expect(page.getByText('Favorites')).toBeVisible();
+
+    // Go to Songs List
     await page.getByTestId('view-all-btn').click();
     await expect(page.locator('h1')).toHaveText('My Repertoire');
 
@@ -33,8 +37,14 @@ test.describe('Feature Discovery Modal', () => {
     // Wait for redirect to dashboard after saving
     await expect(page).toHaveURL(/.*\/dashboard/);
     
+    // Wait for dashboard to load songs
+    await expect(page.getByText('Favorites')).toBeVisible();
+    
     // Now click the song on the dashboard!
     await page.getByText(uniqueTitle).first().click();
+    
+    // Check URL to confirm we are on song view
+    await expect(page).toHaveURL(/.*\/songs\/view\/.*/);
     
     // Wait for the modal timeout
     await page.waitForTimeout(1500);
