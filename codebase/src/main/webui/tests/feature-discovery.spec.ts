@@ -14,6 +14,9 @@ test.describe('Feature Discovery Modal', () => {
     // Login
     await page.goto(`/auth/callback#access_token=${mockJwt}&refresh_token=dummy`);
     await expect(page).toHaveURL(/.*\/dashboard/);
+    
+    await page.getByTestId('view-all-btn').click();
+    await expect(page.locator('h1')).toHaveText('My Repertoire');
 
     // Create a new song to view (since DB is fresh)
     await page.getByTestId('add-song-btn').click();
