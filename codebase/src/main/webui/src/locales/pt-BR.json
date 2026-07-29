@@ -216,7 +216,11 @@
     "exit": "Sair do Modo Teatro",
     "fullscreen": "Tela Cheia",
     "decreaseFont": "Diminuir Fonte",
-    "increaseFont": "Aumentar Fonte"
+    "increaseFont": "Aumentar Fonte",
+    "resumeSessionPromptTitle": "Continuar Sessão?",
+    "resumeSessionPromptDesc": "Você tem uma sessão de performance ativa para esta playlist. Gostaria de continuar de onde parou?",
+    "startFresh": "Começar do Zero",
+    "resume": "Continuar"
   },
   "linkPlaylist": {
     "shareTitle": "Compartilhar uma Playlist",

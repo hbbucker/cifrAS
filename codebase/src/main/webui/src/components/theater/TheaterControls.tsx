@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Play, Pause, ChevronLeft, ChevronRight, Maximize, X } from 'lucide-react';
+import { Play, Pause, ChevronLeft, ChevronRight, Maximize, X, Lock, Unlock } from 'lucide-react';
 import { TransposePad } from '../music/TransposePad';
 
 interface TheaterControlsProps {
@@ -18,21 +18,40 @@ interface TheaterControlsProps {
  onFontSizeIncrease?: () => void;
  onFontSizeDecrease?: () => void;
  className?: string;
+ isLocked?: boolean;
+ onLockToggle?: () => void;
 }
 
  export const TheaterControls: React.FC<TheaterControlsProps> = ({
  isScrolling, speed, currentKey,
  onPlayPause, onSpeedChange, onTransposeUp, onTransposeDown,
  onNextSong, onPrevSong, onToggleFullscreen, onExit,
- onFontSizeIncrease, onFontSizeDecrease, className = ''
+ onFontSizeIncrease, onFontSizeDecrease, className = '',
+ isLocked = false, onLockToggle
 }) => {
   const { t } = useTranslation();
- return (
+  const [lockPressTimer, setLockPressTimer] = React.useState<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleLockTouchStart = () => {
+    const timer = setTimeout(() => {
+      if (onLockToggle) onLockToggle();
+    }, 1000); // 1 second long press
+    setLockPressTimer(timer);
+  };
+
+  const handleLockTouchEnd = () => {
+    if (lockPressTimer) {
+      clearTimeout(lockPressTimer);
+      setLockPressTimer(null);
+    }
+  };
+  return (
  <div className={`fixed bottom-28 md:bottom-6 left-1/2 -translate-x-1/2 bg-bg-card/95 backdrop-blur-xl text-text-main px-4 md:px-6 py-4 rounded-3xl shadow-2xl border border-border-main flex flex-col md:flex-row items-center gap-4 md:gap-6 z-40 transition-all hover:bg-bg-card w-[92%] md:w-auto ${className}`} data-testid="theater-controls">
  
  {/* --- First Row (Mobile) / Left Group (Desktop) --- */}
  <div className="flex flex-row items-center justify-between w-full md:w-auto gap-2 md:gap-6">
  {/* Song Navigation */}
+ {!isLocked && (
  <div className="flex items-center gap-1 md:gap-2 shrink-0">
  <button onClick={onPrevSong} className="p-2 hover:bg-bg-elevated rounded-full transition-colors" disabled={!onPrevSong} data-testid="prev-song-btn">
  <ChevronLeft className="w-6 h-6" />
@@ -41,11 +60,13 @@ interface TheaterControlsProps {
  <ChevronRight className="w-6 h-6" />
  </button>
  </div>
+ )}
 
- <div className="w-px h-8 bg-border-main hidden md:block shrink-0" />
+ {!isLocked && <div className="w-px h-8 bg-border-main hidden md:block shrink-0" />}
 
  {/* Playback & Speed */}
  <div className="flex items-center gap-3 md:gap-4 flex-1 justify-end md:justify-start">
+ {!isLocked && (
  <div className="flex flex-col gap-1 w-24 md:w-32">
  <div className="flex justify-between text-[10px] md:text-xs text-text-mute font-medium px-1">
  <span>{t('theater.slow')}</span>
@@ -58,23 +79,27 @@ interface TheaterControlsProps {
  data-testid="speed-slider"
  />
  </div>
+ )}
 
  <button 
  onClick={onPlayPause}
- className="w-12 h-12 md:w-14 md:h-14 bg-[#8629cc] hover:bg-[#721eb8] flex items-center justify-center rounded-full transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-[#8629cc]/20 shrink-0"
+ className="w-12 h-12 md:w-14 md:h-14 bg-[#8629cc] hover:bg-[#721eb8] flex items-center justify-center rounded-full transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-[#8629cc]/20 shrink-0 disabled:opacity-50"
  data-testid="play-pause-btn"
+ disabled={isLocked}
  >
  {isScrolling ? <Pause className="w-6 h-6 md:w-7 md:h-7 fill-white text-white" /> : <Play className="w-6 h-6 md:w-7 md:h-7 fill-white text-white ml-1" />}
  </button>
  </div>
  </div>
 
- <div className="w-full h-px bg-border-main block md:hidden" />
- <div className="w-px h-8 bg-border-main hidden md:block shrink-0" />
+ {!isLocked && <div className="w-full h-px bg-border-main block md:hidden" />}
+ {!isLocked && <div className="w-px h-8 bg-border-main hidden md:block shrink-0" />}
 
  {/* --- Second Row (Mobile) / Right Group (Desktop) --- */}
  <div className="flex flex-row items-center justify-between w-full md:w-auto gap-2 md:gap-6 overflow-x-auto no-scrollbar py-1">
  
+ {!isLocked && (
+ <>
  {/* Transpose */}
  <div className="shrink-0">
  <TransposePad currentKey={currentKey} onTransposeDown={onTransposeDown} onTransposeUp={onTransposeUp} />
@@ -93,12 +118,30 @@ interface TheaterControlsProps {
  </div>
 
  <div className="w-px h-6 bg-border-main shrink-0" />
+ </>
+ )}
 
  {/* Display Options */}
  <div className="flex items-center gap-1 shrink-0">
+ <button 
+ onTouchStart={handleLockTouchStart}
+ onTouchEnd={handleLockTouchEnd}
+ onMouseDown={handleLockTouchStart}
+ onMouseUp={handleLockTouchEnd}
+ onMouseLeave={handleLockTouchEnd}
+ className={`p-2.5 md:p-3 hover:bg-bg-elevated rounded-full transition-colors ${isLocked ? 'text-[#8629cc]' : 'text-text-mute hover:text-text-main'}`}
+ title="Lock (Long Press)" 
+ data-testid="lock-mode-btn"
+ >
+ {/* Using lucide icons, Lock / Unlock */}
+ {isLocked ? <Lock className="w-5 h-5" /> : <Unlock className="w-5 h-5" />}
+ </button>
+
+ {!isLocked && (
  <button onClick={onToggleFullscreen} className="p-2.5 md:p-3 hover:bg-bg-elevated rounded-full transition-colors text-text-mute hover:text-text-main" title={t('theater.fullscreen')} data-testid="fullscreen-btn">
  <Maximize className="w-5 h-5" />
  </button>
+ )}
 
  <button onClick={onExit} className="p-2.5 md:p-3 hover:bg-red-500/20 rounded-full transition-colors text-text-mute hover:text-red-500" title={t('theater.exit')} data-testid="exit-theater-btn">
  <X className="w-5 h-5" />

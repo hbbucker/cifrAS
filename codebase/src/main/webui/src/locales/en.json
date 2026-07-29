@@ -216,7 +216,11 @@
     "exit": "Exit Theater",
     "fullscreen": "Fullscreen",
     "decreaseFont": "Decrease Font",
-    "increaseFont": "Increase Font"
+    "increaseFont": "Increase Font",
+    "resumeSessionPromptTitle": "Resume Session?",
+    "resumeSessionPromptDesc": "You have an active performance session for this playlist. Would you like to resume where you left off?",
+    "startFresh": "Start Fresh",
+    "resume": "Resume"
   },
   "linkPlaylist": {
     "shareTitle": "Share a Playlist",
