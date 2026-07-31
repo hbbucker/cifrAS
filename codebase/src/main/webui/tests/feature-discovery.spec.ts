@@ -29,7 +29,6 @@ test.describe('Feature Discovery Modal', () => {
     const uniqueTitle = 'Feature Discovery Song ' + Date.now();
     await page.getByTestId('song-title-input').fill(uniqueTitle);
     await page.getByTestId('song-artist-input').fill('Artist');
-    await page.getByTestId('song-key-input').fill('C');
     await page.getByTestId('song-content-input').fill('[C]Hello World');
     
     await page.getByTestId('save-song-btn').click();
