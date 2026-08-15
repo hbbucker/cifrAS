@@ -68,16 +68,20 @@ public class SongResource {
     public Response listSongs(
         @QueryParam("q") String query,
         @QueryParam("page") @DefaultValue("1") int page,
-        @QueryParam("pageSize") @DefaultValue("20") int pageSize
+        @QueryParam("size") @DefaultValue("20") int size
     ) {
-        String userId = securityUtils.getCurrentUserId();
-        PagedResponse<Song> songs = listUserSongsUseCase.execute(userId, page, pageSize, query);
+        if (page < 1) page = 1;
+        if (size < 1) size = 20;
+        if (size > 100) size = 100;
 
-        List<SongSummaryDTO> summaries = songs.data().stream()
+        String userId = securityUtils.getCurrentUserId();
+        PagedResponse<Song> songs = listUserSongsUseCase.execute(userId, page, size, query);
+
+        List<SongSummaryDTO> summaries = songs.items().stream()
             .map(SongSummaryDTO::from)
             .toList();
 
-        return Response.ok(PagedResponse.of(summaries, songs.total(), songs.page(), songs.pageSize())).build();
+        return Response.ok(PagedResponse.of(summaries, songs.totalCount(), songs.page(), songs.size())).build();
     }
 
     @POST

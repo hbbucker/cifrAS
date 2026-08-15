@@ -76,9 +76,9 @@ class SongUseCasesTest extends BaseIntegrationTest {
 
         PagedResponse<Song> response = listUserSongsUseCase.execute(USER_A, 1, 20, null);
 
-        assertTrue(response.data().stream().allMatch(s -> USER_A.equals(s.getUserId())),
+        assertTrue(response.items().stream().allMatch(s -> USER_A.equals(s.getUserId())),
             "List must contain only USER_A's songs");
-        assertTrue(response.data().size() >= 2);
+        assertTrue(response.items().size() >= 2);
     }
 
     /**
@@ -92,7 +92,7 @@ class SongUseCasesTest extends BaseIntegrationTest {
         deleteSongUseCase.execute(song.getId(), USER_A);
 
         PagedResponse<Song> response = listUserSongsUseCase.execute(USER_A, 1, 20, null);
-        boolean found = response.data().stream().anyMatch(s -> s.getId().equals(song.getId()));
+        boolean found = response.items().stream().anyMatch(s -> s.getId().equals(song.getId()));
         assertFalse(found, "Soft-deleted song must not appear in list");
     }
 
