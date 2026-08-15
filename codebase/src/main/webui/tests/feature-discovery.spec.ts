@@ -33,11 +33,11 @@ test.describe('Feature Discovery Modal', () => {
     
     await page.getByTestId('save-song-btn').click();
     
-    // Wait for redirect to dashboard after saving
-    await expect(page).toHaveURL(/.*\/dashboard/);
+    // Wait for redirect to songs list after saving
+    await expect(page).toHaveURL(/.*\/songs/);
     
-    // Wait for dashboard to load songs
-    await expect(page.getByText('Favorites')).toBeVisible();
+    // Wait for songs list to load songs
+    await expect(page.getByText('My Repertoire')).toBeVisible();
     
     // Now click the song on the dashboard!
     await page.getByText(uniqueTitle).first().click();
