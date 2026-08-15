@@ -43,6 +43,7 @@ test('Songs Pagination and Sticky Header', async ({ page }) => {
 
   // Login
   await page.goto(`/auth/callback#access_token=${mockJwt}&refresh_token=dummy`);
+  await expect(page).toHaveURL(/.*\/dashboard/);
   
   // Go to songs list directly
   await page.goto('/songs');
