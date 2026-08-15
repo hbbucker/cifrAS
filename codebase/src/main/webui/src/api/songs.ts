@@ -17,14 +17,21 @@ export const getSongs = async (
   limit: number = 20,
   search?: string
 ): Promise<PaginatedResponse<SongData> | SongData[]> => {
-  const params: Record<string, string | number> = { page, limit };
+  const params: Record<string, string | number> = { page, size: limit };
   if (search && search.trim().length >= 3) {
-    params.search = search.trim();
+    params.q = search.trim();
   }
 
-  const { data } = await apiClient.get<PaginatedResponse<SongData> | SongData[]>('/songs', {
-    params
-  });
+  const response = await apiClient.get('/songs', { params });
+  let data = response.data;
+  
+  if (typeof data === 'string') {
+    try {
+      data = JSON.parse(data);
+    } catch {
+      // Ignore JSON parse errors, return as string
+    }
+  }
 
   return data;
 };

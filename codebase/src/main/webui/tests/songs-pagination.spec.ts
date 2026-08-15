@@ -15,13 +15,15 @@ test('Songs Pagination and Sticky Header', async ({ page }) => {
   await page.route(url => url.pathname === '/api/songs' || url.pathname.startsWith('/api/songs?'), async (route) => {
     const url = new URL(route.request().url());
     const pageParam = parseInt(url.searchParams.get('page') || '1');
-    const qParam = url.searchParams.get('search') || '';
+    const qParam = url.searchParams.get('q') || '';
+    console.log('MOCK INTERCEPT:', url.toString(), 'page:', pageParam, 'q:', qParam);
 
     // Simulate 45 total songs
     const totalCount = qParam === 'song' ? 45 : qParam !== '' ? 2 : 45;
     
     const items = [];
-    const limit = 20;
+    const limit = parseInt(url.searchParams.get('size') || '20');
+    console.log('MOCK LIMIT:', limit);
     const start = (pageParam - 1) * limit;
     const end = Math.min(start + limit, totalCount);
 
