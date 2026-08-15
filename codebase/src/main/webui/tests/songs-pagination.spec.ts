@@ -7,10 +7,11 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('Songs Pagination and Sticky Header', async ({ page }) => {
+  page.on("console", msg => console.log("BROWSER: " + msg.text()));
   const mockJwt = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL3Rlc3QuY2lmcmFzLmNvbSIsInN1YiI6ImUyZS11c2VyLTEyMzQiLCJ1cG4iOiJlMmUtdXNlci0xMjM0Iiwicm9sZSI6WyJ1c2VyIiwiYXV0aGVudGljYXRlZCJdLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoyMTAyMTU2NTQxLCJpYXQiOjE3ODY3OTY1NDF9.ays3isbuaqCirzrSTZpZC6J9pq1GLElKRYrcnovrRxXKTb3vR8UOxkUKJJlhOsi8iAk-7yGexVq1NglMxPFqyf3pvVHgaELvFYi0w99LZWM7qO6zKTkABjqHM2iXU9LD5Q05uHyR1M0EeATuBbfzEGCj8Nd3hPSo0j2OoaafCOVB2ugcOVJ5fz0UXgHM9Xuc8uTy3ZKFxjVlk91soU3Y6dMq49_vkPrKnZVBAAvl4HNT2Zvabg8iKPUhFDOTTBazWUthaN4UU6U2HuFEeBknEGSDpYO2Uv9VJ8Zx0ttzDJhy56lWgXM-T9EoGMe3qPCg29mzhhtwxmnTVDZMfWiTPQ';
   
   // Mock API to return paginated response
-  await page.route('**/api/songs*', async (route) => {
+  await page.route(url => url.pathname === '/api/songs' || url.pathname.startsWith('/api/songs?'), async (route) => {
     const url = new URL(route.request().url());
     const pageParam = parseInt(url.searchParams.get('page') || '1');
     const qParam = url.searchParams.get('search') || '';
@@ -26,7 +27,7 @@ test('Songs Pagination and Sticky Header', async ({ page }) => {
     for (let i = start; i < end; i++) {
       items.push({
         id: `song-${i}`,
-        title: `Mock Song ${i + 1} ${qParam}`,
+        title: `Mock Song ${i + 1}${qParam ? ' ' + qParam : ''}`,
         artist: 'Artist',
         keySignature: 'C',
         isFavorite: false,
@@ -65,7 +66,7 @@ test('Songs Pagination and Sticky Header', async ({ page }) => {
   await expect(page.getByText('Mock Song 41')).toBeVisible();
 
   // Search input - reset page to 1
-  const searchInput = page.getByPlaceholder('Search songs...');
+  const searchInput = page.getByPlaceholder('Search songs or artists...');
   await searchInput.fill('song');
   
   // Wait for debounce and verify page 1 is active again
@@ -76,7 +77,7 @@ test('Songs Pagination and Sticky Header', async ({ page }) => {
   await page.getByRole('button', { name: 'Clear search' }).click();
   // Should reload and stay on page 1
   await expect(page.getByRole('button', { name: 'Page 1' })).toHaveClass(/bg-\[#aa3bff\]/);
-  await expect(page.getByText('Mock Song 1')).toBeVisible();
+  await expect(page.getByText('Mock Song 1', { exact: true })).toBeVisible();
 
   // Test Scroll to Top
   // We can evaluate scrollY in the scroll container
