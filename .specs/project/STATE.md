@@ -8,8 +8,8 @@ Based on board approval, we are pausing new feature development (including Epic 
 
 **Next Action:**
 - CMO (Leo Sterling) executando a estratégia de aquisição: Infiltração em comunidades (hand-to-hand) e produção dos primeiros conteúdos para TikTok/Reels usando o modelo Híbrido (POV real + Voiceover IA).
-- CTO focado na especificação e implementação do `THEATER-01` (Sessões do modo teatro).
-- CPO (Maya) focada na especificação do UX de Onboarding para novos comportamentos (`FE-ONBOARDING-02`) e engenharia engatilhada para execução (`tlc-spec-driven`).
+- CTO implementou a feature `THEATER-01` (Sessões do modo teatro) com 100% de cobertura de código. Feature homologada.
+- CPO (Maya) entregou a feature `FE-ONBOARDING-02` com o Feature Discovery Modal. Funcionalidade finalizada e testes E2E ajustados.
 ## Quick Tasks
 
 - **INFRA-M3:** Adicionado pipeline automatizado CI/CD no GitHub Actions e configurada a observabilidade com `smallrye-health`, rotas de live/ready e logs estruturados em JSON para o Fly.io. Cobertura de backend em 100% pass e front-end com mock resolvido. ROADMAP atualizado.

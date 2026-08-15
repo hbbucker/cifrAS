@@ -200,7 +200,30 @@ Para invocar um dos agentes abaixo em suas tarefas, os agentes do conselho devem
 
 ## 9. Guia de Trabalho para Agentes de Desenvolvimento de IA
 
+**ESTAS REGRAS SÃO INVIOLÁVEIS:** Todos o desenvolvimento deve estar ancorado nessas especificações.
+
 Se você é um Agente de IA trabalhando neste projeto, siga este fluxo rigoroso para garantir a conformidade e qualidade das entregas:
+
+### Etapas de trabalho:
+
+**ESTE WORKFLOW É INVIOLÁVEL:** Todos o desenvolvimento deve estar ancorado nesse fluxo.
+
+Todas as atividades seja planejamento, execução ou correção, devem utilizar a skill `tlc-spec-driven` seguindo o seguinte workflows.
+
+**SE SKILL TLC-SPEC-DRIVEN NÃO ESTIVER DISPONÍVEL CANCELAR AÇÃO E REPORTAR**
+
+1. **Análise:** Primeira etapa, pode ser uma feature, correção de bug ou quick-fix, PRD  deve ser sempre criado para guiar os requisitos e entrega de valor;;
+2. **Spec:** Especificação técnica para a atividade analisada;
+3. **Tasks:** DCriar as quebras das tarefas para guiar o desenvolvimento;;
+4. **Worktree:** Trabalhar com branches e worktrees não conflitantes;
+5. **Execução:** Codar seguindo os as boas práticas de mercado, utilizando a técnica de TDD, cobertura dos testes unitário, integração e E2E (Sempre com foco na usabilidade e nas regras de negócio que entregam valor)
+6. **Validação de Testes:** Build, Lints e cobertura devem atender os critérios já especificados, validar todos os edge-cases, border-cases e se os testes e a entrega possuem a qualidade desejada para caracterizar uma entrega de valor ao usuário final, responsabilidade do agente de **QA**;
+7. **Commit/Push:** Utilização de commits atômicos e padrão conventional commits. Um novo PR deve ser aberto no GitHub (usando `gh pr create` por exemplo). Logo após a criação, é OBRIGATÓRIO aguardar a conclusão da pipeline com o comando `gh pr checks --watch`;
+8. **PR Review (Quality Gate):** Sempre que um PR for aberto, o agente de **QA** deve executar a skill `pr-review`. O agente **CTO** deve fazer as correções apontadas. Esse ciclo deve ocorrer em até 3 interações para atingir o sucesso. Caso não seja resolvido nesse limite, o PR deve ficar em aberto para o CEO revisar.
+9. **Loop**: Problemas de qualidade, testes e indicados no Code Review devem voltar para Implementação até que sejam resolvidos, o **CTO** deve ser informado para tomar as providencias;
+10. **Deploy & Merge:** O Report final apresentado para a decisão do humano deve, obrigatoriamente, conter a confirmação de que as actions do GitHub (CI/CD) finalizaram com status OK (verde). É estritamente proibido solicitar ou executar o merge do PR se a pipeline ainda estiver em andamento ou com erros. **Nunca execute o merge do PR sem a permissão expressa do CEO.**
+
+### Como abordar cada etapa:
 
 1. **Abordagem Orientada a Specs (Spec-driven workflow):**
    - Antes de implementar qualquer código, valide o escopo nos arquivos de especificação correspondentes dentro de `.specs/features/[feature]/spec.md`.
@@ -216,18 +239,3 @@ Se você é um Agente de IA trabalhando neste projeto, siga este fluxo rigoroso 
 5. **Verificação de Portão Final e Playwright:**
    - Sempre execute a verificação final (testes locais, build, e `npx playwright test` no diretório webui) antes de declarar uma tarefa como concluída, propor commits ou abrir Pull Requests. Garanta que o projeto compila localmente com sucesso. Utilize a CLI do GitHub (`gh pr create`) para abrir PRs de forma autônoma, se aplicável. Em seguida, é OBRIGATÓRIO executar `gh pr checks --watch` para aguardar a conclusão (Status OK/Verde) de todas as actions (CI/CD) do GitHub. Nunca declare a tarefa como concluída se o CI falhar ou estiver em andamento.
 
-## 10. Workflow de implementação
-
-Todas as atividades seja planejamento, execução ou correção, devem utilizar a skill `tlc-spec-driven` seguindo o seguinte workflows.
-
-**SE SKILL TLC-SPEC-DRIVEN NÃO ESTIVER DISPONÍVEL CANCELAR AÇÃO E REPORTAR**
-
-1. **Análise:** Primeira etapa, pode ser uma feature, correção de bug ou quick-fix;
-2. **Spec:** Especificação técnica para a atividade analisada;
-3. **Tasks:** Definição das tasks que serão executadas;
-4. **Execução:** Implementação das tasks criadas utilizando TDD, para qualquer tipo de implementação;
-5. **Validação de Testes:** Build, Lints e cobertura devem atender os critérios já especificados;
-6. **Worktree:** Trabalhar com branches e worktrees não conflitantes;
-7. **Commit/Push:** Utilização de commits atômicos e padrão conventional commits. Um novo PR deve ser aberto no GitHub (usando `gh pr create` por exemplo). Logo após a criação, é OBRIGATÓRIO aguardar a conclusão da pipeline com o comando `gh pr checks --watch`;
-8. **PR Review (Quality Gate):** Sempre que um PR for aberto, o agente de **QA** deve executar a skill `pr-review`. O agente **CTO** deve fazer as correções apontadas. Esse ciclo deve ocorrer em até 3 interações para atingir o sucesso. Caso não seja resolvido nesse limite, o PR deve ficar em aberto para o CEO revisar.
-9. **Deploy & Merge:** O Report final apresentado para a decisão do humano deve, obrigatoriamente, conter a confirmação de que as actions do GitHub (CI/CD) finalizaram com status OK (verde). É estritamente proibido solicitar ou executar o merge do PR se a pipeline ainda estiver em andamento ou com erros. **Nunca execute o merge do PR sem a permissão expressa do CEO.**
