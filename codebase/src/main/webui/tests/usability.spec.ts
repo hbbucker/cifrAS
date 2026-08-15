@@ -1,6 +1,12 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('feature_discovery_02_seen', 'true');
+  });
+});
+
 const TARGET_URL = 'http://localhost:8080'; 
 
 test.describe('Avaliação de Usabilidade e Acessibilidade no Contexto CifrAS', () => {

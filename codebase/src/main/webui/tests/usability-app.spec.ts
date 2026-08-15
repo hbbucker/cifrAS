@@ -1,6 +1,12 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('feature_discovery_02_seen', 'true');
+  });
+});
+
 test.describe('Avaliação de Usabilidade e Acessibilidade (Área Logada)', () => {
   // Aumentar o timeout global deste teste para permitir login manual
   test.setTimeout(120000); 

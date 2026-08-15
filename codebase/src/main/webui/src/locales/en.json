@@ -237,5 +237,11 @@
   "transposePad": {
     "up": "Transpose up",
     "down": "Transpose down"
+  },
+  "featureDiscovery": {
+    "title": "What is new in CifrAS!",
+    "pitchPersistence": "Pitch Persistence: pitches are now saved in your browser.",
+    "theaterMode": "Theater Mode: maximize lyrics for stage use.",
+    "button": "Got it!"
   }
 }
