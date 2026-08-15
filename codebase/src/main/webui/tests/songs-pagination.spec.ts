@@ -3,6 +3,7 @@ import { test, expect } from '@playwright/test';
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
     localStorage.setItem('feature_discovery_02_seen', 'true');
+    localStorage.setItem('tooltip_seen_add_song_btn', 'true');
   });
 });
 
