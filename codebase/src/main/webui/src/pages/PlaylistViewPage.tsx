@@ -36,37 +36,60 @@ export const PlaylistViewPage: React.FC = () => {
  const [allSongs, setAllSongs] = useState<SongData[]>([]);
  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
  const [searchQuery, setSearchQuery] = useState('');
+ const [isSearching, setIsSearching] = useState(false);
 
- const availableSongs = allSongs.filter(s => 
- !songs.some(ps => ps.id === s.id) && 
- (s.title.toLowerCase().includes(searchQuery.toLowerCase()) || s.artist.toLowerCase().includes(searchQuery.toLowerCase()))
- );
+ const availableSongs = allSongs.filter(s => !songs.some(ps => ps.id === s.id));
 
  const isOwner = playlist?.userId === user?.id;
 
- useEffect(() => {
- fetch(`/api/playlists/${id}`, {
- headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
- })
- .then(res => {
- if (res.status === 401) {
- logout();
- navigate('/login');
- throw new Error('Unauthorized');
- }
- if (!res.ok) throw new Error('Fetch failed');
- return res.json();
- })
- .then(data => {
- setPlaylist(data);
- setSongs(data.songs || []);
- setLoading(false);
- })
- .catch(() => {
- toast('Failed to load playlist', 'error');
- setLoading(false);
- });
- }, [id, logout, navigate, toast]);
+  useEffect(() => {
+  fetch(`/api/playlists/${id}`, {
+  headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+  })
+  .then(res => {
+  if (res.status === 401) {
+  logout();
+  navigate('/login');
+  throw new Error('Unauthorized');
+  }
+  if (!res.ok) throw new Error('Fetch failed');
+  return res.json();
+  })
+  .then(data => {
+  setPlaylist(data);
+  setSongs(data.songs || []);
+  setLoading(false);
+  })
+  .catch(() => {
+  toast('Failed to load playlist', 'error');
+  setLoading(false);
+  });
+  }, [id, logout, navigate, toast]);
+
+  useEffect(() => {
+    if (!showAddModal) return;
+
+    const timeoutId = setTimeout(() => {
+      const params = new URLSearchParams();
+      params.append('pageSize', '50');
+      if (searchQuery) {
+        params.append('q', searchQuery);
+      }
+
+      fetch(`/api/songs?${params.toString()}`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      })
+      .then(res => res.json())
+      .then(data => {
+        const items = Array.isArray(data) ? data : (data.data || []);
+        setAllSongs(items);
+      })
+      .catch(() => toast('Failed to fetch library', 'error'))
+      .finally(() => setIsSearching(false));
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, showAddModal, toast]);
 
  const moveSong = (index: number, direction: 'up' | 'down') => {
  if (direction === 'up' && index === 0) return;
@@ -150,16 +173,9 @@ export const PlaylistViewPage: React.FC = () => {
  {isOwner && (
  <button 
  onClick={() => {
- fetch('/api/songs', {
- headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
- })
- .then(res => res.json())
- .then(data => {
- const items = Array.isArray(data) ? data : (data.data || []);
- setAllSongs(items);
+ setSearchQuery('');
+ setIsSearching(true);
  setShowAddModal(true);
- })
- .catch(() => toast('Failed to fetch library', 'error'));
  }}
  className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-text-main px-4 py-2.5 rounded-lg font-bold transition-colors"
  >
@@ -291,15 +307,22 @@ export const PlaylistViewPage: React.FC = () => {
  type="text"
  placeholder={t('playlistView.searchPlaceholder')}
  value={searchQuery}
- onChange={(e) => setSearchQuery(e.target.value)}
+ onChange={(e) => {
+ setSearchQuery(e.target.value);
+ setIsSearching(true);
+ }}
  className="w-full pl-12 pr-4 py-3 bg-bg-card border border-border-main rounded-xl text-text-main focus:ring-2 focus:ring-[#8629cc] outline-none shadow-sm"
  />
  </div>
 
  <div className="flex-1 overflow-y-auto bg-bg-card rounded-xl border border-border-main shadow-sm">
- {availableSongs.length === 0 ? (
+ {isSearching ? (
  <div className="text-center py-12 text-text-mute">
- {allSongs.length === 0 ? 'Loading library...' : 'No matching songs found.'}
+ {t('playlistView.loading')}
+ </div>
+ ) : availableSongs.length === 0 ? (
+ <div className="text-center py-12 text-text-mute">
+ No matching songs found.
  </div>
  ) : (
  availableSongs.map(s => (
