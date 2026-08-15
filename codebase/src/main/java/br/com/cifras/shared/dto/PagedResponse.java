@@ -12,12 +12,12 @@ import java.util.List;
  */
 @RegisterForReflection
 public record PagedResponse<T>(
-    List<T> data,
-    long total,
+    List<T> items,
+    long totalCount,
     int page,
-    int pageSize
+    int size
 ) {
-    public static <T> PagedResponse<T> of(List<T> data, long total, int page, int pageSize) {
-        return new PagedResponse<>(data, total, page, pageSize);
+    public static <T> PagedResponse<T> of(List<T> items, long totalCount, int page, int size) {
+        return new PagedResponse<>(items, totalCount, page, size);
     }
 }

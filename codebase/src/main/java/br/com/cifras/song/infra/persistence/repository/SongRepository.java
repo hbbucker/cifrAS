@@ -47,18 +47,18 @@ public class SongRepository {
         return entities.stream().map(mapper::toDomain).collect(Collectors.toList());
     }
 
-    public List<Song> findByUserIdActive(String userId, int page, int pageSize, String query) {
+    public List<Song> findByUserIdActive(String userId, int page, int size, String query) {
         String baseQuery = "userId = ?1 AND " + ACTIVE_FILTER;
         List<SongEntity> entities;
         if (query != null && !query.isBlank()) {
             baseQuery += " AND (LOWER(title) LIKE LOWER(?2) OR LOWER(artist) LIKE LOWER(?2))";
             entities = jpaRepo.find(baseQuery, Sort.by("createdAt").descending(),
                     userId, "%" + query + "%")
-                .page(Page.of(page - 1, pageSize))
+                .page(Page.of(page - 1, size))
                 .list();
         } else {
             entities = jpaRepo.find(baseQuery, Sort.by("createdAt").descending(), userId)
-                .page(Page.of(page - 1, pageSize))
+                .page(Page.of(page - 1, size))
                 .list();
         }
         return entities.stream().map(mapper::toDomain).collect(Collectors.toList());

@@ -50,7 +50,7 @@ export const DashboardPage: React.FC = () => {
  return res.json();
  })
  .then(data => {
- const items = Array.isArray(data) ? data : (data.data || []);
+ const items = Array.isArray(data) ? data : (data.items || data.data || []);
  setTotalSongsCount(items.length);
  const favoriteItems = items.filter((song: Record<string, unknown>) => song.isFavorite);
  const mappedSongs = favoriteItems.slice(0, 3).map((song: Record<string, unknown>) => ({

@@ -13,9 +13,9 @@ public class ListUserSongsUseCase {
     @Inject
     SongRepository songRepository;
 
-    public PagedResponse<Song> execute(String userId, int page, int pageSize, String query) {
-        List<Song> songs = songRepository.findByUserIdActive(userId, page, pageSize, query);
+    public PagedResponse<Song> execute(String userId, int page, int size, String query) {
+        List<Song> songs = songRepository.findByUserIdActive(userId, page, size, query);
         long total = songRepository.countByUserIdActive(userId, query);
-        return PagedResponse.of(songs, total, page, pageSize);
+        return PagedResponse.of(songs, total, page, size);
     }
 }

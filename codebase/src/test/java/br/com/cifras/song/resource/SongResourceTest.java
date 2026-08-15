@@ -90,10 +90,43 @@ class SongResourceTest extends BaseIntegrationTest {
             .when().get("/songs")
             .then()
             .statusCode(200)
-            .body("data", notNullValue())
-            .body("total", greaterThanOrEqualTo(0))
+            .body("items", notNullValue())
+            .body("totalCount", greaterThanOrEqualTo(0))
             .body("page", equalTo(1))
-            .body("pageSize", equalTo(20));
+            .body("size", equalTo(20));
+    }
+
+    @Test
+    @TestSecurity(user = OWNER, roles = {"user"})
+    void givenInvalidPageAndSize_whenGetSongs_thenDefaultsToSafeValues() {
+        given()
+            .queryParam("page", -1)
+            .queryParam("size", 10000)
+            .when().get("/songs")
+            .then()
+            .statusCode(200)
+            .body("page", equalTo(1))
+            .body("size", equalTo(100)); // the max allowed size is 100
+    }
+
+    @Test
+    @TestSecurity(user = OWNER, roles = {"user"})
+    void givenSearchQuery_whenGetSongs_thenReturnsFilteredResultsAndCorrectTotalCount() {
+        // Create 2 songs
+        given().contentType(ContentType.JSON).body("""
+            {"title":"Pagination Test Song A","artist":"Pagination Artist","originalKey":"C"}
+            """).when().post("/songs").then().statusCode(201);
+        given().contentType(ContentType.JSON).body("""
+            {"title":"Pagination Test Song B","artist":"Other Artist","originalKey":"D"}
+            """).when().post("/songs").then().statusCode(201);
+
+        given()
+            .queryParam("q", "Pagination Test Song")
+            .when().get("/songs")
+            .then()
+            .statusCode(200)
+            .body("items", hasSize(greaterThanOrEqualTo(2)))
+            .body("totalCount", greaterThanOrEqualTo(2));
     }
 
     /**
