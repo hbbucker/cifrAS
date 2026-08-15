@@ -43,7 +43,7 @@ test.describe('Feature Discovery Modal', () => {
     await page.getByText(uniqueTitle).first().click();
     
     // Check URL to confirm we are on song view
-    await expect(page).toHaveURL(/.*\/songs\/view\/.*/);
+    await expect(page).toHaveURL(/.*\/song\/.*/);
     
     // Wait for the modal timeout
     await page.waitForTimeout(1500);

@@ -12,7 +12,7 @@ test('debug screenshot', async ({ page }) => {
   await page.addInitScript(() => localStorage.removeItem('feature_discovery_02_seen'));
   await page.goto(`/auth/callback#access_token=${mockJwt}&refresh_token=dummy`);
   await expect(page).toHaveURL(/.*\/dashboard/);
-  await page.goto('/songs/view/1');
+  await page.goto('/song/1');
   await page.waitForTimeout(2000);
   console.log('Taking screenshot');
   await page.screenshot({ path: 'debug.png', fullPage: true });
