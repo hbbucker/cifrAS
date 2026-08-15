@@ -36,3 +36,6 @@ slack_bridge/
 test_pipe.js
 test_pipe_tools.js
 test_pipe_tools_2.js
+
+*.log
+codebase/src/main/webui/playwright-report/**
