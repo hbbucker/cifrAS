@@ -199,8 +199,55 @@ export const TheaterModePage: React.FC = () => {
  };
 
   const handleFontSizeChange = (delta: number) => {
-    setFontSize(prev => Math.max(14, Math.min(60, prev + delta)));
+    setFontSize(prev => Math.max(10, Math.min(60, prev + delta)));
   };
+
+  // Auto-fit: compute the ideal starting font size that prevents horizontal overflow.
+  // font-mono char width ≈ fontSize × 0.601 (monospace invariant).
+  const [autoFitMax, setAutoFitMax] = useState<number>(60);
+  // Flag: true once we've applied autoFitMax as the initial size for the current song.
+  const autoFitAppliedRef = React.useRef(false);
+
+  // Reset the flag whenever the active song changes so each song gets a fresh fit.
+  useEffect(() => {
+    autoFitAppliedRef.current = false;
+  }, [activeSongId]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container || !transposedContent) return;
+
+    const recalculate = () => {
+      // Available width subtracts px-4 (mobile) or px-12 (md) padding
+      const isMd = window.innerWidth >= 768;
+      const availableWidth = container.clientWidth - (isMd ? 96 : 32);
+      if (availableWidth <= 0) return;
+
+      const lines = transposedContent.split('\n');
+      const maxLineLength = Math.max(...lines.map(l => l.length), 1);
+
+      // Solve: availableWidth >= maxLineLength * fontSize * 0.601
+      const maxFit = Math.floor(availableWidth / (maxLineLength * 0.601));
+      const fitted = Math.max(10, maxFit);
+      setAutoFitMax(fitted);
+
+      // Apply only once per song load, and only when there are no saved preferences.
+      if (!autoFitAppliedRef.current && !passedState) {
+        autoFitAppliedRef.current = true;
+        setFontSize(prev => {
+          // If the user (or saved pref) already set a size, keep it — don't override.
+          // We only auto-fit when the size is still the hardcoded default.
+          const defaultSize = isMobile ? 24 : 32;
+          return prev === defaultSize ? fitted : prev;
+        });
+      }
+    };
+
+    recalculate();
+    const observer = new ResizeObserver(recalculate);
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [transposedContent, containerRef, passedState, isMobile]);
 
  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
  const newScrollTop = e.currentTarget.scrollTop;
@@ -213,35 +260,41 @@ export const TheaterModePage: React.FC = () => {
  const currentKey = transposeContent(song.originalKey, transposeSteps, useBb, useEb);
  const transposedContent = transposeContent(song.content, transposeSteps, useBb, useEb);
 
- // Swipe logic
- const [touchStart, setTouchStart] = useState<number | null>(null);
- const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  // Swipe logic
+  const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
+  const [touchEnd, setTouchEnd] = useState<{ x: number; y: number } | null>(null);
 
- const minSwipeDistance = 50;
+  // Minimum horizontal distance for a swipe to register as song navigation
+  const minSwipeDistance = 100;
 
- const onTouchStart = (e: React.TouchEvent) => {
- setLastInteraction(Date.now());
- setTouchEnd(null); // otherwise the swipe is fired even with usual touch events
- setTouchStart(e.targetTouches[0].clientX);
- };
+  const onTouchStart = (e: React.TouchEvent) => {
+  setLastInteraction(Date.now());
+  setTouchEnd(null); // otherwise the swipe is fired even with usual touch events
+  setTouchStart({ x: e.targetTouches[0].clientX, y: e.targetTouches[0].clientY });
+  };
 
- const onTouchMove = (e: React.TouchEvent) => {
- setTouchEnd(e.targetTouches[0].clientX);
- };
+  const onTouchMove = (e: React.TouchEvent) => {
+  setTouchEnd({ x: e.targetTouches[0].clientX, y: e.targetTouches[0].clientY });
+  };
 
- const onTouchEnd = () => {
- if (!touchStart || !touchEnd) return;
- const distance = touchStart - touchEnd;
- const isLeftSwipe = distance > minSwipeDistance;
- const isRightSwipe = distance < -minSwipeDistance;
+  const onTouchEnd = () => {
+  if (!touchStart || !touchEnd) return;
+  const distanceX = touchStart.x - touchEnd.x;
+  const distanceY = Math.abs(touchStart.y - touchEnd.y);
 
- if (isLeftSwipe) {
- handleNextSong();
- } else if (isRightSwipe) {
- handlePrevSong();
- }
- // Tap is handled by onClick
- };
+  // If vertical movement is dominant, treat as scroll — ignore song navigation
+  if (distanceY > Math.abs(distanceX)) return;
+
+  const isLeftSwipe = distanceX > minSwipeDistance;
+  const isRightSwipe = distanceX < -minSwipeDistance;
+
+  if (isLeftSwipe) {
+  handleNextSong();
+  } else if (isRightSwipe) {
+  handlePrevSong();
+  }
+  // Tap is handled by onClick
+  };
 
  // Fake full screen logic
  const toggleFullscreen = () => {
@@ -316,7 +369,7 @@ export const TheaterModePage: React.FC = () => {
  data-testid="theater-scroll-container"
  >
  <div className="max-w-4xl mx-auto text-text-main">
- <ChordSheet content={transposedContent} fontSize={fontSize} transparent={true} />
+  <ChordSheet content={transposedContent} fontSize={fontSize} transparent={true} />
  </div>
  </div>
 
