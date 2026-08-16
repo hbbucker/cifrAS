@@ -43,35 +43,35 @@ export const PlaylistViewPage: React.FC = () => {
  const isOwner = playlist?.userId === user?.id;
 
   useEffect(() => {
-  fetch(`/api/playlists/${id}`, {
-  headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-  })
-  .then(res => {
-  if (res.status === 401) {
-  logout();
-  navigate('/login');
-  throw new Error('Unauthorized');
-  }
-  if (!res.ok) throw new Error('Fetch failed');
-  return res.json();
-  })
-  .then(data => {
-  setPlaylist(data);
-  setSongs(data.songs || []);
-  setLoading(false);
-  })
-  .catch(() => {
-  toast('Failed to load playlist', 'error');
-  setLoading(false);
-  });
-  }, [id, logout, navigate, toast]);
+    fetch(`/api/playlists/${id}`, {
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    })
+    .then(res => {
+      if (res.status === 401) {
+        logout();
+        navigate('/login');
+        throw new Error('Unauthorized');
+      }
+      if (!res.ok) throw new Error('Fetch failed');
+      return res.json();
+    })
+    .then(data => {
+      setPlaylist(data);
+      setSongs(data.songs || []);
+      setLoading(false);
+    })
+    .catch(() => {
+      toast(t('playlistView.failedLoadPlaylist'), 'error');
+      setLoading(false);
+    });
+  }, [id, logout, navigate, t, toast]);
 
   useEffect(() => {
     if (!showAddModal) return;
 
     const timeoutId = setTimeout(() => {
       const params = new URLSearchParams();
-      params.append('pageSize', '50');
+      params.append('size', '50');
       if (searchQuery) {
         params.append('q', searchQuery);
       }
@@ -81,75 +81,75 @@ export const PlaylistViewPage: React.FC = () => {
       })
       .then(res => res.json())
       .then(data => {
-        const items = Array.isArray(data) ? data : (data.data || []);
+        const items = Array.isArray(data) ? data : (data.items || data.data || []);
         setAllSongs(items);
       })
-      .catch(() => toast('Failed to fetch library', 'error'))
+      .catch(() => toast(t('playlistView.failedFetchLibrary'), 'error'))
       .finally(() => setIsSearching(false));
     }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [searchQuery, showAddModal, toast]);
+  }, [searchQuery, showAddModal, t, toast]);
 
- const moveSong = (index: number, direction: 'up' | 'down') => {
- if (direction === 'up' && index === 0) return;
- if (direction === 'down' && index === songs.length - 1) return;
- 
- const newSongs = [...songs];
- const swapIndex = direction === 'up' ? index - 1 : index + 1;
- [newSongs[index], newSongs[swapIndex]] = [newSongs[swapIndex], newSongs[index]];
- setSongs(newSongs);
+  const moveSong = (index: number, direction: 'up' | 'down') => {
+    if (direction === 'up' && index === 0) return;
+    if (direction === 'down' && index === songs.length - 1) return;
+    
+    const newSongs = [...songs];
+    const swapIndex = direction === 'up' ? index - 1 : index + 1;
+    [newSongs[index], newSongs[swapIndex]] = [newSongs[swapIndex], newSongs[index]];
+    setSongs(newSongs);
 
- // Call API to reorder
- const orderedIds = newSongs.map(s => s.id);
- fetch(`/api/playlists/${id}/songs/reorder`, {
- method: 'PATCH',
- headers: {
- 'Authorization': `Bearer ${localStorage.getItem('token')}`,
- 'Content-Type': 'application/json'
- },
- body: JSON.stringify({ orderedSongIds: orderedIds })
- }).catch(() => toast('Failed to reorder playlist', 'error'));
- };
+    // Call API to reorder
+    const orderedIds = newSongs.map(s => s.id);
+    fetch(`/api/playlists/${id}/songs/reorder`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ orderedSongIds: orderedIds })
+    }).catch(() => toast(t('playlistView.failedReorder'), 'error'));
+  };
 
- const handleDrop = (dropIndex: number) => {
- if (draggedIndex === null || draggedIndex === dropIndex) return;
- 
- const newSongs = [...songs];
- const [removed] = newSongs.splice(draggedIndex, 1);
- newSongs.splice(dropIndex, 0, removed);
- setSongs(newSongs);
- setDraggedIndex(null);
+  const handleDrop = (dropIndex: number) => {
+    if (draggedIndex === null || draggedIndex === dropIndex) return;
+    
+    const newSongs = [...songs];
+    const [removed] = newSongs.splice(draggedIndex, 1);
+    newSongs.splice(dropIndex, 0, removed);
+    setSongs(newSongs);
+    setDraggedIndex(null);
 
- // Call API to reorder
- const orderedIds = newSongs.map(s => s.id);
- fetch(`/api/playlists/${id}/songs/reorder`, {
- method: 'PATCH',
- headers: {
- 'Authorization': `Bearer ${localStorage.getItem('token')}`,
- 'Content-Type': 'application/json'
- },
- body: JSON.stringify({ orderedSongIds: orderedIds })
- }).catch(() => toast('Failed to reorder playlist', 'error'));
- };
+    // Call API to reorder
+    const orderedIds = newSongs.map(s => s.id);
+    fetch(`/api/playlists/${id}/songs/reorder`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ orderedSongIds: orderedIds })
+    }).catch(() => toast(t('playlistView.failedReorder'), 'error'));
+  };
 
- const removeSong = (songId: string) => {
- if (!window.confirm(t('playlistView.confirmRemoveSong'))) return;
- 
- fetch(`/api/playlists/${id}/songs/${songId}`, {
- method: 'DELETE',
- headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
- })
- .then(res => {
- if (res.ok) {
- setSongs(prev => prev.filter(s => s.id !== songId));
- toast('Song removed from playlist', 'success');
- } else {
- toast('Failed to remove song', 'error');
- }
- })
- .catch(() => toast('Failed to remove song', 'error'));
- };
+  const removeSong = (songId: string) => {
+    if (!window.confirm(t('playlistView.confirmRemoveSong'))) return;
+    
+    fetch(`/api/playlists/${id}/songs/${songId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    })
+    .then(res => {
+      if (res.ok) {
+        setSongs(prev => prev.filter(s => s.id !== songId));
+        toast(t('playlistView.songRemoved'), 'success');
+      } else {
+        toast(t('playlistView.failedRemoveSong'), 'error');
+      }
+    })
+    .catch(() => toast(t('playlistView.failedRemoveSong'), 'error'));
+  };
 
  return (
  <>
@@ -315,60 +315,60 @@ export const PlaylistViewPage: React.FC = () => {
  />
  </div>
 
- <div className="flex-1 overflow-y-auto bg-bg-card rounded-xl border border-border-main shadow-sm">
- {isSearching ? (
- <div className="text-center py-12 text-text-mute">
- {t('playlistView.loading')}
- </div>
- ) : availableSongs.length === 0 ? (
- <div className="text-center py-12 text-text-mute">
- No matching songs found.
- </div>
- ) : (
- availableSongs.map(s => (
- <div key={s.id} className="flex items-center justify-between p-4 border-b border-border-main last:border-0 hover:bg-bg-main /50 transition-colors">
- <div className="flex-1 min-w-0 pr-4">
- <h3 className="font-bold text-text-main truncate">{s.title}</h3>
- <p className="text-sm text-text-mute truncate">{s.artist}</p>
- </div>
- 
- <div className="flex items-center gap-4">
- <div className="hidden sm:block px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded font-mono text-sm text-text-main font-bold">
- {s.originalKey || s.key || '?'}
- </div>
- <button 
- onClick={() => {
- fetch(`/api/playlists/${id}/songs`, {
- method: 'POST',
- headers: { 
- 'Authorization': `Bearer ${localStorage.getItem('token')}`,
- 'Content-Type': 'application/json'
- },
- body: JSON.stringify({ songId: s.id, position: songs.length })
- })
- .then(res => {
- if (res.ok) {
- setSongs(prev => [...prev, s]);
- toast('Song added to playlist', 'success');
- } else {
- toast('Failed to add song', 'error');
- }
- })
- .catch(() => toast('Failed to add song', 'error'));
- }}
- className="flex items-center gap-1 px-4 py-2 bg-gray-100 hover:bg-[#8629cc] hover:text-white dark:bg-gray-700 dark:hover:bg-[#8629cc] text-gray-700 rounded-lg font-bold transition-colors"
- >
- <Plus className="w-4 h-4" />
- <span>{t('playlistView.add')}</span>
- </button>
- </div>
- </div>
- ))
- )}
- </div>
- </div>
- </div>
- )}
+        <div className="flex-1 overflow-y-auto bg-bg-card rounded-xl border border-border-main shadow-sm">
+          {isSearching ? (
+            <div className="text-center py-12 text-text-mute">
+              {t('playlistView.loading')}
+            </div>
+          ) : availableSongs.length === 0 ? (
+            <div className="text-center py-12 text-text-mute">
+              {t('playlistView.noMatchingSongs')}
+            </div>
+          ) : (
+            availableSongs.map(s => (
+              <div key={s.id} className="flex items-center justify-between p-4 border-b border-border-main last:border-0 hover:bg-bg-main/50 transition-colors">
+                <div className="flex-1 min-w-0 pr-4">
+                  <h3 className="font-bold text-text-main truncate">{s.title}</h3>
+                  <p className="text-sm text-text-mute truncate">{s.artist}</p>
+                </div>
+                
+                <div className="flex items-center gap-4">
+                  <div className="hidden sm:block px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded font-mono text-sm text-text-main font-bold">
+                    {s.originalKey || s.key || '?'}
+                  </div>
+                  <button 
+                    onClick={() => {
+                      fetch(`/api/playlists/${id}/songs`, {
+                        method: 'POST',
+                        headers: { 
+                          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                          'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ songId: s.id, position: songs.length })
+                      })
+                      .then(res => {
+                        if (res.ok) {
+                          setSongs(prev => [...prev, s]);
+                          toast(t('playlistView.songAdded'), 'success');
+                        } else {
+                          toast(t('playlistView.failedAddSong'), 'error');
+                        }
+                      })
+                      .catch(() => toast(t('playlistView.failedAddSong'), 'error'));
+                    }}
+                    className="flex items-center gap-1 px-4 py-2 bg-gray-100 hover:bg-[#8629cc] hover:text-white dark:bg-gray-700 dark:hover:bg-[#8629cc] text-gray-700 rounded-lg font-bold transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>{t('playlistView.add')}</span>
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  )}
  </>
  );
 };

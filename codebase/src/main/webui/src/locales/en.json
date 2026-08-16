@@ -166,7 +166,15 @@
     "moveUp": "Move up",
     "moveDown": "Move down",
     "searchPlaceholder": "Search by title or artist...",
-    "confirmRemoveSong": "Remove this song from the playlist?"
+    "confirmRemoveSong": "Remove this song from the playlist?",
+    "noMatchingSongs": "No matching songs found.",
+    "failedLoadPlaylist": "Failed to load playlist",
+    "failedFetchLibrary": "Failed to fetch library",
+    "failedReorder": "Failed to reorder playlist",
+    "songRemoved": "Song removed from playlist",
+    "failedRemoveSong": "Failed to remove song",
+    "songAdded": "Song added to playlist",
+    "failedAddSong": "Failed to add song"
   },
   "sharedWithMe": {
     "noPlaylists": "No playlists shared with you yet.",
