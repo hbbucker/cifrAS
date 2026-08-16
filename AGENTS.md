@@ -98,7 +98,66 @@ codebase/
 
 ---
 
-## 5. Regras Críticas de Domínio (Transposição e Cifras)
+## 5. Política de Cobertura de Testes (Coverage Gate) 🔴 INVIOLÁVEL
+
+### 5.1 Regra de Ouro: 90% no Diff, Não no Legado
+
+> **Toda nova implementação deve garantir ≥ 90% de cobertura sobre as linhas alteradas/adicionadas pelo PR.**
+> O código legado existente não é retrocedido. A régua se aplica **exclusivamente ao diff do branch em relação à base (`main`).**
+
+Esta regra é **obrigatória e inegociável**. O QA Lead deve rejeitá-la antes de qualquer aprovação se não for atendida.
+
+### 5.2 Cobertura por Camada
+
+| Camada | Ferramenta | Tipo de Teste Exigido | Threshold no Diff |
+|--------|------------|----------------------|-------------------|
+| **Backend — Lógica de Domínio** (`model/`, `application/`) | JaCoCo + JUnit 5 | Unitários | ≥ 90% |
+| **Backend — Recursos REST** (`resource/`) | JaCoCo + REST Assured + Testcontainers | Integração | ≥ 90% |
+| **Backend — Infra/Repositórios** (`infra/`) | JaCoCo + Testcontainers | Integração | ≥ 90% |
+| **Frontend — Componentes/Hooks** (`components/`, `hooks/`) | Vitest + Testing Library | Unitários | ≥ 90% |
+| **Frontend — Pages / Fluxos Críticos** (`pages/`) | Playwright | E2E | Cobertura funcional dos ACs |
+| **Frontend — Utils** (`utils/`) | Vitest | Unitários | ≥ 90% |
+
+### 5.3 Responsabilidades por Papel
+
+**Makers (CTO e Frontend Staff):**
+- Antes de entregar ao QA, devem rodar localmente a verificação de cobertura no diff:
+  ```bash
+  # Backend — gera relatório JaCoCo e verifica diff-coverage
+  ./mvnw verify && diff-cover codebase/target/site/jacoco/jacoco.xml --compare-branch=origin/main --fail-under=90
+
+  # Frontend — cobertura com Vitest
+  cd codebase/src/main/webui && npm run coverage
+  ```
+- Qualquer linha nova sem cobertura de teste é uma **entrega incompleta**.
+
+**QA Lead:**
+- ✅ DEVE verificar a cobertura do diff como **primeiro critério de rejeição**.
+- Ao revisar um PR, deve executar (leitura dos relatórios):
+  1. Ler o relatório `jacoco.xml` ou o output do `diff-cover`.
+  2. Confirmar que os testes unitários cobrem os `model/` e `application/` novos/alterados.
+  3. Confirmar que os testes de integração cobrem os `resource/` e `infra/` novos/alterados.
+  4. Confirmar que os fluxos críticos adicionados/alterados têm cenário E2E correspondente.
+- Se a cobertura do diff for < 90% em qualquer camada → **rejeitar imediatamente** com comentário explícito do percentual atual vs. exigido.
+
+### 5.4 Definição de "Cobertura Funcional E2E"
+
+Para o Playwright, a cobertura não é medida em linhas, mas em **Acceptance Criteria (ACs)**:
+- Cada AC da spec da feature deve ter ao menos **1 cenário E2E correspondente**.
+- O QA Lead valida o mapeamento AC → Teste antes de aprovar.
+- Fluxos de erro (ex: 400, 401, 404) também devem ter cenário E2E quando forem parte dos ACs.
+
+### 5.5 Exceções Permitidas
+
+As seguintes situações dispensam cobertura de 90% no diff, mas **exigem justificativa explícita no PR**:
+- Código de configuração puro (`config/`, `application.properties`) sem lógica de negócio.
+- Migrações de banco de dados (arquivos `.sql`).
+- Arquivos de tipagem pura TypeScript (`.d.ts`, interfaces sem lógica).
+- Mocks e factories de teste (código dentro de `src/test/`).
+
+---
+
+## 6. Regras Críticas de Domínio (Transposição e Cifras)
 
 ### 1. Formato de Cifra Estruturado (JSON)
 O campo `lyrics` das músicas é armazenado como um JSON estruturado:
@@ -115,7 +174,7 @@ A transposição de acordes ocorre *stateless* e *on-the-fly* ao passar o query 
 
 ---
 
-## 6. Diretrizes do Design System (Pinterest-inspired)
+## 7. Diretrizes do Design System (Pinterest-inspired)
 
 O CifrAS adota uma interface limpa baseada no design do Pinterest: o foco visual é a cifra, e a interface recua de forma elegante.
 
@@ -136,7 +195,7 @@ O CifrAS adota uma interface limpa baseada no design do Pinterest: o foco visual
 
 ---
 
-## 7. Comandos de Terminal e Fluxo de Execução
+## 8. Comandos de Terminal e Fluxo de Execução
 
 ### Regra Crítica: RTK (Rust Token Killer) ⚠️
 Para economizar tokens de contexto nas interações com o terminal e o git, todos os comandos executados no shell do sistema devem ser rodados usando o proxy `rtk`.
@@ -180,29 +239,29 @@ fly deploy --local-only --verbose
 
 ---
 
-## 8. Princípios Fundamentais
+## 9. Princípios Fundamentais
 
-### 8.1 Spec-Driven Development (TLC)
+### 9.1 Spec-Driven Development (TLC)
 Toda implementação regular deve ser precedida por uma especificação clara. O fluxo padrão é:
 > **Specify → Clarify/Plan (Fundidos) → Tasks → Implement → Validate**
 
 **Fast-Track**: Alterações de baixa complexidade ou ajustes de UI podem pular do `Specify` direto para o `Implement`.
 
-### 8.2 Maker-Checker Separation
+### 9.2 Maker-Checker Separation
 O agente que gera o artefato (Maker) **nunca** pode validá-lo. A validação é responsabilidade exclusiva do Checker (QA Lead). O QA Lead atua também com viés adversarial caso os Makers excedam 3 rejeições.
 
-### 8.3 Autoridade de Domínio (Domain Authority)
+### 9.3 Autoridade de Domínio (Domain Authority)
 Para evitar o "Paradoxo do Árbitro" e poupar o fundador humano:
 - O **CPO** tem a decisão final irrevogável em regras de produto e negócio.
 - O **CTO** tem a decisão final irrevogável em arquitetura e stack técnica.
 O humano (CEO/Fundador) só deve ser escalado para pivotagens de roadmap, aumento crítico de escopo ou decisões financeiras/tempo.
 
-### 8.4 Paralelismo Contract-First
+### 9.4 Paralelismo Contract-First
 Ao iniciar a etapa de `Implement`, o CTO deve gerar os DTOs (Contratos de API) primeiro. A partir da selagem do contrato, CTO e Frontend codificam em paralelo.
 
 ---
 
-## 9. Papéis (Agents)
+## 10. Papéis (Agents)
 
 | Papel | Responsabilidade | Ferramentas Permitidas | Modelo Sugerido | Skill Correspondente |
 |-------|------------------|------------------------|-----------------|----------------------|
@@ -214,9 +273,9 @@ Ao iniciar a etapa de `Implement`, o CTO deve gerar os DTOs (Contratos de API) p
 
 ---
 
-## 10. Regras de Ferramentas por Papel
+## 11. Regras de Ferramentas por Papel
 
-### 10.1 Restrições Estritas de QA Lead
+### 11.1 Restrições Estritas de QA Lead
 
 O papel de **QA Lead** é estritamente **read-only**:
 
@@ -227,29 +286,29 @@ O papel de **QA Lead** é estritamente **read-only**:
 - `Exec` — **Proibido**
 - `Edit` — **Proibido**
 
-### 10.2 Makers (CTO e Frontend Staff)
+### 11.2 Makers (CTO e Frontend Staff)
 
 Podem executar código, escrever arquivos e usar ferramentas de implementação, mas **não podem** validar seu próprio trabalho.
 
 ---
 
-## 11. Workflow de Governança
+## 12. Workflow de Governança
 
-### 11.1 Workflow Operacional
+### 12.1 Workflow Operacional
 1. **Specify** — CPO captura requisitos e cria critérios de aceite.
 2. **Clarify/Plan** — CTO levanta viabilidade técnica e define DTOs/Banco.
 3. **Implement (Paralelo)** — CTO (Backend) e Frontend codificam simultaneamente guiados pelos DTOs.
 4. **Validate** — QA Lead avalia. Se reprovar, devolve ao Maker. 
 5. **Adversarial Mode** — Se o QA Lead rejeitar 3 vezes a mesma entrega, ele congela a feature e força a Autoridade de Domínio (CTO ou CPO) a assumir a responsabilidade técnica/funcional.
 
-### 11.2 Escalação Humana (CEO/Fundador)
+### 12.2 Escalação Humana (CEO/Fundador)
 A IA (Orquestrador) só deve pausar o workflow e chamar o humano se:
 1. Houver necessidade de alterar `.specs/project/ROADMAP.md` ou `.specs/project/PROJECT.md`.
 2. O risco financeiro, de tempo ou de segurança for muito alto para a IA assumir.
 
 ---
 
-## 12. Princípios de Trade-Off (Startup Principles)
+## 13. Princípios de Trade-Off (Startup Principles)
 
 1. **Progresso sobre Perfeição** — Entregue valor incremental (Fast-Track para coisas simples).
 2. **Especifique antes de Codificar** — Para features complexas, o contrato é inegociável.
@@ -259,7 +318,7 @@ A IA (Orquestrador) só deve pausar o workflow e chamar o humano se:
 
 ---
 
-## 13. Documentação do Projeto
+## 14. Documentação do Projeto
 
 Os documentos de referência do projeto vivem em `.specs/project/`:
 
