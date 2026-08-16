@@ -202,17 +202,27 @@ export const TheaterModePage: React.FC = () => {
     setFontSize(prev => Math.max(10, Math.min(60, prev + delta)));
   };
 
-  // Auto-fit: compute the ideal starting font size that prevents horizontal overflow.
+  // Auto-fit: flag resets whenever the active song changes so each song gets a fresh fit.
   // font-mono char width ≈ fontSize × 0.601 (monospace invariant).
-  const [autoFitMax, setAutoFitMax] = useState<number>(60);
-  // Flag: true once we've applied autoFitMax as the initial size for the current song.
   const autoFitAppliedRef = React.useRef(false);
 
-  // Reset the flag whenever the active song changes so each song gets a fresh fit.
   useEffect(() => {
     autoFitAppliedRef.current = false;
   }, [activeSongId]);
 
+ const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+ const newScrollTop = e.currentTarget.scrollTop;
+ if (Math.abs(newScrollTop - scrollTop) > 5) {
+ if (showControls) setShowControls(false);
+ }
+ setScrollTop(newScrollTop);
+ };
+
+ const currentKey = transposeContent(song.originalKey, transposeSteps, useBb, useEb);
+ const transposedContent = transposeContent(song.content, transposeSteps, useBb, useEb);
+
+  // Auto-fit: compute the ideal starting font size that prevents horizontal overflow.
+  // Runs after transposedContent is available. font-mono char width ≈ fontSize × 0.601.
   useEffect(() => {
     const container = containerRef.current;
     if (!container || !transposedContent) return;
@@ -229,14 +239,11 @@ export const TheaterModePage: React.FC = () => {
       // Solve: availableWidth >= maxLineLength * fontSize * 0.601
       const maxFit = Math.floor(availableWidth / (maxLineLength * 0.601));
       const fitted = Math.max(10, maxFit);
-      setAutoFitMax(fitted);
 
       // Apply only once per song load, and only when there are no saved preferences.
       if (!autoFitAppliedRef.current && !passedState) {
         autoFitAppliedRef.current = true;
         setFontSize(prev => {
-          // If the user (or saved pref) already set a size, keep it — don't override.
-          // We only auto-fit when the size is still the hardcoded default.
           const defaultSize = isMobile ? 24 : 32;
           return prev === defaultSize ? fitted : prev;
         });
@@ -249,16 +256,6 @@ export const TheaterModePage: React.FC = () => {
     return () => observer.disconnect();
   }, [transposedContent, containerRef, passedState, isMobile]);
 
- const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
- const newScrollTop = e.currentTarget.scrollTop;
- if (Math.abs(newScrollTop - scrollTop) > 5) {
- if (showControls) setShowControls(false);
- }
- setScrollTop(newScrollTop);
- };
-
- const currentKey = transposeContent(song.originalKey, transposeSteps, useBb, useEb);
- const transposedContent = transposeContent(song.content, transposeSteps, useBb, useEb);
 
   // Swipe logic
   const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
