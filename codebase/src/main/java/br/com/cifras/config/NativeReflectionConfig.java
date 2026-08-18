@@ -30,6 +30,7 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
     // Group DTOs
     br.com.cifras.group.dto.CreateGroupRequest.class,
     br.com.cifras.group.dto.GroupDTO.class,
+    br.com.cifras.group.dto.GroupMemberDTO.class,
     br.com.cifras.group.dto.AddMemberRequest.class,
     br.com.cifras.group.dto.LinkPlaylistRequest.class,
     br.com.cifras.group.dto.GroupInvitationDTO.class,

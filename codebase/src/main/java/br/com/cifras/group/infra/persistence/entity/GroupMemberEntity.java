@@ -3,6 +3,7 @@ package br.com.cifras.group.infra.persistence.entity;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import org.hibernate.annotations.UuidGenerator;
+import java.time.Instant;
 import java.util.UUID;
 import br.com.cifras.group.model.GroupRole;
 
@@ -29,4 +30,14 @@ public class GroupMemberEntity extends PanacheEntityBase {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     public GroupRole role;
+
+    @Column(name = "joined_at")
+    public Instant joinedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        if (joinedAt == null) {
+            joinedAt = Instant.now();
+        }
+    }
 }

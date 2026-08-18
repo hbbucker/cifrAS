@@ -88,35 +88,35 @@ export const GroupsPage: React.FC = () => {
  }).catch(() => toast('Failed to dismiss declined invite', 'error'));
  };
 
- const fetchGroups = useCallback(() => {
- setLoading(true);
- fetch('/api/groups', {
- headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
- })
- .then(res => {
- if (res.status === 401) {
- logout();
- navigate('/login');
- throw new Error('Unauthorized');
- }
- if (!res.ok) throw new Error('Fetch failed');
- return res.json();
- })
- .then(data => {
- const formattedGroups = data.map((g: Record<string, unknown>) => ({
- ...g,
- id: String(g.id), // Convert number ID to string for GroupCard
- memberCount: 1, // Defaulting as backend does not return it yet
- role: g.ownerId === user?.id ? 'Admin' : 'Member'
- })) as GroupData[];
- setGroups(formattedGroups);
- setLoading(false);
- })
- .catch(() => {
- toast('Failed to load groups', 'error');
- setLoading(false);
- });
- }, [logout, navigate, toast, user?.id]);
+  const fetchGroups = useCallback(() => {
+    setLoading(true);
+    fetch('/api/groups', {
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    })
+    .then(res => {
+      if (res.status === 401) {
+        logout();
+        navigate('/login');
+        throw new Error('Unauthorized');
+      }
+      if (!res.ok) throw new Error('Fetch failed');
+      return res.json();
+    })
+    .then(data => {
+      const formattedGroups = data.map((g: Record<string, unknown>) => ({
+        ...g,
+        id: String(g.id),
+        memberCount: typeof g.memberCount === 'number' ? g.memberCount : 1,
+        role: g.ownerId === user?.id ? 'Admin' : 'Member'
+      })) as GroupData[];
+      setGroups(formattedGroups);
+      setLoading(false);
+    })
+    .catch(() => {
+      toast('Failed to load groups', 'error');
+      setLoading(false);
+    });
+  }, [logout, navigate, toast, user?.id]);
 
  useEffect(() => {
  fetchGroups();

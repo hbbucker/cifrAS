@@ -7,7 +7,6 @@ import br.com.cifras.group.model.Group;
 import br.com.cifras.group.model.GroupMember;
 import br.com.cifras.group.model.GroupInvitation;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 
 @ApplicationScoped
 public class GroupMapper {
@@ -19,12 +18,12 @@ public class GroupMapper {
 
     public GroupMember toDomainMember(GroupMemberEntity entity) {
         if (entity == null) return null;
-        return GroupMember.restore(entity.id, toDomain(entity.group), entity.userId, entity.role, null);
+        return GroupMember.restore(entity.id, toDomain(entity.group), entity.userId, entity.role, entity.joinedAt);
     }
 
     public GroupInvitation toDomainInvitation(GroupInvitationEntity entity) {
         if (entity == null) return null;
-        return GroupInvitation.restore(entity.id, toDomain(entity.group), entity.inviterId, entity.inviteeEmail, entity.status, null, null);
+        return GroupInvitation.restore(entity.id, toDomain(entity.group), entity.inviterId, entity.inviteeEmail, entity.status, entity.createdAt, null);
     }
 
     public GroupEntity toEntity(Group group) {
@@ -42,6 +41,7 @@ public class GroupMapper {
         entity.id = member.getId();
         entity.userId = member.getUserId();
         entity.role = member.getRole();
+        entity.joinedAt = member.getJoinedAt();
         return entity;
     }
 

@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class GroupInvitationRepository {
 
     @ApplicationScoped
-    static class JpaGroupInvitationRepository implements PanacheRepositoryBase<GroupInvitationEntity, UUID> {}
+    public static class JpaGroupInvitationRepository implements PanacheRepositoryBase<GroupInvitationEntity, UUID> {}
 
     @Inject
     JpaGroupInvitationRepository jpaRepo;
@@ -34,6 +34,20 @@ public class GroupInvitationRepository {
 
     public List<GroupInvitation> findByInviterIdAndStatus(String inviterId, GroupInvitationStatus status) {
         return jpaRepo.find("inviterId = ?1 and status = ?2", inviterId, status)
+                .stream()
+                .map(mapper::toDomainInvitation)
+                .collect(Collectors.toList());
+    }
+
+    public List<GroupInvitation> findByGroupId(UUID groupId) {
+        return jpaRepo.find("group.id", groupId)
+                .stream()
+                .map(mapper::toDomainInvitation)
+                .collect(Collectors.toList());
+    }
+
+    public List<GroupInvitation> findByGroupIdAndStatus(UUID groupId, GroupInvitationStatus status) {
+        return jpaRepo.find("group.id = ?1 and status = ?2", groupId, status)
                 .stream()
                 .map(mapper::toDomainInvitation)
                 .collect(Collectors.toList());

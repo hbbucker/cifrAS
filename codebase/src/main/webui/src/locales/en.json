@@ -208,7 +208,42 @@
     "invite": "Invite Member",
     "remove": "Remove from Group",
     "noSharedPlaylists": "No shared playlists",
-    "confirmRemovePlaylist": "Are you sure you want to remove this playlist from the group?"
+    "confirmRemovePlaylist": "Are you sure you want to remove this playlist from the group?",
+    "tabs": {
+      "playlists": "Playlists",
+      "members": "Members & Invites"
+    },
+    "members": {
+      "title": "Members",
+      "count_one": "{{count}} member",
+      "count_other": "{{count}} members",
+      "empty": "No active members found.",
+      "roles": {
+        "owner": "Owner",
+        "admin": "Admin",
+        "member": "Member"
+      },
+      "removeMember": "Remove from Group",
+      "leaveGroup": "Leave Group",
+      "confirmRemoveTitle": "Remove Member",
+      "confirmRemoveDesc": "Are you sure you want to remove {{name}} from this group? They will lose access to shared playlists.",
+      "confirmLeaveTitle": "Leave Group",
+      "confirmLeaveDesc": "Are you sure you want to leave {{name}}? You will lose access to shared playlists.",
+      "memberRemoved": "Member removed successfully.",
+      "leftGroup": "You left the group.",
+      "inviteSuccess": "Invitation sent successfully.",
+      "joinedAt": "Joined on"
+    },
+    "invitations": {
+      "title": "Sent Invitations",
+      "pending": "Awaiting response",
+      "declined": "Declined",
+      "cancel": "Cancel",
+      "dismiss": "Dismiss",
+      "canceled": "Invitation canceled successfully.",
+      "empty": "No pending or declined invitations.",
+      "sentTo": "Sent to"
+    }
   },
   "musicCard": {
     "delete": "Delete",

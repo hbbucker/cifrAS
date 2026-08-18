@@ -10,19 +10,17 @@ import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class GroupRepository {
 
     @ApplicationScoped
-    static class JpaGroupRepository implements PanacheRepositoryBase<GroupEntity, UUID> {}
+    public static class JpaGroupRepository implements PanacheRepositoryBase<GroupEntity, UUID> {}
 
     @ApplicationScoped
-    static class JpaGroupMemberRepository implements PanacheRepositoryBase<GroupMemberEntity, UUID> {}
+    public static class JpaGroupMemberRepository implements PanacheRepositoryBase<GroupMemberEntity, UUID> {}
 
     @Inject
     JpaGroupRepository jpaRepo;
@@ -46,10 +44,40 @@ public class GroupRepository {
                 groupId, userId, GroupRole.OWNER) > 0;
     }
 
+    public boolean isOwnerOrAdmin(UUID groupId, String userId) {
+        return jpaMemberRepo.count("group.id = ?1 and userId = ?2 and (role = ?3 or role = ?4)", 
+                groupId, userId, GroupRole.OWNER, GroupRole.ADMIN) > 0;
+    }
+
     public Optional<GroupMember> findMember(UUID groupId, String userId) {
         return jpaMemberRepo.find("group.id = ?1 and userId = ?2", groupId, userId)
                 .firstResultOptional()
                 .map(mapper::toDomainMember);
+    }
+
+    public List<GroupMember> findMembersByGroupId(UUID groupId) {
+        return jpaMemberRepo.list("group.id", groupId).stream()
+                .map(mapper::toDomainMember)
+                .collect(Collectors.toList());
+    }
+
+    public long countMembers(UUID groupId) {
+        return jpaMemberRepo.count("group.id", groupId);
+    }
+
+    public Map<UUID, Long> countMembersForGroups(List<UUID> groupIds) {
+        if (groupIds == null || groupIds.isEmpty()) return Collections.emptyMap();
+        List<?> results = jpaMemberRepo.getEntityManager()
+            .createQuery("SELECT m.group.id, count(m.id) FROM GroupMemberEntity m WHERE m.group.id IN (:groupIds) GROUP BY m.group.id")
+            .setParameter("groupIds", groupIds)
+            .getResultList();
+        Map<UUID, Long> counts = new HashMap<>();
+        for (Object item : results) {
+            if (item instanceof Object[] row) {
+                counts.put((UUID) row[0], ((Number) row[1]).longValue());
+            }
+        }
+        return counts;
     }
 
     public List<Group> listGroupsByUser(String userId) {

@@ -208,7 +208,42 @@
     "invite": "Convidar Membro",
     "remove": "Remover do Grupo",
     "noSharedPlaylists": "Nenhuma playlist compartilhada",
-    "confirmRemovePlaylist": "Tem certeza de que deseja remover esta playlist do grupo?"
+    "confirmRemovePlaylist": "Tem certeza de que deseja remover esta playlist do grupo?",
+    "tabs": {
+      "playlists": "Playlists",
+      "members": "Membros & Convites"
+    },
+    "members": {
+      "title": "Membros",
+      "count_one": "{{count}} membro",
+      "count_other": "{{count}} membros",
+      "empty": "Nenhum membro ativo.",
+      "roles": {
+        "owner": "Proprietário",
+        "admin": "Admin",
+        "member": "Membro"
+      },
+      "removeMember": "Remover do Grupo",
+      "leaveGroup": "Sair do Grupo",
+      "confirmRemoveTitle": "Remover Membro",
+      "confirmRemoveDesc": "Tem certeza de que deseja remover {{name}} deste grupo? Ele perderá o acesso às playlists compartilhadas.",
+      "confirmLeaveTitle": "Sair do Grupo",
+      "confirmLeaveDesc": "Tem certeza de que deseja sair de {{name}}? Você perderá o acesso às playlists compartilhadas.",
+      "memberRemoved": "Membro removido com sucesso.",
+      "leftGroup": "Você saiu do grupo.",
+      "inviteSuccess": "Convite enviado com sucesso.",
+      "joinedAt": "Entrou em"
+    },
+    "invitations": {
+      "title": "Convites Enviados",
+      "pending": "Aguardando resposta",
+      "declined": "Recusado",
+      "cancel": "Cancelar",
+      "dismiss": "Dispensar",
+      "canceled": "Convite cancelado com sucesso.",
+      "empty": "Nenhum convite pendente ou recusado.",
+      "sentTo": "Enviado para"
+    }
   },
   "musicCard": {
     "delete": "Deletar",

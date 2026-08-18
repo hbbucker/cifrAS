@@ -202,13 +202,48 @@
     "memberEmail": "member@example.com"
   },
   "group": {
-    "sharePlaylist": "Share Playlist",
-    "sharedPlaylists": "Shared Playlists",
-    "leave": "Leave Group",
-    "invite": "Invite Member",
-    "remove": "Remove from Group",
-    "noSharedPlaylists": "No shared playlists",
-    "confirmRemovePlaylist": "Are you sure you want to remove this playlist from the group?"
+    "sharePlaylist": "Compartir Playlist",
+    "sharedPlaylists": "Playlists Compartidas",
+    "leave": "Salir del Grupo",
+    "invite": "Invitar Miembro",
+    "remove": "Eliminar del Grupo",
+    "noSharedPlaylists": "No hay playlists compartidas",
+    "confirmRemovePlaylist": "¿Estás seguro de que deseas eliminar esta playlist del grupo?",
+    "tabs": {
+      "playlists": "Playlists",
+      "members": "Miembros e Invitaciones"
+    },
+    "members": {
+      "title": "Miembros",
+      "count_one": "{{count}} miembro",
+      "count_other": "{{count}} miembros",
+      "empty": "No se encontraron miembros activos.",
+      "roles": {
+        "owner": "Propietario",
+        "admin": "Admin",
+        "member": "Miembro"
+      },
+      "removeMember": "Eliminar del Grupo",
+      "leaveGroup": "Salir del Grupo",
+      "confirmRemoveTitle": "Eliminar Miembro",
+      "confirmRemoveDesc": "¿Estás seguro de que deseas eliminar a {{name}} de este grupo? Perderá el acceso a las playlists compartidas.",
+      "confirmLeaveTitle": "Salir del Grupo",
+      "confirmLeaveDesc": "¿Estás seguro de que deseas salir de {{name}}? Perderás el acceso a las playlists compartidas.",
+      "memberRemoved": "Miembro eliminado con éxito.",
+      "leftGroup": "Has salido del grupo.",
+      "inviteSuccess": "Invitación enviada con éxito.",
+      "joinedAt": "Se unió el"
+    },
+    "invitations": {
+      "title": "Invitaciones Enviadas",
+      "pending": "Esperando respuesta",
+      "declined": "Rechazado",
+      "cancel": "Cancelar",
+      "dismiss": "Descartar",
+      "canceled": "Invitación cancelada con éxito.",
+      "empty": "No hay invitaciones pendientes ni rechazadas.",
+      "sentTo": "Enviado a"
+    }
   },
   "musicCard": {
     "delete": "Delete",

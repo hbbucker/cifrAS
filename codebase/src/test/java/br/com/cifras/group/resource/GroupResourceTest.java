@@ -23,6 +23,9 @@ import br.com.cifras.group.dto.LinkPlaylistRequest;
 import br.com.cifras.playlist.model.Playlist;
 import jakarta.inject.Inject;
 
+import java.util.Map;
+import java.util.UUID;
+
 /**
  * T13: GroupResource REST integration tests
  */
@@ -70,12 +73,13 @@ class GroupResourceTest extends BaseIntegrationTest {
             .statusCode(201)
             .body("id", notNullValue())
             .body("name", equalTo("My Band"))
-            .body("ownerId", equalTo(OWNER));
+            .body("ownerId", equalTo(OWNER))
+            .body("memberCount", equalTo(1));
     }
 
     @Test
     @TestSecurity(user = OWNER, roles = {"user"})
-    void givenAuthenticated_whenGetGroups_thenReturns200() {
+    void givenAuthenticated_whenGetGroups_thenReturns200WithMemberCount() {
         createGroup("My Second Band");
 
         given()
@@ -83,7 +87,55 @@ class GroupResourceTest extends BaseIntegrationTest {
             .then()
             .statusCode(200)
             .body("$", instanceOf(java.util.List.class))
-            .body("size()", greaterThan(0));
+            .body("size()", greaterThan(0))
+            .body("[0].memberCount", notNullValue());
+    }
+
+    @Test
+    @TestSecurity(user = OWNER, roles = {"user"})
+    void givenGroup_whenGetMembers_thenReturns200() {
+        UUID groupId = createGroup("Band With Profile Members");
+        addGroupMemberUseCase.execute(groupId, MEMBER, OWNER);
+
+        Mockito.when(userService.findUserProfilesByIds(Mockito.anyList()))
+            .thenReturn(Map.of(
+                OWNER, new UserService.UserProfile(OWNER, "owner@cifras.com", "Owner Name"),
+                MEMBER, new UserService.UserProfile(MEMBER, "member@cifras.com", "Member Name")
+            ));
+
+        given()
+            .when().get("/groups/" + groupId + "/members")
+            .then()
+            .statusCode(200)
+            .body("size()", equalTo(2))
+            .body("[0].email", notNullValue())
+            .body("[0].name", notNullValue());
+    }
+
+    @Test
+    @TestSecurity(user = OWNER, roles = {"user"})
+    void givenGroupWithInvite_whenGetAndCancelInvitations_thenReturns200And204() {
+        UUID groupId = createGroup("Band With Invites");
+        Mockito.when(userService.getUserIdByEmail("invitee@test.com")).thenReturn("some-invitee-uuid");
+
+        given()
+            .contentType(ContentType.JSON)
+            .body(new AddMemberRequest("invitee@test.com"))
+            .when().post("/groups/" + groupId + "/members")
+            .then()
+            .statusCode(204);
+
+        String inviteIdStr = given()
+            .when().get("/groups/" + groupId + "/invitations")
+            .then()
+            .statusCode(200)
+            .body("size()", greaterThanOrEqualTo(1))
+            .extract().path("[0].id");
+
+        given()
+            .when().delete("/groups/" + groupId + "/invitations/" + inviteIdStr)
+            .then()
+            .statusCode(204);
     }
 
     @Test

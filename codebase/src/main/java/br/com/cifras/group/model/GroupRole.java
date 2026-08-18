@@ -5,5 +5,6 @@ package br.com.cifras.group.model;
  */
 public enum GroupRole {
     OWNER,
+    ADMIN,
     MEMBER
 }
