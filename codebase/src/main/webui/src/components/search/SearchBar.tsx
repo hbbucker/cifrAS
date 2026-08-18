@@ -56,9 +56,9 @@ export const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
  
  if (!response.ok) throw new Error('Search failed');
  
- const data = await response.json();
- const items = Array.isArray(data) ? data : (data.data || []);
- // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const data = await response.json();
+    const items = Array.isArray(data) ? data : (data.items || data.data || []);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
  const mappedItems = items.map((item: any) => ({
  ...item,
  keySignature: item.originalKey || item.keySignature || 'C'

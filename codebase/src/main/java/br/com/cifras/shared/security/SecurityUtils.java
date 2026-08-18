@@ -38,11 +38,18 @@ public class SecurityUtils {
     }
 
     /**
-     * Returns the email from the JWT claims, if present.
+     * Returns the email from the JWT claims, or principal name if it looks like an email.
      */
     public String getCurrentUserEmail() {
+        if (securityIdentity.isAnonymous()) {
+            return null;
+        }
         if (securityIdentity.getPrincipal() instanceof JsonWebToken jwtPrincipal && jwtPrincipal.containsClaim("email")) {
             return jwtPrincipal.getClaim("email");
+        }
+        String name = securityIdentity.getPrincipal().getName();
+        if (name != null && name.contains("@")) {
+            return name;
         }
         return null;
     }

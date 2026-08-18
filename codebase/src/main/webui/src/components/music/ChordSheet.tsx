@@ -73,7 +73,7 @@ export const ChordSheet: React.FC<ChordSheetProps> = ({
 
  return (
  <div 
- className={transparent ? "w-full overflow-hidden" : "bg-bg-card rounded p-4 border border-border-main shadow-sm overflow-y-auto"}
+ className={transparent ? "w-full overflow-x-hidden" : "bg-bg-card rounded p-4 border border-border-main shadow-sm overflow-y-auto"}
  style={transparent ? { fontSize: `${fontSize}px` } : { fontSize: `${fontSize}px`, width, height }}
  data-testid="chord-sheet-container"
  >
@@ -85,6 +85,7 @@ export const ChordSheet: React.FC<ChordSheetProps> = ({
  const isTabLine = /^[eBGDAEa-g][#b]?\|/.test(trimmed);
  const isStrumLine = /^[\s]*[↓↑v^]+[\s↓↑v^]*$/.test(line) && trimmed.length > 0;
  
+ // All lines use whitespace-pre to preserve chord/lyric column alignment.
  let lineClasses = transparent ? 'text-inherit' : 'text-text-main';
  if (isChordLine) {
  lineClasses = 'text-[#8629cc] font-bold';

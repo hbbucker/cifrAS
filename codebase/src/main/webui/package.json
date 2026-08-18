@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "test": "vitest run --passWithNoTests",
+    "coverage": "vitest run --coverage --passWithNoTests",
     "preview": "vite preview",
     "e2e": "playwright test"
   },
@@ -38,6 +39,7 @@
     "@types/react-dom": "^19.2.3",
     "@types/react-window": "^1.8.8",
     "@vitejs/plugin-react": "^6.0.2",
+    "@vitest/coverage-v8": "^4.1.10",
     "dotenv": "^17.4.2",
     "eslint": "^10.3.0",
     "eslint-plugin-react-hooks": "^7.1.1",

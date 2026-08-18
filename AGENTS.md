@@ -98,7 +98,66 @@ codebase/
 
 ---
 
-## 5. Regras Críticas de Domínio (Transposição e Cifras)
+## 5. Política de Cobertura de Testes (Coverage Gate) 🔴 INVIOLÁVEL
+
+### 5.1 Regra de Ouro: 90% no Diff, Não no Legado
+
+> **Toda nova implementação deve garantir ≥ 90% de cobertura sobre as linhas alteradas/adicionadas pelo PR.**
+> O código legado existente não é retrocedido. A régua se aplica **exclusivamente ao diff do branch em relação à base (`main`).**
+
+Esta regra é **obrigatória e inegociável**. O QA Lead deve rejeitá-la antes de qualquer aprovação se não for atendida.
+
+### 5.2 Cobertura por Camada
+
+| Camada | Ferramenta | Tipo de Teste Exigido | Threshold no Diff |
+|--------|------------|----------------------|-------------------|
+| **Backend — Lógica de Domínio** (`model/`, `application/`) | JaCoCo + JUnit 5 | Unitários | ≥ 90% |
+| **Backend — Recursos REST** (`resource/`) | JaCoCo + REST Assured + Testcontainers | Integração | ≥ 90% |
+| **Backend — Infra/Repositórios** (`infra/`) | JaCoCo + Testcontainers | Integração | ≥ 90% |
+| **Frontend — Componentes/Hooks** (`components/`, `hooks/`) | Vitest + Testing Library | Unitários | ≥ 90% |
+| **Frontend — Pages / Fluxos Críticos** (`pages/`) | Playwright | E2E | Cobertura funcional dos ACs |
+| **Frontend — Utils** (`utils/`) | Vitest | Unitários | ≥ 90% |
+
+### 5.3 Responsabilidades por Papel
+
+**Makers (CTO e Frontend Staff):**
+- Antes de entregar ao QA, devem rodar localmente a verificação de cobertura no diff:
+  ```bash
+  # Backend — gera relatório JaCoCo e verifica diff-coverage
+  ./mvnw verify && diff-cover codebase/target/site/jacoco/jacoco.xml --compare-branch=origin/main --fail-under=90
+
+  # Frontend — cobertura com Vitest
+  cd codebase/src/main/webui && npm run coverage
+  ```
+- Qualquer linha nova sem cobertura de teste é uma **entrega incompleta**.
+
+**QA Lead:**
+- ✅ DEVE verificar a cobertura do diff como **primeiro critério de rejeição**.
+- Ao revisar um PR, deve executar (leitura dos relatórios):
+  1. Ler o relatório `jacoco.xml` ou o output do `diff-cover`.
+  2. Confirmar que os testes unitários cobrem os `model/` e `application/` novos/alterados.
+  3. Confirmar que os testes de integração cobrem os `resource/` e `infra/` novos/alterados.
+  4. Confirmar que os fluxos críticos adicionados/alterados têm cenário E2E correspondente.
+- Se a cobertura do diff for < 90% em qualquer camada → **rejeitar imediatamente** com comentário explícito do percentual atual vs. exigido.
+
+### 5.4 Definição de "Cobertura Funcional E2E"
+
+Para o Playwright, a cobertura não é medida em linhas, mas em **Acceptance Criteria (ACs)**:
+- Cada AC da spec da feature deve ter ao menos **1 cenário E2E correspondente**.
+- O QA Lead valida o mapeamento AC → Teste antes de aprovar.
+- Fluxos de erro (ex: 400, 401, 404) também devem ter cenário E2E quando forem parte dos ACs.
+
+### 5.5 Exceções Permitidas
+
+As seguintes situações dispensam cobertura de 90% no diff, mas **exigem justificativa explícita no PR**:
+- Código de configuração puro (`config/`, `application.properties`) sem lógica de negócio.
+- Migrações de banco de dados (arquivos `.sql`).
+- Arquivos de tipagem pura TypeScript (`.d.ts`, interfaces sem lógica).
+- Mocks e factories de teste (código dentro de `src/test/`).
+
+---
+
+## 6. Regras Críticas de Domínio (Transposição e Cifras)
 
 ### 1. Formato de Cifra Estruturado (JSON)
 O campo `lyrics` das músicas é armazenado como um JSON estruturado:
@@ -115,7 +174,7 @@ A transposição de acordes ocorre *stateless* e *on-the-fly* ao passar o query 
 
 ---
 
-## 6. Diretrizes do Design System (Pinterest-inspired)
+## 7. Diretrizes do Design System (Pinterest-inspired)
 
 O CifrAS adota uma interface limpa baseada no design do Pinterest: o foco visual é a cifra, e a interface recua de forma elegante.
 
@@ -136,7 +195,7 @@ O CifrAS adota uma interface limpa baseada no design do Pinterest: o foco visual
 
 ---
 
-## 7. Comandos de Terminal e Fluxo de Execução
+## 8. Comandos de Terminal e Fluxo de Execução
 
 ### Regra Crítica: RTK (Rust Token Killer) ⚠️
 Para economizar tokens de contexto nas interações com o terminal e o git, todos os comandos executados no shell do sistema devem ser rodados usando o proxy `rtk`.
@@ -180,62 +239,217 @@ fly deploy --local-only --verbose
 
 ---
 
-## 8. Equipe do Projeto e StartupOS
+## 9. Princípios Fundamentais
 
-Este projeto opera sob uma arquitetura de **Sistema Operacional para Startups (StartupOS)**. A tomada de decisão é orquestrada pelo CEO AI, que conta com um time expansível de especialistas. 
+### 9.1 Spec-Driven Development (TLC)
+Toda implementação regular deve ser precedida por uma especificação clara. O fluxo padrão é:
+> **Specify → Clarify/Plan (Fundidos) → Tasks → Implement → Validate**
 
-As definições e system prompts estão consolidados como **Agentes Antigravity Persistentes** (Subagents). Eles são inicializados por meio do plugin local configurado em `.gemini/plugins/startupos/agents/`.
+**Fast-Track**: Alterações de baixa complexidade ou ajustes de UI podem pular do `Specify` direto para o `Implement`.
 
-Para invocar um dos agentes abaixo em suas tarefas, os agentes do conselho devem utilizar a tool `invoke_subagent` indicando o respectivo nome (ex: `TypeName: "ceo"`).
+### 9.2 Maker-Checker Separation
+O agente que gera o artefato (Maker) **nunca** pode validá-lo. A validação é responsabilidade exclusiva do Checker (QA Lead). O QA Lead atua também com viés adversarial caso os Makers excedam 3 rejeições.
 
-- **ceo (CEO AI / Founder):** Orquestrador principal. Focado em estratégia, priorização, tomada de decisão e aumento do valor da empresa. (Permissões: Subagents, Código, MCP).
-- **cto (CTO AI):** Arquitetura técnica, infraestrutura, qualidade do código e liderança da equipe de engenharia. (Permissões: Subagents, Código, MCP).
-- **maya-rivers (CPO AI):** Descoberta de produto, roadmap, UX (Pinterest-style), validação de hipóteses e ativação.
-- **po (Product Owner AI):** Tradução de requisitos, detalhamento de sprints e acompanhamento de tarefas granulares.
-- **leo-sterling (CMO AI):** Marketing digital, relações com desenvolvedores, SEO, redes sociais, aquisição e comunidade.
-- **alex-j-code (Frontend Performance Engineer):** Otimizações pesadas de front-end, Web Vitals e refinamento de interface.
-- **Demais Especialistas (CRO, CFO, COO, QA, Research):** Podem ser definidos sob demanda ou agregados futuramente via plugin.
+### 9.3 Autoridade de Domínio (Domain Authority)
+Para evitar o "Paradoxo do Árbitro" e poupar o fundador humano:
+- O **CPO** tem a decisão final irrevogável em regras de produto e negócio.
+- O **CTO** tem a decisão final irrevogável em arquitetura e stack técnica.
+O humano (CEO/Fundador) só deve ser escalado para pivotagens de roadmap, aumento crítico de escopo ou decisões financeiras/tempo.
+
+### 9.4 Paralelismo Contract-First
+Ao iniciar a etapa de `Implement`, o CTO deve gerar os DTOs (Contratos de API) primeiro. A partir da selagem do contrato, CTO e Frontend codificam em paralelo.
 
 ---
 
-## 9. Guia de Trabalho para Agentes de Desenvolvimento de IA
+## 10. Papéis (Agents)
 
-**ESTAS REGRAS SÃO INVIOLÁVEIS:** Todos o desenvolvimento deve estar ancorado nessas especificações.
+| Papel | Responsabilidade | Ferramentas Permitidas | Modelo Sugerido | Skill Correspondente |
+|-------|------------------|------------------------|-----------------|----------------------|
+| **CEO & Orquestrador** | Roteamento do workflow, aplicação da Autoridade, escalação | Leitura/Escrita completa | Sonnet / Opus / Pro | `startupos-ceo` |
+| **CTO** | Arquitetura, backend, DTOs, banco de dados | Leitura/Escrita/Execução | Sonnet / Opus / Pro | `startupos-cto` |
+| **CPO** | Produto, UX, critérios de aceite, roadmap | Leitura/Escrita (docs) | Sonnet / Opus / Pro | `startupos-cpo` |
+| **QA Lead** | Checker único. Testes, aprovação de release | **Somente Leitura** | Sonnet / Pro | `startupos-qa-lead` |
+| **Frontend Staff** | UX, jornadas, UI (React/Vite) | Leitura/Escrita/Execução | Sonnet / Opus / Pro | `startupos-frontend-staff` |
 
-Se você é um Agente de IA trabalhando neste projeto, siga este fluxo rigoroso para garantir a conformidade e qualidade das entregas:
+---
 
-### Etapas de trabalho:
+## 11. Regras de Ferramentas por Papel
 
-**ESTE WORKFLOW É INVIOLÁVEL:** Todos o desenvolvimento deve estar ancorado nesse fluxo.
+### 11.1 Restrições Estritas de QA Lead
 
-Todas as atividades seja planejamento, execução ou correção, devem utilizar a skill `tlc-spec-driven` seguindo o seguinte workflows.
+O papel de **QA Lead** é estritamente **read-only**:
 
-**SE SKILL TLC-SPEC-DRIVEN NÃO ESTIVER DISPONÍVEL CANCELAR AÇÃO E REPORTAR**
+- `Read` — Permitido
+- `Grep` — Permitido
+- `Glob` — Permitido
+- `Write` — **Proibido**
+- `Exec` — **Proibido**
+- `Edit` — **Proibido**
 
-1. **Análise:** Primeira etapa, pode ser uma feature, correção de bug ou quick-fix, PRD  deve ser sempre criado para guiar os requisitos e entrega de valor;;
-2. **Spec:** Especificação técnica para a atividade analisada;
-3. **Tasks:** DCriar as quebras das tarefas para guiar o desenvolvimento;;
-4. **Worktree:** Trabalhar com branches e worktrees não conflitantes;
-5. **Execução:** Codar seguindo os as boas práticas de mercado, utilizando a técnica de TDD, cobertura dos testes unitário, integração e E2E (Sempre com foco na usabilidade e nas regras de negócio que entregam valor)
-6. **Validação de Testes:** Build, Lints e cobertura devem atender os critérios já especificados, validar todos os edge-cases, border-cases e se os testes e a entrega possuem a qualidade desejada para caracterizar uma entrega de valor ao usuário final, responsabilidade do agente de **QA**;
-7. **Commit/Push:** Utilização de commits atômicos e padrão conventional commits. Um novo PR deve ser aberto no GitHub (usando `gh pr create` por exemplo). Logo após a criação, é OBRIGATÓRIO aguardar a conclusão da pipeline com o comando `gh pr checks --watch`;
-8. **PR Review (Quality Gate):** Sempre que um PR for aberto, o agente de **QA** deve executar a skill `pr-review`. O agente **CTO** deve fazer as correções apontadas. Esse ciclo deve ocorrer em até 3 interações para atingir o sucesso. Caso não seja resolvido nesse limite, o PR deve ficar em aberto para o CEO revisar.
-9. **Loop**: Problemas de qualidade, testes e indicados no Code Review devem voltar para Implementação até que sejam resolvidos, o **CTO** deve ser informado para tomar as providencias;
-10. **Deploy & Merge:** O Report final apresentado para a decisão do humano deve, obrigatoriamente, conter a confirmação de que as actions do GitHub (CI/CD) finalizaram com status OK (verde). É estritamente proibido solicitar ou executar o merge do PR se a pipeline ainda estiver em andamento ou com erros. **Nunca execute o merge do PR sem a permissão expressa do CEO.**
+### 11.2 Makers (CTO e Frontend Staff)
 
-### Como abordar cada etapa:
+Podem executar código, escrever arquivos e usar ferramentas de implementação, mas **não podem** validar seu próprio trabalho.
 
-1. **Abordagem Orientada a Specs (Spec-driven workflow):**
-   - Antes de implementar qualquer código, valide o escopo nos arquivos de especificação correspondentes dentro de `.specs/features/[feature]/spec.md`.
-   - Se a especificação não existir ou precisar de alterações, utilize a skill tlc-spec-driven para planejar a criação/atualização de um documento de design técnico antes de começar a codificar.
-2. **Abordagem TDD (Test-Driven Development):**
-   - Escreva testes unitários para validar a lógica de domínio enriquecida e o motor de transposição. A cobertura deve ser de no mínimo 95%.
-   - Não submeta código de backend sem o correspondente teste de integração utilizando `REST Assured` e/ou `Testcontainers` se houver persistência.
-3. **Validação E2E com Playwright:**
-   - Ao alterar telas ou fluxos visuais do React, certifique-se de executar os testes E2E do Playwright (`npx playwright test`) a partir do diretório `src/main/webui` para validar que nenhum fluxo foi quebrado.
-   - **Autenticação E2E (Bypass):** Os testes contornam a UI de login do Google injetando um mock JWT e navegando direto para `/auth/callback`. O backend (Quarkus) precisa rodar com o perfil `e2e` ativado (`-Dquarkus.profile=e2e`), que suporta validação local do algoritmo `RS256`. Use o script `generate_jwt.py` caso precise emitir novos tokens de teste com claims atualizadas (`iat`, `exp`).
-4. **Preservação do Legado:**
-   - Preserve integralmente todos os comentários, JSDoc e documentação existente no código que não forem alvo direto da alteração.
-5. **Verificação de Portão Final e Playwright:**
-   - Sempre execute a verificação final (testes locais, build, e `npx playwright test` no diretório webui) antes de declarar uma tarefa como concluída, propor commits ou abrir Pull Requests. Garanta que o projeto compila localmente com sucesso. Utilize a CLI do GitHub (`gh pr create`) para abrir PRs de forma autônoma, se aplicável. Em seguida, é OBRIGATÓRIO executar `gh pr checks --watch` para aguardar a conclusão (Status OK/Verde) de todas as actions (CI/CD) do GitHub. Nunca declare a tarefa como concluída se o CI falhar ou estiver em andamento.
+---
 
+## 12. Workflow de Governança
+
+### 12.1 Workflow Operacional
+1. **Specify** — CPO captura requisitos e cria critérios de aceite.
+2. **Clarify/Plan** — CTO levanta viabilidade técnica e define DTOs/Banco.
+3. **Implement (Paralelo)** — CTO (Backend) e Frontend codificam simultaneamente guiados pelos DTOs.
+4. **Validate** — QA Lead avalia. Se reprovar, devolve ao Maker. 
+5. **Adversarial Mode** — Se o QA Lead rejeitar 3 vezes a mesma entrega, ele congela a feature e força a Autoridade de Domínio (CTO ou CPO) a assumir a responsabilidade técnica/funcional.
+
+### 12.2 Escalação Humana (CEO/Fundador)
+A IA (Orquestrador) só deve pausar o workflow e chamar o humano se:
+1. Houver necessidade de alterar `.specs/project/ROADMAP.md` ou `.specs/project/PROJECT.md`.
+2. O risco financeiro, de tempo ou de segurança for muito alto para a IA assumir.
+
+---
+
+## 13. Princípios de Trade-Off (Startup Principles)
+
+1. **Progresso sobre Perfeição** — Entregue valor incremental (Fast-Track para coisas simples).
+2. **Especifique antes de Codificar** — Para features complexas, o contrato é inegociável.
+3. **Separe Maker de Checker** — Quem escreve código não pode dar "Go" para release.
+4. **Autoridade de Domínio** — Deixe a engenharia decidir engenharia e o produto decidir produto. Poupe o fundador.
+5. **Contexto Fresco** — O QA Lead não deve ler o histórico de pensamento do Maker para não contaminar seu viés.
+
+---
+
+## 14. Documentação do Projeto
+
+Os documentos de referência do projeto vivem em `.specs/project/`:
+
+- **[`PROJECT.md`](.specs/project/PROJECT.md)** — Constituição: visão, objetivos, stack e escopo.
+- **[`ROADMAP.md`](.specs/project/ROADMAP.md)** — Milestones e status de entrega.
+- **[`STATE.md`](.specs/project/STATE.md)** — Estado atual do projeto (contexto operacional).
+- **[`.specs/features/`](.specs/features/)** — Especificações técnicas por feature.
+
+<!-- startupos-governance:start -->
+# Startup OS Governance
+
+Este arquivo define as regras de governança, papéis, restrições de ferramentas e fluxo de trabalho para o Startup OS. Todos os agentes devem seguir estritamente estas regras.
+
+---
+
+## 1. Princípios Fundamentais
+
+### 1.1 Spec-Driven Development (TLC)
+Toda implementação regular deve ser precedida por uma especificação clara. O fluxo padrão é:
+> **Specify → Clarify/Plan (Fundidos) → Tasks → Implement → Validate**
+
+**Fast-Track**: Alterações pequenas e locais usam uma microespecificação em vez do plano completo, mas nunca pulam o controle de qualidade: o CTO e o QA Lead devem ser consultados antes da implementação; se houver interface, jornada, acessibilidade ou conteúdo visual, o CPO/UX também deve ser consultado. O QA Lead continua responsável pela validação independente final. A classificação de impacto é obrigatória: somente I0 ou I1 pode permanecer em Fast-Track; qualquer sinal I2 ou I3 retorna ao fluxo padrão.
+
+### 1.2 Maker-Checker Separation
+O agente que gera o artefato (Maker) **nunca** pode validá-lo. A validação é responsabilidade exclusiva do Checker (QA Lead). O QA Lead atua também com viés adversarial caso os Makers excedam 3 rejeições.
+
+### 1.3 Autoridade de Domínio (Domain Authority)
+Para evitar o "Paradoxo do Árbitro" e poupar o fundador humano:
+- O **CPO** tem a decisão final irrevogável em regras de produto e negócio.
+- O **CTO** tem a decisão final irrevogável em arquitetura e stack técnica.
+O humano (CEO/Fundador) só deve ser escalado para pivotagens de roadmap, aumento crítico de escopo ou decisões financeiras/tempo.
+
+### 1.4 Paralelismo Contract-First
+Ao iniciar a etapa de `Implement`, o CTO deve gerar os DTOs (Contratos de API) primeiro. A partir da selagem do contrato, CTO e Frontend codificam em paralelo.
+
+---
+
+## 2. Papéis (Agents)
+
+| Papel | Responsabilidade | Ferramentas Permitidas | Modelo Sugerido | Skill Correspondente |
+|-------|------------------|------------------------|-----------------|---------------------|
+| **CEO & Orquestrador** | Roteamento do workflow, aplicação da Autoridade de Domínio, escalação humana | Leitura/Escrita completa | Sonnet / Opus / Pro | `startupos-ceo` |
+| **CTO** | Arquitetura, backend, DTOs, banco de dados, avaliação e registro de ADRs | Leitura/Escrita/Execução (código/infra) | Sonnet / Opus / Pro | `startupos-cto` |
+| **CPO** | Produto, UX, critérios de aceite, roadmap | Leitura/Escrita (docs/especificações) | Sonnet / Opus / Pro | `startupos-cpo` |
+| **QA Lead** | Checker único. Testes, aprovação de release. Atua de forma adversarial após 3 falhas | **Somente Leitura** (Read, Grep, Glob) | Sonnet / Pro | `startupos-qa-lead` |
+| **Frontend Staff** | UX, jornadas, UI (React/Vite), avaliação e registro de ADRs | Leitura/Escrita/Execução (frontend) | Sonnet / Opus / Pro | `startupos-frontend-staff` |
+
+---
+
+## 3. Regras de Ferramentas por Papel
+
+### 3.1 Restrições Estritas de QA Lead
+
+O papel de **QA Lead** é estritamente **read-only**:
+
+- `Read` — Permitido
+- `Grep` — Permitido
+- `Glob` — Permitido
+- `Write` — **Proibido**
+- `Exec` — **Proibido**
+- `Edit` — **Proibido**
+
+### 3.2 Makers (CTO e Frontend Staff)
+
+Podem executar código, escrever arquivos e usar ferramentas de implementação, mas **não podem** validar seu próprio trabalho.
+
+---
+
+## 4. Workflow de Governança
+
+### 4.1 Workflow Operacional
+1. **Specify** — CPO captura requisitos, cria critérios de aceite e registra a classificação de impacto de produto quando aplicável.
+2. **Clarify/Plan** — CTO levanta viabilidade técnica, define DTOs/Banco, classifica impactos técnicos, consolida o maior nível e avalia a necessidade de criação de um Architecture Decision Record (ADR) antes da implementação.
+3. **Implement (Paralelo)** — CTO (Backend) e Frontend codificam simultaneamente guiados pelos DTOs. Ambos devem avaliar e registrar ADRs caso tomem decisões arquiteturais complexas em suas áreas.
+4. **Validate** — QA Lead avalia contra o nível consolidado, gates e evidências. O parecer de integração é `PRONTA PARA INTEGRAÇÃO` ou `REJEITADA`; ele não autoriza release. O QA produz o texto do parecer read-only e o CEO/Orquestrador o persiste verbatim em `.specs/features/<feature>/qa/`.
+5. **Adversarial Mode** — Se o QA Lead rejeitar 3 vezes a mesma entrega, ele congela a feature e força a Autoridade de Domínio (CTO ou CPO) a assumir a responsabilidade técnica/funcional.
+
+### 4.2 Fast-Track com Gate de Qualidade
+1. Registrar uma microespecificação com objetivo, escopo, critérios de aceite e riscos conhecidos.
+2. Consultar o CTO, que decide se a mudança pode permanecer em Fast-Track.
+3. Quando houver interface, fluxo do usuário, acessibilidade ou conteúdo visual, consultar o CPO/UX antes de implementar.
+4. Consultar o QA Lead de forma independente para definir os riscos e a evidência mínima de validação.
+5. Implementar e entregar as evidências do nível de impacto; o QA Lead faz a validação independente antes da decisão de integração. I2 ou I3 não pode continuar em Fast-Track.
+
+### 4.3 Escalação Humana (CEO/Fundador)
+A IA (Orquestrador) só deve pausar o workflow e chamar o humano se:
+1. Houver necessidade de alterar `.specs/project/ROADMAP.md` ou `.specs/project/CONSTITUTION.md`.
+2. O risco financeiro, de tempo ou de segurança for muito alto para a IA assumir.
+
+---
+
+## 5. Política de Testes
+
+`.specs/project/TESTING.md` é a fonte de verdade da política de testes do projeto. Ela define a matriz I0–I3, a baseline, a cobertura mínima quando houver, a cadência da suíte completa e os gates de integração, release e pós-deploy.
+
+- Todo spec e microespecificação registra nível, sinais, contornos, gates, classificações do CTO/CPO quando aplicáveis, nível consolidado e gatilhos de reclassificação antes da implementação. Incerteza, divergência ou novo risco sobe ao maior nível plausível.
+- Makers executam e evidenciam somente os gates proporcionais ao nível; uma feature aprovada é apenas pronta para integração, não uma autorização de lançamento.
+- A suíte completa roda na cadência definida pela política e obrigatoriamente no candidato a release. O CEO/Orquestrador não autoriza release normal sem o parecer `CANDIDATO A RELEASE APROVADO` do QA Lead para a baseline atual.
+- Quando cobertura mínima não estiver definida, ninguém inventa percentual. O QA registra a pendência no parecer; os gates qualitativos da matriz continuam exigíveis.
+- Hotfix só pode adiar a suíte completa diante de dano ativo, com incidente, urgência, escopo mínimo, risco residual, responsável e revalidação registrados. Persistência, integração externa, operações irreversíveis e I3 exigem rollback verificável antes da autorização.
+
+### 5.1 Localização Canônica da Documentação
+
+Toda documentação compartilhada do projeto deve ficar em `.specs/project/`:
+
+- `PROJECT.md` — contexto, arquitetura e stack;
+- `TESTING.md` — política de testes e cobertura;
+- `GUIDES.md` — guias de desenvolvimento;
+- `DESIGN-SYSTEM.md` — decisões de design system.
+- `ROADMAP.md`, `CONSTITUTION.md` e `adrs/` — direcionamento estratégico e decisões arquiteturais.
+
+Especificações de uma entrega permanecem em `.specs/features/<feature>/`. Em repositórios existentes, preserve documentos legados e não crie uma segunda fonte de verdade sem uma migração explícita.
+
+---
+
+## 6. Princípios de Trade-Off (Startup Principles)
+
+1. **Progresso sobre Perfeição** — Entregue valor incremental (Fast-Track para coisas simples).
+2. **Especifique antes de Codificar** — Para features complexas, o contrato é inegociável.
+3. **Separe Maker de Checker** — Quem escreve código não pode dar "Go" para release.
+4. **Autoridade de Domínio** — Deixe a engenharia decidir engenharia e o produto decidir produto. Poupe o fundador.
+5. **Contexto Fresco** — O QA Lead não deve ler o histórico de pensamento do Maker para não contaminar seu viés.
+
+---
+
+## 7. Inicialização do Projeto
+
+Ao iniciar um novo projeto no Startup OS, executar na ordem:
+1. Definir a **Constituição** do projeto (propósito e público).
+2. Oferecer a definição opcional de **Arquitetura e Stack**. O fluxo respeita preferências técnicas existentes ou conduz um discovery curto, apresenta duas alternativas e registra somente a escolha do fundador em `.specs/project/PROJECT.md`.
+3. Criar **Guias de Desenvolvimento**.
+4. Executar **Deep Research** (se necessário).
+5. Iniciar o desenvolvimento usando a Orquestração do CEO.
+<!-- startupos-governance:end -->

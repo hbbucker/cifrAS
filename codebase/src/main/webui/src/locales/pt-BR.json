@@ -166,7 +166,15 @@
     "moveUp": "Mover para cima",
     "moveDown": "Mover para baixo",
     "searchPlaceholder": "Buscar por título ou artista...",
-    "confirmRemoveSong": "Remover esta música da playlist?"
+    "confirmRemoveSong": "Remover esta música da playlist?",
+    "noMatchingSongs": "Nenhuma música encontrada.",
+    "failedLoadPlaylist": "Falha ao carregar playlist",
+    "failedFetchLibrary": "Falha ao buscar músicas",
+    "failedReorder": "Falha ao reordenar playlist",
+    "songRemoved": "Música removida da playlist",
+    "failedRemoveSong": "Falha ao remover música",
+    "songAdded": "Música adicionada à playlist",
+    "failedAddSong": "Falha ao adicionar música"
   },
   "sharedWithMe": {
     "noPlaylists": "Nenhuma playlist compartilhada com você ainda.",
@@ -243,5 +251,28 @@
     "pitchPersistence": "Persistência de Tom: os tons agora ficam salvos no seu browser.",
     "theaterMode": "Modo Teatro: maximize a letra para usar no palco.",
     "button": "Entendi!"
+  },
+  "songSharing": {
+    "shareSong": "Compartilhar Música",
+    "shareDesc": "Informe o e-mail de um usuário cadastrado para compartilhar esta música.",
+    "emailLabel": "E-mail do Destinatário",
+    "emailPlaceholder": "usuario@exemplo.com",
+    "sendInvite": "Enviar Cifra",
+    "sending": "Enviando...",
+    "shareSuccess": "Convite de compartilhamento enviado com sucesso!",
+    "userNotFound": "Nenhum usuário encontrado com este e-mail.",
+    "selfShareError": "Você não pode compartilhar uma música com você mesmo.",
+    "conflictError": "Esta música já foi compartilhada com este usuário e está pendente.",
+    "generalError": "Falha ao compartilhar a música. Tente novamente.",
+    "receivedSongs": "Músicas Recebidas",
+    "pendingBadge": "Pendente",
+    "sharedBy": "Enviado por: {{email}}",
+    "accept": "Aceitar",
+    "accepting": "Aceitando...",
+    "decline": "Recusar",
+    "declining": "Recusando...",
+    "acceptSuccess": "Música adicionada ao seu repertório!",
+    "declineSuccess": "Compartilhamento recusado.",
+    "noPendingSongs": "Você não possui nenhuma música compartilhada pendente."
   }
 }

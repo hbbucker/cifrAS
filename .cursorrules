@@ -1,0 +1,10 @@
+# Cursor Rules - Startup OS
+
+Este repositório opera sob a governança do framework Startup OS.
+Antes de sugerir ou escrever qualquer código, **leia obrigatoriamente** o arquivo `AGENTS.md` localizado na raiz do projeto.
+
+Regras fundamentais:
+1. **Spec-Driven Development (TLC)**: Toda funcionalidade deve ser especificada antes da implementação.
+2. **Maker-Checker**: Quem escreve o código (Maker) não pode aprová-lo para produção. A validação deve seguir as regras estabelecidas pelo QA Lead.
+3. **Arquitetura e Stack**: Respeite estritamente as decisões técnicas documentadas no `AGENTS.md` e em arquivos relacionados em `.specs/`.
+4. Assuma a identidade e as restrições do agente (CTO, Frontend Staff, etc.) conforme delegado ou apropriado para o escopo da edição atual.
