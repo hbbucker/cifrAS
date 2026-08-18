@@ -120,23 +120,23 @@ export const GroupMembersSection: React.FC<GroupMembersSectionProps> = ({
   const getRoleBadge = (memberRole: string) => {
     if (memberRole === 'OWNER') {
       return (
-        <span className="flex items-center gap-1 text-[11px] sm:text-xs font-semibold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-[#8629cc]/15 text-[#8629cc] border border-[#8629cc]/30 shrink-0">
-          <ShieldCheck className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
+        <span className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-semibold px-2.5 py-1 rounded-full bg-[#8629cc]/15 text-[#8629cc] border border-[#8629cc]/30 shrink-0">
+          <ShieldCheck className="w-3.5 h-3.5" />
           {t('group.members.roles.owner')}
         </span>
       );
     }
     if (memberRole === 'ADMIN') {
       return (
-        <span className="flex items-center gap-1 text-[11px] sm:text-xs font-semibold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 shrink-0">
-          <Shield className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
+        <span className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 shrink-0">
+          <Shield className="w-3.5 h-3.5" />
           {t('group.members.roles.admin')}
         </span>
       );
     }
     return (
-      <span className="flex items-center gap-1 text-[11px] sm:text-xs font-medium px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 shrink-0">
-        <User className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
+      <span className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-medium px-2.5 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 shrink-0">
+        <User className="w-3.5 h-3.5" />
         {t('group.members.roles.member')}
       </span>
     );
@@ -152,14 +152,14 @@ export const GroupMembersSection: React.FC<GroupMembersSectionProps> = ({
   };
 
   return (
-    <div className="bg-bg-card rounded-2xl border border-border-main p-4 sm:p-6 space-y-6 sm:space-y-8 min-w-0">
+    <div className="bg-bg-card rounded-2xl border border-border-main p-3.5 sm:p-6 space-y-5 sm:space-y-8 min-w-0">
       {/* Header with Members count and Invite Button */}
-      <div className="flex flex-row justify-between items-center gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="min-w-0">
           <h2 className="text-lg sm:text-xl font-bold text-text-main flex items-center gap-2 flex-wrap">
             <span>{t('group.members.title')}</span>
             {!loading && (
-              <span className="text-xs sm:text-sm font-normal text-text-mute px-2 py-0.5 rounded-full bg-bg-main border border-border-main">
+              <span className="text-xs sm:text-sm font-normal text-text-mute px-2.5 py-0.5 rounded-full bg-bg-main border border-border-main">
                 {members.length === 1
                   ? t('group.members.count_one', { count: 1 })
                   : t('group.members.count_other', { count: members.length })}
@@ -169,10 +169,14 @@ export const GroupMembersSection: React.FC<GroupMembersSectionProps> = ({
         </div>
 
         {role === 'Admin' && (
-          <Button onClick={onInviteNew} size="sm" data-testid="invite-member-btn" className="min-h-[40px] sm:min-h-[44px] px-3 sm:px-4 text-xs sm:text-sm shrink-0">
-            <UserPlus className="w-4 h-4 mr-1 sm:mr-1.5" />
-            <span className="hidden sm:inline">{t('group.invite')}</span>
-            <span className="sm:hidden">{t('groups.create')}</span>
+          <Button 
+            onClick={onInviteNew} 
+            size="sm" 
+            data-testid="invite-member-btn" 
+            className="w-full sm:w-auto min-h-[44px] px-4 text-xs sm:text-sm shrink-0 flex items-center justify-center font-medium"
+          >
+            <UserPlus className="w-4 h-4 mr-2" />
+            <span>{t('group.invite')}</span>
           </Button>
         )}
       </div>
@@ -189,7 +193,7 @@ export const GroupMembersSection: React.FC<GroupMembersSectionProps> = ({
           {t('group.members.empty')}
         </div>
       ) : (
-        <div className="flex flex-col gap-2.5 sm:gap-3">
+        <div className="flex flex-col gap-3">
           {members.map((member) => {
             const isSelf = member.userId === user?.id;
             const canRemove = role === 'Admin' && member.role !== 'OWNER' && !isSelf;
@@ -197,11 +201,12 @@ export const GroupMembersSection: React.FC<GroupMembersSectionProps> = ({
             return (
               <div
                 key={member.id || member.userId}
-                className="flex items-center justify-between p-3 sm:p-4 border border-border-main rounded-2xl bg-bg-card hover:bg-bg-main/50 transition-colors gap-2 sm:gap-3"
+                className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 sm:p-4 border border-border-main rounded-2xl bg-bg-card hover:bg-bg-main/50 transition-colors gap-3"
                 data-testid={`member-row-${member.userId}`}
               >
-                <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#8629cc]/15 text-[#8629cc] flex items-center justify-center font-bold text-xs sm:text-sm shrink-0">
+                {/* Member Info */}
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <div className="w-10 h-10 rounded-full bg-[#8629cc]/15 text-[#8629cc] flex items-center justify-center font-bold text-xs sm:text-sm shrink-0">
                     {getInitials(member.name, member.email)}
                   </div>
                   <div className="min-w-0 flex-1">
@@ -219,32 +224,37 @@ export const GroupMembersSection: React.FC<GroupMembersSectionProps> = ({
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+                {/* Role Badge and Actions */}
+                <div className="flex items-center justify-between sm:justify-end gap-2.5 shrink-0 pt-2.5 sm:pt-0 border-t border-border-main/40 sm:border-t-0">
                   {getRoleBadge(member.role)}
 
-                  {canRemove && (
-                    <button
-                      onClick={() => setSelectedMemberToRemove(member)}
-                      className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors shrink-0"
-                      title={t('group.members.removeMember')}
-                      data-testid={`remove-member-btn-${member.userId}`}
-                      aria-label={t('group.members.removeMember')}
-                    >
-                      <UserMinus className="w-4 h-4" />
-                    </button>
-                  )}
+                  <div className="flex items-center gap-1.5">
+                    {canRemove && (
+                      <button
+                        onClick={() => setSelectedMemberToRemove(member)}
+                        className="min-h-[36px] sm:min-h-[40px] px-2.5 sm:px-3 py-1.5 flex items-center gap-1.5 text-xs font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors shrink-0"
+                        title={t('group.members.removeMember')}
+                        data-testid={`remove-member-btn-${member.userId}`}
+                        aria-label={t('group.members.removeMember')}
+                      >
+                        <UserMinus className="w-4 h-4" />
+                        <span className="sm:hidden">{t('group.members.removeMember')}</span>
+                      </button>
+                    )}
 
-                  {isSelf && member.role !== 'OWNER' && (
-                    <button
-                      onClick={() => setShowLeaveModal(true)}
-                      className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors shrink-0"
-                      title={t('group.members.leaveGroup')}
-                      data-testid="leave-group-btn"
-                      aria-label={t('group.members.leaveGroup')}
-                    >
-                      <LogOut className="w-4 h-4" />
-                    </button>
-                  )}
+                    {isSelf && member.role !== 'OWNER' && (
+                      <button
+                        onClick={() => setShowLeaveModal(true)}
+                        className="min-h-[36px] sm:min-h-[40px] px-2.5 sm:px-3 py-1.5 flex items-center gap-1.5 text-xs font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors shrink-0"
+                        title={t('group.members.leaveGroup')}
+                        data-testid="leave-group-btn"
+                        aria-label={t('group.members.leaveGroup')}
+                      >
+                        <LogOut className="w-4 h-4" />
+                        <span className="sm:hidden">{t('group.members.leaveGroup')}</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             );
@@ -268,7 +278,7 @@ export const GroupMembersSection: React.FC<GroupMembersSectionProps> = ({
               {invitations.map((inv) => (
                 <div
                   key={inv.id}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-3.5 border border-border-main rounded-2xl bg-bg-main/40 gap-2 sm:gap-3"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 sm:p-4 border border-border-main rounded-2xl bg-bg-main/40 gap-3"
                   data-testid={`invite-row-${inv.id}`}
                 >
                   <div className="min-w-0 flex-1">
@@ -292,7 +302,7 @@ export const GroupMembersSection: React.FC<GroupMembersSectionProps> = ({
 
                   <button
                     onClick={() => handleCancelInvite(inv.id)}
-                    className="self-end sm:self-auto text-xs font-medium px-3 py-1.5 min-h-[36px] sm:min-h-[40px] flex items-center justify-center rounded-xl border border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900/40 dark:text-red-400 dark:hover:bg-red-950/30 transition-colors shrink-0"
+                    className="w-full sm:w-auto text-xs font-medium px-4 py-2 min-h-[38px] sm:min-h-[40px] flex items-center justify-center rounded-xl border border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900/40 dark:text-red-400 dark:hover:bg-red-950/30 transition-colors shrink-0"
                     data-testid={`cancel-invite-btn-${inv.id}`}
                   >
                     {inv.status === 'PENDING' ? t('group.invitations.cancel') : t('group.invitations.dismiss')}
