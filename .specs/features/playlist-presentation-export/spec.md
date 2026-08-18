@@ -56,8 +56,9 @@ O sistema processa a estrutura de letras (`LyricsStructure`) de todas as música
 1. **Permissões de Acesso:**
    - **Playlists Privadas:** Apenas o dono da playlist pode visualizar e gerar slides.
    - **Playlists Compartilhadas / de Grupo:** Qualquer membro autenticado do grupo associado à playlist pode visualizar e gerar slides.
-2. **Desacoplamento de Cifras:**
-   - As letras nos slides e no texto copiado NUNCA devem conter símbolos de acordes (`C`, `G/B`, `Am7`, etc.), barras de compasso soltas ou marcações estruturais que poluam a leitura da congregação.
+2. **Desacoplamento de Cifras, Tablaturas e Diagramas de Ritmo:**
+   - As letras nos slides e no texto copiado NUNCA devem conter símbolos de acordes (`C`, `G/B`, `Am7`, etc.), linhas de tablatura (`e|---`, `1|---`), diagramas de ritmo/batida (`↓ ↑ ↓ ↑`), padrões de dedilhado (`P I M A`) ou marcações estruturais que poluam a leitura da congregação. Seções puramente instrumentais/tablatura devem ser descartadas.
+   - Detalhes específicos de sanitização e heurísticas encontram-se documentados na microespecificação: [`micro-spec-tabs-cleanup.md`](micro-spec-tabs-cleanup.md).
 3. **Paginação Inteligente por Slide:**
    - Cada seção (`[Verso]`, `[Refrão]`, `[Ponte]`) deve ser respeitada como unidade lógica.
    - Limite máximo de **4 a 6 linhas por slide** para garantir fonte grande (36 a 44pt) e legibilidade a distância.
@@ -80,12 +81,12 @@ O sistema processa a estrutura de letras (`LyricsStructure`) de todas as música
 - [ ] **AC-01:** O botão "Gerar Slides" está visível no cabeçalho da página `PlaylistViewPage` tanto para playlists privadas quanto colaborativas.
 - [ ] **AC-02:** Clicar no botão abre o modal `ExportPlaylistPresentationModal` exibindo a lista de músicas, opções de tema e botões de ação.
 - [ ] **AC-03:** Clicar em "Baixar PowerPoint (.pptx)" dispara o download de um arquivo `.pptx` válido na proporção 16:9.
-- [ ] **AC-04:** Os slides gerados NÃO contêm cifras ou acordes musicais, exibindo apenas o texto das letras limpas.
+- [ ] **AC-04:** Os slides gerados NÃO contêm cifras, acordes musicais, linhas de tablatura (`e|---`, `B|---`, etc.) ou diagramas de ritmo/dedilhado (`↓ ↑ ↓ ↑`, `P I M A`), exibindo apenas o texto das letras limpas.
 - [ ] **AC-05:** Os slides respeitam a paginação com no máximo 6 linhas por slide e tamanho de fonte adequado para projeção ($\ge 36\text{pt}$).
 - [ ] **AC-06:** Se o usuário desmarcar uma música na lista do modal, essa música não é incluída no `.pptx` gerado.
-- [ ] **AC-07:** A ação "Copiar Todas as Letras" copia o texto puro de todas as músicas selecionadas para o Clipboard.
+- [ ] **AC-07:** A ação "Copiar Todas as Letras" copia o texto puro de todas as músicas selecionadas para o Clipboard sem cifras, tablaturas ou diagramas de ritmo.
 - [ ] **AC-08:** O layout e temas (Dark, Light, Litúrgico) aplicam corretamente as cores de fundo e texto configuradas.
-- [ ] **AC-09:** A aplicação não quebra quando uma música possui letra vazia ou apenas introdução instrumental.
+- [ ] **AC-09:** A aplicação não quebra quando uma música possui letra vazia ou apenas introdução instrumental/tablatura, exibindo aviso amigável de instrumental.
 - [ ] **AC-10:** Todas as strings da interface utilizam hooks do `react-i18next` sem textos hardcoded.
 
 ---
@@ -95,3 +96,4 @@ O sistema processa a estrutura de letras (`LyricsStructure`) de todas as música
 - **Nível Consolidado:** **I1** (Feature de apresentação isolada sem migrações de banco destrutivas).
 - **Sinais:** Inclusão de componente modal, utilitário client-side de geração de PowerPoint (`pptxgenjs`), enriquecimento do DTO de playlist se necessário, 100% coberto por testes unitários e de integração.
 - **Gates Exigidos:** Suíte unitária do backend e frontend $\ge 90\%$ no diff, validação de renderização dos slides e lint/build 100% limpos.
+

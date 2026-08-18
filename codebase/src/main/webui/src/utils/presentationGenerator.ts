@@ -68,6 +68,117 @@ const THEME_STYLES: Record<
 };
 
 /**
+ * Detects if a line is a guitar/bass tablature line.
+ */
+export function isTabLine(line: string): boolean {
+  const trimmed = line.trim();
+  if (!trimmed) return false;
+
+  // 1. Standard string tuning notation prefix: e.g. "e|", "B|", "G|", "D|", "A|", "E|", "1|", "6|", "Eb|", "F#|", "C# |", "e |", etc.
+  if (/^([eBGDAEa-g][#b]?|[1-6])\s*\|/i.test(trimmed)) {
+    return true;
+  }
+
+  // 2. Line starting with pipe '|' and composed of dashes, numbers, tab notation
+  if (/^\|[-0-9/\\~hpsxX|b\s()—]+$/i.test(trimmed) && (trimmed.match(/[-—]/g)?.length || 0) >= 2) {
+    return true;
+  }
+
+  // 3. Tab line without leading pipe, starting with dashes: e.g. "---0-2-3---"
+  if (/^[-—]{2,}[-0-9/\\~hpsxX|b\s()—]+$/i.test(trimmed) && (trimmed.match(/[-—]/g)?.length || 0) >= 3) {
+    return true;
+  }
+
+  // 4. Line with multiple pipes and high concentration of dashes/fret numbers
+  if (trimmed.includes('|') && (trimmed.match(/[-—]/g)?.length || 0) >= 4) {
+    const withoutTabChars = trimmed.replace(/[-—0-9/\\~hpsxX|b\s()]/gi, '');
+    if (withoutTabChars.length === 0) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Detects if a line represents strumming patterns, rhythm directions, or fingerpicking diagrams.
+ */
+export function isStrummingOrRhythmLine(line: string): boolean {
+  const trimmed = line.trim();
+  if (!trimmed) return false;
+
+  // 1. Explicit rhythm/strumming/fingerpicking prefix:
+  if (
+    /^(ritmo|batida|dedilhado|dedilhado\/ritmo|strumming|strum|rhythm|compasso|fingerpicking)\b\s*[:\-–—]/i.test(
+      trimmed
+    )
+  ) {
+    return true;
+  }
+
+  // 2. Pure arrow or direction symbols:
+  if (
+    /^[\s↓↑⬇⬆▲▼<>v^|\-.*·•()]+$/i.test(trimmed) &&
+    /[↓↑⬇⬆▲▼]/.test(trimmed)
+  ) {
+    return true;
+  }
+
+  // 3. Strumming notation with carets and v's only:
+  if (/^[\sv^|\-.*·•()]+$/i.test(trimmed) && (trimmed.match(/[v^]/gi)?.length || 0) >= 2) {
+    return true;
+  }
+
+  // 4. Classical fingerpicking notation: "P I M A", "P I M A I M", "P - I - M - A"
+  if (/^([PIMA][\s\-–—.*·•,]*){3,}$/i.test(trimmed)) {
+    return true;
+  }
+
+  // 5. Strumming direction notation: "D U D U", "D D U U D U", "B D D U D U", "B C B C"
+  if (/^([DUBC][\s\-–—/|.*·•]*){4,}$/i.test(trimmed)) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Detects if a line is composed purely or predominantly of chord notations.
+ */
+export function isChordOnlyLine(line: string): boolean {
+  const trimmed = line.trim();
+  if (!trimmed) return false;
+
+  const chordRegex = /^([A-G][#b]?)([mM0-9]|maj|min|dim|aug|sus|add|\+|-|º|°|ø|b|#)*(\([^)]+\))*(\/([A-G][#b]?|[0-9]+))?$/;
+  const markerRegex = /^(\|:|:\||\||%|-|~|\(\d+x\)|\d+x|intro:?|solo:?|riff:?|base:?|interlúdio:?|interlude:?|fim:?|final:?)$/i;
+
+  const tokens = trimmed.split(/\s+/).filter(Boolean);
+  if (tokens.length === 0) return false;
+
+  let chordCount = 0;
+  let evaluatedTokens = 0;
+
+  for (const token of tokens) {
+    const cleanToken = token.replace(/^[([]+|[)\].,;]+$/g, '');
+
+    if (markerRegex.test(token) || markerRegex.test(cleanToken)) {
+      continue;
+    }
+
+    evaluatedTokens++;
+    if (chordRegex.test(token) || (cleanToken.length > 0 && chordRegex.test(cleanToken))) {
+      chordCount++;
+    }
+  }
+
+  if (evaluatedTokens === 0) {
+    return true;
+  }
+
+  return chordCount / evaluatedTokens >= 0.5;
+}
+
+/**
  * Extracts clean, chord-free sections and lyrics text from a song.
  */
 export function extractCleanLyricsSections(song: SongForPresentation): ParsedSection[] {
@@ -80,6 +191,13 @@ export function extractCleanLyricsSections(song: SongForPresentation): ParsedSec
         for (const line of section.lines) {
           const rawText = line.text?.trim();
           if (rawText && rawText.length > 0) {
+            if (
+              isTabLine(rawText) ||
+              isStrummingOrRhythmLine(rawText) ||
+              isChordOnlyLine(rawText)
+            ) {
+              continue;
+            }
             cleanLines.push(rawText);
           }
         }
@@ -112,15 +230,15 @@ export function extractCleanLyricsSections(song: SongForPresentation): ParsedSec
         continue;
       }
 
-      // Check if it's likely a chord line
-      const chordRegex = /^([A-G][#b]?)([mM0-9]|maj|min|dim|aug|sus|add|\+|-|º|°)*(\([^)]+\))*(\/[A-G][#b]?([mM0-9]|maj|min|dim|aug|sus|add|\+|-|º|°)*(\([^)]+\))*)?$/;
-      const tokens = trimmed.split(/\s+/).filter(Boolean);
-      const chordCount = tokens.filter(t => chordRegex.test(t) || t === '|').length;
-      const isChordLine = tokens.length > 0 && chordCount / tokens.length > 0.5;
-
-      if (!isChordLine) {
-        currentLines.push(trimmed);
+      if (
+        isTabLine(trimmed) ||
+        isStrummingOrRhythmLine(trimmed) ||
+        isChordOnlyLine(trimmed)
+      ) {
+        continue;
       }
+
+      currentLines.push(trimmed);
     }
 
     if (currentLines.length > 0) {
