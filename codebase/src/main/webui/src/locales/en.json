@@ -174,7 +174,32 @@
     "songRemoved": "Song removed from playlist",
     "failedRemoveSong": "Failed to remove song",
     "songAdded": "Song added to playlist",
-    "failedAddSong": "Failed to add song"
+    "failedAddSong": "Failed to add song",
+    "generateSlides": "Generate Slides",
+    "noSongsToExport": "Add songs to playlist to generate slides"
+  },
+  "playlistPresentation": {
+    "generateSlides": "Generate Slides",
+    "exportPresentation": "Export Presentation",
+    "modalTitle": "Presentation Slides (.pptx)",
+    "modalSubtitle": "Generate clean, chord-free slides for projection and screens",
+    "selectSongs": "Songs to include",
+    "selectAll": "Select all",
+    "deselectAll": "Deselect all",
+    "optionsTitle": "Presentation Options",
+    "theme": "Color Theme",
+    "themeDark": "Screen / Dark (High Contrast)",
+    "themeLight": "Light / Clean (White Background)",
+    "themeLiturgic": "Liturgic / Solemn (Midnight Blue)",
+    "includeCover": "Playlist opening cover slide",
+    "includeSongTitles": "Song title slide before each song",
+    "downloadPptx": "Download PowerPoint (.pptx)",
+    "generating": "Generating slides...",
+    "copyLyrics": "Copy Clean Lyrics",
+    "copySuccess": "Lyrics copied to clipboard!",
+    "exportSuccess": "Presentation downloaded successfully!",
+    "exportError": "Failed to generate presentation slides.",
+    "noSongsSelected": "Please select at least one song."
   },
   "sharedWithMe": {
     "noPlaylists": "No playlists shared with you yet.",

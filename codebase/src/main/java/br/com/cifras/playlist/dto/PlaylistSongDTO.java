@@ -3,6 +3,7 @@ package br.com.cifras.playlist.dto;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
 import br.com.cifras.playlist.model.PlaylistSong;
+import br.com.cifras.song.model.LyricsStructure;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -12,6 +13,7 @@ public record PlaylistSongDTO(
     String title,
     String artist,
     String originalKey,
+    LyricsStructure lyrics,
     int position,
     Instant addedAt
 ) {
@@ -21,6 +23,7 @@ public record PlaylistSongDTO(
             ps.getSong().getTitle(),
             ps.getSong().getArtist(),
             ps.getSong().getOriginalKey(),
+            ps.getSong().getLyrics(),
             ps.getPosition(),
             ps.getSong().getCreatedAt() // just to have a date
         );

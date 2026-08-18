@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
-import { ArrowLeft, PlayCircle, GripVertical, Trash2, ChevronUp, ChevronDown, Plus, Search } from 'lucide-react';
+import { ArrowLeft, PlayCircle, GripVertical, Trash2, ChevronUp, ChevronDown, Plus, Search, Presentation } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useToast } from '../context/ToastContext';
+import { ExportPlaylistPresentationModal } from '../components/modals/ExportPlaylistPresentationModal';
+import type { SongForPresentation } from '../utils/presentationGenerator';
 
 interface SongData {
  id: string;
@@ -37,6 +39,7 @@ export const PlaylistViewPage: React.FC = () => {
  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
  const [searchQuery, setSearchQuery] = useState('');
  const [isSearching, setIsSearching] = useState(false);
+ const [showPresentationModal, setShowPresentationModal] = useState(false);
 
  const availableSongs = allSongs.filter(s => !songs.some(ps => ps.id === s.id));
 
@@ -189,6 +192,22 @@ export const PlaylistViewPage: React.FC = () => {
                 <span className="hidden sm:inline">{t('playlistView.addSong')}</span>
               </button>
             )}
+            <button 
+              onClick={() => {
+                if (songs.length === 0) {
+                  toast(t('playlistView.noSongsToExport'), 'error');
+                  return;
+                }
+                setShowPresentationModal(true);
+              }}
+              className="flex items-center justify-center gap-1.5 bg-[#aa3bff] hover:bg-[#9926f0] text-white px-3 sm:px-4 py-2 sm:py-2.5 min-h-[38px] sm:min-h-[44px] rounded-lg font-bold text-xs sm:text-sm transition-colors shadow-xs"
+              data-testid="export-presentation-btn"
+              title={t('playlistPresentation.generateSlides')}
+              aria-label={t('playlistPresentation.generateSlides')}
+            >
+              <Presentation className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="hidden sm:inline">{t('playlistPresentation.generateSlides')}</span>
+            </button>
             <button 
               onClick={() => navigate(`/theater/${id}`)}
               className="flex items-center justify-center gap-1.5 bg-[#10B981] hover:bg-[#059669] text-white px-3 sm:px-5 py-2 sm:py-2.5 min-h-[38px] sm:min-h-[44px] rounded-lg font-bold text-xs sm:text-sm transition-colors shadow-lg shadow-emerald-500/20"
@@ -389,6 +408,12 @@ export const PlaylistViewPage: React.FC = () => {
           </div>
         </div>
       )}
+      <ExportPlaylistPresentationModal
+        isOpen={showPresentationModal}
+        playlistTitle={playlist?.name || 'Playlist'}
+        songs={songs as unknown as SongForPresentation[]}
+        onClose={() => setShowPresentationModal(false)}
+      />
     </>
- );
+  );
 };

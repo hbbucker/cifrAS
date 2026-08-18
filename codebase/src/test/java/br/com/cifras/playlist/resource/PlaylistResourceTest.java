@@ -12,12 +12,13 @@ import static org.hamcrest.Matchers.*;
 
 /**
  * T12: PlaylistResource REST integration tests
- * Tests: 5
+ * Tests: 6
  * 1. POST /playlists → 201 with PlaylistDTO
  * 2. GET /playlists → 200 with list
- * 3. POST /playlists/{id}/songs → 204 song added
- * 4. DELETE /playlists/{id}/songs/{songId} → 204 song removed
- * 5. PATCH /playlists/{id}/songs/reorder → 204 songs reordered
+ * 3. GET /playlists/{id} → 200 with details and songs
+ * 4. POST /playlists/{id}/songs → 204 song added
+ * 5. DELETE /playlists/{id}/songs/{songId} → 204 song removed
+ * 6. PATCH /playlists/{id}/songs/reorder → 204 songs reordered
  */
 import br.com.cifras.BaseIntegrationTest;
 
@@ -39,7 +40,7 @@ class PlaylistResourceTest extends BaseIntegrationTest {
     private java.util.UUID createSong(String title) {
         String idStr = given()
             .contentType(ContentType.JSON)
-            .body("{\"title\":\"" + title + "\",\"artist\":\"Artist\",\"originalKey\":\"C\"}")
+            .body("{\"title\":\"" + title + "\",\"artist\":\"Artist\",\"originalKey\":\"C\",\"lyrics\":{\"sections\":[{\"label\":\"Verso\",\"lines\":[{\"chords\":[],\"text\":\"Letra de teste\"}]}]}}")
             .when().post("/songs")
             .then().statusCode(201)
             .extract().path("id");
@@ -76,7 +77,33 @@ class PlaylistResourceTest extends BaseIntegrationTest {
     }
 
     /**
-     * Test 3: POST /playlists/{id}/songs adds a song (204).
+     * Test 3: GET /playlists/{id} returns 200 with details and songs including lyrics.
+     */
+    @Test
+    @TestSecurity(user = OWNER, roles = {"user"})
+    void givenPlaylistWithSong_whenGetById_thenReturnsDetailsWithSongLyrics() {
+        java.util.UUID playlistId = createPlaylist("Set for Details");
+        java.util.UUID songId = createSong("Song with Lyrics");
+
+        given()
+            .contentType(ContentType.JSON)
+            .body("{\"songId\":\"" + songId + "\",\"position\":0}")
+            .when().post("/playlists/" + playlistId + "/songs")
+            .then().statusCode(204);
+
+        given()
+            .when().get("/playlists/" + playlistId)
+            .then()
+            .statusCode(200)
+            .body("id", equalTo(playlistId.toString()))
+            .body("songs", hasSize(1))
+            .body("songs[0].id", equalTo(songId.toString()))
+            .body("songs[0].lyrics.sections", hasSize(1))
+            .body("songs[0].lyrics.sections[0].lines[0].text", equalTo("Letra de teste"));
+    }
+
+    /**
+     * Test 4: POST /playlists/{id}/songs adds a song (204).
      */
     @Test
     @TestSecurity(user = OWNER, roles = {"user"})
@@ -92,7 +119,7 @@ class PlaylistResourceTest extends BaseIntegrationTest {
     }
 
     /**
-     * Test 4: DELETE /playlists/{id}/songs/{songId} removes the song (204).
+     * Test 5: DELETE /playlists/{id}/songs/{songId} removes the song (204).
      */
     @Test
     @TestSecurity(user = OWNER, roles = {"user"})
@@ -111,7 +138,7 @@ class PlaylistResourceTest extends BaseIntegrationTest {
     }
 
     /**
-     * Test 5: PATCH /playlists/{id}/songs/reorder reorders songs (204).
+     * Test 6: PATCH /playlists/{id}/songs/reorder reorders songs (204).
      */
     @Test
     @TestSecurity(user = OWNER, roles = {"user"})

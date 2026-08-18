@@ -174,7 +174,32 @@
     "songRemoved": "Canción eliminada de la lista",
     "failedRemoveSong": "Error al eliminar la canción",
     "songAdded": "Canción agregada a la lista",
-    "failedAddSong": "Error al agregar la canción"
+    "failedAddSong": "Error al agregar la canción",
+    "generateSlides": "Generar Diapositivas",
+    "noSongsToExport": "Agregue canciones a la lista para generar diapositivas"
+  },
+  "playlistPresentation": {
+    "generateSlides": "Generar Diapositivas",
+    "exportPresentation": "Exportar Presentación",
+    "modalTitle": "Presentación de Diapositivas (.pptx)",
+    "modalSubtitle": "Genere diapositivas formateadas sin acordes para pantalla y proyección",
+    "selectSongs": "Canciones a incluir",
+    "selectAll": "Seleccionar todas",
+    "deselectAll": "Deseleccionar todas",
+    "optionsTitle": "Opciones de Presentación",
+    "theme": "Tema de Color",
+    "themeDark": "Pantalla / Dark (Alto Contraste)",
+    "themeLight": "Claro / Clean (Fondo Blanco)",
+    "themeLiturgic": "Litúrgico / Solemne (Azul Noche)",
+    "includeCover": "Diapositiva de portada de la lista",
+    "includeSongTitles": "Diapositiva de título antes de cada canción",
+    "downloadPptx": "Descargar PowerPoint (.pptx)",
+    "generating": "Generando diapositivas...",
+    "copyLyrics": "Copiar Letras Limpias",
+    "copySuccess": "¡Letras copiadas al portapapeles!",
+    "exportSuccess": "¡Presentación descargada con éxito!",
+    "exportError": "Error al generar la presentación de diapositivas.",
+    "noSongsSelected": "Seleccione al menos una canción."
   },
   "sharedWithMe": {
     "noPlaylists": "No hay playlists compartidas contigo aún.",

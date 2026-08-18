@@ -148,4 +148,29 @@ describe('PlaylistViewPage Component', () => {
     fireEvent.click(moveUpBtn);
     fireEvent.click(moveDownBtn);
   });
+
+  it('opens export presentation modal when Gerar Slides button is clicked', async () => {
+    render(
+      <AuthProvider>
+        <ThemeProvider>
+          <ToastProvider>
+            <MemoryRouter initialEntries={['/playlists/pl-1']}>
+              <Routes>
+                <Route path="/playlists/:id" element={<PlaylistViewPage />} />
+              </Routes>
+            </MemoryRouter>
+          </ToastProvider>
+        </ThemeProvider>
+      </AuthProvider>
+    );
+
+    expect(await screen.findByText('Minha Playlist')).toBeInTheDocument();
+
+    const exportBtn = screen.getByTestId('export-presentation-btn');
+    expect(exportBtn).toBeInTheDocument();
+    fireEvent.click(exportBtn);
+
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+  });
 });
+
