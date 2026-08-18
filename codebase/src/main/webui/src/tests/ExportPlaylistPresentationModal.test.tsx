@@ -18,7 +18,7 @@ vi.mock('react-i18next', () => ({
         'playlistPresentation.theme': 'Tema de Cores',
         'playlistPresentation.themeDark': 'Telão / Dark',
         'playlistPresentation.themeLight': 'Claro / Clean',
-        'playlistPresentation.themeLiturgic': 'Litúrgico / Solene',
+        'playlistPresentation.themeLiturgic': 'Litúrgico',
         'playlistPresentation.optionsTitle': 'Opções de Apresentação',
         'playlistPresentation.includeCover': 'Slide de abertura da playlist',
         'playlistPresentation.includeSongTitles': 'Slide de título antes de cada música',

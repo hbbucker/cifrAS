@@ -158,47 +158,53 @@ export const ExportPlaylistPresentationModal: React.FC<ExportPlaylistPresentatio
             <label className="text-xs font-semibold uppercase tracking-wider text-text-mute mb-2 block">
               {t('playlistPresentation.theme')}
             </label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
               <button
                 type="button"
                 onClick={() => setTheme('dark')}
-                className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border text-xs font-semibold transition-all ${
+                className={`flex flex-col items-center justify-center gap-1 py-2 px-1 sm:p-3 rounded-xl border text-center transition-all min-h-[58px] sm:min-h-[64px] ${
                   theme === 'dark'
                     ? 'border-[#aa3bff] bg-black text-white ring-2 ring-[#aa3bff]/20'
                     : 'border-border-main bg-bg-elevated/40 text-text-main hover:bg-bg-elevated'
                 }`}
                 data-testid="theme-dark-btn"
               >
-                <Moon className="w-4 h-4 text-[#aa3bff]" />
-                <span className="truncate">{t('playlistPresentation.themeDark')}</span>
+                <Moon className="w-4 h-4 text-[#aa3bff] shrink-0" />
+                <span className="text-[11px] sm:text-xs font-semibold leading-tight text-center break-words max-w-full">
+                  {t('playlistPresentation.themeDark')}
+                </span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setTheme('light')}
-                className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border text-xs font-semibold transition-all ${
+                className={`flex flex-col items-center justify-center gap-1 py-2 px-1 sm:p-3 rounded-xl border text-center transition-all min-h-[58px] sm:min-h-[64px] ${
                   theme === 'light'
                     ? 'border-[#aa3bff] bg-white text-gray-900 ring-2 ring-[#aa3bff]/20 shadow-xs'
                     : 'border-border-main bg-bg-elevated/40 text-text-main hover:bg-bg-elevated'
                 }`}
                 data-testid="theme-light-btn"
               >
-                <Sun className="w-4 h-4 text-amber-500" />
-                <span className="truncate">{t('playlistPresentation.themeLight')}</span>
+                <Sun className="w-4 h-4 text-amber-500 shrink-0" />
+                <span className="text-[11px] sm:text-xs font-semibold leading-tight text-center break-words max-w-full">
+                  {t('playlistPresentation.themeLight')}
+                </span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setTheme('liturgic')}
-                className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border text-xs font-semibold transition-all ${
+                className={`flex flex-col items-center justify-center gap-1 py-2 px-1 sm:p-3 rounded-xl border text-center transition-all min-h-[58px] sm:min-h-[64px] ${
                   theme === 'liturgic'
                     ? 'border-[#aa3bff] bg-[#0A1128] text-blue-50 ring-2 ring-[#aa3bff]/20'
                     : 'border-border-main bg-bg-elevated/40 text-text-main hover:bg-bg-elevated'
                 }`}
                 data-testid="theme-liturgic-btn"
               >
-                <Church className="w-4 h-4 text-blue-400" />
-                <span className="truncate">{t('playlistPresentation.themeLiturgic')}</span>
+                <Church className="w-4 h-4 text-blue-400 shrink-0" />
+                <span className="text-[11px] sm:text-xs font-semibold leading-tight text-center break-words max-w-full">
+                  {t('playlistPresentation.themeLiturgic')}
+                </span>
               </button>
             </div>
           </div>
@@ -232,11 +238,11 @@ export const ExportPlaylistPresentationModal: React.FC<ExportPlaylistPresentatio
 
           {/* Song Selection List */}
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-semibold uppercase tracking-wider text-text-mute">
+            <div className="flex flex-wrap items-center justify-between gap-1.5 mb-2">
+              <label className="text-xs font-semibold uppercase tracking-wider text-text-mute shrink-0">
                 {t('playlistPresentation.selectSongs')} ({selectedCount}/{songs.length})
               </label>
-              <div className="flex items-center gap-2 text-xs">
+              <div className="flex items-center gap-2 text-xs shrink-0">
                 <button
                   type="button"
                   onClick={handleSelectAll}
