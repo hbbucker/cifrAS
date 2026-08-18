@@ -297,7 +297,10 @@
     "resumeSessionPromptTitle": "¿Reanudar Sesión?",
     "resumeSessionPromptDesc": "Tienes una sesión de presentación activa para esta lista. ¿Te gustaría reanudar donde lo dejaste?",
     "startFresh": "Empezar de Cero",
-    "resume": "Reanudar"
+    "resume": "Reanudar",
+    "singerMode": "Modo Cantante",
+    "chordsMode": "Modo Acordes",
+    "singerModeDesc": "Ocultar acordes y tablaturas para enfocarse en la letra"
   },
   "linkPlaylist": {
     "shareTitle": "Compartir una Playlist",

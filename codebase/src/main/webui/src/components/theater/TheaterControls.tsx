@@ -1,33 +1,36 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Play, Pause, ChevronLeft, ChevronRight, Maximize, X, Lock, Unlock } from 'lucide-react';
+import { Play, Pause, ChevronLeft, ChevronRight, Maximize, X, Lock, Unlock, Mic } from 'lucide-react';
 import { TransposePad } from '../music/TransposePad';
 
 interface TheaterControlsProps {
- isScrolling: boolean;
- speed: number;
- currentKey: string;
- onPlayPause: () => void;
- onSpeedChange: (speed: number) => void;
- onTransposeUp: () => void;
- onTransposeDown: () => void;
- onNextSong?: () => void;
- onPrevSong?: () => void;
- onToggleFullscreen?: () => void;
- onExit?: () => void;
- onFontSizeIncrease?: () => void;
- onFontSizeDecrease?: () => void;
- className?: string;
- isLocked?: boolean;
- onLockToggle?: () => void;
+  isScrolling: boolean;
+  speed: number;
+  currentKey: string;
+  onPlayPause: () => void;
+  onSpeedChange: (speed: number) => void;
+  onTransposeUp: () => void;
+  onTransposeDown: () => void;
+  onNextSong?: () => void;
+  onPrevSong?: () => void;
+  onToggleFullscreen?: () => void;
+  onExit?: () => void;
+  onFontSizeIncrease?: () => void;
+  onFontSizeDecrease?: () => void;
+  className?: string;
+  isLocked?: boolean;
+  onLockToggle?: () => void;
+  isSingerMode?: boolean;
+  onToggleSingerMode?: () => void;
 }
 
- export const TheaterControls: React.FC<TheaterControlsProps> = ({
- isScrolling, speed, currentKey,
- onPlayPause, onSpeedChange, onTransposeUp, onTransposeDown,
- onNextSong, onPrevSong, onToggleFullscreen, onExit,
- onFontSizeIncrease, onFontSizeDecrease, className = '',
- isLocked = false, onLockToggle
+export const TheaterControls: React.FC<TheaterControlsProps> = ({
+  isScrolling, speed, currentKey,
+  onPlayPause, onSpeedChange, onTransposeUp, onTransposeDown,
+  onNextSong, onPrevSong, onToggleFullscreen, onExit,
+  onFontSizeIncrease, onFontSizeDecrease, className = '',
+  isLocked = false, onLockToggle,
+  isSingerMode = false, onToggleSingerMode
 }) => {
   const { t } = useTranslation();
 
@@ -84,52 +87,67 @@ interface TheaterControlsProps {
  {/* --- Second Row (Mobile) / Right Group (Desktop) --- */}
  <div className="flex flex-row items-center justify-between w-full md:w-auto gap-2 md:gap-6 overflow-x-auto no-scrollbar py-1">
  
- {!isLocked && (
- <>
- {/* Transpose */}
- <div className="shrink-0">
- <TransposePad currentKey={currentKey} onTransposeDown={onTransposeDown} onTransposeUp={onTransposeUp} />
- </div>
+        {!isLocked && (
+          <>
+            {/* Transpose - only when not in Singer Mode */}
+            {!isSingerMode && (
+              <>
+                <div className="shrink-0">
+                  <TransposePad currentKey={currentKey} onTransposeDown={onTransposeDown} onTransposeUp={onTransposeUp} />
+                </div>
+                <div className="w-px h-6 bg-border-main shrink-0" />
+              </>
+            )}
+            
+            {/* Font Size */}
+            <div className="flex items-center gap-0.5 shrink-0">
+              <button onClick={onFontSizeDecrease} className="p-2 hover:bg-bg-elevated rounded-lg transition-colors text-text-mute hover:text-text-main font-bold" title={t('theater.decreaseFont')} data-testid="decrease-font-btn">
+                {t('theater.aMinus')}
+              </button>
+              <button onClick={onFontSizeIncrease} className="p-2 hover:bg-bg-elevated rounded-lg transition-colors text-text-mute hover:text-text-main font-bold text-lg" title={t('theater.increaseFont')} data-testid="increase-font-btn">
+                {t('theater.aPlus')}
+              </button>
+            </div>
 
- <div className="w-px h-6 bg-border-main shrink-0" />
- 
- {/* Font Size */}
- <div className="flex items-center gap-0.5 shrink-0">
- <button onClick={onFontSizeDecrease} className="p-2 hover:bg-bg-elevated rounded-lg transition-colors text-text-mute hover:text-text-main font-bold" title={t('theater.decreaseFont')} data-testid="decrease-font-btn">
- {t('theater.aMinus')}
- </button>
- <button onClick={onFontSizeIncrease} className="p-2 hover:bg-bg-elevated rounded-lg transition-colors text-text-mute hover:text-text-main font-bold text-lg" title={t('theater.increaseFont')} data-testid="increase-font-btn">
- {t('theater.aPlus')}
- </button>
- </div>
+            <div className="w-px h-6 bg-border-main shrink-0" />
+          </>
+        )}
 
- <div className="w-px h-6 bg-border-main shrink-0" />
- </>
- )}
+        {/* Display Options */}
+        <div className="flex items-center gap-1 shrink-0">
+          {!isLocked && (
+            <button 
+              onClick={onToggleSingerMode}
+              className={`p-2.5 md:p-3 hover:bg-bg-elevated rounded-full transition-colors ${isSingerMode ? 'bg-[#8629cc]/15 text-[#8629cc] ring-1 ring-[#8629cc]/30' : 'text-text-mute hover:text-text-main'}`}
+              title={isSingerMode ? t('theater.chordsMode') : t('theater.singerMode')} 
+              aria-label={isSingerMode ? t('theater.chordsMode') : t('theater.singerMode')}
+              data-testid="singer-mode-btn"
+            >
+              <Mic className="w-5 h-5" />
+            </button>
+          )}
 
- {/* Display Options */}
- <div className="flex items-center gap-1 shrink-0">
- <button 
- onClick={onLockToggle}
- className={`p-2.5 md:p-3 hover:bg-bg-elevated rounded-full transition-colors ${isLocked ? 'text-[#8629cc]' : 'text-text-mute hover:text-text-main'}`}
- title={isLocked ? t('theater.unlock') : t('theater.lock')} 
- data-testid="lock-mode-btn"
- >
- {/* Using lucide icons, Lock / Unlock */}
- {isLocked ? <Lock className="w-5 h-5" /> : <Unlock className="w-5 h-5" />}
- </button>
+          <button 
+            onClick={onLockToggle}
+            className={`p-2.5 md:p-3 hover:bg-bg-elevated rounded-full transition-colors ${isLocked ? 'text-[#8629cc]' : 'text-text-mute hover:text-text-main'}`}
+            title={isLocked ? t('theater.unlock') : t('theater.lock')} 
+            data-testid="lock-mode-btn"
+          >
+            {/* Using lucide icons, Lock / Unlock */}
+            {isLocked ? <Lock className="w-5 h-5" /> : <Unlock className="w-5 h-5" />}
+          </button>
 
- {!isLocked && (
- <button onClick={onToggleFullscreen} className="p-2.5 md:p-3 hover:bg-bg-elevated rounded-full transition-colors text-text-mute hover:text-text-main" title={t('theater.fullscreen')} data-testid="fullscreen-btn">
- <Maximize className="w-5 h-5" />
- </button>
- )}
+          {!isLocked && (
+            <button onClick={onToggleFullscreen} className="p-2.5 md:p-3 hover:bg-bg-elevated rounded-full transition-colors text-text-mute hover:text-text-main" title={t('theater.fullscreen')} data-testid="fullscreen-btn">
+              <Maximize className="w-5 h-5" />
+            </button>
+          )}
 
- <button onClick={onExit} className="p-2.5 md:p-3 hover:bg-red-500/20 rounded-full transition-colors text-text-mute hover:text-red-500" title={t('theater.exit')} data-testid="exit-theater-btn">
- <X className="w-5 h-5" />
- </button>
- </div>
- </div>
+          <button onClick={onExit} className="p-2.5 md:p-3 hover:bg-red-500/20 rounded-full transition-colors text-text-mute hover:text-red-500" title={t('theater.exit')} data-testid="exit-theater-btn">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
 
  </div>
  );

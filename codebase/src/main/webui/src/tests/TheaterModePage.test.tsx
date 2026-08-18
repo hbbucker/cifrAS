@@ -271,4 +271,22 @@ describe('TheaterModePage Component — Gesture & Interaction Navigation', () =>
     fireEvent.click(transposeUp);
     fireEvent.click(transposeDown);
   });
+
+  it('toggles singer mode (Modo Cantor) hiding chords and transpose pad from the stage view', async () => {
+    renderComponent();
+    expect(await screen.findByText('Song 1')).toBeInTheDocument();
+
+    const singerBtn = screen.getByTestId('singer-mode-btn');
+    expect(singerBtn).toBeInTheDocument();
+
+    // Click to toggle Singer Mode on
+    fireEvent.click(singerBtn);
+
+    // Transpose controls should be hidden in Singer Mode
+    expect(screen.queryByTestId('transpose-up')).not.toBeInTheDocument();
+
+    // Click to toggle Singer Mode back off
+    fireEvent.click(singerBtn);
+    expect(screen.getByTestId('transpose-up')).toBeInTheDocument();
+  });
 });
