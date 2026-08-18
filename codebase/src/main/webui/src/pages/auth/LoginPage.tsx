@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '../../context/ToastContext';
 import authClient from '../../services/authService';
-import { Music } from 'lucide-react';
+import { BrandLogo } from '../../components/ui/BrandLogo';
 
 export const LoginPage: React.FC = () => {
   const { t } = useTranslation();
@@ -29,8 +29,8 @@ export const LoginPage: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4">
       <div className="max-w-md w-full bg-gray-800 rounded-xl shadow-2xl p-8 border border-gray-700">
         <div className="flex flex-col items-center mb-8">
-          <div className="w-16 h-16 bg-[#8629cc]/20 rounded-full flex items-center justify-center mb-4">
-            <Music className="w-8 h-8 text-[#8629cc]" />
+          <div className="mb-4">
+            <BrandLogo iconOnly size="lg" />
           </div>
           <h2 className="text-3xl font-bold text-white text-center">{t('auth.welcome')}</h2>
           <p className="text-gray-500 mt-2 text-center">{t('auth.subtitle')}</p>

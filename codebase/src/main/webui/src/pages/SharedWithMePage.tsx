@@ -7,6 +7,7 @@ import { getPendingSongShares, acceptSongShare, declineSongShare } from '../api/
 import type { PendingSongShareItem } from '../api/songShares';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { BrandLogo } from '../components/ui/BrandLogo';
 
 interface Playlist {
   id: number;
@@ -109,8 +110,9 @@ export const SharedWithMePage: React.FC = () => {
   return (
     <>
       <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
-        <header className="min-h-[56px] sm:min-h-[64px] flex items-center px-4 sm:px-6 bg-bg-card border-b border-border-main shrink-0">
-          <h1 className="text-lg sm:text-xl font-bold text-text-main">{t('sharedWithMe.title')}</h1>
+        <header className="min-h-[52px] sm:min-h-[64px] flex items-center px-3.5 sm:px-6 bg-bg-card border-b border-border-main shrink-0 gap-2 sm:gap-3" role="banner">
+          <BrandLogo iconOnly size="sm" asLink to="/dashboard" className="sm:hidden shrink-0" />
+          <h1 className="text-lg sm:text-xl font-bold text-text-main truncate">{t('sharedWithMe.title')}</h1>
         </header>
 
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 pb-24 sm:pb-8 space-y-6 sm:space-y-8 min-w-0">

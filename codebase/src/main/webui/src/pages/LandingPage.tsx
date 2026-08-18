@@ -1,8 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Music, Guitar, Mic, FileText, LayoutDashboard } from 'lucide-react';
+import { Guitar, Mic, FileText, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { BrandLogo } from '../components/ui/BrandLogo';
 
 export const LandingPage: React.FC = () => {
   const { t } = useTranslation();
@@ -13,10 +14,7 @@ export const LandingPage: React.FC = () => {
             {/* Header */}
             <header className="container mx-auto px-6 py-6 flex justify-between items-center border-b border-gray-800">
                 <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-[#8629cc]/20 rounded-full flex items-center justify-center">
-                        <Music className="w-5 h-5 text-[#8629cc]" />
-                    </div>
-                    <span className="text-2xl font-bold">CifrAS</span>
+                    <BrandLogo size="md" asLink to="/" textClassName="text-white text-2xl font-bold" />
                 </div>
                 <nav className="flex items-center space-x-4">
                     <Link to="/privacy" className="text-sm text-gray-400 hover:text-white transition-colors">{t('landing.privacy')}</Link>

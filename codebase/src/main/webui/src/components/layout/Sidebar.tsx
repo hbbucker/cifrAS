@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Home, ListMusic, Users, Settings, Menu, X, Share2 } from 'lucide-react';
 import { UserMenu } from './UserMenu';
+import { BrandLogo } from '../ui/BrandLogo';
 import { useTranslation } from 'react-i18next';
 import { usePendingSharesCount } from '../../hooks/usePendingSharesCount';
 
@@ -32,8 +33,8 @@ export const Sidebar: React.FC = () => {
         } h-screen sticky top-0`}
         data-testid="sidebar"
       >
-        <div className="flex items-center justify-between p-4 border-b border-border-main h-16">
-          {!collapsed && <span className="font-bold text-xl text-[#8629cc]">CifrAS</span>}
+        <div className={`flex items-center ${collapsed ? 'justify-center' : 'justify-between'} p-4 border-b border-border-main h-16`}>
+          {!collapsed && <BrandLogo size="md" asLink to="/dashboard" />}
           <button 
             onClick={() => setCollapsed(!collapsed)} 
             className="p-1 rounded hover:bg-bg-elevated focus:outline-none focus:ring-2 focus:ring-[#8629cc]"

@@ -12,6 +12,7 @@ import { EmptyState } from '../components/ui/EmptyState';
 import { EducationalEmptyState } from '../components/ui/EducationalEmptyState';
 import { Music } from 'lucide-react';
 import { ShareSongModal } from '../components/modals/ShareSongModal';
+import { BrandLogo } from '../components/ui/BrandLogo';
 
 interface SongData {
  id: string;
@@ -117,12 +118,17 @@ export const DashboardPage: React.FC = () => {
 
   return (
     <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
-      <header className="min-h-[56px] sm:min-h-[64px] flex items-center justify-between px-4 sm:px-6 bg-bg-card border-b border-border-main gap-3 shrink-0">
-        <h1 className="text-xl font-bold text-text-main sr-only sm:not-sr-only sm:block">{t('dashboard.title')}</h1>
-        <div className="flex-1 sm:ml-8">
+      <header className="min-h-[52px] sm:min-h-[64px] flex items-center justify-between px-3.5 sm:px-6 bg-bg-card/95 backdrop-blur border-b border-border-main gap-2 sm:gap-4 shrink-0" role="banner">
+        <div className="flex items-center gap-3 shrink-0">
+          <div className="sm:hidden">
+            <BrandLogo size="sm" asLink to="/dashboard" />
+          </div>
+          <h1 className="text-xl font-bold text-text-main hidden sm:block">{t('dashboard.title')}</h1>
+        </div>
+        <div className="flex-1 min-w-0 sm:ml-4 max-w-xl">
           <SearchBar onSearch={setSearchQuery} />
         </div>
-        <div className="ml-2 sm:ml-4 flex items-center gap-2 sm:gap-4 shrink-0">
+        <div className="flex items-center gap-2 sm:gap-4 shrink-0">
           <UserMenu />
         </div>
       </header>
