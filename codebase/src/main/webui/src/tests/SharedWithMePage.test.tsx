@@ -20,10 +20,10 @@ vi.mock('../api/groups', () => ({
 describe('SharedWithMePage Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    global.fetch = vi.fn().mockResolvedValue({
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       ok: true,
       json: async () => [],
-    } as unknown as Response);
+    } as unknown as Response));
   });
 
   const renderPage = () => {
