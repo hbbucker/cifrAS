@@ -181,4 +181,28 @@ describe('SharedWithMePage Component', () => {
       expect(screen.getByText('Música Falha Recusa')).toBeInTheDocument();
     });
   });
+
+  it('renders shared group playlists with correct songCount and navigation', async () => {
+    vi.mocked(songSharesApi.getPendingSongShares).mockResolvedValueOnce([]);
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => [{ id: 'group-1', name: 'Banda Louvor' }],
+    } as unknown as Response));
+
+    const groupsApi = await import('../api/groups');
+    vi.mocked(groupsApi.getGroupPlaylists).mockResolvedValueOnce([
+      {
+        id: 'pl-1',
+        name: 'Playlist Culto Domingo',
+        songCount: 12,
+        userId: 'other-user',
+      },
+    ]);
+
+    renderPage();
+
+    expect(await screen.findByText('Playlist Culto Domingo')).toBeInTheDocument();
+    expect(screen.getByText(/12.*playlists\.songsCount/)).toBeInTheDocument();
+    expect(screen.getByText(/sharedWithMe\.from.*Banda Louvor/)).toBeInTheDocument();
+  });
 });

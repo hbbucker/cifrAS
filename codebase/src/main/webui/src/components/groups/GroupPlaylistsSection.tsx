@@ -11,6 +11,7 @@ import { Spinner } from '../ui/Spinner';
 interface PlaylistData {
   id: string | number;
   name: string;
+  songCount?: number;
   songs?: unknown[];
   [key: string]: unknown;
 }
@@ -39,19 +40,19 @@ export const GroupPlaylistsSection: React.FC<GroupPlaylistsSectionProps> = ({ gr
       })
       .catch(() => {
         if (mounted) {
-          toast('Failed to load shared playlists', 'error');
+          toast(t('group.loadPlaylistsError'), 'error');
           setLoading(false);
         }
       });
     return () => { mounted = false; };
-  }, [groupId, toast]);
+  }, [groupId, toast, t]);
 
   const fetchPlaylists = async () => {
     try {
       const data = await getGroupPlaylists(groupId);
       setPlaylists(data as PlaylistData[]);
     } catch {
-      toast('Failed to load shared playlists', 'error');
+      toast(t('group.loadPlaylistsError'), 'error');
     }
   };
 
@@ -60,9 +61,9 @@ export const GroupPlaylistsSection: React.FC<GroupPlaylistsSectionProps> = ({ gr
     try {
       await unlinkPlaylist(groupId, playlistId);
       fetchPlaylists();
-      toast('Playlist removed from group', 'success');
+      toast(t('group.removePlaylistSuccess'), 'success');
     } catch {
-      toast('Failed to remove playlist', 'error');
+      toast(t('group.removePlaylistError'), 'error');
     }
   };
 
@@ -73,8 +74,7 @@ export const GroupPlaylistsSection: React.FC<GroupPlaylistsSectionProps> = ({ gr
         {role === 'Admin' && (
           <Button onClick={onLinkNew} size="sm" className="min-h-[40px] sm:min-h-[44px] px-3 sm:px-4 text-xs sm:text-sm shrink-0">
             <Plus className="w-4 h-4 mr-1" />
-            <span className="hidden sm:inline">{t('group.sharePlaylist')}</span>
-            <span className="sm:hidden">{t('groups.create')}</span>
+            <span>{t('group.sharePlaylist')}</span>
           </Button>
         )}
       </div>
@@ -87,7 +87,7 @@ export const GroupPlaylistsSection: React.FC<GroupPlaylistsSectionProps> = ({ gr
         <EmptyState 
           icon={ListMusic} 
           title={t('group.noSharedPlaylists')} 
-          description="No playlists shared with this group yet." 
+          description={t('group.noSharedPlaylistsDesc')} 
         />
       ) : (
         <div className="flex flex-col gap-2.5 sm:gap-3">
@@ -98,15 +98,17 @@ export const GroupPlaylistsSection: React.FC<GroupPlaylistsSectionProps> = ({ gr
                 onClick={() => navigate(`/playlists/${playlist.id}`)}
               >
                 <h3 className="font-bold text-text-main text-sm sm:text-base truncate mb-0.5">{playlist.name}</h3>
-                <p className="text-xs text-text-mute">{playlist.songs?.length || 0} songs</p>
+                <p className="text-xs text-text-mute">
+                  {playlist.songCount ?? playlist.songs?.length ?? 0} {t('playlists.songsCount')}
+                </p>
               </div>
               
               <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                 <button 
                   onClick={() => navigate(`/theater/${playlist.id}`)}
                   className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-colors shrink-0"
-                  title="Theater Mode"
-                  aria-label="Theater Mode"
+                  title={t('sharedWithMe.playTheater')}
+                  aria-label={t('sharedWithMe.playTheater')}
                 >
                   <Play className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>

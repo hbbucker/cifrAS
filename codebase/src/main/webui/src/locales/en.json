@@ -180,7 +180,8 @@
     "noPlaylists": "No playlists shared with you yet.",
     "title": "Shared with Me",
     "loading": "Loading shared playlists...",
-    "playTheater": "Play in Theater Mode"
+    "playTheater": "Play in Theater Mode",
+    "from": "From"
   },
   "groups": {
     "loadingGroups": "Loading groups...",
@@ -208,6 +209,10 @@
     "invite": "Invite Member",
     "remove": "Remove from Group",
     "noSharedPlaylists": "No shared playlists",
+    "noSharedPlaylistsDesc": "No playlists shared with this group yet.",
+    "loadPlaylistsError": "Failed to load shared playlists",
+    "removePlaylistSuccess": "Playlist removed from group",
+    "removePlaylistError": "Failed to remove playlist",
     "confirmRemovePlaylist": "Are you sure you want to remove this playlist from the group?",
     "tabs": {
       "playlists": "Playlists",
@@ -218,6 +223,7 @@
       "count_one": "{{count}} member",
       "count_other": "{{count}} members",
       "empty": "No active members found.",
+      "loadError": "Failed to load group members or invites",
       "roles": {
         "owner": "Owner",
         "admin": "Admin",
@@ -225,6 +231,8 @@
       },
       "removeMember": "Remove from Group",
       "leaveGroup": "Leave Group",
+      "removeMemberError": "Failed to remove member",
+      "leaveGroupError": "Failed to leave group",
       "confirmRemoveTitle": "Remove Member",
       "confirmRemoveDesc": "Are you sure you want to remove {{name}} from this group? They will lose access to shared playlists.",
       "confirmLeaveTitle": "Leave Group",
@@ -241,6 +249,7 @@
       "cancel": "Cancel",
       "dismiss": "Dismiss",
       "canceled": "Invitation canceled successfully.",
+      "cancelError": "Failed to cancel invitation",
       "empty": "No pending or declined invitations.",
       "sentTo": "Sent to"
     }
@@ -268,7 +277,11 @@
   "linkPlaylist": {
     "shareTitle": "Share a Playlist",
     "shareDesc": "Select one of your personal playlists to share with this group. Members will be able to view and play it.",
-    "noPlaylists": "No personal playlists"
+    "noPlaylists": "No personal playlists",
+    "noPlaylistsDesc": "You don't have any playlists yet.",
+    "loadError": "Could not load your playlists",
+    "shareSuccess": "Playlist shared successfully",
+    "linkError": "Failed to link playlist"
   },
   "search": {
     "noResults": "No results found",

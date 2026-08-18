@@ -177,29 +177,30 @@
     "failedAddSong": "Error al agregar la canción"
   },
   "sharedWithMe": {
-    "noPlaylists": "No playlists shared with you yet.",
-    "title": "Shared with Me",
-    "loading": "Loading shared playlists...",
-    "playTheater": "Play in Theater Mode"
+    "noPlaylists": "No hay playlists compartidas contigo aún.",
+    "title": "Compartido Conmigo",
+    "loading": "Cargando playlists compartidas...",
+    "playTheater": "Tocar en Modo Teatro",
+    "from": "De"
   },
   "groups": {
-    "loadingGroups": "Loading groups...",
-    "newGroup": "New Group",
-    "createNewGroup": "Create New Group",
-    "groups": "Groups",
-    "invitedToJoin": "Invited to join",
-    "declinedInvitation": "declined your invitation to join",
-    "accept": "Accept",
-    "decline": "Decline",
-    "create": "Create",
-    "sendInvite": "Send Invite",
-    "noGroups": "No groups found.",
-    "dismiss": "Dismiss",
-    "declinedInvitations": "Declined Invitations",
-    "pendingInvitations": "Pending Invitations",
-    "inviteToGroup": "Invite to Group",
-    "groupName": "Group Name",
-    "memberEmail": "member@example.com"
+    "loadingGroups": "Cargando grupos...",
+    "newGroup": "Nuevo Grupo",
+    "createNewGroup": "Crear Nuevo Grupo",
+    "groups": "Grupos",
+    "invitedToJoin": "Invitado(a) a unirse",
+    "declinedInvitation": "rechazó tu invitación para unirse",
+    "accept": "Aceptar",
+    "decline": "Rechazar",
+    "create": "Crear",
+    "sendInvite": "Enviar Invitación",
+    "noGroups": "No se encontraron grupos.",
+    "dismiss": "Descartar",
+    "declinedInvitations": "Invitaciones Rechazadas",
+    "pendingInvitations": "Invitaciones Pendientes",
+    "inviteToGroup": "Invitar al Grupo",
+    "groupName": "Nombre del Grupo",
+    "memberEmail": "miembro@ejemplo.com"
   },
   "group": {
     "sharePlaylist": "Compartir Playlist",
@@ -208,6 +209,10 @@
     "invite": "Invitar Miembro",
     "remove": "Eliminar del Grupo",
     "noSharedPlaylists": "No hay playlists compartidas",
+    "noSharedPlaylistsDesc": "No hay playlists compartidas con este grupo aún.",
+    "loadPlaylistsError": "Error al cargar las playlists compartidas",
+    "removePlaylistSuccess": "Playlist eliminada del grupo",
+    "removePlaylistError": "Error al eliminar la playlist",
     "confirmRemovePlaylist": "¿Estás seguro de que deseas eliminar esta playlist del grupo?",
     "tabs": {
       "playlists": "Playlists",
@@ -218,6 +223,7 @@
       "count_one": "{{count}} miembro",
       "count_other": "{{count}} miembros",
       "empty": "No se encontraron miembros activos.",
+      "loadError": "Error al cargar los miembros o invitaciones del grupo",
       "roles": {
         "owner": "Propietario",
         "admin": "Admin",
@@ -225,6 +231,8 @@
       },
       "removeMember": "Eliminar del Grupo",
       "leaveGroup": "Salir del Grupo",
+      "removeMemberError": "Error al eliminar el miembro",
+      "leaveGroupError": "Error al salir del grupo",
       "confirmRemoveTitle": "Eliminar Miembro",
       "confirmRemoveDesc": "¿Estás seguro de que deseas eliminar a {{name}} de este grupo? Perderá el acceso a las playlists compartidas.",
       "confirmLeaveTitle": "Salir del Grupo",
@@ -241,6 +249,7 @@
       "cancel": "Cancelar",
       "dismiss": "Descartar",
       "canceled": "Invitación cancelada con éxito.",
+      "cancelError": "Error al cancelar la invitación",
       "empty": "No hay invitaciones pendientes ni rechazadas.",
       "sentTo": "Enviado a"
     }
@@ -266,9 +275,13 @@
     "resume": "Reanudar"
   },
   "linkPlaylist": {
-    "shareTitle": "Share a Playlist",
-    "shareDesc": "Select one of your personal playlists to share with this group. Members will be able to view and play it.",
-    "noPlaylists": "No personal playlists"
+    "shareTitle": "Compartir una Playlist",
+    "shareDesc": "Selecciona una de tus playlists personales para compartir con este grupo. Los miembros podrán verla y tocarla.",
+    "noPlaylists": "No hay playlists personales",
+    "noPlaylistsDesc": "Aún no tienes playlists.",
+    "loadError": "No se pudieron cargar tus playlists",
+    "shareSuccess": "Playlist compartida con éxito",
+    "linkError": "Error al vincular la playlist"
   },
   "search": {
     "noResults": "No results found",

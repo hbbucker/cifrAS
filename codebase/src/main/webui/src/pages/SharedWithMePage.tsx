@@ -11,6 +11,7 @@ import { useToast } from '../context/ToastContext';
 interface Playlist {
   id: number;
   name: string;
+  songCount?: number;
   songs?: unknown[];
   groupName?: string;
   userId?: string;
@@ -208,7 +209,9 @@ export const SharedWithMePage: React.FC = () => {
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex-1 cursor-pointer" onClick={() => navigate(`/playlists/${playlist.id}`)}>
                         <h3 className="font-bold text-lg text-text-main mb-1 line-clamp-1">{playlist.name}</h3>
-                        <p className="text-sm text-text-mute">{playlist.songs?.length || 0} songs</p>
+                        <p className="text-sm text-text-mute">
+                          {playlist.songCount ?? playlist.songs?.length ?? 0} {t('playlists.songsCount')}
+                        </p>
                       </div>
                       <button 
                         onClick={() => navigate(`/theater/${playlist.id}`)}
@@ -220,7 +223,7 @@ export const SharedWithMePage: React.FC = () => {
                     </div>
                     <div className="mt-auto">
                       <span className="text-xs font-bold text-text-mute uppercase tracking-wider bg-gray-100 dark:bg-gray-700 inline-block px-2 py-1 rounded">
-                        From: {playlist.groupName}
+                        {t('sharedWithMe.from')}: {playlist.groupName}
                       </span>
                     </div>
                   </div>

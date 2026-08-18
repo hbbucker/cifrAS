@@ -50,11 +50,11 @@ export const GroupMembersSection: React.FC<GroupMembersSectionProps> = ({
         setInvitations(invitesData);
       }
     } catch {
-      toast('Failed to load group members or invites', 'error');
+      toast(t('group.members.loadError'), 'error');
     } finally {
       setLoading(false);
     }
-  }, [groupId, role, onMemberCountChange, toast]);
+  }, [groupId, role, onMemberCountChange, toast, t]);
 
   useEffect(() => {
     let mounted = true;
@@ -72,7 +72,7 @@ export const GroupMembersSection: React.FC<GroupMembersSectionProps> = ({
         }
       })
       .catch(() => {
-        if (mounted) toast('Failed to load group members or invites', 'error');
+        if (mounted) toast(t('group.members.loadError'), 'error');
       })
       .finally(() => {
         if (mounted) setLoading(false);
@@ -81,7 +81,7 @@ export const GroupMembersSection: React.FC<GroupMembersSectionProps> = ({
     return () => {
       mounted = false;
     };
-  }, [groupId, role, onMemberCountChange, toast]);
+  }, [groupId, role, onMemberCountChange, toast, t]);
 
   const handleConfirmRemove = async () => {
     if (!selectedMemberToRemove) return;
@@ -91,7 +91,7 @@ export const GroupMembersSection: React.FC<GroupMembersSectionProps> = ({
       setSelectedMemberToRemove(null);
       loadData();
     } catch {
-      toast('Failed to remove member', 'error');
+      toast(t('group.members.removeMemberError'), 'error');
     }
   };
 
@@ -103,7 +103,7 @@ export const GroupMembersSection: React.FC<GroupMembersSectionProps> = ({
       setShowLeaveModal(false);
       navigate('/groups');
     } catch {
-      toast('Failed to leave group', 'error');
+      toast(t('group.members.leaveGroupError'), 'error');
     }
   };
 
@@ -113,7 +113,7 @@ export const GroupMembersSection: React.FC<GroupMembersSectionProps> = ({
       toast(t('group.invitations.canceled'), 'success');
       loadData();
     } catch {
-      toast('Failed to cancel invitation', 'error');
+      toast(t('group.invitations.cancelError'), 'error');
     }
   };
 
