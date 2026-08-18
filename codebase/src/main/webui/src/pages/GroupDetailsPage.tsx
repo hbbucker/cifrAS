@@ -110,27 +110,28 @@ export const GroupDetailsPage: React.FC = () => {
 
   return (
     <>
-      <div className="flex-1 flex flex-col h-full overflow-hidden">
+      <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
         {/* Header */}
-        <header className="h-16 flex items-center px-6 bg-bg-card border-b border-border-main gap-4 shrink-0">
+        <header className="min-h-[56px] sm:min-h-[64px] flex items-center px-3.5 sm:px-6 bg-bg-card border-b border-border-main gap-2.5 sm:gap-4 shrink-0">
           <button
             onClick={() => navigate('/groups')}
-            className="p-2 hover:bg-bg-elevated rounded-full text-text-mute transition-colors"
+            className="w-10 h-10 flex items-center justify-center hover:bg-bg-elevated rounded-full text-text-mute transition-colors shrink-0"
             data-testid="back-to-groups-btn"
+            aria-label="Back"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
 
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center shrink-0">
-              <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center shrink-0">
+              <Users className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-400" />
             </div>
-            <div className="min-w-0">
-              <h1 className="text-xl font-bold text-text-main leading-tight truncate">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-base sm:text-xl font-bold text-text-main leading-tight truncate">
                 {group.name}
               </h1>
               <span
-                className={`text-xs font-bold px-2 py-0.5 rounded ${
+                className={`inline-block text-[11px] sm:text-xs font-bold px-2 py-0.5 rounded ${
                   group.role === 'Admin'
                     ? 'bg-[#8629cc]/10 text-[#8629cc]'
                     : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
@@ -144,10 +145,10 @@ export const GroupDetailsPage: React.FC = () => {
           </div>
 
           {group.role === 'Admin' && (
-            <div className="ml-auto">
+            <div className="shrink-0 ml-auto">
               <button
                 onClick={() => setShowInviteModal(true)}
-                className="flex items-center gap-2 bg-[#8629cc] hover:bg-[#721eb8] text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                className="flex items-center gap-1.5 sm:gap-2 bg-[#8629cc] hover:bg-[#721eb8] text-white px-3 sm:px-4 py-2 min-h-[40px] sm:min-h-[44px] rounded-xl font-medium transition-colors text-xs sm:text-sm"
                 data-testid="header-invite-btn"
               >
                 <UserPlus className="w-4 h-4" />
@@ -158,11 +159,11 @@ export const GroupDetailsPage: React.FC = () => {
         </header>
 
         {/* Navigation Tabs (Pinterest-inspired) */}
-        <div className="bg-bg-card px-6 border-b border-border-main shrink-0">
-          <nav className="flex space-x-6">
+        <div className="bg-bg-card px-3.5 sm:px-6 border-b border-border-main shrink-0 overflow-x-auto no-scrollbar">
+          <nav className="flex space-x-4 sm:space-x-6 min-w-max">
             <button
               onClick={() => setActiveTab('playlists')}
-              className={`py-3.5 px-1 border-b-2 font-semibold text-sm transition-colors flex items-center gap-2 ${
+              className={`min-h-[44px] py-2.5 sm:py-3.5 px-1 border-b-2 font-semibold text-xs sm:text-sm transition-colors flex items-center gap-1.5 sm:gap-2 ${
                 activeTab === 'playlists'
                   ? 'border-[#e60023] text-text-main'
                   : 'border-transparent text-text-mute hover:text-text-main'
@@ -175,7 +176,7 @@ export const GroupDetailsPage: React.FC = () => {
 
             <button
               onClick={() => setActiveTab('members')}
-              className={`py-3.5 px-1 border-b-2 font-semibold text-sm transition-colors flex items-center gap-2 ${
+              className={`min-h-[44px] py-2.5 sm:py-3.5 px-1 border-b-2 font-semibold text-xs sm:text-sm transition-colors flex items-center gap-1.5 sm:gap-2 ${
                 activeTab === 'members'
                   ? 'border-[#e60023] text-text-main'
                   : 'border-transparent text-text-mute hover:text-text-main'
@@ -184,7 +185,7 @@ export const GroupDetailsPage: React.FC = () => {
             >
               <Users className="w-4 h-4" />
               {t('group.tabs.members')}
-              <span className="text-xs px-2 py-0.5 rounded-full bg-bg-elevated text-text-mute">
+              <span className="text-[11px] sm:text-xs px-2 py-0.5 rounded-full bg-bg-elevated text-text-mute font-medium">
                 {memberCount}
               </span>
             </button>
@@ -192,7 +193,7 @@ export const GroupDetailsPage: React.FC = () => {
         </div>
 
         {/* Content Container */}
-        <div className="flex-1 overflow-y-auto p-6 max-w-5xl mx-auto w-full">
+        <div className="flex-1 overflow-y-auto p-3.5 sm:p-6 pb-24 sm:pb-8 max-w-5xl mx-auto w-full min-w-0">
           {activeTab === 'playlists' ? (
             <GroupPlaylistsSection
               key={refreshTrigger}
@@ -223,8 +224,8 @@ export const GroupDetailsPage: React.FC = () => {
       {/* Invite Modal */}
       {showInviteModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-bg-card rounded-3xl max-w-md w-full p-6 shadow-2xl">
-            <h2 className="text-xl font-bold text-text-main mb-4">
+          <div className="bg-bg-card rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl mx-auto">
+            <h2 className="text-lg sm:text-xl font-bold text-text-main mb-4">
               {t('groups.inviteToGroup')}
             </h2>
 
@@ -242,7 +243,7 @@ export const GroupDetailsPage: React.FC = () => {
                 setInviteError('');
               }}
               placeholder={t('groups.memberEmail')}
-              className="w-full px-4 py-3 bg-bg-main border border-border-main rounded-xl mb-6 text-text-main focus:ring-2 focus:ring-[#8629cc] outline-none"
+              className="w-full px-4 py-3 bg-bg-main border border-border-main rounded-xl mb-6 text-text-main focus:ring-2 focus:ring-[#8629cc] outline-none text-sm sm:text-base"
               data-testid="invite-email-input"
             />
             <div className="flex justify-end gap-3">
@@ -251,7 +252,7 @@ export const GroupDetailsPage: React.FC = () => {
                   setShowInviteModal(false);
                   setInviteError('');
                 }}
-                className="px-4 py-2 font-medium text-text-mute hover:bg-bg-elevated rounded-xl transition-colors"
+                className="px-4 py-2.5 min-h-[44px] font-medium text-text-mute hover:bg-bg-elevated rounded-xl transition-colors text-sm"
                 disabled={inviting}
               >
                 {t('common.cancel')}
@@ -259,7 +260,7 @@ export const GroupDetailsPage: React.FC = () => {
               <button
                 onClick={handleInvite}
                 disabled={inviting || !inviteEmail.trim()}
-                className="px-4 py-2 font-medium bg-[#8629cc] hover:bg-[#721eb8] text-white rounded-xl transition-colors disabled:opacity-50"
+                className="px-4 py-2.5 min-h-[44px] font-medium bg-[#8629cc] hover:bg-[#721eb8] text-white rounded-xl transition-colors disabled:opacity-50 text-sm"
                 data-testid="send-invite-btn"
               >
                 {inviting ? '...' : t('groups.sendInvite')}

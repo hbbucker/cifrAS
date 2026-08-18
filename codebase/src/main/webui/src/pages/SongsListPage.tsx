@@ -122,22 +122,23 @@ export const SongsListPage: React.FC = () => {
 
   return (
     <>
-      <div className="flex-1 flex flex-col h-full overflow-hidden">
-        <header className="h-16 flex items-center justify-between px-6 bg-bg-card border-b border-border-main">
-          <h1 className="text-xl font-bold text-text-main">{t('songsList.title')}</h1>
+      <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
+        <header className="min-h-[56px] sm:min-h-[64px] flex items-center justify-between px-4 sm:px-6 bg-bg-card border-b border-border-main shrink-0">
+          <h1 className="text-lg sm:text-xl font-bold text-text-main">{t('songsList.title')}</h1>
           <OnboardingTooltip tooltipId="add_song_btn">
             <Button
               onClick={() => navigate('/songs/new')}
               data-testid="add-song-btn"
+              className="min-h-[40px] sm:min-h-[44px] px-3.5 sm:px-4 text-xs sm:text-sm"
             >
-              <Plus className="w-5 h-5 mr-1" />
-              <span className="hidden sm:inline">{t('songsList.addSong')}</span>
+              <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-1" />
+              <span>{t('songsList.addSong')}</span>
             </Button>
           </OnboardingTooltip>
         </header>
 
-        <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 pb-24 sm:pb-6 relative">
-          <div className="sticky top-0 z-10 bg-bg-card/95 backdrop-blur -mx-6 px-6 pt-2 pb-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border-main/50">
+        <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 sm:p-6 pb-24 sm:pb-8 relative min-w-0">
+          <div className="sticky top-0 z-10 bg-bg-card/95 backdrop-blur -mx-4 sm:-mx-6 px-4 sm:px-6 pt-2 pb-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 border-b border-border-main/50">
             <div className="relative max-w-sm w-full">
               <input
                 type="text"

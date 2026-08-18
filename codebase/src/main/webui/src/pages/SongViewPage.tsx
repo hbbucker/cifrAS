@@ -150,103 +150,108 @@ export const SongViewPage: React.FC = () => {
 
   return (
     <>
-      <div className="flex-1 flex flex-col h-full overflow-hidden">
-        <header className="flex flex-col sm:flex-row sm:items-center justify-between px-4 sm:px-6 py-3 sm:py-0 sm:h-16 bg-bg-card border-b border-border-main shrink-0 gap-3 sm:gap-0 relative z-10">
-          <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto overflow-hidden">
-            <button onClick={() => navigate('/songs')} className="p-2 hover:bg-bg-elevated rounded-full text-text-mute shrink-0 -ml-2 sm:ml-0">
+      <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
+        <header className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-2.5 sm:py-0 sm:h-16 bg-bg-card border-b border-border-main shrink-0 gap-2.5 sm:gap-4 relative z-10">
+          <div className="flex items-center gap-2.5 sm:gap-4 w-full sm:w-auto overflow-hidden">
+            <button onClick={() => navigate('/songs')} className="w-10 h-10 min-w-[40px] flex items-center justify-center hover:bg-bg-elevated rounded-full text-text-mute shrink-0 -ml-1 sm:ml-0" aria-label="Back">
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div className="min-w-0 flex-1">
-              <h1 className="text-lg font-bold text-text-main leading-tight truncate">{song.title}</h1>
+              <h1 className="text-base sm:text-lg font-bold text-text-main leading-tight truncate">{song.title}</h1>
               <p className="text-xs text-text-mute truncate">{song.artist}</p>
             </div>
           </div>
           
-          <div className="flex items-center gap-3 self-end sm:self-auto">
+          <div className="flex items-center gap-1.5 sm:gap-3 justify-between sm:justify-end w-full sm:w-auto">
             <TransposePad 
               currentKey={currentKey}
               onTransposeDown={() => setTransposeSteps(s => s - 1)}
               onTransposeUp={() => setTransposeSteps(s => s + 1)}
             />
             
-            <div className="relative">
-              <button 
-                onClick={() => setShowSettings(!showSettings)}
-                className="flex items-center gap-2 p-2 text-text-mute hover:bg-bg-elevated rounded-lg transition-colors"
-                title="Preferences"
-              >
-                <Settings2 className={`w-5 h-5 ${showSettings ? 'text-[#8629cc]' : ''}`} />
-              </button>
-              
-              {showSettings && (
-                <div className="absolute top-full right-0 mt-2 w-64 bg-bg-card border border-border-main rounded-lg shadow-xl p-4 z-50 animate-in slide-in-from-top-2">
-                  <h3 className="font-semibold text-text-main mb-4">{t('songView.preferences')}</h3>
-                  
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <label className="text-sm text-text-mute flex justify-between">
-                        <span>{t('songView.autoScroll')}</span>
-                        <span>{autoScrollSpeed === 0 ? 'Off' : autoScrollSpeed}</span>
-                      </label>
-                      <input 
-                        type="range" 
-                        min="0" 
-                        max="10" 
-                        value={autoScrollSpeed}
-                        onChange={(e) => setAutoScrollSpeed(Number(e.target.value))}
-                        className="w-full accent-[#8629cc]"
-                      />
-                    </div>
+            <div className="flex items-center gap-1 sm:gap-2">
+              <div className="relative">
+                <button 
+                  onClick={() => setShowSettings(!showSettings)}
+                  className="w-10 h-10 min-w-[40px] flex items-center justify-center text-text-mute hover:bg-bg-elevated rounded-xl transition-colors"
+                  title="Preferences"
+                  aria-label="Preferences"
+                >
+                  <Settings2 className={`w-5 h-5 ${showSettings ? 'text-[#8629cc]' : ''}`} />
+                </button>
+                
+                {showSettings && (
+                  <div className="absolute top-full right-0 mt-2 w-64 bg-bg-card border border-border-main rounded-2xl shadow-xl p-4 z-50 animate-in slide-in-from-top-2">
+                    <h3 className="font-semibold text-text-main mb-4">{t('songView.preferences')}</h3>
                     
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-text-main font-medium">{t('songView.useBb')}</span>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" className="sr-only peer" checked={useBb} onChange={(e) => setUseBb(e.target.checked)} />
-                        <div className="w-11 h-6 bg-bg-elevated peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-text-main after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#8629cc]"></div>
-                      </label>
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-text-main font-medium">{t('songView.useEb')}</span>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" className="sr-only peer" checked={useEb} onChange={(e) => setUseEb(e.target.checked)} />
-                        <div className="w-11 h-6 bg-bg-elevated peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-text-main after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#8629cc]"></div>
-                      </label>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <label className="text-sm text-text-mute flex justify-between">
+                          <span>{t('songView.autoScroll')}</span>
+                          <span>{autoScrollSpeed === 0 ? 'Off' : autoScrollSpeed}</span>
+                        </label>
+                        <input 
+                          type="range" 
+                          min="0" 
+                          max="10" 
+                          value={autoScrollSpeed}
+                          onChange={(e) => setAutoScrollSpeed(Number(e.target.value))}
+                          className="w-full accent-[#8629cc]"
+                        />
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-text-main font-medium">{t('songView.useBb')}</span>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input type="checkbox" className="sr-only peer" checked={useBb} onChange={(e) => setUseBb(e.target.checked)} />
+                          <div className="w-11 h-6 bg-bg-elevated peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-text-main after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#8629cc]"></div>
+                        </label>
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-text-main font-medium">{t('songView.useEb')}</span>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input type="checkbox" className="sr-only peer" checked={useEb} onChange={(e) => setUseEb(e.target.checked)} />
+                          <div className="w-11 h-6 bg-bg-elevated peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-text-main after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#8629cc]"></div>
+                        </label>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
 
-            <button 
-              onClick={() => setShowShareModal(true)}
-              className="flex items-center gap-2 p-2 text-text-mute hover:bg-bg-elevated rounded-lg transition-colors"
-              title={t('songSharing.shareSong')}
-              data-testid="share-song-btn"
-            >
-              <Share2 className="w-5 h-5" />
-            </button>
-            
-            <button 
-              onClick={() => navigate(`/songs/edit/${id}`, { state: { wasTransposed: transposeSteps !== 0, originalKey: song.originalKey } })}
-              className="hidden sm:flex items-center gap-2 p-2 text-text-mute hover:bg-bg-elevated rounded-lg"
-              title={t('songView.editSong')}
-            >
-              <Edit className="w-5 h-5" />
-            </button>
-            
-            <button 
-              onClick={() => navigate(`/theater/song/${id}`, { state: { autoScrollSpeed, useBb, useEb, transposeSteps } })}
-              className="flex items-center gap-2 bg-[#8629cc] hover:bg-[#721eb8] text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm"
-              data-testid="theater-mode-btn"
-            >
-              <PlayCircle className="w-5 h-5" />
-              <span className="hidden sm:inline">{t('songView.perform')}</span>
-            </button>
+              <button 
+                onClick={() => setShowShareModal(true)}
+                className="w-10 h-10 min-w-[40px] flex items-center justify-center text-text-mute hover:bg-bg-elevated rounded-xl transition-colors"
+                title={t('songSharing.shareSong')}
+                data-testid="share-song-btn"
+                aria-label={t('songSharing.shareSong')}
+              >
+                <Share2 className="w-5 h-5" />
+              </button>
+              
+              <button 
+                onClick={() => navigate(`/songs/edit/${id}`, { state: { wasTransposed: transposeSteps !== 0, originalKey: song.originalKey } })}
+                className="w-10 h-10 min-w-[40px] flex items-center justify-center text-text-mute hover:bg-bg-elevated rounded-xl transition-colors"
+                title={t('songView.editSong')}
+                aria-label={t('songView.editSong')}
+              >
+                <Edit className="w-5 h-5" />
+              </button>
+              
+              <button 
+                onClick={() => navigate(`/theater/song/${id}`, { state: { autoScrollSpeed, useBb, useEb, transposeSteps } })}
+                className="flex items-center gap-1.5 sm:gap-2 bg-[#8629cc] hover:bg-[#721eb8] text-white px-3 sm:px-4 py-2 min-h-[40px] sm:min-h-[44px] rounded-xl font-medium transition-colors shadow-sm text-xs sm:text-sm shrink-0"
+                data-testid="theater-mode-btn"
+              >
+                <PlayCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span>{t('songView.perform')}</span>
+              </button>
+            </div>
           </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto p-6 bg-bg-main/50" ref={scrollContainerRef}>
+        <div className="flex-1 overflow-y-auto p-3.5 sm:p-6 pb-24 sm:pb-8 bg-bg-main/50 min-w-0" ref={scrollContainerRef}>
           <div className="max-w-3xl mx-auto h-full flex flex-col">
             <ChordSheet content={transposedContent} fontSize={20} />
           </div>

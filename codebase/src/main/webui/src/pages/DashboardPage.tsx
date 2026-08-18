@@ -115,19 +115,19 @@ export const DashboardPage: React.FC = () => {
 
   const [sharingSong, setSharingSong] = useState<{ id: string; title: string } | null>(null);
 
- return (
-  <div className="flex-1 flex flex-col h-full overflow-hidden">
- <header className="h-16 flex items-center justify-between px-6 bg-bg-card border-b border-border-main">
- <h1 className="text-xl font-bold text-text-main sr-only sm:not-sr-only sm:block">{t('dashboard.title')}</h1>
- <div className="flex-1 sm:ml-8">
- <SearchBar onSearch={setSearchQuery} />
- </div>
- <div className="ml-4 flex items-center gap-4">
- <UserMenu />
- </div>
- </header>
+  return (
+    <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
+      <header className="min-h-[56px] sm:min-h-[64px] flex items-center justify-between px-4 sm:px-6 bg-bg-card border-b border-border-main gap-3 shrink-0">
+        <h1 className="text-xl font-bold text-text-main sr-only sm:not-sr-only sm:block">{t('dashboard.title')}</h1>
+        <div className="flex-1 sm:ml-8">
+          <SearchBar onSearch={setSearchQuery} />
+        </div>
+        <div className="ml-2 sm:ml-4 flex items-center gap-2 sm:gap-4 shrink-0">
+          <UserMenu />
+        </div>
+      </header>
 
-  <div className="flex-1 overflow-y-auto p-6 pb-6">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 pb-24 sm:pb-8 min-w-0">
  <div className="mb-8">
  <h2 className="text-2xl font-bold text-text-main mb-2">
  {t('dashboard.welcome', { name: user?.name?.split(' ')[0] || 'Musician' })}

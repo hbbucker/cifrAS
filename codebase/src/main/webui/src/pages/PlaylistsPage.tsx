@@ -111,69 +111,71 @@ export const PlaylistsPage: React.FC = () => {
  .catch(() => toast(t('playlists.deleteError'), 'error'));
  };
 
- return (
- <>
- <div className="flex-1 flex flex-col h-full overflow-hidden">
- <header className="h-16 flex items-center justify-between px-6 bg-bg-card border-b border-border-main">
- <h1 className="text-xl font-bold text-text-main">{t('sidebar.playlists')}</h1>
- <Button 
- onClick={() => setShowModal(true)}
- data-testid="create-playlist-btn"
- >
- <Plus className="w-5 h-5 mr-1" />
- <span className="hidden sm:inline">{t('playlists.newPlaylist')}</span>
- </Button>
- </header>
+  return (
+    <>
+      <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
+        <header className="min-h-[56px] sm:min-h-[64px] flex items-center justify-between px-4 sm:px-6 bg-bg-card border-b border-border-main shrink-0">
+          <h1 className="text-lg sm:text-xl font-bold text-text-main">{t('sidebar.playlists')}</h1>
+          <Button 
+            onClick={() => setShowModal(true)}
+            data-testid="create-playlist-btn"
+            className="min-h-[40px] sm:min-h-[44px] px-3.5 sm:px-4 text-xs sm:text-sm"
+          >
+            <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-1" />
+            <span>{t('playlists.newPlaylist')}</span>
+          </Button>
+        </header>
 
- <div className="flex-1 overflow-y-auto p-6 pb-24 sm:pb-6">
- <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
- {loading && playlists.length === 0 ? (
- <div className="col-span-full flex justify-center py-12">
- <Spinner size="lg" />
- </div>
- ) : playlists.length === 0 ? (
- <div className="col-span-full">
- <EmptyState 
- icon={ListMusic} 
- title={t('playlists.emptyTitle')} 
- description={t('playlists.emptyDesc')} 
- action={{ label: t('playlists.createPlaylist'), onClick: () => setShowModal(true) }} 
- />
- </div>
- ) : (
- playlists.map(pl => (
- <div 
- key={pl.id} 
- onClick={() => navigate(`/playlists/${pl.id}`)}
- className="bg-bg-card rounded-xl border border-border-main p-5 cursor-pointer hover:shadow-lg hover:border-[#8629cc]/50 transition-all group"
- data-testid={`playlist-card-${pl.id}`}
- >
- <div className="flex items-start justify-between mb-4">
- <div className="w-12 h-12 bg-[#8629cc]/10 rounded-lg flex items-center justify-center group-hover:bg-[#8629cc]/20 transition-colors">
- <ListMusic className="w-6 h-6 text-[#8629cc]" />
- </div>
- <button
- onClick={(e) => handleDeletePlaylist(e, pl.id)}
- className="p-2 text-text-mute hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
- title={t('playlists.deleteTooltip')}
- >
- <Trash2 className="w-5 h-5" />
- </button>
- </div>
- <h3 className="text-lg font-bold text-text-main mb-1">{pl.name}</h3>
- <div className="flex items-center justify-between">
- <p className="text-sm text-text-mute">{pl.songCount} {t('playlists.songsCount')}</p>
- <span className={`text-xs font-bold px-2 py-1 rounded flex items-center gap-1 ${pl.isCollaborative ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-gray-100 text-gray-700 dark:bg-gray-700 '}`}>
- {pl.isCollaborative && <Users className="w-3 h-3" />}
- {pl.isCollaborative ? t('playlists.collab') : t('playlists.private')}
- </span>
- </div>
- </div>
- ))
- )}
- </div>
- </div>
- </div>
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 pb-24 sm:pb-8 min-w-0">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+            {loading && playlists.length === 0 ? (
+              <div className="col-span-full flex justify-center py-12">
+                <Spinner size="lg" />
+              </div>
+            ) : playlists.length === 0 ? (
+              <div className="col-span-full">
+                <EmptyState 
+                  icon={ListMusic} 
+                  title={t('playlists.emptyTitle')} 
+                  description={t('playlists.emptyDesc')} 
+                  action={{ label: t('playlists.createPlaylist'), onClick: () => setShowModal(true) }} 
+                />
+              </div>
+            ) : (
+              playlists.map(pl => (
+                <div 
+                  key={pl.id} 
+                  onClick={() => navigate(`/playlists/${pl.id}`)}
+                  className="bg-bg-card rounded-2xl border border-border-main p-4 sm:p-5 cursor-pointer hover:shadow-md hover:border-[#8629cc]/50 transition-all group min-w-0"
+                  data-testid={`playlist-card-${pl.id}`}
+                >
+                  <div className="flex items-start justify-between mb-3 sm:mb-4">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#8629cc]/10 rounded-xl flex items-center justify-center group-hover:bg-[#8629cc]/20 transition-colors shrink-0">
+                      <ListMusic className="w-5 h-5 sm:w-6 sm:h-6 text-[#8629cc]" />
+                    </div>
+                    <button
+                      onClick={(e) => handleDeletePlaylist(e, pl.id)}
+                      className="w-10 h-10 min-w-[40px] min-h-[40px] flex items-center justify-center text-text-mute hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-colors opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+                      title={t('playlists.deleteTooltip')}
+                      aria-label={t('playlists.deleteTooltip')}
+                    >
+                      <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                    </button>
+                  </div>
+                  <h3 className="text-base sm:text-lg font-bold text-text-main mb-1 truncate">{pl.name}</h3>
+                  <div className="flex items-center justify-between mt-3 sm:mt-4">
+                    <p className="text-xs sm:text-sm text-text-mute">{pl.songCount} {t('playlists.songsCount')}</p>
+                    <span className={`text-[11px] sm:text-xs font-bold px-2 py-0.5 sm:py-1 rounded-full flex items-center gap-1 ${pl.isCollaborative ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'}`}>
+                      {pl.isCollaborative && <Users className="w-3 h-3" />}
+                      {pl.isCollaborative ? t('playlists.collab') : t('playlists.private')}
+                    </span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
 
  {/* Create Modal */}
  {showModal && (
