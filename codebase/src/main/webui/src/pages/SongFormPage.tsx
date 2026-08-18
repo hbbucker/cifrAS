@@ -115,25 +115,26 @@ export const SongFormPage: React.FC = () => {
  };
 
  return (
- <>
- <div className="flex-1 flex flex-col h-full overflow-hidden">
- <header className="h-16 flex items-center justify-between px-6 bg-bg-card border-b border-border-main">
- <div className="flex items-center gap-4">
- <button onClick={handleBack} className="p-2 hover:bg-bg-elevated rounded-full text-text-mute">
- <ArrowLeft className="w-5 h-5" />
- </button>
- <h1 className="text-xl font-bold text-text-main">{id ? t('songForm.editTitle') : t('songForm.newTitle')}</h1>
- </div>
- <Button 
- onClick={handleSave}
- data-testid="save-song-btn"
- >
- <Save className="w-5 h-5" />
- <span className="hidden sm:inline">{t('common.save')}</span>
- </Button>
- </header>
+    <>
+      <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
+        <header className="min-h-[56px] sm:min-h-[64px] flex items-center justify-between px-4 sm:px-6 bg-bg-card border-b border-border-main shrink-0">
+          <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+            <button onClick={handleBack} className="p-2 hover:bg-bg-elevated rounded-full text-text-mute shrink-0">
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <h1 className="text-lg sm:text-xl font-bold text-text-main truncate">{id ? t('songForm.editTitle') : t('songForm.newTitle')}</h1>
+          </div>
+          <Button 
+            onClick={handleSave}
+            data-testid="save-song-btn"
+            className="min-h-[40px] sm:min-h-[44px] px-3.5 sm:px-4 text-xs sm:text-sm shrink-0"
+          >
+            <Save className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-1" />
+            <span className="hidden sm:inline">{t('common.save')}</span>
+          </Button>
+        </header>
 
- <div className="flex-1 overflow-y-auto p-4 md:p-6 flex flex-col bg-bg-main">
+        <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-24 sm:pb-8 flex flex-col bg-bg-main min-w-0">
  <div className="max-w-5xl mx-auto w-full flex-1 flex flex-col space-y-6">
  {wasTransposed && (
  <div className="bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-sm p-3 rounded-lg flex items-center gap-2">

@@ -121,4 +121,31 @@ describe('PlaylistViewPage Component', () => {
     const addButtons = screen.getAllByRole('button', { name: /add/i });
     expect(addButtons.length).toBeGreaterThan(0);
   });
+
+  it('handles reorder and delete actions', async () => {
+    render(
+      <AuthProvider>
+        <ThemeProvider>
+          <ToastProvider>
+            <MemoryRouter initialEntries={['/playlists/pl-1']}>
+              <Routes>
+                <Route path="/playlists/:id" element={<PlaylistViewPage />} />
+              </Routes>
+            </MemoryRouter>
+          </ToastProvider>
+        </ThemeProvider>
+      </AuthProvider>
+    );
+
+    expect(await screen.findByText('Minha Playlist')).toBeInTheDocument();
+    expect(screen.getByTestId('playlist-item-song-1')).toBeInTheDocument();
+
+    const moveUpBtn = screen.getByTestId('move-up-song-1');
+    const moveDownBtn = screen.getByTestId('move-down-song-1');
+    expect(moveUpBtn).toBeInTheDocument();
+    expect(moveDownBtn).toBeInTheDocument();
+
+    fireEvent.click(moveUpBtn);
+    fireEvent.click(moveDownBtn);
+  });
 });

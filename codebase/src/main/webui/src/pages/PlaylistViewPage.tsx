@@ -151,224 +151,244 @@ export const PlaylistViewPage: React.FC = () => {
     .catch(() => toast(t('playlistView.failedRemoveSong'), 'error'));
   };
 
- return (
- <>
- <div className="flex-1 flex flex-col h-full overflow-hidden">
- <header className="h-20 flex items-center justify-between px-6 bg-bg-card border-b border-border-main shrink-0">
- <div className="flex items-center gap-4">
- <button onClick={() => navigate('/playlists')} className="p-2 hover:bg-bg-elevated rounded-full text-text-mute">
- <ArrowLeft className="w-5 h-5" />
- </button>
- <div>
- {loading ? (
- <div className="h-6 w-48 bg-gray-200 dark:bg-gray-700 animate-pulse rounded mb-2"></div>
- ) : (
- <h1 className="text-2xl font-bold text-text-main leading-tight">{playlist?.name || 'Playlist'}</h1>
- )}
- <p className="text-sm text-text-mute">{songs.length} songs • {playlist?.isCollaborative ? 'Collab' : 'Private'}</p>
- </div>
- </div>
- 
- <div className="flex gap-2">
- {isOwner && (
- <button 
- onClick={() => {
- setSearchQuery('');
- setIsSearching(true);
- setShowAddModal(true);
- }}
- className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-text-main px-4 py-2.5 rounded-lg font-bold transition-colors"
- >
- <Plus className="w-5 h-5" />
- <span className="hidden sm:inline">{t('playlistView.addSong')}</span>
- </button>
- )}
- <button 
- onClick={() => navigate(`/theater/${id}`)}
- className="flex items-center gap-2 bg-[#10B981] hover:bg-[#059669] text-white px-5 py-2.5 rounded-lg font-bold transition-colors shadow-lg shadow-emerald-500/20"
- data-testid="start-theater-btn"
- >
- <PlayCircle className="w-6 h-6" />
- <span className="hidden sm:inline">{t('playlistView.startTheater')}</span>
- </button>
- </div>
- </header>
-
- <div className="flex-1 overflow-y-auto p-6 max-w-4xl mx-auto w-full">
- {loading ? (
- <div className="text-center py-8 text-text-mute">{t('playlistView.loading')}</div>
- ) : songs.length === 0 ? (
- <div className="text-center py-12 bg-bg-card rounded-xl border border-dashed border-gray-300 ">
- <h3 className="text-lg font-medium text-text-main mb-2">{t('playlistView.noSongs')}</h3>
- <p className="text-text-mute">{t('playlistView.addDesc')}</p>
- </div>
- ) : (
- <div className="bg-bg-card rounded-xl border border-border-main shadow-sm overflow-hidden">
- {songs.map((song, index) => (
- <div 
- key={song.id} 
- draggable={isOwner}
- onDragStart={() => {
- if (!isOwner) return;
- setTimeout(() => setDraggedIndex(index), 0);
- }}
- onDragOver={(e) => {
- if (!isOwner) return;
- e.preventDefault();
- }}
- onDragEnd={() => setDraggedIndex(null)}
- onDrop={(e) => {
- if (!isOwner) return;
- e.preventDefault();
- handleDrop(index);
- }}
- className={`flex items-center gap-4 p-4 border-b border-border-main last:border-0 hover:bg-bg-main /50 transition-all group ${
- draggedIndex === index ? 'opacity-30' : ''
- }`}
- data-testid={`playlist-item-${song.id}`}
- >
- {isOwner && (
- <div className="flex flex-col sm:flex-row gap-1 items-center justify-center">
- <button 
- onClick={() => moveSong(index, 'up')} 
- className="p-2 sm:p-1.5 text-text-mute hover:text-[#8629cc] bg-gray-100 hover:bg-[#8629cc]/10 rounded-lg transition-colors active:scale-95" 
- data-testid={`move-up-${song.id}`}
- aria-label={t('playlistView.moveUp')}
- >
- <ChevronUp className="w-6 h-6 sm:w-5 sm:h-5" />
- </button>
- <button 
- onClick={() => moveSong(index, 'down')} 
- className="p-2 sm:p-1.5 text-text-mute hover:text-[#8629cc] bg-gray-100 hover:bg-[#8629cc]/10 rounded-lg transition-colors active:scale-95" 
- data-testid={`move-down-${song.id}`}
- aria-label={t('playlistView.moveDown')}
- >
- <ChevronDown className="w-6 h-6 sm:w-5 sm:h-5" />
- </button>
- </div>
- )}
- 
- {isOwner && (
- <div className="text-gray-500 cursor-grab active:cursor-grabbing hover:text-[#8629cc]">
- <GripVertical className="w-5 h-5 pointer-events-none" />
- </div>
- )}
- 
- <div className="w-8 text-center text-gray-500 font-medium">{index + 1}</div>
- 
- <div className="flex-1 min-w-0">
- <h3 className="font-bold text-text-main truncate">{song.title}</h3>
- <p className="text-sm text-text-mute truncate">{song.artist}</p>
- {/* Key on mobile */}
- <div className="mt-1 sm:hidden inline-block px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded font-mono text-xs text-text-main font-bold">
- {song.originalKey || song.key || '?'}
- </div>
- </div>
- 
- {/* Key on desktop */}
- <div className="hidden sm:block px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded font-mono text-sm text-text-main font-bold">
- {song.originalKey || song.key || '?'}
- </div>
- 
- {isOwner && (
- <button 
- onClick={() => removeSong(song.id)}
- className="p-2 text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity rounded-full hover:bg-red-50 dark:hover:bg-red-900/20"
- >
- <Trash2 className="w-5 h-5" />
- </button>
- )}
- </div>
- ))}
- </div>
- )}
- </div>
- </div>
-
- {/* Add Song Modal (Full Screen) */}
- {showAddModal && (
- <div className="fixed inset-0 bg-bg-main z-50 flex flex-col">
- <header className="h-20 flex items-center justify-between px-6 bg-bg-card border-b border-border-main shrink-0">
- <div className="flex items-center gap-4">
- <button onClick={() => setShowAddModal(false)} className="p-2 hover:bg-bg-elevated rounded-full text-text-mute">
- <ArrowLeft className="w-6 h-6" />
- </button>
- <div>
- <h2 className="text-xl font-bold text-text-main">{t('playlistView.addSongs')}</h2>
- <p className="text-sm text-text-mute">{t('playlistView.selectSongs')}</p>
- </div>
- </div>
- </header>
-
- <div className="flex-1 flex flex-col max-w-3xl mx-auto w-full p-6 overflow-hidden">
- <div className="relative mb-6 shrink-0">
- <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
- <input
- type="text"
- placeholder={t('playlistView.searchPlaceholder')}
- value={searchQuery}
- onChange={(e) => {
- setSearchQuery(e.target.value);
- setIsSearching(true);
- }}
- className="w-full pl-12 pr-4 py-3 bg-bg-card border border-border-main rounded-xl text-text-main focus:ring-2 focus:ring-[#8629cc] outline-none shadow-sm"
- />
- </div>
-
-        <div className="flex-1 overflow-y-auto bg-bg-card rounded-xl border border-border-main shadow-sm">
-          {isSearching ? (
-            <div className="text-center py-12 text-text-mute">
-              {t('playlistView.loading')}
+  return (
+    <>
+      <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
+        <header className="min-h-[56px] sm:min-h-[64px] py-2.5 sm:py-3 flex items-center justify-between px-3.5 sm:px-6 bg-bg-card border-b border-border-main shrink-0 gap-2">
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
+            <button 
+              onClick={() => navigate('/playlists')} 
+              className="p-2 min-w-[36px] min-h-[36px] sm:min-w-[40px] sm:min-h-[40px] flex items-center justify-center hover:bg-bg-elevated rounded-full text-text-mute shrink-0"
+              aria-label="Back"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <div className="min-w-0 flex-1">
+              {loading ? (
+                <div className="h-6 w-32 sm:w-48 bg-gray-200 dark:bg-gray-700 animate-pulse rounded mb-1"></div>
+              ) : (
+                <h1 className="text-base sm:text-xl md:text-2xl font-bold text-text-main leading-tight truncate sm:whitespace-normal">{playlist?.name || 'Playlist'}</h1>
+              )}
+              <p className="text-xs sm:text-sm text-text-mute truncate">{songs.length} songs • {playlist?.isCollaborative ? 'Collab' : 'Private'}</p>
             </div>
-          ) : availableSongs.length === 0 ? (
-            <div className="text-center py-12 text-text-mute">
-              {t('playlistView.noMatchingSongs')}
+          </div>
+          
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {isOwner && (
+              <button 
+                onClick={() => {
+                  setSearchQuery('');
+                  setIsSearching(true);
+                  setShowAddModal(true);
+                }}
+                className="flex items-center justify-center gap-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-text-main px-2.5 sm:px-4 py-2 sm:py-2.5 min-h-[38px] sm:min-h-[44px] rounded-lg font-bold text-xs sm:text-sm transition-colors"
+                title={t('playlistView.addSong')}
+                aria-label={t('playlistView.addSong')}
+              >
+                <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="hidden sm:inline">{t('playlistView.addSong')}</span>
+              </button>
+            )}
+            <button 
+              onClick={() => navigate(`/theater/${id}`)}
+              className="flex items-center justify-center gap-1.5 bg-[#10B981] hover:bg-[#059669] text-white px-3 sm:px-5 py-2 sm:py-2.5 min-h-[38px] sm:min-h-[44px] rounded-lg font-bold text-xs sm:text-sm transition-colors shadow-lg shadow-emerald-500/20"
+              data-testid="start-theater-btn"
+              title={t('playlistView.startTheater')}
+              aria-label={t('playlistView.startTheater')}
+            >
+              <PlayCircle className="w-5 h-5 sm:w-6 sm:h-6" />
+              <span className="hidden sm:inline">{t('playlistView.startTheater')}</span>
+            </button>
+          </div>
+        </header>
+
+        <div className="flex-1 overflow-y-auto p-3 sm:p-6 pb-24 sm:pb-8 max-w-4xl mx-auto w-full min-w-0">
+          {loading ? (
+            <div className="text-center py-8 text-text-mute">{t('playlistView.loading')}</div>
+          ) : songs.length === 0 ? (
+            <div className="text-center py-12 bg-bg-card rounded-xl border border-dashed border-gray-300">
+              <h3 className="text-lg font-medium text-text-main mb-2">{t('playlistView.noSongs')}</h3>
+              <p className="text-text-mute">{t('playlistView.addDesc')}</p>
             </div>
           ) : (
-            availableSongs.map(s => (
-              <div key={s.id} className="flex items-center justify-between p-4 border-b border-border-main last:border-0 hover:bg-bg-main/50 transition-colors">
-                <div className="flex-1 min-w-0 pr-4">
-                  <h3 className="font-bold text-text-main truncate">{s.title}</h3>
-                  <p className="text-sm text-text-mute truncate">{s.artist}</p>
-                </div>
-                
-                <div className="flex items-center gap-4">
-                  <div className="hidden sm:block px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded font-mono text-sm text-text-main font-bold">
-                    {s.originalKey || s.key || '?'}
+            <div className="bg-bg-card rounded-xl border border-border-main shadow-sm overflow-hidden">
+              {songs.map((song, index) => (
+                <div 
+                  key={song.id} 
+                  draggable={isOwner}
+                  onDragStart={() => {
+                    if (!isOwner) return;
+                    setTimeout(() => setDraggedIndex(index), 0);
+                  }}
+                  onDragOver={(e) => {
+                    if (!isOwner) return;
+                    e.preventDefault();
+                  }}
+                  onDragEnd={() => setDraggedIndex(null)}
+                  onDrop={(e) => {
+                    if (!isOwner) return;
+                    e.preventDefault();
+                    handleDrop(index);
+                  }}
+                  className={`flex items-center gap-2 sm:gap-4 p-3 sm:p-4 border-b border-border-main last:border-0 hover:bg-bg-main/50 transition-all group min-w-0 ${
+                    draggedIndex === index ? 'opacity-30' : ''
+                  }`}
+                  data-testid={`playlist-item-${song.id}`}
+                >
+                  {isOwner && (
+                    <div className="flex flex-col sm:flex-row gap-0.5 sm:gap-1 items-center justify-center shrink-0">
+                      <button 
+                        onClick={() => moveSong(index, 'up')} 
+                        className="p-1 sm:p-1.5 text-text-mute hover:text-[#8629cc] bg-gray-100 hover:bg-[#8629cc]/10 dark:bg-gray-800 rounded-md sm:rounded-lg transition-colors active:scale-95 min-h-[30px] min-w-[30px] sm:min-h-[36px] sm:min-w-[36px] flex items-center justify-center" 
+                        data-testid={`move-up-${song.id}`}
+                        aria-label={t('playlistView.moveUp')}
+                      >
+                        <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5" />
+                      </button>
+                      <button 
+                        onClick={() => moveSong(index, 'down')} 
+                        className="p-1 sm:p-1.5 text-text-mute hover:text-[#8629cc] bg-gray-100 hover:bg-[#8629cc]/10 dark:bg-gray-800 rounded-md sm:rounded-lg transition-colors active:scale-95 min-h-[30px] min-w-[30px] sm:min-h-[36px] sm:min-w-[36px] flex items-center justify-center" 
+                        data-testid={`move-down-${song.id}`}
+                        aria-label={t('playlistView.moveDown')}
+                      >
+                        <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />
+                      </button>
+                    </div>
+                  )}
+                  
+                  {isOwner && (
+                    <div className="hidden sm:block text-gray-500 cursor-grab active:cursor-grabbing hover:text-[#8629cc] shrink-0">
+                      <GripVertical className="w-5 h-5 pointer-events-none" />
+                    </div>
+                  )}
+                  
+                  <div className="w-5 sm:w-8 text-center text-xs sm:text-sm text-gray-500 font-medium shrink-0">{index + 1}</div>
+                  
+                  <div className="flex-1 min-w-0 pr-1">
+                    <h3 className="font-semibold sm:font-bold text-sm sm:text-base text-text-main truncate">{song.title}</h3>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <p className="text-xs sm:text-sm text-text-mute truncate">{song.artist}</p>
+                      <span className="sm:hidden inline-block px-1.5 py-0.2 bg-gray-200 dark:bg-gray-700 rounded font-mono text-[10px] text-text-main font-bold shrink-0">
+                        {song.originalKey || song.key || '?'}
+                      </span>
+                    </div>
                   </div>
-                  <button 
-                    onClick={() => {
-                      fetch(`/api/playlists/${id}/songs`, {
-                        method: 'POST',
-                        headers: { 
-                          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                          'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ songId: s.id, position: songs.length })
-                      })
-                      .then(res => {
-                        if (res.ok) {
-                          setSongs(prev => [...prev, s]);
-                          toast(t('playlistView.songAdded'), 'success');
-                        } else {
-                          toast(t('playlistView.failedAddSong'), 'error');
-                        }
-                      })
-                      .catch(() => toast(t('playlistView.failedAddSong'), 'error'));
-                    }}
-                    className="flex items-center gap-1 px-4 py-2 bg-gray-100 hover:bg-[#8629cc] hover:text-white dark:bg-gray-700 dark:hover:bg-[#8629cc] text-gray-700 rounded-lg font-bold transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span>{t('playlistView.add')}</span>
-                  </button>
+                  
+                  {/* Key on desktop */}
+                  <div className="hidden sm:block px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded font-mono text-sm text-text-main font-bold shrink-0">
+                    {song.originalKey || song.key || '?'}
+                  </div>
+                  
+                  {isOwner && (
+                    <button 
+                      onClick={() => removeSong(song.id)}
+                      className="p-1.5 sm:p-2 text-gray-500 hover:text-red-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 shrink-0 min-h-[36px] min-w-[36px] flex items-center justify-center"
+                      title={t('playlistView.confirmRemoveSong')}
+                      aria-label={t('playlistView.confirmRemoveSong')}
+                    >
+                      <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                    </button>
+                  )}
                 </div>
-              </div>
-            ))
+              ))}
+            </div>
           )}
         </div>
       </div>
-    </div>
-  )}
- </>
+
+      {/* Add Song Modal (Full Screen) */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-bg-main z-50 flex flex-col">
+          <header className="min-h-[56px] sm:min-h-[64px] py-2.5 sm:py-3 flex items-center justify-between px-3.5 sm:px-6 bg-bg-card border-b border-border-main shrink-0">
+            <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+              <button 
+                onClick={() => setShowAddModal(false)} 
+                className="p-2 min-w-[36px] min-h-[36px] sm:min-w-[40px] sm:min-h-[40px] flex items-center justify-center hover:bg-bg-elevated rounded-full text-text-mute shrink-0"
+                aria-label="Back"
+              >
+                <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
+              <div className="min-w-0">
+                <h2 className="text-base sm:text-xl font-bold text-text-main truncate">{t('playlistView.addSongs')}</h2>
+                <p className="text-xs sm:text-sm text-text-mute truncate">{t('playlistView.selectSongs')}</p>
+              </div>
+            </div>
+          </header>
+
+          <div className="flex-1 flex flex-col max-w-3xl mx-auto w-full p-3 sm:p-6 pb-20 sm:pb-6 overflow-hidden min-w-0">
+            <div className="relative mb-4 sm:mb-6 shrink-0">
+              <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+              <input
+                type="text"
+                placeholder={t('playlistView.searchPlaceholder')}
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setIsSearching(true);
+                }}
+                className="w-full pl-12 pr-4 py-2.5 sm:py-3 bg-bg-card border border-border-main rounded-xl text-text-main focus:ring-2 focus:ring-[#8629cc] outline-none shadow-sm text-sm sm:text-base"
+              />
+            </div>
+
+            <div className="flex-1 overflow-y-auto bg-bg-card rounded-xl border border-border-main shadow-sm min-w-0">
+              {isSearching ? (
+                <div className="text-center py-12 text-text-mute">
+                  {t('playlistView.loading')}
+                </div>
+              ) : availableSongs.length === 0 ? (
+                <div className="text-center py-12 text-text-mute">
+                  {t('playlistView.noMatchingSongs')}
+                </div>
+              ) : (
+                availableSongs.map(s => (
+                  <div key={s.id} className="flex items-center justify-between p-3 sm:p-4 border-b border-border-main last:border-0 hover:bg-bg-main/50 transition-colors gap-2 min-w-0">
+                    <div className="flex-1 min-w-0 pr-2">
+                      <h3 className="font-semibold sm:font-bold text-sm sm:text-base text-text-main truncate">{s.title}</h3>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <p className="text-xs sm:text-sm text-text-mute truncate">{s.artist}</p>
+                        <span className="sm:hidden inline-block px-1.5 py-0.2 bg-gray-200 dark:bg-gray-700 rounded font-mono text-[10px] text-text-main font-bold shrink-0">
+                          {s.originalKey || s.key || '?'}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+                      <div className="hidden sm:block px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded font-mono text-sm text-text-main font-bold">
+                        {s.originalKey || s.key || '?'}
+                      </div>
+                      <button 
+                        onClick={() => {
+                          fetch(`/api/playlists/${id}/songs`, {
+                            method: 'POST',
+                            headers: { 
+                              'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                              'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ songId: s.id, position: songs.length })
+                          })
+                          .then(res => {
+                            if (res.ok) {
+                              setSongs(prev => [...prev, s]);
+                              toast(t('playlistView.songAdded'), 'success');
+                            } else {
+                              toast(t('playlistView.failedAddSong'), 'error');
+                            }
+                          })
+                          .catch(() => toast(t('playlistView.failedAddSong'), 'error'));
+                        }}
+                        className="flex items-center gap-1 px-3 sm:px-4 py-1.5 sm:py-2 bg-gray-100 hover:bg-[#8629cc] hover:text-white dark:bg-gray-700 dark:hover:bg-[#8629cc] text-gray-700 dark:text-gray-200 rounded-lg font-bold text-xs sm:text-sm transition-colors min-h-[36px]"
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>{t('playlistView.add')}</span>
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
  );
 };

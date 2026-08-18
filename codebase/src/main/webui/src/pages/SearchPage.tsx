@@ -29,15 +29,15 @@ export const SearchPage: React.FC = () => {
  }, [query]);
 
  return (
- <>
- <div className="flex-1 flex flex-col h-full overflow-hidden">
- <header className="h-16 flex items-center px-6 bg-bg-card border-b border-border-main">
- <h1 className="text-xl font-bold text-text-main">
- Search Results for "{query}"
- </h1>
- </header>
+    <>
+      <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
+        <header className="min-h-[56px] sm:min-h-[64px] flex items-center px-4 sm:px-6 bg-bg-card border-b border-border-main shrink-0">
+          <h1 className="text-lg sm:text-xl font-bold text-text-main truncate">
+            Search Results for "{query}"
+          </h1>
+        </header>
 
- <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 pb-24 sm:pb-8 min-w-0">
  {loading ? (
  <div className="flex justify-center items-center h-32">
  <div className="animate-spin w-8 h-8 border-4 border-[#8629cc] border-t-transparent rounded-full" />

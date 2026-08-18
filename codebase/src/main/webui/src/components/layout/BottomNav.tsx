@@ -50,7 +50,7 @@ export const BottomNav: React.FC = () => {
                 </span>
               )}
             </div>
-            <span className="text-[10px] font-medium truncate max-w-[60px] text-center">{link.label}</span>
+            <span className="text-[10px] font-medium leading-tight text-center px-0.5 truncate w-full">{link.label}</span>
           </NavLink>
         );
       })}
