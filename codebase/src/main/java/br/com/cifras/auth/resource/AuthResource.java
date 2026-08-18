@@ -33,6 +33,7 @@ public class AuthResource {
 
     @GET
     @Path("/google-url")
+    @PermitAll
     public Response getGoogleLoginUrl(@QueryParam("redirectTo") String redirectTo) {
         String baseUrl = supabaseUrl;
         if (baseUrl.endsWith("/")) {

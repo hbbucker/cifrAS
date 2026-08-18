@@ -25,10 +25,16 @@ const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue = [];
 };
 
+const PUBLIC_AUTH_ROUTES = ['/login', '/register', '/google-url', '/refresh'];
+
 const setupInterceptors = (client: AxiosInstance) => {
   client.interceptors.request.use((config) => {
-    // Avoid sending tokens for login/register
-    if (config.url === '/login' || config.url === '/register') {
+    // Avoid sending tokens for public auth endpoints (e.g. /google-url, /login, /register, /refresh)
+    const isPublic = PUBLIC_AUTH_ROUTES.some((route) => config.url?.startsWith(route));
+    if (isPublic) {
+      if (config.headers && config.headers.Authorization) {
+        delete config.headers.Authorization;
+      }
       return config;
     }
 
@@ -81,6 +87,8 @@ const setupInterceptors = (client: AxiosInstance) => {
           processQueue(err, null);
           localStorage.removeItem('token');
           localStorage.removeItem('refreshToken');
+          delete authClient.defaults.headers.common.Authorization;
+          delete apiClient.defaults.headers.common.Authorization;
           window.location.href = '/login';
           return Promise.reject(err);
         } finally {
