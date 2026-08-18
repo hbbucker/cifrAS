@@ -31,7 +31,11 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
             return buildResponse(404, "Not found", null);
         }
 
-        if (exception instanceof IllegalArgumentException) {
+        if (exception instanceof ConflictException) {
+            return buildResponse(409, exception.getMessage(), null);
+        }
+
+        if (exception instanceof IllegalArgumentException || exception instanceof IllegalStateException) {
             return buildResponse(400, exception.getMessage(), null);
         }
 

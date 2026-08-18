@@ -251,5 +251,28 @@
     "pitchPersistence": "Persistencia de Tono: los tonos ahora se guardan en tu navegador.",
     "theaterMode": "Modo Teatro: maximiza la letra para usar en el escenario.",
     "button": "¡Entendido!"
+  },
+  "songSharing": {
+    "shareSong": "Compartir Canción",
+    "shareDesc": "Ingresa el correo electrónico de un usuario registrado para compartir esta cifra.",
+    "emailLabel": "Correo del Destinatario",
+    "emailPlaceholder": "usuario@ejemplo.com",
+    "sendInvite": "Enviar Canción",
+    "sending": "Enviando...",
+    "shareSuccess": "¡Invitación para compartir enviada con éxito!",
+    "userNotFound": "No se encontró ningún usuario registrado con este correo.",
+    "selfShareError": "No puedes compartir una canción contigo mismo.",
+    "conflictError": "Esta canción ya fue compartida con este usuario y está pendiente.",
+    "generalError": "Error al compartir la canción. Inténtalo de nuevo.",
+    "receivedSongs": "Canciones Recibidas",
+    "pendingBadge": "Pendiente",
+    "sharedBy": "Enviado por: {{email}}",
+    "accept": "Aceptar",
+    "accepting": "Aceptando...",
+    "decline": "Rechazar",
+    "declining": "Rechazando...",
+    "acceptSuccess": "¡Canción añadida a tu biblioteca!",
+    "declineSuccess": "Canción compartida rechazada.",
+    "noPendingSongs": "No tienes canciones compartidas pendientes."
   }
 }

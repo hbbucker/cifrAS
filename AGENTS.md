@@ -326,3 +326,130 @@ Os documentos de referência do projeto vivem em `.specs/project/`:
 - **[`ROADMAP.md`](.specs/project/ROADMAP.md)** — Milestones e status de entrega.
 - **[`STATE.md`](.specs/project/STATE.md)** — Estado atual do projeto (contexto operacional).
 - **[`.specs/features/`](.specs/features/)** — Especificações técnicas por feature.
+
+<!-- startupos-governance:start -->
+# Startup OS Governance
+
+Este arquivo define as regras de governança, papéis, restrições de ferramentas e fluxo de trabalho para o Startup OS. Todos os agentes devem seguir estritamente estas regras.
+
+---
+
+## 1. Princípios Fundamentais
+
+### 1.1 Spec-Driven Development (TLC)
+Toda implementação regular deve ser precedida por uma especificação clara. O fluxo padrão é:
+> **Specify → Clarify/Plan (Fundidos) → Tasks → Implement → Validate**
+
+**Fast-Track**: Alterações pequenas e locais usam uma microespecificação em vez do plano completo, mas nunca pulam o controle de qualidade: o CTO e o QA Lead devem ser consultados antes da implementação; se houver interface, jornada, acessibilidade ou conteúdo visual, o CPO/UX também deve ser consultado. O QA Lead continua responsável pela validação independente final. A classificação de impacto é obrigatória: somente I0 ou I1 pode permanecer em Fast-Track; qualquer sinal I2 ou I3 retorna ao fluxo padrão.
+
+### 1.2 Maker-Checker Separation
+O agente que gera o artefato (Maker) **nunca** pode validá-lo. A validação é responsabilidade exclusiva do Checker (QA Lead). O QA Lead atua também com viés adversarial caso os Makers excedam 3 rejeições.
+
+### 1.3 Autoridade de Domínio (Domain Authority)
+Para evitar o "Paradoxo do Árbitro" e poupar o fundador humano:
+- O **CPO** tem a decisão final irrevogável em regras de produto e negócio.
+- O **CTO** tem a decisão final irrevogável em arquitetura e stack técnica.
+O humano (CEO/Fundador) só deve ser escalado para pivotagens de roadmap, aumento crítico de escopo ou decisões financeiras/tempo.
+
+### 1.4 Paralelismo Contract-First
+Ao iniciar a etapa de `Implement`, o CTO deve gerar os DTOs (Contratos de API) primeiro. A partir da selagem do contrato, CTO e Frontend codificam em paralelo.
+
+---
+
+## 2. Papéis (Agents)
+
+| Papel | Responsabilidade | Ferramentas Permitidas | Modelo Sugerido | Skill Correspondente |
+|-------|------------------|------------------------|-----------------|---------------------|
+| **CEO & Orquestrador** | Roteamento do workflow, aplicação da Autoridade de Domínio, escalação humana | Leitura/Escrita completa | Sonnet / Opus / Pro | `startupos-ceo` |
+| **CTO** | Arquitetura, backend, DTOs, banco de dados, avaliação e registro de ADRs | Leitura/Escrita/Execução (código/infra) | Sonnet / Opus / Pro | `startupos-cto` |
+| **CPO** | Produto, UX, critérios de aceite, roadmap | Leitura/Escrita (docs/especificações) | Sonnet / Opus / Pro | `startupos-cpo` |
+| **QA Lead** | Checker único. Testes, aprovação de release. Atua de forma adversarial após 3 falhas | **Somente Leitura** (Read, Grep, Glob) | Sonnet / Pro | `startupos-qa-lead` |
+| **Frontend Staff** | UX, jornadas, UI (React/Vite), avaliação e registro de ADRs | Leitura/Escrita/Execução (frontend) | Sonnet / Opus / Pro | `startupos-frontend-staff` |
+
+---
+
+## 3. Regras de Ferramentas por Papel
+
+### 3.1 Restrições Estritas de QA Lead
+
+O papel de **QA Lead** é estritamente **read-only**:
+
+- `Read` — Permitido
+- `Grep` — Permitido
+- `Glob` — Permitido
+- `Write` — **Proibido**
+- `Exec` — **Proibido**
+- `Edit` — **Proibido**
+
+### 3.2 Makers (CTO e Frontend Staff)
+
+Podem executar código, escrever arquivos e usar ferramentas de implementação, mas **não podem** validar seu próprio trabalho.
+
+---
+
+## 4. Workflow de Governança
+
+### 4.1 Workflow Operacional
+1. **Specify** — CPO captura requisitos, cria critérios de aceite e registra a classificação de impacto de produto quando aplicável.
+2. **Clarify/Plan** — CTO levanta viabilidade técnica, define DTOs/Banco, classifica impactos técnicos, consolida o maior nível e avalia a necessidade de criação de um Architecture Decision Record (ADR) antes da implementação.
+3. **Implement (Paralelo)** — CTO (Backend) e Frontend codificam simultaneamente guiados pelos DTOs. Ambos devem avaliar e registrar ADRs caso tomem decisões arquiteturais complexas em suas áreas.
+4. **Validate** — QA Lead avalia contra o nível consolidado, gates e evidências. O parecer de integração é `PRONTA PARA INTEGRAÇÃO` ou `REJEITADA`; ele não autoriza release. O QA produz o texto do parecer read-only e o CEO/Orquestrador o persiste verbatim em `.specs/features/<feature>/qa/`.
+5. **Adversarial Mode** — Se o QA Lead rejeitar 3 vezes a mesma entrega, ele congela a feature e força a Autoridade de Domínio (CTO ou CPO) a assumir a responsabilidade técnica/funcional.
+
+### 4.2 Fast-Track com Gate de Qualidade
+1. Registrar uma microespecificação com objetivo, escopo, critérios de aceite e riscos conhecidos.
+2. Consultar o CTO, que decide se a mudança pode permanecer em Fast-Track.
+3. Quando houver interface, fluxo do usuário, acessibilidade ou conteúdo visual, consultar o CPO/UX antes de implementar.
+4. Consultar o QA Lead de forma independente para definir os riscos e a evidência mínima de validação.
+5. Implementar e entregar as evidências do nível de impacto; o QA Lead faz a validação independente antes da decisão de integração. I2 ou I3 não pode continuar em Fast-Track.
+
+### 4.3 Escalação Humana (CEO/Fundador)
+A IA (Orquestrador) só deve pausar o workflow e chamar o humano se:
+1. Houver necessidade de alterar `.specs/project/ROADMAP.md` ou `.specs/project/CONSTITUTION.md`.
+2. O risco financeiro, de tempo ou de segurança for muito alto para a IA assumir.
+
+---
+
+## 5. Política de Testes
+
+`.specs/project/TESTING.md` é a fonte de verdade da política de testes do projeto. Ela define a matriz I0–I3, a baseline, a cobertura mínima quando houver, a cadência da suíte completa e os gates de integração, release e pós-deploy.
+
+- Todo spec e microespecificação registra nível, sinais, contornos, gates, classificações do CTO/CPO quando aplicáveis, nível consolidado e gatilhos de reclassificação antes da implementação. Incerteza, divergência ou novo risco sobe ao maior nível plausível.
+- Makers executam e evidenciam somente os gates proporcionais ao nível; uma feature aprovada é apenas pronta para integração, não uma autorização de lançamento.
+- A suíte completa roda na cadência definida pela política e obrigatoriamente no candidato a release. O CEO/Orquestrador não autoriza release normal sem o parecer `CANDIDATO A RELEASE APROVADO` do QA Lead para a baseline atual.
+- Quando cobertura mínima não estiver definida, ninguém inventa percentual. O QA registra a pendência no parecer; os gates qualitativos da matriz continuam exigíveis.
+- Hotfix só pode adiar a suíte completa diante de dano ativo, com incidente, urgência, escopo mínimo, risco residual, responsável e revalidação registrados. Persistência, integração externa, operações irreversíveis e I3 exigem rollback verificável antes da autorização.
+
+### 5.1 Localização Canônica da Documentação
+
+Toda documentação compartilhada do projeto deve ficar em `.specs/project/`:
+
+- `PROJECT.md` — contexto, arquitetura e stack;
+- `TESTING.md` — política de testes e cobertura;
+- `GUIDES.md` — guias de desenvolvimento;
+- `DESIGN-SYSTEM.md` — decisões de design system.
+- `ROADMAP.md`, `CONSTITUTION.md` e `adrs/` — direcionamento estratégico e decisões arquiteturais.
+
+Especificações de uma entrega permanecem em `.specs/features/<feature>/`. Em repositórios existentes, preserve documentos legados e não crie uma segunda fonte de verdade sem uma migração explícita.
+
+---
+
+## 6. Princípios de Trade-Off (Startup Principles)
+
+1. **Progresso sobre Perfeição** — Entregue valor incremental (Fast-Track para coisas simples).
+2. **Especifique antes de Codificar** — Para features complexas, o contrato é inegociável.
+3. **Separe Maker de Checker** — Quem escreve código não pode dar "Go" para release.
+4. **Autoridade de Domínio** — Deixe a engenharia decidir engenharia e o produto decidir produto. Poupe o fundador.
+5. **Contexto Fresco** — O QA Lead não deve ler o histórico de pensamento do Maker para não contaminar seu viés.
+
+---
+
+## 7. Inicialização do Projeto
+
+Ao iniciar um novo projeto no Startup OS, executar na ordem:
+1. Definir a **Constituição** do projeto (propósito e público).
+2. Oferecer a definição opcional de **Arquitetura e Stack**. O fluxo respeita preferências técnicas existentes ou conduz um discovery curto, apresenta duas alternativas e registra somente a escolha do fundador em `.specs/project/PROJECT.md`.
+3. Criar **Guias de Desenvolvimento**.
+4. Executar **Deep Research** (se necessário).
+5. Iniciar o desenvolvimento usando a Orquestração do CEO.
+<!-- startupos-governance:end -->

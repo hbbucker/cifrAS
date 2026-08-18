@@ -36,6 +36,29 @@ public class Song {
         return song;
     }
 
+    public static Song createCloneForUser(Song original, String newUserId) {
+        if (original == null) {
+            throw new IllegalArgumentException("Original song cannot be null");
+        }
+        if (newUserId == null || newUserId.isBlank()) {
+            throw new IllegalArgumentException("User ID cannot be blank");
+        }
+        Song clone = new Song();
+        clone.userId = newUserId;
+        clone.title = original.getTitle();
+        clone.artist = original.getArtist();
+        clone.originalKey = original.getOriginalKey();
+        clone.lyrics = original.getLyrics();
+        clone.isFavorite = false;
+        clone.prefUseBb = false;
+        clone.prefUseEb = false;
+        clone.prefAutoScrollSpeed = 1;
+        clone.prefTransposeSteps = 0;
+        clone.createdAt = Instant.now();
+        clone.updatedAt = Instant.now();
+        return clone;
+    }
+
     public static Song restore(UUID id, String userId, String title, String artist, String originalKey, 
                                LyricsStructure lyrics, Boolean isFavorite, Boolean prefUseBb, Boolean prefUseEb, 
                                Integer prefAutoScrollSpeed, Integer prefTransposeSteps, 

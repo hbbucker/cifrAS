@@ -14,6 +14,7 @@ import { Pagination } from '../components/ui/Pagination';
 import { useRef } from 'react';
 import { getSongs } from '../api/songs';
 import type { SongData } from '../api/songs';
+import { ShareSongModal } from '../components/modals/ShareSongModal';
 
 
 export const SongsListPage: React.FC = () => {
@@ -96,6 +97,8 @@ export const SongsListPage: React.FC = () => {
       })
       .catch(() => toast(t('dashboard.deleteError'), 'error'));
   };
+
+  const [sharingSong, setSharingSong] = useState<{ id: string; title: string } | null>(null);
 
   const handleToggleFavorite = (id: string) => {
     fetch(`/api/songs/${id}/favorite`, {
@@ -204,7 +207,7 @@ export const SongsListPage: React.FC = () => {
                     {...song}
                     onToggleFavorite={handleToggleFavorite}
                     onEdit={(id) => navigate(`/songs/edit/${id}`)}
-                    onShare={() => { }}
+                    onShare={() => setSharingSong({ id: song.id, title: song.title })}
                     onDelete={handleDelete}
                   />
                 </div>
@@ -213,6 +216,14 @@ export const SongsListPage: React.FC = () => {
           )}
         </div>
       </div>
+      {sharingSong && (
+        <ShareSongModal
+          isOpen={!!sharingSong}
+          songId={sharingSong.id}
+          songTitle={sharingSong.title}
+          onClose={() => setSharingSong(null)}
+        />
+      )}
     </>
   );
 };

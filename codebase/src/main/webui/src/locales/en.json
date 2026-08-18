@@ -251,5 +251,28 @@
     "pitchPersistence": "Pitch Persistence: pitches are now saved in your browser.",
     "theaterMode": "Theater Mode: maximize lyrics for stage use.",
     "button": "Got it!"
+  },
+  "songSharing": {
+    "shareSong": "Share Song",
+    "shareDesc": "Enter the email address of a registered user to share this chord sheet.",
+    "emailLabel": "Recipient Email",
+    "emailPlaceholder": "user@example.com",
+    "sendInvite": "Send Song",
+    "sending": "Sending...",
+    "shareSuccess": "Song share invitation sent successfully!",
+    "userNotFound": "No registered user found with this email.",
+    "selfShareError": "You cannot share a song with yourself.",
+    "conflictError": "This song is already shared with this user and pending.",
+    "generalError": "Failed to share song. Please try again.",
+    "receivedSongs": "Received Songs",
+    "pendingBadge": "Pending",
+    "sharedBy": "Shared by: {{email}}",
+    "accept": "Accept",
+    "accepting": "Accepting...",
+    "decline": "Decline",
+    "declining": "Declining...",
+    "acceptSuccess": "Song added to your songs library!",
+    "declineSuccess": "Song share declined.",
+    "noPendingSongs": "You have no pending shared songs."
   }
 }

@@ -39,3 +39,5 @@ test_pipe_tools_2.js
 
 *.log
 codebase/src/main/webui/playwright-report/**
+**/coverage/**
+
