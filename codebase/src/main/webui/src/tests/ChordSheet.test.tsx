@@ -42,8 +42,58 @@ That they're gonna throw it back to you`;
  expect(container.style.fontSize).toBe('24px');
  });
 
- it('handles empty content without crashing', () => {
- render(<ChordSheet content="" />);
- expect(screen.getByTestId('chord-sheet-container')).toBeInTheDocument();
- });
+  it('handles empty content without crashing', () => {
+    render(<ChordSheet content="" />);
+    expect(screen.getByTestId('chord-sheet-container')).toBeInTheDocument();
+  });
+
+  it('hides chord lines and tab lines when singerMode is active (Modo Cantor)', () => {
+    const mixedContent = `[Intro]
+C G Am F
+e|---0---2---|
+B|---1---3---|
+↓↑↓↑
+
+[Verse 1]
+C G
+Hoje é o dia de cantar
+Am F
+Sem cifras na tela`;
+
+    const { rerender } = render(<ChordSheet content={mixedContent} singerMode={false} />);
+
+    // In normal mode, chords and tabs are rendered
+    expect(screen.getByText('C G Am F')).toBeInTheDocument();
+    expect(screen.getByText('Hoje é o dia de cantar')).toBeInTheDocument();
+    expect(screen.getByText(/e\|/)).toBeInTheDocument();
+
+    // In singer mode, chords, tabs and strumming are hidden
+    rerender(<ChordSheet content={mixedContent} singerMode={true} />);
+
+    expect(screen.queryByText('C G Am F')).not.toBeInTheDocument();
+    expect(screen.queryByText('C G')).not.toBeInTheDocument();
+    expect(screen.queryByText('Am F')).not.toBeInTheDocument();
+    expect(screen.queryByText(/e\|/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/↓↑↓↑/)).not.toBeInTheDocument();
+
+    // Section headers and lyrics are preserved
+    expect(screen.getByText('[Intro]')).toBeInTheDocument();
+    expect(screen.getByText('[Verse 1]')).toBeInTheDocument();
+    expect(screen.getByText('Hoje é o dia de cantar')).toBeInTheDocument();
+    expect(screen.getByText('Sem cifras na tela')).toBeInTheDocument();
+  });
+
+  it('displays instrumental notice when song has no lyrics in singerMode', () => {
+    const instrumentalContent = `[Solo]
+e|---0---2---3---|
+B|---1---3---0---|
+G|---0---2---0---|
+D|---2---0---0---|
+A|---3-------2---|
+E|-----------3---|`;
+
+    render(<ChordSheet content={instrumentalContent} singerMode={true} />);
+    expect(screen.getByTestId('instrumental-singer-notice')).toBeInTheDocument();
+    expect(screen.getByText('(Música Instrumental / Sem Letra)')).toBeInTheDocument();
+  });
 });

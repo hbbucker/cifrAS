@@ -43,6 +43,7 @@ export const TheaterModePage: React.FC = () => {
  const [scrollTop, setScrollTop] = useState(0);
  const [slideDir, setSlideDir] = useState<'right'|'left'>('right');
  const [isLocked, setIsLocked] = useState(false);
+ const [isSingerMode, setIsSingerMode] = useState(false);
  // eslint-disable-next-line @typescript-eslint/no-explicit-any
  const wakeLockRef = React.useRef<any>(null);
  
@@ -381,7 +382,7 @@ export const TheaterModePage: React.FC = () => {
  data-testid="theater-scroll-container"
  >
  <div className="max-w-4xl mx-auto text-text-main">
-  <ChordSheet content={transposedContent} fontSize={fontSize} transparent={true} />
+  <ChordSheet content={transposedContent} fontSize={fontSize} transparent={true} singerMode={isSingerMode} />
  </div>
  </div>
 
@@ -457,6 +458,8 @@ export const TheaterModePage: React.FC = () => {
  onFontSizeDecrease={() => handleFontSizeChange(-2)}
  isLocked={isLocked}
  onLockToggle={() => setIsLocked(!isLocked)}
+ isSingerMode={isSingerMode}
+ onToggleSingerMode={() => setIsSingerMode(prev => !prev)}
  />
  </div>
  );

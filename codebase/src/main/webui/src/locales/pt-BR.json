@@ -297,7 +297,10 @@
     "resumeSessionPromptTitle": "Continuar Sessão?",
     "resumeSessionPromptDesc": "Você tem uma sessão de performance ativa para esta playlist. Gostaria de continuar de onde parou?",
     "startFresh": "Começar do Zero",
-    "resume": "Continuar"
+    "resume": "Continuar",
+    "singerMode": "Modo Cantor",
+    "chordsMode": "Modo Cifras",
+    "singerModeDesc": "Ocultar cifras e tablaturas para focar na letra"
   },
   "linkPlaylist": {
     "shareTitle": "Compartilhar uma Playlist",

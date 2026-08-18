@@ -297,7 +297,10 @@
     "resumeSessionPromptTitle": "Resume Session?",
     "resumeSessionPromptDesc": "You have an active performance session for this playlist. Would you like to resume where you left off?",
     "startFresh": "Start Fresh",
-    "resume": "Resume"
+    "resume": "Resume",
+    "singerMode": "Singer Mode",
+    "chordsMode": "Chords Mode",
+    "singerModeDesc": "Hide chords and tabs to focus on lyrics"
   },
   "linkPlaylist": {
     "shareTitle": "Share a Playlist",
