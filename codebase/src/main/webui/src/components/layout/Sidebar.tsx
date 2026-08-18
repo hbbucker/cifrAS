@@ -3,16 +3,23 @@ import { NavLink } from 'react-router-dom';
 import { Home, ListMusic, Users, Settings, Menu, X, Share2 } from 'lucide-react';
 import { UserMenu } from './UserMenu';
 import { useTranslation } from 'react-i18next';
+import { usePendingSharesCount } from '../../hooks/usePendingSharesCount';
 
 export const Sidebar: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const { t } = useTranslation();
+  const pendingCount = usePendingSharesCount();
 
   const links = [
     { to: '/dashboard', icon: <Home className="w-6 h-6" />, label: t('sidebar.home') },
     { to: '/playlists', icon: <ListMusic className="w-6 h-6" />, label: t('sidebar.playlists') },
     { to: '/groups', icon: <Users className="w-6 h-6" />, label: t('sidebar.groups') },
-    { to: '/shared', icon: <Share2 className="w-6 h-6" />, label: t('sidebar.shared') },
+    { 
+      to: '/shared', 
+      icon: <Share2 className="w-6 h-6" />, 
+      label: t('sidebar.shared'),
+      badge: pendingCount > 0 ? pendingCount : null,
+    },
     { to: '/settings', icon: <Settings className="w-6 h-6" />, label: t('sidebar.settings') },
   ];
 
@@ -43,7 +50,7 @@ export const Sidebar: React.FC = () => {
               key={link.to}
               to={link.to}
               className={({ isActive }) => 
-                `flex items-center gap-4 px-3 py-3 rounded-lg transition-colors ${
+                `flex items-center gap-4 px-3 py-3 rounded-lg transition-colors relative ${
                   isActive 
                     ? 'bg-[#8629cc]/10 text-[#8629cc]' 
                     : 'text-text-mute hover:bg-bg-elevated'
@@ -51,8 +58,24 @@ export const Sidebar: React.FC = () => {
               }
               title={collapsed ? link.label : undefined}
             >
-              {link.icon}
-              {!collapsed && <span className="font-medium">{link.label}</span>}
+              <div className="relative flex items-center justify-center">
+                {link.icon}
+                {link.badge !== null && link.badge !== undefined && (
+                  <span className="absolute -top-1.5 -right-2 bg-[#8629cc] text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full min-w-[16px] h-4 flex items-center justify-center">
+                    {link.badge}
+                  </span>
+                )}
+              </div>
+              {!collapsed && (
+                <div className="flex-1 flex items-center justify-between">
+                  <span className="font-medium">{link.label}</span>
+                  {link.badge !== null && link.badge !== undefined && (
+                    <span className="bg-[#8629cc]/10 text-[#8629cc] text-xs font-bold px-2 py-0.5 rounded-full">
+                      {link.badge}
+                    </span>
+                  )}
+                </div>
+              )}
             </NavLink>
           ))}
         </nav>

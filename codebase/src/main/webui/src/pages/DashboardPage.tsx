@@ -11,6 +11,7 @@ import { UserMenu } from '../components/layout/UserMenu';
 import { EmptyState } from '../components/ui/EmptyState';
 import { EducationalEmptyState } from '../components/ui/EducationalEmptyState';
 import { Music } from 'lucide-react';
+import { ShareSongModal } from '../components/modals/ShareSongModal';
 
 interface SongData {
  id: string;
@@ -112,6 +113,8 @@ export const DashboardPage: React.FC = () => {
     .catch(() => toast('Error toggling favorite', 'error'));
   };
 
+  const [sharingSong, setSharingSong] = useState<{ id: string; title: string } | null>(null);
+
  return (
   <div className="flex-1 flex flex-col h-full overflow-hidden">
  <header className="h-16 flex items-center justify-between px-6 bg-bg-card border-b border-border-main">
@@ -155,7 +158,7 @@ export const DashboardPage: React.FC = () => {
  {...song}
  onToggleFavorite={handleToggleFavorite}
  onEdit={(id) => navigate(`/songs/edit/${id}`)}
- onShare={() => { }}
+ onShare={() => setSharingSong({ id: song.id, title: song.title })}
  onDelete={handleDelete}
  />
  </div>
@@ -181,6 +184,14 @@ export const DashboardPage: React.FC = () => {
  />
  )}
  </div>
+ {sharingSong && (
+    <ShareSongModal
+      isOpen={!!sharingSong}
+      songId={sharingSong.id}
+      songTitle={sharingSong.title}
+      onClose={() => setSharingSong(null)}
+    />
+  )}
   </div>
  );
 };

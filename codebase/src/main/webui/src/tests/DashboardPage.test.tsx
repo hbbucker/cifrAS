@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { DashboardPage } from '../pages/DashboardPage';
 import { BrowserRouter } from 'react-router-dom';
@@ -9,11 +9,11 @@ import '@testing-library/jest-dom/vitest';
 
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
- const actual = await vi.importActual('react-router-dom');
- return {
- ...actual as Record<string, unknown>,
- useNavigate: () => mockNavigate,
- };
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual as Record<string, unknown>,
+    useNavigate: () => mockNavigate,
+  };
 });
 
 const mockSongs = [
@@ -29,44 +29,70 @@ globalThis.fetch = vi.fn(() =>
 );
 
 describe('DashboardPage Component', () => {
- it('navigates to song edit when edit action is clicked', async () => {
-  render(
-  <AuthProvider>
-  <ThemeProvider>
-  <ToastProvider>
-  <BrowserRouter>
-  <DashboardPage />
-  </BrowserRouter>
-  </ToastProvider>
-  </ThemeProvider>
-  </AuthProvider>
-  );
+  it('navigates to song edit when edit action is clicked', async () => {
+    render(
+      <AuthProvider>
+        <ThemeProvider>
+          <ToastProvider>
+            <BrowserRouter>
+              <DashboardPage />
+            </BrowserRouter>
+          </ToastProvider>
+        </ThemeProvider>
+      </AuthProvider>
+    );
 
- // Wait for mock data to load
- const menuBtn = await screen.findAllByTestId('menu-btn', {}, { timeout: 2000 });
- fireEvent.click(menuBtn[0]);
- 
- const editBtn = screen.getAllByText('musicCard.edit')[0];
- fireEvent.click(editBtn);
- 
- expect(mockNavigate).toHaveBeenCalledWith(expect.stringContaining('/songs/edit/'));
- });
+    // Wait for mock data to load
+    const menuBtn = await screen.findAllByTestId('menu-btn', {}, { timeout: 2000 });
+    fireEvent.click(menuBtn[0]);
+    
+    const editBtn = screen.getAllByText('musicCard.edit')[0];
+    fireEvent.click(editBtn);
+    
+    expect(mockNavigate).toHaveBeenCalledWith(expect.stringContaining('/songs/edit/'));
+  });
 
- it('navigates to song view when card is clicked', async () => {
-  render(
-  <AuthProvider>
-  <ThemeProvider>
-  <ToastProvider>
-  <BrowserRouter>
-  <DashboardPage />
-  </BrowserRouter>
-  </ToastProvider>
-  </ThemeProvider>
-  </AuthProvider>
-  );
+  it('navigates to song view when card is clicked', async () => {
+    render(
+      <AuthProvider>
+        <ThemeProvider>
+          <ToastProvider>
+            <BrowserRouter>
+              <DashboardPage />
+            </BrowserRouter>
+          </ToastProvider>
+        </ThemeProvider>
+      </AuthProvider>
+    );
 
- const viewDivs = await screen.findAllByTestId(/view-song-/i, {}, { timeout: 2000 });
- fireEvent.click(viewDivs[0]);
- expect(mockNavigate).toHaveBeenCalledWith(expect.stringContaining('/song/'));
- });
+    const viewDivs = await screen.findAllByTestId(/view-song-/i, {}, { timeout: 2000 });
+    fireEvent.click(viewDivs[0]);
+    expect(mockNavigate).toHaveBeenCalledWith(expect.stringContaining('/song/'));
+  });
+
+  it('opens ShareSongModal when share action is clicked', async () => {
+    render(
+      <AuthProvider>
+        <ThemeProvider>
+          <ToastProvider>
+            <BrowserRouter>
+              <DashboardPage />
+            </BrowserRouter>
+          </ToastProvider>
+        </ThemeProvider>
+      </AuthProvider>
+    );
+
+    const menuBtn = await screen.findAllByTestId('menu-btn', {}, { timeout: 2000 });
+    fireEvent.click(menuBtn[0]);
+
+    const shareBtn = screen.getAllByText('musicCard.share')[0];
+    fireEvent.click(shareBtn);
+
+    await waitFor(() => {
+      const dialog = screen.getByRole('dialog');
+      expect(dialog).toBeInTheDocument();
+      expect(within(dialog).getByText('Song 1')).toBeInTheDocument();
+    });
+  });
 });
