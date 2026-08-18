@@ -184,19 +184,19 @@ export const TheaterModePage: React.FC = () => {
     }
   }, [playlistId, currentPlaylistIndex, scrollTop, saveProgress, activeSongId, song.title, t]);
 
- const handleNextSong = () => {
- if (playlistId && currentPlaylistIndex < playlistSongs.length - 1) {
- setSlideDir('right');
- setCurrentPlaylistIndex(prev => prev + 1);
- }
- };
+  const handleNextSong = React.useCallback(() => {
+    if (playlistId && currentPlaylistIndex < playlistSongs.length - 1) {
+      setSlideDir('right');
+      setCurrentPlaylistIndex(prev => prev + 1);
+    }
+  }, [playlistId, currentPlaylistIndex, playlistSongs.length]);
 
- const handlePrevSong = () => {
- if (playlistId && currentPlaylistIndex > 0) {
- setSlideDir('left');
- setCurrentPlaylistIndex(prev => prev - 1);
- }
- };
+  const handlePrevSong = React.useCallback(() => {
+    if (playlistId && currentPlaylistIndex > 0) {
+      setSlideDir('left');
+      setCurrentPlaylistIndex(prev => prev - 1);
+    }
+  }, [playlistId, currentPlaylistIndex]);
 
   const handleFontSizeChange = (delta: number) => {
     setFontSize(prev => Math.max(10, Math.min(60, prev + delta)));
@@ -251,9 +251,11 @@ export const TheaterModePage: React.FC = () => {
     };
 
     recalculate();
-    const observer = new ResizeObserver(recalculate);
-    observer.observe(container);
-    return () => observer.disconnect();
+    if (typeof ResizeObserver !== 'undefined') {
+      const observer = new ResizeObserver(recalculate);
+      observer.observe(container);
+      return () => observer.disconnect();
+    }
   }, [transposedContent, containerRef, passedState, isMobile]);
 
 
@@ -275,74 +277,87 @@ export const TheaterModePage: React.FC = () => {
   };
 
   const onTouchEnd = () => {
-  if (!touchStart || !touchEnd) return;
-  const distanceX = touchStart.x - touchEnd.x;
-  const distanceY = Math.abs(touchStart.y - touchEnd.y);
+    if (isLocked) return;
+    if (!touchStart || !touchEnd) return;
+    const distanceX = touchStart.x - touchEnd.x;
+    const distanceY = Math.abs(touchStart.y - touchEnd.y);
 
-  // If vertical movement is dominant, treat as scroll — ignore song navigation
-  if (distanceY > Math.abs(distanceX)) return;
+    // If vertical movement is dominant, treat as scroll — ignore song navigation
+    if (distanceY > Math.abs(distanceX)) return;
 
-  const isLeftSwipe = distanceX > minSwipeDistance;
-  const isRightSwipe = distanceX < -minSwipeDistance;
+    const isLeftSwipe = distanceX > minSwipeDistance;
+    const isRightSwipe = distanceX < -minSwipeDistance;
 
-  if (isLeftSwipe) {
-  handleNextSong();
-  } else if (isRightSwipe) {
-  handlePrevSong();
-  }
-  // Tap is handled by onClick
+    if (isLeftSwipe) {
+      handleNextSong();
+    } else if (isRightSwipe) {
+      handlePrevSong();
+    }
   };
 
- // Fake full screen logic
- const toggleFullscreen = () => {
- if (!document.fullscreenElement) {
- document.documentElement.requestFullscreen().catch(() => {});
- } else {
- document.exitFullscreen().catch(() => {});
- }
- };
+  // Keyboard accessibility for stage / pedal controllers
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (isLocked) return;
+      if (e.key === 'ArrowRight') {
+        handleNextSong();
+      } else if (e.key === 'ArrowLeft') {
+        handlePrevSong();
+      } else if (e.key === ' ' || e.code === 'Space') {
+        e.preventDefault();
+        if (isScrolling) {
+          pause();
+        } else {
+          play();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isLocked, isScrolling, pause, play, handleNextSong, handlePrevSong]);
 
- useEffect(() => {
- // Cleanup fullscreen on exit
- return () => {
- if (document.fullscreenElement) {
- document.exitFullscreen().catch(() => {});
- }
- };
- }, []);
+  // Fake full screen logic
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  };
 
- const handleExit = () => {
- if (window.history.state && window.history.state.idx > 0) {
- navigate(-1);
- } else {
- navigate(playlistId ? `/playlists/${playlistId}` : songId ? `/song/${songId}` : '/songs');
- }
- };
+  useEffect(() => {
+    // Cleanup fullscreen on exit
+    return () => {
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+      }
+    };
+  }, []);
 
- // Calculate opacity based on scroll position (1.0 at top, down to 0.2 after 200px)
- const headerOpacity = Math.max(0.2, 1 - scrollTop / 200);
+  const handleExit = () => {
+    if (window.history.state && window.history.state.idx > 0) {
+      navigate(-1);
+    } else {
+      navigate(playlistId ? `/playlists/${playlistId}` : songId ? `/song/${songId}` : '/songs');
+    }
+  };
 
- return (
- <div 
- className="h-screen w-full bg-bg-main text-text-main overflow-hidden relative flex flex-col font-sans"
- onTouchStart={onTouchStart}
- onTouchMove={onTouchMove}
- onTouchEnd={onTouchEnd}
- onClick={(e) => {
- setLastInteraction(Date.now());
- // Desktop/mouse tap zones
- if (e.target instanceof Element && e.target.closest('button, a, input, [role="button"]')) return;
- const clientX = e.clientX;
- const width = window.innerWidth;
- if (clientX < width * 0.3) {
- if (playlistId) handlePrevSong();
- } else if (clientX > width * 0.7) {
- if (playlistId) handleNextSong();
- } else {
- setShowControls(prev => !prev);
- }
- }}
- >
+  // Calculate opacity based on scroll position (1.0 at top, down to 0.2 after 200px)
+  const headerOpacity = Math.max(0.2, 1 - scrollTop / 200);
+
+  return (
+    <div 
+      className="h-screen w-full bg-bg-main text-text-main overflow-hidden relative flex flex-col font-sans"
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+      onClick={(e) => {
+        setLastInteraction(Date.now());
+        if (e.target instanceof Element && e.target.closest('button, a, input, [role="button"]')) return;
+        setShowControls(prev => !prev);
+      }}
+    >
  {/* Header becomes semi-transparent when scrolling */}
  <header 
  className="p-4 flex flex-col md:flex-row items-start md:items-center justify-between absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-bg-main via-bg-main/80 to-transparent pointer-events-none transition-opacity duration-200"
