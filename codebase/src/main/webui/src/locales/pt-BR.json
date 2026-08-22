@@ -326,6 +326,8 @@
     "title": "Novidades no CifrAS!",
     "pitchPersistence": "Persistência de Tom: os tons agora ficam salvos no seu browser.",
     "theaterMode": "Modo Teatro: maximize a letra para usar no palco.",
+    "singerMode": "Modo Cantor no Modo Teatro (apenas letras).",
+    "playlistExport": "Exportação de Playlists (.pptx) sem tablaturas.",
     "button": "Entendi!"
   },
   "songSharing": {

@@ -15,15 +15,12 @@ vi.mock('react-router-dom', async () => {
 });
 
 const toastMock = vi.fn();
+const mockToastObj = { toast: toastMock };
 vi.mock('../context/ToastContext', () => ({
-  useToast: () => ({
-    toast: toastMock,
-  }),
+  useToast: () => mockToastObj,
 }));
 
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => {
+const mockT = (key: string) => {
       const dict: Record<string, string> = {
         'group.sharedPlaylists': 'Playlists Compartilhadas',
         'group.sharePlaylist': 'Compartilhar Playlist',
@@ -37,17 +34,21 @@ vi.mock('react-i18next', () => ({
         'group.remove': 'Remover do Grupo',
         'playlists.songsCount': 'músicas',
         'sharedWithMe.playTheater': 'Tocar no Modo Teatro',
+        'common.confirm': 'Confirmar',
+        'common.cancel': 'Cancelar',
       };
       return dict[key] || key;
-    },
-  }),
+    };
+const mockI18nObj = { t: mockT };
+vi.mock('react-i18next', () => ({
+  useTranslation: () => mockI18nObj,
 }));
 
 describe('GroupPlaylistsSection Component', () => {
   const onLinkNewMock = vi.fn();
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   const renderComponent = (role: 'Admin' | 'Member' = 'Admin') => {
@@ -114,8 +115,7 @@ describe('GroupPlaylistsSection Component', () => {
   });
 
   it('calls unlinkPlaylist and refreshes list when admin removes a playlist', async () => {
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
-    const unlinkSpy = vi.spyOn(groupsApi, 'unlinkPlaylist').mockResolvedValue();
+    const unlinkSpy = vi.spyOn(groupsApi, 'unlinkPlaylist').mockResolvedValue(undefined);
     vi.spyOn(groupsApi, 'getGroupPlaylists')
       .mockResolvedValueOnce([{ id: 'p1', name: 'Repertório Culto', songCount: 5 }])
       .mockResolvedValueOnce([]);
@@ -125,7 +125,9 @@ describe('GroupPlaylistsSection Component', () => {
     const deleteBtn = await screen.findByTitle('Remover do Grupo');
     fireEvent.click(deleteBtn);
 
-    expect(confirmSpy).toHaveBeenCalled();
+    const confirmBtn = await screen.findByText('Confirmar');
+    fireEvent.click(confirmBtn);
+
     await waitFor(() => {
       expect(unlinkSpy).toHaveBeenCalledWith('group-1', 'p1');
       expect(toastMock).toHaveBeenCalledWith('Playlist removida do grupo', 'success');
@@ -133,7 +135,6 @@ describe('GroupPlaylistsSection Component', () => {
   });
 
   it('does not unlink playlist if confirmation is cancelled', async () => {
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false);
     const unlinkSpy = vi.spyOn(groupsApi, 'unlinkPlaylist');
     vi.spyOn(groupsApi, 'getGroupPlaylists').mockResolvedValueOnce([
       { id: 'p1', name: 'Repertório Culto', songCount: 5 },
@@ -144,7 +145,9 @@ describe('GroupPlaylistsSection Component', () => {
     const deleteBtn = await screen.findByTitle('Remover do Grupo');
     fireEvent.click(deleteBtn);
 
-    expect(confirmSpy).toHaveBeenCalled();
+    const cancelBtn = await screen.findByText('Cancelar');
+    fireEvent.click(cancelBtn);
+
     expect(unlinkSpy).not.toHaveBeenCalled();
   });
 
@@ -159,7 +162,6 @@ describe('GroupPlaylistsSection Component', () => {
   });
 
   it('shows error toast when unlinking fails', async () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(true);
     vi.spyOn(groupsApi, 'getGroupPlaylists').mockResolvedValueOnce([
       { id: 'p1', name: 'Repertório Culto', songCount: 5 },
     ]);
@@ -169,6 +171,9 @@ describe('GroupPlaylistsSection Component', () => {
 
     const deleteBtn = await screen.findByTitle('Remover do Grupo');
     fireEvent.click(deleteBtn);
+    
+    const confirmBtn = await screen.findByText('Confirmar');
+    fireEvent.click(confirmBtn);
 
     await waitFor(() => {
       expect(toastMock).toHaveBeenCalledWith('Falha ao remover playlist', 'error');

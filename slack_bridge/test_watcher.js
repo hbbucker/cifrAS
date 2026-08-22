@@ -10,7 +10,7 @@ let mapping = {
     'thread_1': { pendingId: 'slack_init_123', channel: 'C123', offset: 0 }
 };
 
-const processNewLines = async (filePath, thread_ts, mData) => {
+const applyNewLines = async (filePath, thread_ts, mData) => {
     try {
         const stats = fs.statSync(filePath);
         if (stats.size <= (mData.offset || 0)) return;
@@ -75,7 +75,7 @@ const handleFileChange = (filePath) => {
 
     for (const [thread_ts, mData] of Object.entries(mapping)) {
         if (mData.sessionId === sessionId) {
-            processNewLines(filePath, thread_ts, mData);
+            applyNewLines(filePath, thread_ts, mData);
         }
     }
 };

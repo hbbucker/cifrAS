@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
-    localStorage.setItem('feature_discovery_02_seen', 'true');
+    localStorage.setItem('feature_discovery_03_seen', 'true');
     localStorage.setItem('tooltip_seen_add_song_btn', 'true');
   });
 });
@@ -27,7 +27,8 @@ test('full application flow including registration and song CRUD', async ({ page
   await expect(page).toHaveURL(/.*\/songs\/new/);
   await expect(page.locator('h1')).toHaveText('New Song');
   
-  await page.getByTestId('song-title-input').fill('My New Song');
+  const songTitle = 'My New Song ' + Date.now();
+  await page.getByTestId('song-title-input').fill(songTitle);
   await page.getByTestId('song-artist-input').fill('Me');
   await page.getByTestId('song-content-input').fill('[C] Hello [G] World');
   
@@ -36,8 +37,8 @@ test('full application flow including registration and song CRUD', async ({ page
   await expect(page.getByText('Song created successfully!')).toBeVisible();
 
   // 4. View Song
-  await page.locator('div[data-testid^="view-song-"]').first().click();
-  await expect(page.locator('h1')).toHaveText('My New Song');
+  await page.getByText(songTitle).first().click();
+  await expect(page.locator('h1')).toHaveText(songTitle);
   
   // Transpose Pad check
   await expect(page.getByTestId('current-key')).toHaveText('C');

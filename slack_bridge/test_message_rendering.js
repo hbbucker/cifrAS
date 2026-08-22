@@ -6,15 +6,25 @@ const test = require('node:test');
 const {
   SLACK_MARKDOWN_LIMIT,
   createAccessibleFallback,
-  createPublicationState,
   extractLocalFiles,
+  redactLocalPaths,
+  splitMarkdownForSlack
+} = require('./message_rendering');
+
+const {
+  createPublicationState,
+  applyRootTranscriptEvent,
+  applyStreamAgentResponseEvent,
+  applyRootTranscriptAtFinish,
+  applySubagentTranscriptEvent
+} = require('./agy_execution');
+const {
   postFinalMessage,
   publishFinalWithUploads,
   publishStatus,
-  redactLocalPaths,
-  splitMarkdownForSlack,
-  waitForSlackQueue,
-} = require('./bot');
+  waitForSlackQueue
+} = require('./slack_delivery');
+
 
 function closeUploadStream(stream) {
   return new Promise((resolve, reject) => {

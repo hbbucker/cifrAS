@@ -1,3 +1,5 @@
+ALTER TABLE songs ADD COLUMN IF NOT EXISTS fts_vector tsvector GENERATED ALWAYS AS (setweight(to_tsvector('portuguese', coalesce(title, '')), 'A') || setweight(to_tsvector('portuguese', coalesce(artist, '')), 'B')) STORED;
+
 -- Insert dummy songs for E2E testing user (e2e-user-1234)
 INSERT INTO songs (id, userid, title, artist, originalkey, lyrics, is_favorite, createdat, updatedat, pref_auto_scroll_speed, pref_transpose_steps, pref_use_bb, pref_use_eb)
 VALUES

@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
-    localStorage.setItem('feature_discovery_02_seen', 'true');
+    localStorage.setItem('feature_discovery_03_seen', 'true');
   });
 });
 
@@ -18,14 +18,15 @@ test('Evidencia - Aviso de Transposicao', async ({ page }) => {
   
   // 3. Create New Song
   await page.getByTestId('add-song-btn').click();
-  await page.getByTestId('song-title-input').fill('Evidencia Song');
+  const songTitle = 'Evidencia Song ' + Date.now();
+  await page.getByTestId('song-title-input').fill(songTitle);
   await page.getByTestId('song-artist-input').fill('Artist');
   await page.getByTestId('song-content-input').fill('[C] Hello [G] World');
   await page.getByTestId('save-song-btn').click();
   await expect(page).toHaveURL(/.*\/songs/);
   
   // 4. View Song
-  await page.locator('div[data-testid^="view-song-"]').first().click();
+  await page.getByText(songTitle).first().click();
   
   // 5. Transpose the song up once
   await page.getByTestId('transpose-up').click();

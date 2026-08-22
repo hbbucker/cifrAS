@@ -9,7 +9,7 @@ test('debug screenshot', async ({ page }) => {
   await page.route('**/api/theater/song-preferences/*', async route => {
     await route.fulfill({ status: 200, json: {} });
   });
-  await page.addInitScript(() => localStorage.removeItem('feature_discovery_02_seen'));
+  await page.addInitScript(() => localStorage.removeItem('feature_discovery_03_seen'));
   await page.goto(`/auth/callback#access_token=${mockJwt}&refresh_token=dummy`);
   await expect(page).toHaveURL(/.*\/dashboard/);
   await page.goto('/song/1');

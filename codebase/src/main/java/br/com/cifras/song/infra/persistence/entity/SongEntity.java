@@ -66,6 +66,9 @@ public class SongEntity extends PanacheEntityBase {
     /** Soft delete — null means the song is active */
     public Instant deletedAt;
 
+    @Column(name = "fts_vector", columnDefinition = "tsvector GENERATED ALWAYS AS (setweight(to_tsvector('portuguese', coalesce(title, '')), 'A') || setweight(to_tsvector('portuguese', coalesce(artist, '')), 'B')) STORED", insertable = false, updatable = false)
+    public String ftsVector;
+
     @PrePersist
     public void prePersist() {
         this.createdAt = Instant.now();

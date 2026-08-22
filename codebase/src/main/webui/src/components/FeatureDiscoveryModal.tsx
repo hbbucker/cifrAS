@@ -23,8 +23,8 @@ export const FeatureDiscoveryModal: React.FC<FeatureDiscoveryModalProps> = ({ on
           {t('featureDiscovery.title')}
         </h2>
         <div className="text-[#33332e] text-base space-y-3 mb-8 text-left w-full">
-          <p>✨ {t('featureDiscovery.pitchPersistence')}</p>
-          <p>🎭 {t('featureDiscovery.theaterMode')}</p>
+          <p>🎤 {t('featureDiscovery.singerMode')}</p>
+          <p>📊 {t('featureDiscovery.playlistExport')}</p>
         </div>
 
         {/* Action Button */}
