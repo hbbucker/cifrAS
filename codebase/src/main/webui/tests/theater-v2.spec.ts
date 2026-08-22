@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
-    localStorage.setItem('feature_discovery_02_seen', 'true');
+    localStorage.setItem('feature_discovery_03_seen', 'true');
   });
 });
 
@@ -23,13 +23,14 @@ test('theater mode lock functionality', async ({ page }) => {
 
   await page.goto('/songs');
   await page.getByTestId('add-song-btn').click();
-  await page.getByTestId('song-title-input').fill('Theater Lock Test');
+  const songTitle = 'Theater Lock Test ' + Date.now();
+  await page.getByTestId('song-title-input').fill(songTitle);
   await page.getByTestId('song-artist-input').fill('Artist');
   await page.getByTestId('song-content-input').fill('[C] Hello [G] World');
   await page.getByTestId('save-song-btn').click();
   await page.waitForURL(/.*\/songs/);
 
-  await page.locator('div[data-testid^="view-song-"]').first().click();
+  await page.getByText(songTitle).first().click();
   await page.getByTestId('theater-mode-btn').click();
   await page.waitForURL(/.*\/theater\/song\/[a-zA-Z0-9-]+/);
   await expect(page.getByTestId('theater-controls')).toBeVisible();

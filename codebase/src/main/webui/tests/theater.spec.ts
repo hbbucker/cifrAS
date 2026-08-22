@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
-    localStorage.setItem('feature_discovery_02_seen', 'true');
+    localStorage.setItem('feature_discovery_03_seen', 'true');
   });
 });
 
@@ -20,14 +20,15 @@ test('theater mode session state is preserved', async ({ page }) => {
   
   // 3. Create New Song
   await page.getByTestId('add-song-btn').click();
-  await page.getByTestId('song-title-input').fill('Theater Test Song');
+  const songTitle = 'Theater Test Song ' + Date.now();
+  await page.getByTestId('song-title-input').fill(songTitle);
   await page.getByTestId('song-artist-input').fill('Artist');
   await page.getByTestId('song-content-input').fill('[C] Hello [G] World');
   await page.getByTestId('save-song-btn').click();
   await expect(page).toHaveURL(/.*\/songs/);
   
   // 4. View Song
-  await page.locator('div[data-testid^="view-song-"]').first().click();
+  await page.getByText(songTitle).first().click();
   
   // 5. Enter Theater Mode
   await page.getByTestId('theater-mode-btn').click();

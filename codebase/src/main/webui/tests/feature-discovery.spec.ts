@@ -4,7 +4,7 @@ test.describe('Feature Discovery Modal', () => {
   test.beforeEach(async ({ page }) => {
     // Ensure we see the modal
     await page.addInitScript(() => {
-      localStorage.removeItem('feature_discovery_02_seen');
+      localStorage.removeItem('feature_discovery_03_seen');
     });
   });
 
@@ -53,7 +53,7 @@ test.describe('Feature Discovery Modal', () => {
     await expect(overlay).toBeVisible({ timeout: 5000 });
     
     // Check localStorage before click
-    let seenState = await page.evaluate(() => localStorage.getItem('feature_discovery_02_seen'));
+    let seenState = await page.evaluate(() => localStorage.getItem('feature_discovery_03_seen'));
     expect(seenState).toBeNull();
     
     // Click the button to dismiss
@@ -64,7 +64,7 @@ test.describe('Feature Discovery Modal', () => {
     await expect(overlay).toBeHidden({ timeout: 2000 });
     
     // Check localStorage after click
-    seenState = await page.evaluate(() => localStorage.getItem('feature_discovery_02_seen'));
+    seenState = await page.evaluate(() => localStorage.getItem('feature_discovery_03_seen'));
     expect(seenState).toBe('true');
   });
 });
