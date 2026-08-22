@@ -10,7 +10,7 @@ watcher.on('all', (event, p) => console.log(event, p));
 watcher.on('ready', () => {
     console.log("Ready. Creating file...");
     const sub = path.join(dir, 'sess_1');
-    fs.mkdirSync(sub);
+    if (!fs.existsSync(sub)) fs.mkdirSync(sub);
     fs.writeFileSync(path.join(sub, 'log.txt'), "hello");
     setTimeout(() => {
         fs.appendFileSync(path.join(sub, 'log.txt'), " world");

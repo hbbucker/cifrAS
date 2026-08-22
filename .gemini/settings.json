@@ -1,5 +1,14 @@
 {
   "hooksConfig": {
     "enabled": false
+  },
+  "mcpServers": {
+    "headroom": {
+      "command": "/home/bucker/anaconda3/bin/headroom",
+      "args": [
+        "mcp",
+        "serve"
+      ]
+    }
   }
 }
