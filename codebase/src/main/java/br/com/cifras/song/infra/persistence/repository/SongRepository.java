@@ -48,26 +48,38 @@ public class SongRepository {
     }
 
     public List<Song> findByUserIdActive(String userId, int page, int size, String query) {
-        String baseQuery = "userId = ?1 AND " + ACTIVE_FILTER;
-        List<SongEntity> entities;
         if (query != null && !query.isBlank()) {
-            baseQuery += " AND (LOWER(title) LIKE LOWER(?2) OR LOWER(artist) LIKE LOWER(?2))";
-            entities = jpaRepo.find(baseQuery, Sort.by("createdAt").descending(),
-                    userId, "%" + query + "%")
-                .page(Page.of(page - 1, size))
-                .list();
-        } else {
-            entities = jpaRepo.find(baseQuery, Sort.by("createdAt").descending(), userId)
-                .page(Page.of(page - 1, size))
-                .list();
+            String formattedQuery = query.trim().replaceAll("\\s+", " & ");
+            String sql = "SELECT * FROM songs WHERE userId = :userId AND " + ACTIVE_FILTER + " " + 
+                         "AND fts_vector @@ to_tsquery('portuguese', :query) " +
+                         "ORDER BY ts_rank(fts_vector, to_tsquery('portuguese', :query)) DESC";
+            
+            List<SongEntity> entities = em.createNativeQuery(sql, SongEntity.class)
+                    .setParameter("userId", userId)
+                    .setParameter("query", formattedQuery)
+                    .setFirstResult((page - 1) * size)
+                    .setMaxResults(size)
+                    .getResultList();
+            return entities.stream().map(mapper::toDomain).collect(Collectors.toList());
         }
+
+        String baseQuery = "userId = ?1 AND " + ACTIVE_FILTER;
+        List<SongEntity> entities = jpaRepo.find(baseQuery, Sort.by("createdAt").descending(), userId)
+            .page(Page.of(page - 1, size))
+            .list();
         return entities.stream().map(mapper::toDomain).collect(Collectors.toList());
     }
 
     public long countByUserIdActive(String userId, String query) {
         if (query != null && !query.isBlank()) {
-            return jpaRepo.count("userId = ?1 AND " + ACTIVE_FILTER + " AND (LOWER(title) LIKE LOWER(?2) OR LOWER(artist) LIKE LOWER(?2))",
-                    userId, "%" + query + "%");
+            String formattedQuery = query.trim().replaceAll("\\s+", " & ");
+            String sql = "SELECT COUNT(*) FROM songs WHERE userId = :userId AND " + ACTIVE_FILTER + " " + 
+                         "AND fts_vector @@ to_tsquery('portuguese', :query)";
+            Number count = (Number) em.createNativeQuery(sql)
+                    .setParameter("userId", userId)
+                    .setParameter("query", formattedQuery)
+                    .getSingleResult();
+            return count.longValue();
         }
         return jpaRepo.count("userId = ?1 AND " + ACTIVE_FILTER, userId);
     }
