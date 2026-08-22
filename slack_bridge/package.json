@@ -1,0 +1,19 @@
+{
+  "name": "slack_bridge",
+  "version": "1.0.12",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --test test_message_rendering.js test_role_attribution.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@slack/bolt": "^5.0.0",
+    "chokidar": "^5.0.0",
+    "dotenv": "^17.4.2",
+    "p-queue": "^6.6.2"
+  }
+}
