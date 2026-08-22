@@ -10,6 +10,7 @@ import '@testing-library/jest-dom/vitest';
 
 const mockNavigate = vi.fn();
 const mockParams = { playlistId: 'p1', songId: undefined as string | undefined };
+let mockLocation = { state: null as unknown, search: '', pathname: '/theater/p1' };
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
@@ -17,7 +18,8 @@ vi.mock('react-router-dom', async () => {
     ...actual as Record<string, unknown>,
     useNavigate: () => mockNavigate,
     useParams: () => mockParams,
-    useLocation: () => ({ state: null }),
+    useLocation: () => mockLocation,
+    useSearchParams: () => [new URLSearchParams(mockLocation.search), vi.fn()],
   };
 });
 
@@ -45,6 +47,9 @@ vi.mock('../hooks/usePerformanceSession', () => ({
 describe('TheaterModePage Component — Gesture & Interaction Navigation', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockLocation = { state: null, search: '', pathname: '/theater/p1' };
+    mockParams.playlistId = 'p1';
+    mockParams.songId = undefined;
     vi.mocked(apiClient.get).mockImplementation((url: string) => {
       if (url.includes('/playlists/p1')) {
         return Promise.resolve({
@@ -288,5 +293,70 @@ describe('TheaterModePage Component — Gesture & Interaction Navigation', () =>
     // Click to toggle Singer Mode back off
     fireEvent.click(singerBtn);
     expect(screen.getByTestId('transpose-up')).toBeInTheDocument();
+  });
+
+  it('initializes theater mode with intermediate song via query params (?songId=s2)', async () => {
+    mockLocation.search = '?songId=s2';
+
+    renderComponent();
+
+    // Song 2 should be immediately rendered as the active song
+    expect(await screen.findByText('Song 2')).toBeInTheDocument();
+    expect(screen.getByText('Artist 2')).toBeInTheDocument();
+
+    // Previous song button should be enabled and navigate back to Song 1
+    const prevBtn = screen.getByTestId('prev-song-btn');
+    expect(prevBtn).toBeEnabled();
+    fireEvent.click(prevBtn);
+
+    expect(await screen.findByText('Song 1')).toBeInTheDocument();
+
+    // At Song 1 (first song), previous button should now be disabled
+    expect(screen.getByTestId('prev-song-btn')).toBeDisabled();
+  });
+
+  it('initializes theater mode with intermediate song via location state ({ songIndex: 1, songId: "s2" })', async () => {
+    mockLocation.state = { songIndex: 1, songId: 's2' };
+
+    renderComponent();
+
+    // Song 2 should be immediately loaded
+    expect(await screen.findByText('Song 2')).toBeInTheDocument();
+    expect(screen.getByText('Artist 2')).toBeInTheDocument();
+
+    // Next song button should be disabled as Song 2 is the last song (N - 1)
+    const nextBtn = screen.getByTestId('next-song-btn');
+    expect(nextBtn).toBeDisabled();
+  });
+
+  it('initializes theater mode with startIndex query param (?startIndex=1)', async () => {
+    mockLocation.search = '?startIndex=1';
+
+    renderComponent();
+
+    expect(await screen.findByText('Song 2')).toBeInTheDocument();
+  });
+
+  it('falls back to first song if query param songId is not found in playlist', async () => {
+    mockLocation.search = '?songId=nonexistent-id';
+
+    renderComponent();
+
+    expect(await screen.findByText('Song 1')).toBeInTheDocument();
+  });
+
+  it('disables previous button on first song (K = 0) and next button on last song (K = N - 1)', async () => {
+    renderComponent();
+
+    // Initial state: Song 1 (K = 0)
+    expect(await screen.findByText('Song 1')).toBeInTheDocument();
+    expect(screen.getByTestId('prev-song-btn')).toBeDisabled();
+    expect(screen.getByTestId('next-song-btn')).toBeEnabled();
+
+    // Navigate to Song 2 (K = 1, last song)
+    fireEvent.click(screen.getByTestId('next-song-btn'));
+    expect(await screen.findByText('Song 2')).toBeInTheDocument();
+    expect(screen.getByTestId('prev-song-btn')).toBeEnabled();
+    expect(screen.getByTestId('next-song-btn')).toBeDisabled();
   });
 });
