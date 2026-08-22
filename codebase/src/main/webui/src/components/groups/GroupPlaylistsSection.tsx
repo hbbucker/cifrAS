@@ -7,6 +7,7 @@ import { useToast } from '../../context/ToastContext';
 import { Button } from '../ui/Button';
 import { EmptyState } from '../ui/EmptyState';
 import { Spinner } from '../ui/Spinner';
+import { ConfirmModal } from '../modals/ConfirmModal';
 
 interface PlaylistData {
   id: string | number;
@@ -28,6 +29,8 @@ export const GroupPlaylistsSection: React.FC<GroupPlaylistsSectionProps> = ({ gr
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [playlistToRemove, setPlaylistToRemove] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -56,15 +59,27 @@ export const GroupPlaylistsSection: React.FC<GroupPlaylistsSectionProps> = ({ gr
     }
   };
 
-  const handleUnlink = async (playlistId: string) => {
-    if (!window.confirm(t('group.confirmRemovePlaylist'))) return;
+  const handleUnlinkClick = (playlistId: string) => {
+    setPlaylistToRemove(playlistId);
+    setIsConfirmOpen(true);
+  };
+
+  const handleConfirmUnlink = async () => {
+    if (!playlistToRemove) return;
+    setIsConfirmOpen(false);
     try {
-      await unlinkPlaylist(groupId, playlistId);
+      await unlinkPlaylist(groupId, playlistToRemove);
       fetchPlaylists();
       toast(t('group.removePlaylistSuccess'), 'success');
     } catch {
       toast(t('group.removePlaylistError'), 'error');
     }
+    setPlaylistToRemove(null);
+  };
+
+  const handleCancelUnlink = () => {
+    setIsConfirmOpen(false);
+    setPlaylistToRemove(null);
   };
 
   return (
@@ -114,7 +129,7 @@ export const GroupPlaylistsSection: React.FC<GroupPlaylistsSectionProps> = ({ gr
                 </button>
                 {role === 'Admin' && (
                   <button 
-                    onClick={() => handleUnlink(playlist.id.toString())}
+                    onClick={() => handleUnlinkClick(playlist.id.toString())}
                     className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors shrink-0"
                     title={t('group.remove')}
                     aria-label={t('group.remove')}
@@ -127,6 +142,13 @@ export const GroupPlaylistsSection: React.FC<GroupPlaylistsSectionProps> = ({ gr
           ))}
         </div>
       )}
+      <ConfirmModal
+        isOpen={isConfirmOpen}
+        title={t('group.remove')}
+        message={t('group.confirmRemovePlaylist')}
+        onConfirm={handleConfirmUnlink}
+        onCancel={handleCancelUnlink}
+      />
     </div>
   );
 };
