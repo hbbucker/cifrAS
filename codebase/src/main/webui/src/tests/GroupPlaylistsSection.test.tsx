@@ -15,15 +15,12 @@ vi.mock('react-router-dom', async () => {
 });
 
 const toastMock = vi.fn();
+const mockToastObj = { toast: toastMock };
 vi.mock('../context/ToastContext', () => ({
-  useToast: () => ({
-    toast: toastMock,
-  }),
+  useToast: () => mockToastObj,
 }));
 
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => {
+const mockT = (key: string) => {
       const dict: Record<string, string> = {
         'group.sharedPlaylists': 'Playlists Compartilhadas',
         'group.sharePlaylist': 'Compartilhar Playlist',
@@ -41,15 +38,17 @@ vi.mock('react-i18next', () => ({
         'common.cancel': 'Cancelar',
       };
       return dict[key] || key;
-    },
-  }),
+    };
+const mockI18nObj = { t: mockT };
+vi.mock('react-i18next', () => ({
+  useTranslation: () => mockI18nObj,
 }));
 
 describe('GroupPlaylistsSection Component', () => {
   const onLinkNewMock = vi.fn();
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   const renderComponent = (role: 'Admin' | 'Member' = 'Admin') => {
