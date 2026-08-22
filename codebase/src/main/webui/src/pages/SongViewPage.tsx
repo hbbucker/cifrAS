@@ -34,7 +34,7 @@ export const SongViewPage: React.FC = () => {
   const [showFeatureModal, setShowFeatureModal] = useState(false);
 
   useEffect(() => {
-    const seen = localStorage.getItem('feature_discovery_02_seen');
+    const seen = localStorage.getItem('feature_discovery_03_seen');
     if (!seen || seen === 'false') {
       const timer = setTimeout(() => {
         setShowFeatureModal(true);
@@ -44,7 +44,7 @@ export const SongViewPage: React.FC = () => {
   }, []);
 
   const handleCloseFeatureModal = () => {
-    localStorage.setItem('feature_discovery_02_seen', 'true');
+    localStorage.setItem('feature_discovery_03_seen', 'true');
     setShowFeatureModal(false);
   };
 

@@ -326,6 +326,8 @@
     "title": "What is new in CifrAS!",
     "pitchPersistence": "Pitch Persistence: pitches are now saved in your browser.",
     "theaterMode": "Theater Mode: maximize lyrics for stage use.",
+    "singerMode": "Singer Mode in Theater Mode (lyrics only).",
+    "playlistExport": "Playlist Export (.pptx) without tabs.",
     "button": "Got it!"
   },
   "songSharing": {
