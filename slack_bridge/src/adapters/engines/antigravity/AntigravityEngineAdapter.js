@@ -25,8 +25,6 @@ class AntigravityEngineAdapter extends ILLMEnginePort {
     return new Promise((resolve) => {
       let boundSessionId = sessionId || null;
       let finalResponseText = '';
-      const roleByConversation = {};
-      if (boundSessionId) roleByConversation[boundSessionId] = 'CEO';
 
       const child = this.spawn(this.agyBin, args, {
         cwd: workspaceDir,
@@ -42,35 +40,47 @@ class AntigravityEngineAdapter extends ILLMEnginePort {
       }
 
       const streamParser = AntigravityStreamParser.create((event) => {
-        // 1. Vincula Session ID
+        // 1. Vincula Session ID da sessão raiz
         if (event && event.event === 'init' && event.conversation_id) {
           boundSessionId = event.conversation_id;
-          roleByConversation[boundSessionId] = 'CEO';
-          if (callbacks.onSessionBound) callbacks.onSessionBound(boundSessionId);
+          if (callbacks.onSessionBound) {
+            callbacks.onSessionBound({ sessionId: boundSessionId });
+          }
         }
 
-        // 2. Detecção de Subagentes via stream
+        // 2. Notificação de Subagente descoberto (dados agnósticos do protocolo)
         const subagents = event && event.event === 'step_update' && event.step_update && event.step_update.subagent_info && event.step_update.subagent_info.subagents;
         if (Array.isArray(subagents)) {
           for (const sub of subagents) {
-            const role = sub.role || sub.type_name || 'Especialista';
-            if (sub.conversation_id && !roleByConversation[sub.conversation_id]) {
-              roleByConversation[sub.conversation_id] = role;
-              if (callbacks.onSubagentSpawned) {
-                callbacks.onSubagentSpawned(role, sub.conversation_id);
-              }
+            if (sub.conversation_id && callbacks.onSubagentDiscovered) {
+              callbacks.onSubagentDiscovered({
+                conversationId: sub.conversation_id,
+                typeName: sub.role || sub.type_name || null,
+                metadata: sub,
+              });
             }
           }
         }
 
-        // 3. Streaming de deltas de pensamento / texto
+        // 3. Streaming de deltas de pensamento / texto por conversation_id
         if (event && event.event === 'step_update' && event.step_update && event.step_update.step_type === 'agent_response') {
           const convId = event.step_update.conversation_id || boundSessionId;
-          const role = roleByConversation[convId] || 'CEO';
           const text = event.step_update.text_delta || event.step_update.text;
           if (text && callbacks.onStreamDelta) {
-            callbacks.onStreamDelta(role, text);
+            callbacks.onStreamDelta({
+              conversationId: convId,
+              textChunk: text,
+            });
           }
+        }
+
+        // 4. Mudança de status da execução
+        if (event && event.event === 'step_update' && event.step_update && event.step_update.status_text && callbacks.onStatusUpdate) {
+          const convId = event.step_update.conversation_id || boundSessionId;
+          callbacks.onStatusUpdate({
+            conversationId: convId,
+            statusText: event.step_update.status_text,
+          });
         }
       });
 

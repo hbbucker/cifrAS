@@ -1,3 +1,5 @@
+const { AgentRole } = require('../value-objects/AgentRole');
+
 class ThreadSession {
   constructor({
     threadId,
@@ -33,23 +35,25 @@ class ThreadSession {
   }
 
   registerSubagent(conversationId, role) {
+    const roleObj = role instanceof AgentRole ? role : AgentRole.from(role);
     this.subagents.set(conversationId, {
       conversationId,
-      role: role.name || role,
+      role: roleObj.name,
       offset: 0,
     });
-    if (!this.participantRoles.includes(role.name || role)) {
-      this.participantRoles.push(role.name || role);
+    if (!this.participantRoles.includes(roleObj.name)) {
+      this.participantRoles.push(roleObj.name);
     }
   }
 
   getRoleForConversation(conversationId) {
+    if (!conversationId) return AgentRole.from('CEO');
     const sub = this.subagents.get(conversationId);
-    if (!sub) {
-      if (conversationId === this.sessionId) return { name: 'CEO' };
-      return null;
+    if (sub) {
+      return AgentRole.from(sub.role);
     }
-    return { name: sub.role };
+    // Se for a sessão raiz ou não tiver subagente registrado, o líder padrão é o CEO
+    return AgentRole.from('CEO');
   }
 
   addPublishedNarrative(narrativeKey) {

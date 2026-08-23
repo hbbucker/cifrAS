@@ -40,15 +40,15 @@ class InMemoryNotificationService {
   }
 }
 
-test('ProcessMessageUseCase: successfully orchestrates end-to-end turn with mock engine', async () => {
+test('ProcessMessageUseCase: successfully orchestrates end-to-end turn with mock engine and neutral callbacks', async () => {
   const repository = new InMemoryThreadRepository();
   const notifier = new InMemoryNotificationService();
   const mockEngine = new MockEngineAdapter({
     onExecute: async (params, callbacks) => {
-      callbacks.onSessionBound('mock-session-123');
-      callbacks.onStreamDelta('CEO', 'Iniciando análise técnica');
-      callbacks.onSubagentSpawned('CTO', 'sub-conv-456');
-      callbacks.onStreamDelta('CTO', 'Criando índices no banco');
+      callbacks.onSessionBound({ sessionId: 'mock-session-123' });
+      callbacks.onStreamDelta({ conversationId: 'mock-session-123', textChunk: 'Iniciando análise técnica' });
+      callbacks.onSubagentDiscovered({ conversationId: 'sub-conv-456', typeName: 'CTO' });
+      callbacks.onStreamDelta({ conversationId: 'sub-conv-456', textChunk: 'Criando índices no banco' });
       return {
         exitCode: 0,
         responseText: 'Entrega final concluída com sucesso.',

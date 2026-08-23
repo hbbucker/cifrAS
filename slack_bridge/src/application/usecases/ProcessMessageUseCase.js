@@ -39,7 +39,7 @@ class ProcessMessageUseCase {
     const prompt = this.governanceContract.formatPrompt(userText, uniqueId);
 
     try {
-      // 2. Executa o motor com callbacks reativos
+      // 2. Executa o motor com callbacks neutros (sem vazar conceitos de Role para o motor)
       const result = await this.llmEngine.execute(
         {
           prompt,
@@ -48,31 +48,34 @@ class ProcessMessageUseCase {
           uniqueId,
         },
         {
-          onSessionBound: (boundId) => {
-            session.bindSessionId(boundId);
+          onSessionBound: ({ sessionId }) => {
+            session.bindSessionId(sessionId);
             this.sessionRepository.save(session);
           },
-          onSubagentSpawned: async (roleName, conversationId) => {
-            const role = AgentRole.from(roleName);
+          onSubagentDiscovered: async ({ conversationId, typeName }) => {
+            // O Domínio resolve o tipo de agente para seu Value Object
+            const role = AgentRole.from(typeName || 'Especialista');
             session.registerSubagent(conversationId, role);
             await this.sessionRepository.save(session);
+
             const progressMsg = role.getProgressMessage('delegated');
             if (progressMsg) {
               await this.notificationGateway.sendStatus(threadId, channelId, progressMsg, { bypassInterval: true });
             }
           },
-          onStreamDelta: async (roleName, textDelta) => {
-            const sanitized = this.sanitizerService.sanitize(textDelta);
+          onStreamDelta: async ({ conversationId, textChunk }) => {
+            const sanitized = this.sanitizerService.sanitize(textChunk);
             if (!sanitized) return;
 
-            const role = AgentRole.from(roleName);
+            // O Domínio consulta a Role correspondente ao conversationId
+            const role = session.getRoleForConversation(conversationId);
             const duplicate = this.sanitizerService.isDuplicate(role.name, sanitized, session.publishedNarratives);
             if (duplicate) return;
 
             session.addPublishedNarrative(`${role.name}:${sanitized}`);
             await this.notificationGateway.sendIntermediateNarrative(threadId, channelId, role, sanitized);
           },
-          onStatusUpdate: async (roleName, statusText) => {
+          onStatusUpdate: async ({ conversationId, statusText }) => {
             await this.notificationGateway.sendStatus(threadId, channelId, statusText);
           },
         }
