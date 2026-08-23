@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node --test test_message_rendering.js test_role_attribution.js"
+    "test": "node --test tests/unit/**/*.test.js tests/integration/**/*.test.js"
   },
   "keywords": [],
   "author": "",
