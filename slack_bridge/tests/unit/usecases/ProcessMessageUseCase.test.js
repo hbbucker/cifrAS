@@ -3,6 +3,8 @@ const assert = require('node:assert/strict');
 const { ProcessMessageUseCase } = require('../../../src/application/usecases/ProcessMessageUseCase');
 const { MockEngineAdapter } = require('../../../src/adapters/engines/mock/MockEngineAdapter');
 const { ThreadSession } = require('../../../src/domain/entities/ThreadSession');
+const { EngineEvent } = require('../../../src/domain/events/EngineEvent');
+const { TurnResultDTO } = require('../../../src/domain/dtos/TurnResultDTO');
 
 class InMemoryThreadRepository {
   constructor() {
@@ -40,20 +42,21 @@ class InMemoryNotificationService {
   }
 }
 
-test('ProcessMessageUseCase: successfully orchestrates end-to-end turn with mock engine and neutral callbacks', async () => {
+test('ProcessMessageUseCase: successfully orchestrates end-to-end turn with mock event stream', async () => {
   const repository = new InMemoryThreadRepository();
   const notifier = new InMemoryNotificationService();
+
   const mockEngine = new MockEngineAdapter({
-    onExecute: async (params, callbacks) => {
-      callbacks.onSessionBound({ sessionId: 'mock-session-123' });
-      callbacks.onStreamDelta({ conversationId: 'mock-session-123', textChunk: 'Iniciando análise técnica' });
-      callbacks.onSubagentDiscovered({ conversationId: 'sub-conv-456', typeName: 'CTO' });
-      callbacks.onStreamDelta({ conversationId: 'sub-conv-456', textChunk: 'Criando índices no banco' });
-      return {
+    events: async function* () {
+      yield EngineEvent.sessionBound('mock-session-123');
+      yield EngineEvent.textDeltaEmitted('mock-session-123', 'Iniciando análise técnica');
+      yield EngineEvent.subagentDiscovered('sub-conv-456', 'CTO');
+      yield EngineEvent.textDeltaEmitted('sub-conv-456', 'Criando índices no banco');
+      yield EngineEvent.executionCompleted(new TurnResultDTO({
         exitCode: 0,
         responseText: 'Entrega final concluída com sucesso.',
         filePaths: [],
-      };
+      }));
     },
   });
 
@@ -96,18 +99,13 @@ test('ProcessMessageUseCase: successfully orchestrates end-to-end turn with mock
 test('ProcessMessageUseCase: handles engine failure and triggers session recovery', async () => {
   const repository = new InMemoryThreadRepository();
   const notifier = new InMemoryNotificationService();
-  
-  // Salva uma sessão prévia
+
   const existingSession = new ThreadSession({ threadId: '1000.2000', channelId: 'C_TEST', sessionId: 'broken-session-999' });
   await repository.save(existingSession);
 
   const failingEngine = new MockEngineAdapter({
-    onExecute: async () => {
-      return {
-        exitCode: 1,
-        responseText: '',
-        error: new Error('Timer conflict error'),
-      };
+    events: async function* () {
+      yield EngineEvent.executionFailed(new Error('Timer conflict error'), 1);
     },
   });
 

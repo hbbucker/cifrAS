@@ -6,14 +6,33 @@ const os = require('node:os');
 const { EventEmitter } = require('node:events');
 const {
   AntigravityEngineAdapter,
+  AsyncEventQueue,
   DEFAULT_BRAIN_DIR,
   TRANSCRIPT_RELATIVE_PATH,
 } = require('../../../src/adapters/engines/antigravity/AntigravityEngineAdapter');
+const { EngineInstructionDTO } = require('../../../src/domain/dtos/EngineInstructionDTO');
+
+test('AsyncEventQueue: enqueues, pulls, and terminates cleanly', async () => {
+  const queue = new AsyncEventQueue();
+  queue.push('item1');
+  queue.push('item2');
+
+  const items = [];
+  setTimeout(() => {
+    queue.push('item3');
+    queue.close();
+  }, 10);
+
+  for await (const item of queue) {
+    items.push(item);
+  }
+
+  assert.deepEqual(items, ['item1', 'item2', 'item3']);
+});
 
 test('AntigravityEngineAdapter: buildCliArgs generates correct flag array with and without sessionId', () => {
   const adapter = new AntigravityEngineAdapter();
 
-  // Sem sessionId
   const argsWithoutSession = adapter.buildCliArgs({
     prompt: 'Olá CEO',
     sessionId: null,
@@ -27,7 +46,6 @@ test('AntigravityEngineAdapter: buildCliArgs generates correct flag array with a
     '--output-format', 'stream-json',
   ]);
 
-  // Com sessionId
   const argsWithSession = adapter.buildCliArgs({
     prompt: 'Continuar task',
     sessionId: 'session-xyz-123',
@@ -43,26 +61,14 @@ test('AntigravityEngineAdapter: buildCliArgs generates correct flag array with a
   ]);
 });
 
-test('AntigravityEngineAdapter: translateStreamEvent correctly maps NDJSON events to callbacks', () => {
+test('AntigravityEngineAdapter: translateStreamEvent correctly maps NDJSON events to EngineEvent instances in queue', () => {
   const adapter = new AntigravityEngineAdapter();
+  const queue = new AsyncEventQueue();
   const context = { boundSessionId: 'root-123' };
 
-  let sessionBoundResult = null;
-  let subagentDiscoveredResult = null;
-  let streamDeltaResult = null;
-  let statusUpdateResult = null;
-
-  const callbacks = {
-    onSessionBound: (res) => { sessionBoundResult = res; },
-    onSubagentDiscovered: (res) => { subagentDiscoveredResult = res; },
-    onStreamDelta: (res) => { streamDeltaResult = res; },
-    onStatusUpdate: (res) => { statusUpdateResult = res; },
-  };
-
   // 1. Evento init
-  adapter.translateStreamEvent({ event: 'init', conversation_id: 'session-bound-999' }, callbacks, context);
+  adapter.translateStreamEvent({ event: 'init', conversation_id: 'session-bound-999' }, queue, context);
   assert.equal(context.boundSessionId, 'session-bound-999');
-  assert.deepEqual(sessionBoundResult, { sessionId: 'session-bound-999' });
 
   // 2. Evento subagent_info
   adapter.translateStreamEvent({
@@ -72,9 +78,7 @@ test('AntigravityEngineAdapter: translateStreamEvent correctly maps NDJSON event
         subagents: [{ conversation_id: 'sub-456', role: 'CTO', type_name: 'startupos-cto' }],
       },
     },
-  }, callbacks, context);
-  assert.equal(subagentDiscoveredResult.conversationId, 'sub-456');
-  assert.equal(subagentDiscoveredResult.typeName, 'CTO');
+  }, queue, context);
 
   // 3. Evento agent_response
   adapter.translateStreamEvent({
@@ -84,11 +88,7 @@ test('AntigravityEngineAdapter: translateStreamEvent correctly maps NDJSON event
       conversation_id: 'sub-456',
       text_delta: 'Configurando migrations...',
     },
-  }, callbacks, context);
-  assert.deepEqual(streamDeltaResult, {
-    conversationId: 'sub-456',
-    textChunk: 'Configurando migrations...',
-  });
+  }, queue, context);
 
   // 4. Evento status_text
   adapter.translateStreamEvent({
@@ -96,11 +96,29 @@ test('AntigravityEngineAdapter: translateStreamEvent correctly maps NDJSON event
     step_update: {
       status_text: 'Executando comando no terminal',
     },
-  }, callbacks, context);
-  assert.deepEqual(statusUpdateResult, {
-    conversationId: 'session-bound-999',
-    statusText: 'Executando comando no terminal',
-  });
+  }, queue, context);
+
+  queue.close();
+
+  const events = [];
+  for (const ev of queue._queue) {
+    events.push(ev);
+  }
+
+  assert.equal(events[0].type, 'SESSION_BOUND');
+  assert.equal(events[0].payload.sessionId, 'session-bound-999');
+
+  assert.equal(events[1].type, 'SUBAGENT_DISCOVERED');
+  assert.equal(events[1].payload.conversationId, 'sub-456');
+  assert.equal(events[1].payload.typeName, 'CTO');
+
+  assert.equal(events[2].type, 'TEXT_DELTA_EMITTED');
+  assert.equal(events[2].payload.conversationId, 'sub-456');
+  assert.equal(events[2].payload.textChunk, 'Configurando migrations...');
+
+  assert.equal(events[3].type, 'STATUS_UPDATED');
+  assert.equal(events[3].payload.conversationId, 'session-bound-999');
+  assert.equal(events[3].payload.statusText, 'Executando comando no terminal');
 });
 
 test('AntigravityEngineAdapter: readTranscriptResponse asynchronously reads and extracts the latest PLANNER_RESPONSE', async () => {
@@ -123,7 +141,6 @@ test('AntigravityEngineAdapter: readTranscriptResponse asynchronously reads and 
     const text = await adapter.readTranscriptResponse(sessionId);
     assert.equal(text, 'Resposta definitiva extraída do transcript.');
 
-    // Sessão inexistente deve retornar string vazia sem lançar exceção
     const emptyResult = await adapter.readTranscriptResponse('non-existent-session');
     assert.equal(emptyResult, '');
   } finally {
@@ -131,7 +148,7 @@ test('AntigravityEngineAdapter: readTranscriptResponse asynchronously reads and 
   }
 });
 
-test('AntigravityEngineAdapter: execute orchestrates full subprocess lifecycle with injected methods', async () => {
+test('AntigravityEngineAdapter: executeStream yields typed EngineEvent flow throughout subprocess lifecycle', async () => {
   const tempBrainDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agy_test_brain_'));
   const testSessionId = 'test-session-uuid-123';
   const transcriptDir = path.join(tempBrainDir, testSessionId, '.system_generated', 'logs');
@@ -164,26 +181,28 @@ test('AntigravityEngineAdapter: execute orchestrates full subprocess lifecycle w
     spawnFn: mockSpawn,
   });
 
-  let boundSession = null;
-  let discoveredSubagent = null;
-  let streamedDelta = null;
+  const instruction = new EngineInstructionDTO({
+    prompt: 'teste stream',
+    workspaceDir: tempBrainDir,
+  });
 
+  const receivedEvents = [];
   try {
-    const result = await adapter.execute(
-      { prompt: 'teste', workspaceDir: tempBrainDir },
-      {
-        onSessionBound: (payload) => { boundSession = payload; },
-        onSubagentDiscovered: (payload) => { discoveredSubagent = payload; },
-        onStreamDelta: (payload) => { streamedDelta = payload; },
-      }
-    );
+    for await (const event of adapter.executeStream(instruction)) {
+      receivedEvents.push(event);
+    }
 
-    assert.equal(result.exitCode, 0);
-    assert.deepEqual(boundSession, { sessionId: testSessionId });
-    assert.equal(discoveredSubagent.conversationId, 'sub-1');
-    assert.equal(discoveredSubagent.typeName, 'CTO');
-    assert.deepEqual(streamedDelta, { conversationId: 'sub-1', textChunk: 'Trabalhando...' });
-    assert.equal(result.responseText, 'Resposta final do CEO testada com sucesso.');
+    assert.equal(receivedEvents[0].type, 'SESSION_BOUND');
+    assert.equal(receivedEvents[0].payload.sessionId, testSessionId);
+
+    assert.equal(receivedEvents[1].type, 'SUBAGENT_DISCOVERED');
+    assert.equal(receivedEvents[1].payload.typeName, 'CTO');
+
+    assert.equal(receivedEvents[2].type, 'TEXT_DELTA_EMITTED');
+    assert.equal(receivedEvents[2].payload.textChunk, 'Trabalhando...');
+
+    assert.equal(receivedEvents[3].type, 'EXECUTION_COMPLETED');
+    assert.equal(receivedEvents[3].payload.result.responseText, 'Resposta final do CEO testada com sucesso.');
   } finally {
     try { fs.rmSync(tempBrainDir, { recursive: true, force: true }); } catch {}
   }

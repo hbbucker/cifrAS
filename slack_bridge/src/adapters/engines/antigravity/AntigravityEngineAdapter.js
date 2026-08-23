@@ -3,10 +3,71 @@ const path = require('node:path');
 const fs = require('node:fs/promises');
 const os = require('node:os');
 const { ILLMEnginePort } = require('../../../domain/ports/ILLMEnginePort');
+const { EngineEvent } = require('../../../domain/events/EngineEvent');
+const { TurnResultDTO } = require('../../../domain/dtos/TurnResultDTO');
 const { AntigravityStreamParser } = require('./AntigravityStreamParser');
 
 const DEFAULT_BRAIN_DIR = path.join(os.homedir(), '.gemini', 'antigravity-cli', 'brain');
 const TRANSCRIPT_RELATIVE_PATH = path.join('.system_generated', 'logs', 'transcript.jsonl');
+
+/**
+ * Fila assíncrona pura para transformar fluxos push de eventos em AsyncIterable (Pull/Push).
+ */
+class AsyncEventQueue {
+  constructor() {
+    this._queue = [];
+    this._resolvers = [];
+    this._closed = false;
+    this._error = null;
+  }
+
+  push(item) {
+    if (this._closed) return;
+    if (this._resolvers.length > 0) {
+      const resolve = this._resolvers.shift();
+      resolve({ value: item, done: false });
+    } else {
+      this._queue.push(item);
+    }
+  }
+
+  close() {
+    if (this._closed) return;
+    this._closed = true;
+    while (this._resolvers.length > 0) {
+      const resolve = this._resolvers.shift();
+      resolve({ value: undefined, done: true });
+    }
+  }
+
+  fail(err) {
+    if (this._closed) return;
+    this._error = err;
+    this._closed = true;
+    while (this._resolvers.length > 0) {
+      const resolve = this._resolvers.shift();
+      resolve({ value: undefined, done: true });
+    }
+  }
+
+  async *[Symbol.asyncIterator]() {
+    while (true) {
+      if (this._queue.length > 0) {
+        yield this._queue.shift();
+      } else if (this._closed) {
+        if (this._error) throw this._error;
+        return;
+      } else {
+        const nextItem = await new Promise((resolve) => this._resolvers.push(resolve));
+        if (nextItem.done) {
+          if (this._error) throw this._error;
+          return;
+        }
+        yield nextItem.value;
+      }
+    }
+  }
+}
 
 class AntigravityEngineAdapter extends ILLMEnginePort {
   constructor({ brainDir = DEFAULT_BRAIN_DIR, agyBin = 'agy', spawnFn = spawn } = {}) {
@@ -17,44 +78,57 @@ class AntigravityEngineAdapter extends ILLMEnginePort {
   }
 
   /**
-   * Executa um turno no motor Antigravity orquestrando o subprocesso, o stream e o transcript final.
+   * Executa uma instrução emitindo um fluxo tipado de eventos assíncronos (AsyncIterable<EngineEvent>).
+   * @param {import('../../../domain/dtos/EngineInstructionDTO').EngineInstructionDTO} instruction
+   * @returns {AsyncIterable<EngineEvent>}
    */
-  async execute({ prompt, sessionId, workspaceDir, uniqueId }, callbacks = {}) {
-    const args = this.buildCliArgs({ prompt, sessionId, workspaceDir });
-    const executionContext = { boundSessionId: sessionId || null };
+  async *executeStream(instruction) {
+    const args = this.buildCliArgs(instruction);
+    const executionContext = { boundSessionId: instruction.sessionId || null };
+    const queue = new AsyncEventQueue();
 
-    return new Promise((resolve) => {
-      const child = this.spawn(this.agyBin, args, {
-        cwd: workspaceDir,
-        stdio: ['ignore', 'pipe', 'pipe'],
-      });
+    const child = this.spawn(this.agyBin, args, {
+      cwd: instruction.workspaceDir,
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
 
-      if (child.stderr) {
-        child.stderr.on('data', (chunk) => this.handleStderr(chunk));
-      }
+    if (child.stderr) {
+      child.stderr.on('data', (chunk) => this.handleStderr(chunk));
+    }
 
-      const streamParser = AntigravityStreamParser.create((event) => {
-        this.translateStreamEvent(event, callbacks, executionContext);
-      });
+    const streamParser = AntigravityStreamParser.create((event) => {
+      this.translateStreamEvent(event, queue, executionContext);
+    });
 
-      child.stdout.on('data', streamParser);
+    child.stdout.on('data', streamParser);
 
-      const finish = async (exitCode, error = null) => {
-        streamParser.flush();
+    const finish = async (exitCode, error = null) => {
+      streamParser.flush();
 
-        const responseText = await this.readTranscriptResponse(executionContext.boundSessionId);
+      const responseText = await this.readTranscriptResponse(executionContext.boundSessionId);
+      const isSuccess = (typeof exitCode === 'number' ? exitCode : 0) === 0 || Boolean(responseText);
 
-        resolve({
+      if (isSuccess) {
+        queue.push(EngineEvent.executionCompleted(new TurnResultDTO({
           exitCode: typeof exitCode === 'number' ? exitCode : 0,
           responseText,
-          error,
           filePaths: [],
-        });
-      };
+          error,
+        })));
+      } else {
+        queue.push(EngineEvent.executionFailed(
+          error || new Error(`Process exited with code ${exitCode}`),
+          exitCode
+        ));
+      }
 
-      child.once('close', (code) => finish(code));
-      child.once('error', (err) => finish(1, err));
-    });
+      queue.close();
+    };
+
+    child.once('close', (code) => finish(code));
+    child.once('error', (err) => finish(1, err));
+
+    yield* queue;
   }
 
   /**
@@ -70,29 +144,27 @@ class AntigravityEngineAdapter extends ILLMEnginePort {
   }
 
   /**
-   * Traduz eventos NDJSON emitidos pelo protocolo Antigravity para os callbacks agnósticos do domínio.
+   * Traduz eventos NDJSON do protocolo Antigravity e enfileira instâncias tipadas de EngineEvent.
    */
-  translateStreamEvent(event, callbacks = {}, executionContext = {}) {
-    if (!event) return;
+  translateStreamEvent(event, queue, executionContext = {}) {
+    if (!event || !queue) return;
 
     // 1. Vincula Session ID da sessão raiz
     if (event.event === 'init' && event.conversation_id) {
       executionContext.boundSessionId = event.conversation_id;
-      if (callbacks.onSessionBound) {
-        callbacks.onSessionBound({ sessionId: executionContext.boundSessionId });
-      }
+      queue.push(EngineEvent.sessionBound(executionContext.boundSessionId));
     }
 
-    // 2. Notificação de Subagente descoberto (dados agnósticos do protocolo)
+    // 2. Notificação de Subagente descoberto
     const subagents = event.event === 'step_update' && event.step_update && event.step_update.subagent_info && event.step_update.subagent_info.subagents;
     if (Array.isArray(subagents)) {
       for (const sub of subagents) {
-        if (sub.conversation_id && callbacks.onSubagentDiscovered) {
-          callbacks.onSubagentDiscovered({
-            conversationId: sub.conversation_id,
-            typeName: sub.role || sub.type_name || null,
-            metadata: sub,
-          });
+        if (sub.conversation_id) {
+          queue.push(EngineEvent.subagentDiscovered(
+            sub.conversation_id,
+            sub.role || sub.type_name || null,
+            sub
+          ));
         }
       }
     }
@@ -101,21 +173,15 @@ class AntigravityEngineAdapter extends ILLMEnginePort {
     if (event.event === 'step_update' && event.step_update && event.step_update.step_type === 'agent_response') {
       const convId = event.step_update.conversation_id || executionContext.boundSessionId;
       const text = event.step_update.text_delta || event.step_update.text;
-      if (text && callbacks.onStreamDelta) {
-        callbacks.onStreamDelta({
-          conversationId: convId,
-          textChunk: text,
-        });
+      if (text && convId) {
+        queue.push(EngineEvent.textDeltaEmitted(convId, text));
       }
     }
 
     // 4. Mudança de status da execução
-    if (event.event === 'step_update' && event.step_update && event.step_update.status_text && callbacks.onStatusUpdate) {
+    if (event.event === 'step_update' && event.step_update && event.step_update.status_text) {
       const convId = event.step_update.conversation_id || executionContext.boundSessionId;
-      callbacks.onStatusUpdate({
-        conversationId: convId,
-        statusText: event.step_update.status_text,
-      });
+      queue.push(EngineEvent.statusUpdated(convId, event.step_update.status_text));
     }
   }
 
@@ -153,6 +219,7 @@ class AntigravityEngineAdapter extends ILLMEnginePort {
 
 module.exports = {
   AntigravityEngineAdapter,
+  AsyncEventQueue,
   DEFAULT_BRAIN_DIR,
   TRANSCRIPT_RELATIVE_PATH,
 };

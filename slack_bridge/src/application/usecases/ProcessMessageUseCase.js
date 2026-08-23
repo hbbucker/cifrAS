@@ -2,6 +2,7 @@ const { ThreadSession } = require('../../domain/entities/ThreadSession');
 const { AgentRole } = require('../../domain/value-objects/AgentRole');
 const { GovernanceContract } = require('../../domain/value-objects/GovernanceContract');
 const { NarrativeSanitizerService } = require('../../domain/services/NarrativeSanitizerService');
+const { EngineInstructionDTO } = require('../../domain/dtos/EngineInstructionDTO');
 const { ExecutionResultDTO } = require('../dtos/IncomingMessageDTO');
 
 class ProcessMessageUseCase {
@@ -37,63 +38,79 @@ class ProcessMessageUseCase {
 
     const uniqueId = session.sessionId ? '' : `init_${Date.now()}`;
     const prompt = this.governanceContract.formatPrompt(userText, uniqueId);
+    const instruction = new EngineInstructionDTO({
+      prompt,
+      sessionId: session.sessionId,
+      workspaceDir: this.workspaceDir,
+      uniqueId,
+    });
 
     try {
-      // 2. Executa o motor com callbacks neutros (sem vazar conceitos de Role para o motor)
-      const result = await this.llmEngine.execute(
-        {
-          prompt,
-          sessionId: session.sessionId,
-          workspaceDir: this.workspaceDir,
-          uniqueId,
-        },
-        {
-          onSessionBound: ({ sessionId }) => {
-            session.bindSessionId(sessionId);
-            this.sessionRepository.save(session);
-          },
-          onSubagentDiscovered: async ({ conversationId, typeName }) => {
-            // O Domínio resolve o tipo de agente para seu Value Object
-            const role = AgentRole.from(typeName || 'Especialista');
-            session.registerSubagent(conversationId, role);
+      let finalResult = null;
+
+      // 2. Itera de forma sequencial e atômica sobre o fluxo de eventos tipados
+      for await (const event of this.llmEngine.executeStream(instruction)) {
+        switch (event.type) {
+          case 'SESSION_BOUND': {
+            session.bindSessionId(event.payload.sessionId);
+            await this.sessionRepository.save(session);
+            break;
+          }
+
+          case 'SUBAGENT_DISCOVERED': {
+            const role = AgentRole.from(event.payload.typeName || 'Especialista');
+            session.registerSubagent(event.payload.conversationId, role);
             await this.sessionRepository.save(session);
 
             const progressMsg = role.getProgressMessage('delegated');
             if (progressMsg) {
               await this.notificationGateway.sendStatus(threadId, channelId, progressMsg, { bypassInterval: true });
             }
-          },
-          onStreamDelta: async ({ conversationId, textChunk }) => {
-            const sanitized = this.sanitizerService.sanitize(textChunk);
-            if (!sanitized) return;
+            break;
+          }
 
-            // O Domínio consulta a Role correspondente ao conversationId
+          case 'TEXT_DELTA_EMITTED': {
+            const { conversationId, textChunk } = event.payload;
+            const sanitized = this.sanitizerService.sanitize(textChunk);
+            if (!sanitized) break;
+
             const role = session.getRoleForConversation(conversationId);
             const duplicate = this.sanitizerService.isDuplicate(role.name, sanitized, session.publishedNarratives);
-            if (duplicate) return;
+            if (duplicate) break;
 
             session.addPublishedNarrative(`${role.name}:${sanitized}`);
             await this.notificationGateway.sendIntermediateNarrative(threadId, channelId, role, sanitized);
-          },
-          onStatusUpdate: async ({ conversationId, statusText }) => {
-            await this.notificationGateway.sendStatus(threadId, channelId, statusText);
-          },
-        }
-      );
+            break;
+          }
 
-      // 3. Verifica sucesso
-      if (result.exitCode !== 0 && !result.responseText) {
-        throw result.error || new Error(`Engine process failed with exit code ${result.exitCode}`);
+          case 'STATUS_UPDATED': {
+            await this.notificationGateway.sendStatus(threadId, channelId, event.payload.statusText);
+            break;
+          }
+
+          case 'EXECUTION_COMPLETED': {
+            finalResult = event.payload.result;
+            break;
+          }
+
+          case 'EXECUTION_FAILED': {
+            throw event.payload.error || new Error(`Engine process failed with code ${event.payload.exitCode}`);
+          }
+        }
       }
 
-      // 4. Consolidação Final
+      if (!finalResult) {
+        throw new Error('Engine execution completed without emitting TurnResult');
+      }
+
+      // 3. Consolidação Final
       const ceoRole = AgentRole.from('CEO');
       await this.notificationGateway.sendFinalConsolidation(
         threadId,
         channelId,
         ceoRole,
-        result.responseText,
-        result.filePaths || []
+        finalResult.responseText,
+        finalResult.filePaths || []
       );
 
       session.markActive(false);
@@ -102,11 +119,11 @@ class ProcessMessageUseCase {
       return new ExecutionResultDTO({
         success: true,
         sessionId: session.sessionId,
-        responseText: result.responseText,
-        filePaths: result.filePaths || [],
+        responseText: finalResult.responseText,
+        filePaths: finalResult.filePaths || [],
       });
     } catch (error) {
-      // 5. Tratamento de Recuperação (Auto-Recovery)
+      // 4. Tratamento de Recuperação (Auto-Recovery)
       if (session.sessionId) {
         session.resetSession();
         await this.sessionRepository.save(session);
