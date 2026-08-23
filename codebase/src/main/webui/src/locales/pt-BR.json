@@ -161,6 +161,8 @@
     "loading": "Carregando músicas...",
     "selectSongs": "Selecione músicas para adicionar à sua playlist",
     "startTheater": "Iniciar Modo Teatro",
+    "playSongInTheater": "Tocar {{title}} no Modo Teatro",
+    "playSong": "Tocar no Modo Teatro",
     "addDesc": "Adicione músicas da biblioteca para montar seu repertório.",
     "add": "Adicionar",
     "moveUp": "Mover para cima",

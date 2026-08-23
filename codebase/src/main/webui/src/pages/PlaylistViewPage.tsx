@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
-import { ArrowLeft, PlayCircle, GripVertical, Trash2, ChevronUp, ChevronDown, Plus, Search, Presentation } from 'lucide-react';
+import { ArrowLeft, PlayCircle, GripVertical, Trash2, ChevronUp, ChevronDown, Plus, Search, Presentation, Play } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useToast } from '../context/ToastContext';
 import { ExportPlaylistPresentationModal } from '../components/modals/ExportPlaylistPresentationModal';
@@ -297,6 +297,17 @@ export const PlaylistViewPage: React.FC = () => {
                   <div className="hidden sm:block px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded font-mono text-sm text-text-main font-bold shrink-0">
                     {song.originalKey || song.key || '?'}
                   </div>
+
+                  {/* Play in Theater Mode button */}
+                  <button 
+                    onClick={() => navigate(`/theater/${id}?songId=${song.id}`, { state: { songIndex: index, songId: song.id } })}
+                    className="p-2 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-500/10 dark:text-emerald-400 dark:hover:text-emerald-300 dark:hover:bg-emerald-500/10 rounded-full transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center shrink-0 focus:outline-none focus:ring-2 focus:ring-[#10B981]"
+                    data-testid={`play-theater-song-${song.id}`}
+                    title={t('playlistView.playSong')}
+                    aria-label={t('playlistView.playSongInTheater', { title: song.title })}
+                  >
+                    <Play className="w-5 h-5 fill-current" />
+                  </button>
                   
                   {isOwner && (
                     <button 

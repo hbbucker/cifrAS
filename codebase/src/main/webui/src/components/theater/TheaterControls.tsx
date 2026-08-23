@@ -42,10 +42,10 @@ export const TheaterControls: React.FC<TheaterControlsProps> = ({
  {/* Song Navigation */}
  {!isLocked && (
  <div className="flex items-center gap-1 md:gap-2 shrink-0">
- <button onClick={onPrevSong} className="p-2 hover:bg-bg-elevated rounded-full transition-colors" disabled={!onPrevSong} data-testid="prev-song-btn">
+ <button onClick={onPrevSong} className="p-2 hover:bg-bg-elevated rounded-full transition-colors disabled:opacity-30 disabled:cursor-not-allowed" disabled={!onPrevSong} data-testid="prev-song-btn">
  <ChevronLeft className="w-6 h-6" />
  </button>
- <button onClick={onNextSong} className="p-2 hover:bg-bg-elevated rounded-full transition-colors" disabled={!onNextSong} data-testid="next-song-btn">
+ <button onClick={onNextSong} className="p-2 hover:bg-bg-elevated rounded-full transition-colors disabled:opacity-30 disabled:cursor-not-allowed" disabled={!onNextSong} data-testid="next-song-btn">
  <ChevronRight className="w-6 h-6" />
  </button>
  </div>

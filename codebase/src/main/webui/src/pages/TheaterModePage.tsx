@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate, useParams, useLocation, useSearchParams } from 'react-router-dom';
 import { TheaterControls } from '../components/theater/TheaterControls';
 import { useAutoScroll } from '../hooks/useAutoScroll';
 import { ChordSheet } from '../components/music/ChordSheet';
@@ -21,8 +21,30 @@ export const TheaterModePage: React.FC = () => {
  const navigate = useNavigate();
  const { playlistId, songId } = useParams();
  const location = useLocation();
- const passedState = location.state as { autoScrollSpeed?: number, useBb?: boolean, useEb?: boolean, transposeSteps?: number } | null;
+ const [routerSearchParams] = useSearchParams();
+ const searchParams = useMemo(() => {
+   if (location.search) {
+     return new URLSearchParams(location.search);
+   }
+   return routerSearchParams;
+ }, [location.search, routerSearchParams]);
+
+ const passedState = location.state as { 
+   autoScrollSpeed?: number, 
+   useBb?: boolean, 
+   useEb?: boolean, 
+   transposeSteps?: number,
+   songIndex?: number,
+   startIndex?: number,
+   songId?: string 
+ } | null;
  const { toast } = useToast();
+
+ const querySongId = searchParams.get('songId');
+ const queryIndexParam = searchParams.get('startIndex') ?? searchParams.get('index') ?? searchParams.get('songIndex');
+ const queryIndex = queryIndexParam !== null ? parseInt(queryIndexParam, 10) : undefined;
+ const stateSongId = passedState?.songId;
+ const stateIndex = passedState?.songIndex ?? passedState?.startIndex;
  
  const initialSpeed = passedState?.autoScrollSpeed !== undefined ? passedState.autoScrollSpeed : 1;
  const { isScrolling, speed, play, pause, setSpeed, containerRef } = useAutoScroll(initialSpeed);
@@ -65,10 +87,16 @@ export const TheaterModePage: React.FC = () => {
  }
  };
  }, [isLocked]);
- 
- const { activeSession, saveProgress, clearSession } = usePerformanceSession();
- const [showResumePrompt, setShowResumePrompt] = useState(false);
- const [hasPrompted, setHasPrompted] = useState(false);
+  const hasExplicitTarget = Boolean(
+    querySongId ||
+    stateSongId ||
+    (queryIndex !== undefined && !isNaN(queryIndex)) ||
+    stateIndex !== undefined
+  );
+
+  const { activeSession, saveProgress, clearSession } = usePerformanceSession();
+  const [showResumePrompt, setShowResumePrompt] = useState(false);
+  const hasPromptedRef = React.useRef(hasExplicitTarget);
  
  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
  const [showControls, setShowControls] = useState(!isMobile);
@@ -90,7 +118,26 @@ export const TheaterModePage: React.FC = () => {
  .then(data => {
  if (data.songs && data.songs.length > 0) {
  setPlaylistSongs(data.songs);
- setCurrentPlaylistIndex(0);
+ 
+ const targetSongId = querySongId || stateSongId;
+ let targetIndex = -1;
+
+ if (targetSongId) {
+   targetIndex = data.songs.findIndex((s: SongData) => s.id === targetSongId);
+ }
+
+ if (targetIndex === -1) {
+   const possibleIndex = queryIndex !== undefined && !isNaN(queryIndex) ? queryIndex : stateIndex;
+   if (typeof possibleIndex === 'number' && !isNaN(possibleIndex) && possibleIndex >= 0 && possibleIndex < data.songs.length) {
+     targetIndex = possibleIndex;
+   }
+ }
+
+ if (targetIndex === -1) {
+   targetIndex = 0;
+ }
+
+ setCurrentPlaylistIndex(targetIndex);
  } else {
  setSong({ title: t('playlistView.noSongs'), artist: '', originalKey: 'C', content: '' });
  }
@@ -99,7 +146,7 @@ export const TheaterModePage: React.FC = () => {
  toast('Failed to load playlist queue', 'error');
  });
  }
- }, [playlistId, toast, t]);
+ }, [playlistId, toast, t, querySongId, stateSongId, queryIndex, stateIndex]);
 
   // Fetch full song details and preferences for the active song ID
   const activeSongId = playlistId && playlistSongs.length > 0 ? playlistSongs[currentPlaylistIndex].id : songId;
@@ -168,16 +215,18 @@ export const TheaterModePage: React.FC = () => {
   }, [speed, transposeSteps, fontSize, activeSongId, song.title, useBb, useEb, t]);
 
   useEffect(() => {
-    if (activeSession && playlistId && !hasPrompted) {
+    if (hasExplicitTarget) return;
+
+    if (activeSession && playlistId && !hasPromptedRef.current) {
+      hasPromptedRef.current = true;
       if (activeSession.playlistId === playlistId) {
         if (activeSession.currentSongIndex !== currentPlaylistIndex || activeSession.scrollPosition > 0) {
           // eslint-disable-next-line react-hooks/set-state-in-effect
           setShowResumePrompt(true);
         }
       }
-      setHasPrompted(true);
     }
-  }, [activeSession, playlistId, currentPlaylistIndex, hasPrompted]);
+  }, [activeSession, playlistId, currentPlaylistIndex, hasExplicitTarget]);
 
   useEffect(() => {
     if (playlistId && activeSongId && song.title !== t('playlistView.loading')) {
@@ -347,6 +396,9 @@ export const TheaterModePage: React.FC = () => {
   // Calculate opacity based on scroll position (1.0 at top, down to 0.2 after 200px)
   const headerOpacity = Math.max(0.2, 1 - scrollTop / 200);
 
+  const hasNextSong = Boolean(playlistId && playlistSongs.length > 0 && currentPlaylistIndex < playlistSongs.length - 1);
+  const hasPrevSong = Boolean(playlistId && playlistSongs.length > 0 && currentPlaylistIndex > 0);
+
   return (
     <div 
       className="h-screen w-full bg-bg-main text-text-main overflow-hidden relative flex flex-col font-sans"
@@ -359,108 +411,108 @@ export const TheaterModePage: React.FC = () => {
         setShowControls(prev => !prev);
       }}
     >
- {/* Header becomes semi-transparent when scrolling */}
- <header 
- className="p-4 flex flex-col md:flex-row items-start md:items-center justify-between absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-bg-main via-bg-main/80 to-transparent pointer-events-none transition-opacity duration-200"
- style={{ opacity: headerOpacity }}
- >
- <div className="pt-2 md:pt-0">
- <h1 className="text-xl md:text-2xl font-bold truncate max-w-full">{song.title}</h1>
- <p className="text-sm md:text-base text-text-mute truncate max-w-full">{song.artist}</p>
- </div>
- </header>
+      {/* Header becomes semi-transparent when scrolling */}
+      <header 
+        className="p-4 flex flex-col md:flex-row items-start md:items-center justify-between absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-bg-main via-bg-main/80 to-transparent pointer-events-none transition-opacity duration-200"
+        style={{ opacity: headerOpacity }}
+      >
+        <div className="pt-2 md:pt-0">
+          <h1 className="text-xl md:text-2xl font-bold truncate max-w-full">{song.title}</h1>
+          <p className="text-sm md:text-base text-text-mute truncate max-w-full">{song.artist}</p>
+        </div>
+      </header>
 
- {/* Main scrolling container */}
- <div 
- key={activeSongId}
- ref={containerRef} 
- onScroll={handleScroll}
- className="flex-1 overflow-y-auto px-4 md:px-12 pt-28 pb-48 no-scrollbar"
- style={{
- animation: `${slideDir === 'right' ? 'slideInRight' : 'slideInLeft'} 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards`
- }}
- data-testid="theater-scroll-container"
- >
- <div className="max-w-4xl mx-auto text-text-main">
-  <ChordSheet content={transposedContent} fontSize={fontSize} transparent={true} singerMode={isSingerMode} />
- </div>
- </div>
+      {/* Main scrolling container */}
+      <div 
+        key={activeSongId}
+        ref={containerRef} 
+        onScroll={handleScroll}
+        className="flex-1 overflow-y-auto px-4 md:px-12 pt-28 pb-48 no-scrollbar"
+        style={{
+          animation: `${slideDir === 'right' ? 'slideInRight' : 'slideInLeft'} 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards`
+        }}
+        data-testid="theater-scroll-container"
+      >
+        <div className="max-w-4xl mx-auto text-text-main">
+          <ChordSheet content={transposedContent} fontSize={fontSize} transparent={true} singerMode={isSingerMode} />
+        </div>
+      </div>
 
- <style>{`
- @keyframes slideInRight {
- from { transform: translateX(50px); opacity: 0; }
- to { transform: translateX(0); opacity: 1; }
- }
- @keyframes slideInLeft {
- from { transform: translateX(-50px); opacity: 0; }
- to { transform: translateX(0); opacity: 1; }
- }
- `}</style>
+      <style>{`
+        @keyframes slideInRight {
+          from { transform: translateX(50px); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideInLeft {
+          from { transform: translateX(-50px); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+      `}</style>
 
- {/* Floating Action Button (Mobile) to toggle controls */}
- <div className="md:hidden fixed bottom-6 left-6 z-50">
- <button 
- onClick={() => setShowControls(!showControls)}
- className={`w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 ${showControls ? 'bg-bg-elevated text-text-mute' : 'bg-[#8629cc] text-white'}`}
- >
- <Settings2 className="w-6 h-6" />
- </button>
- </div>
-
- {showResumePrompt && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" data-testid="resume-prompt">
-    <div className="bg-bg-card p-6 rounded-2xl shadow-xl border border-border-main max-w-sm w-full mx-4">
-      <h3 className="text-xl font-bold mb-2">{t('theater.resumeSessionPromptTitle')}</h3>
-      <p className="text-text-mute mb-6">{t('theater.resumeSessionPromptDesc')}</p>
-      <div className="flex justify-end gap-3">
+      {/* Floating Action Button (Mobile) to toggle controls */}
+      <div className="md:hidden fixed bottom-6 left-6 z-50">
         <button 
-          onClick={() => {
-            setShowResumePrompt(false);
-            clearSession();
-          }}
-          className="px-4 py-2 rounded-lg font-medium text-text-mute hover:bg-bg-elevated transition-colors"
-          data-testid="resume-no-btn"
+          onClick={() => setShowControls(!showControls)}
+          className={`w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 ${showControls ? 'bg-bg-elevated text-text-mute' : 'bg-[#8629cc] text-white'}`}
         >
-          {t('theater.startFresh')}
-        </button>
-        <button 
-          onClick={() => {
-            setShowResumePrompt(false);
-            setCurrentPlaylistIndex(activeSession?.currentSongIndex || 0);
-            if (containerRef.current) {
-              containerRef.current.scrollTop = activeSession?.scrollPosition || 0;
-            }
-          }}
-          className="px-4 py-2 rounded-lg font-medium bg-[#8629cc] text-white hover:bg-[#721eb8] transition-colors shadow-lg shadow-[#8629cc]/20"
-          data-testid="resume-yes-btn"
-        >
-          {t('theater.resume')}
+          <Settings2 className="w-6 h-6" />
         </button>
       </div>
-    </div>
-  </div>
-  )}
 
- <TheaterControls 
- className={!showControls ? 'translate-y-48 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}
- isScrolling={isScrolling}
- speed={speed}
- currentKey={currentKey}
- onPlayPause={() => isScrolling ? pause() : play()}
- onSpeedChange={setSpeed}
- onTransposeUp={() => setTransposeSteps(s => s + 1)}
- onTransposeDown={() => setTransposeSteps(s => s - 1)}
- onNextSong={playlistId ? handleNextSong : undefined}
- onPrevSong={playlistId ? handlePrevSong : undefined}
- onToggleFullscreen={toggleFullscreen}
- onExit={handleExit}
- onFontSizeIncrease={() => handleFontSizeChange(2)}
- onFontSizeDecrease={() => handleFontSizeChange(-2)}
- isLocked={isLocked}
- onLockToggle={() => setIsLocked(!isLocked)}
- isSingerMode={isSingerMode}
- onToggleSingerMode={() => setIsSingerMode(prev => !prev)}
- />
- </div>
- );
+      {showResumePrompt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" data-testid="resume-prompt">
+          <div className="bg-bg-card p-6 rounded-2xl shadow-xl border border-border-main max-w-sm w-full mx-4">
+            <h3 className="text-xl font-bold mb-2">{t('theater.resumeSessionPromptTitle')}</h3>
+            <p className="text-text-mute mb-6">{t('theater.resumeSessionPromptDesc')}</p>
+            <div className="flex justify-end gap-3">
+              <button 
+                onClick={() => {
+                  setShowResumePrompt(false);
+                  clearSession();
+                }}
+                className="px-4 py-2 rounded-lg font-medium text-text-mute hover:bg-bg-elevated transition-colors"
+                data-testid="resume-no-btn"
+              >
+                {t('theater.startFresh')}
+              </button>
+              <button 
+                onClick={() => {
+                  setShowResumePrompt(false);
+                  setCurrentPlaylistIndex(activeSession?.currentSongIndex || 0);
+                  if (containerRef.current) {
+                    containerRef.current.scrollTop = activeSession?.scrollPosition || 0;
+                  }
+                }}
+                className="px-4 py-2 rounded-lg font-medium bg-[#8629cc] text-white hover:bg-[#721eb8] transition-colors shadow-lg shadow-[#8629cc]/20"
+                data-testid="resume-yes-btn"
+              >
+                {t('theater.resume')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <TheaterControls 
+        className={!showControls ? 'translate-y-48 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}
+        isScrolling={isScrolling}
+        speed={speed}
+        currentKey={currentKey}
+        onPlayPause={() => isScrolling ? pause() : play()}
+        onSpeedChange={setSpeed}
+        onTransposeUp={() => setTransposeSteps(s => s + 1)}
+        onTransposeDown={() => setTransposeSteps(s => s - 1)}
+        onNextSong={hasNextSong ? handleNextSong : undefined}
+        onPrevSong={hasPrevSong ? handlePrevSong : undefined}
+        onToggleFullscreen={toggleFullscreen}
+        onExit={handleExit}
+        onFontSizeIncrease={() => handleFontSizeChange(2)}
+        onFontSizeDecrease={() => handleFontSizeChange(-2)}
+        isLocked={isLocked}
+        onLockToggle={() => setIsLocked(!isLocked)}
+        isSingerMode={isSingerMode}
+        onToggleSingerMode={() => setIsSingerMode(prev => !prev)}
+      />
+    </div>
+  );
 };

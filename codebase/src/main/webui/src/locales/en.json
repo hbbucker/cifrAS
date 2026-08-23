@@ -161,6 +161,8 @@
     "loading": "Loading songs...",
     "selectSongs": "Select songs to add to your playlist",
     "startTheater": "Start Theater Mode",
+    "playSongInTheater": "Play {{title}} in Theater Mode",
+    "playSong": "Play in Theater Mode",
     "addDesc": "Add songs from the library to build your repertoire.",
     "add": "Add",
     "moveUp": "Move up",
