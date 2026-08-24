@@ -147,80 +147,81 @@ export const SongFormPage: React.FC = () => {
           </Button>
         </header>
 
-        <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-24 sm:pb-8 flex flex-col bg-bg-main min-w-0">
- <div className="max-w-5xl mx-auto w-full flex-1 flex flex-col space-y-6">
- {wasTransposed && (
- <div className="bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-sm p-3 rounded-lg flex items-center gap-2">
- {t('songForm.editingOriginalKeyWarning', { key: originalKey || key })}
- </div>
- )}
- <div className="flex flex-col md:flex-row gap-4 bg-bg-card p-4 rounded-[16px] border border-border-main">
- <div className="flex-1">
- <label className="block text-xs font-semibold text-text-mute mb-1 uppercase tracking-wider">{t('songForm.title')}</label>
- <input type="text" value={title} onChange={handleChange(setTitle)} className="w-full px-3 py-2 bg-transparent border-b border-border-main focus:border-primary text-text-main font-bold text-lg focus:outline-none transition-colors" data-testid="song-title-input" placeholder={t('songForm.titlePlaceholder')} />
- </div>
- <div className="flex-1">
- <label className="block text-xs font-semibold text-text-mute mb-1 uppercase tracking-wider">{t('songForm.artist')}</label>
- <input type="text" value={artist} onChange={handleChange(setArtist)} className="w-full px-3 py-2 bg-transparent border-b border-border-main focus:border-primary text-text-main font-bold text-lg focus:outline-none transition-colors" data-testid="song-artist-input" placeholder={t('songForm.artistPlaceholder')} />
- </div>
- <div className="w-full md:w-24">
- <label className="block text-xs font-semibold text-text-mute mb-1 uppercase tracking-wider">{t('songForm.tom')}</label>
- <input type="text" value={key} onChange={handleChange(setKey)} maxLength={5} className="w-full px-3 py-2 bg-transparent border-b border-border-main focus:border-primary text-text-main font-bold text-lg text-center focus:outline-none transition-colors" placeholder="C#" />
- </div>
- </div>
+        <div className="flex-1 overflow-y-auto p-3.5 sm:p-6 pb-24 sm:pb-8 flex flex-col bg-bg-main min-w-0">
+          <div className="max-w-5xl mx-auto w-full flex-1 flex flex-col space-y-4 sm:space-y-6">
+            {wasTransposed && (
+              <div className="bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-xs sm:text-sm p-3 rounded-xl flex items-center gap-2">
+                {t('songForm.editingOriginalKeyWarning', { key: originalKey || key })}
+              </div>
+            )}
+            
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 bg-bg-card p-3.5 sm:p-4.5 rounded-2xl border border-border-main">
+              <div className="flex-1 min-w-0">
+                <label className="block text-xs font-semibold text-text-mute mb-1 uppercase tracking-wider">{t('songForm.title')}</label>
+                <input type="text" value={title} onChange={handleChange(setTitle)} className="w-full px-3 py-2 bg-transparent border-b border-border-main focus:border-primary text-text-main font-bold text-base sm:text-lg focus:outline-none transition-colors" data-testid="song-title-input" placeholder={t('songForm.titlePlaceholder')} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <label className="block text-xs font-semibold text-text-mute mb-1 uppercase tracking-wider">{t('songForm.artist')}</label>
+                <input type="text" value={artist} onChange={handleChange(setArtist)} className="w-full px-3 py-2 bg-transparent border-b border-border-main focus:border-primary text-text-main font-bold text-base sm:text-lg focus:outline-none transition-colors" data-testid="song-artist-input" placeholder={t('songForm.artistPlaceholder')} />
+              </div>
+              <div className="w-full sm:w-28 shrink-0">
+                <label className="block text-xs font-semibold text-text-mute mb-1 uppercase tracking-wider">{t('songForm.tom')}</label>
+                <input type="text" value={key} onChange={handleChange(setKey)} maxLength={5} className="w-full px-3 py-2 bg-transparent border-b border-border-main focus:border-primary text-text-main font-bold text-base sm:text-lg text-left sm:text-center focus:outline-none transition-colors" placeholder="C#" />
+              </div>
+            </div>
 
- <div className="bg-bg-card p-4 rounded-[16px] border border-border-main">
-   <TagInput
-     tags={tags}
-     onChange={(newTags) => {
-       setTags(newTags);
-       setIsDirty(true);
-     }}
-     availableSuggestions={availableTags}
-     label={t('songForm.tags', 'Tags')}
-     placeholder={t('songForm.tagsPlaceholder', 'Adicione tags como Rock, Gospel, Missa...')}
-   />
- </div>
- 
- <div className="flex-1 flex flex-col bg-bg-card p-4 rounded-[16px] border border-border-main">
- <div className="flex flex-wrap items-center justify-between gap-4 mb-4 border-b border-border-main pb-4">
- <div className="flex flex-wrap items-center gap-4">
- <span className="text-sm font-semibold text-text-main">{t('songForm.chordsLyrics')}</span>
- <div className="flex items-center gap-2 bg-bg-main p-1.5 rounded-lg border border-border-main">
- <button onClick={() => insertText('[Refrão]\n')} className="px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-md hover:bg-bg-elevated transition-colors">{t('songForm.refrao')}</button>
- <button onClick={() => insertText('\n\n')} className="px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-md hover:bg-bg-elevated transition-colors">{t('songForm.quebra')}</button>
- <button onClick={() => insertText('\n---\n')} className="px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-md hover:bg-bg-elevated transition-colors">{t('songForm.separador')}</button>
- <button onClick={() => insertText('\ne|---\nB|---\nG|---\nD|---\nA|---\nE|---\n')} className="px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-md hover:bg-bg-elevated transition-colors">{t('songForm.tablatura')}</button>
- </div>
- </div>
- <Button 
- onClick={() => setShowDrivePicker(true)}
- variant="ghost"
- size="sm"
- className="text-primary hover:bg-primary/10"
- data-testid="btn-open-drive-picker"
- >
- <CloudDownload className="w-4 h-4 mr-2" />
- {t('songForm.importDrive')}
- </Button>
- </div>
- <textarea 
- ref={textareaRef}
- value={content} 
- onChange={handleChange(setContent)} 
- onKeyDown={(e) => {
- if ((e.ctrlKey || e.metaKey) && e.key === 's') {
- e.preventDefault();
- handleSave();
- }
- }}
- className="w-full flex-1 min-h-[50vh] bg-transparent text-text-main font-mono text-sm focus:outline-none resize-none leading-relaxed"
- placeholder={t('songForm.contentPlaceholder')}
- data-testid="song-content-input"
- />
- </div>
- </div>
- </div>
+            <div className="bg-bg-card p-3.5 sm:p-4.5 rounded-2xl border border-border-main">
+              <TagInput
+                tags={tags}
+                onChange={(newTags) => {
+                  setTags(newTags);
+                  setIsDirty(true);
+                }}
+                availableSuggestions={availableTags}
+                label={t('songForm.tags', 'Tags')}
+                placeholder={t('songForm.tagsPlaceholder', 'Adicione tags como Rock, Gospel, Missa...')}
+              />
+            </div>
+            
+            <div className="flex-1 flex flex-col bg-bg-card p-3.5 sm:p-4.5 rounded-2xl border border-border-main min-h-0">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3 sm:mb-4 border-b border-border-main pb-3 sm:pb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-4 overflow-hidden">
+                  <span className="text-xs sm:text-sm font-semibold text-text-main shrink-0">{t('songForm.chordsLyrics')}</span>
+                  <div className="flex items-center gap-1.5 sm:gap-2 bg-bg-main p-1 sm:p-1.5 rounded-xl border border-border-main overflow-x-auto no-scrollbar py-1">
+                    <button onClick={() => insertText('[Refrão]\n')} className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-lg hover:bg-bg-elevated transition-colors shrink-0">{t('songForm.refrao')}</button>
+                    <button onClick={() => insertText('\n\n')} className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-lg hover:bg-bg-elevated transition-colors shrink-0">{t('songForm.quebra')}</button>
+                    <button onClick={() => insertText('\n---\n')} className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-lg hover:bg-bg-elevated transition-colors shrink-0">{t('songForm.separador')}</button>
+                    <button onClick={() => insertText('\ne|---\nB|---\nG|---\nD|---\nA|---\nE|---\n')} className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-lg hover:bg-bg-elevated transition-colors shrink-0">{t('songForm.tablatura')}</button>
+                  </div>
+                </div>
+                <Button 
+                  onClick={() => setShowDrivePicker(true)}
+                  variant="ghost"
+                  size="sm"
+                  className="text-primary hover:bg-primary/10 shrink-0 self-start sm:self-auto min-h-[36px]"
+                  data-testid="btn-open-drive-picker"
+                >
+                  <CloudDownload className="w-4 h-4 mr-2" />
+                  {t('songForm.importDrive')}
+                </Button>
+              </div>
+              <textarea 
+                ref={textareaRef}
+                value={content} 
+                onChange={handleChange(setContent)} 
+                onKeyDown={(e) => {
+                  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                    e.preventDefault();
+                    handleSave();
+                  }
+                }}
+                className="w-full flex-1 min-h-[40vh] sm:min-h-[50vh] bg-transparent text-text-main font-mono text-sm sm:text-base focus:outline-none resize-none leading-relaxed"
+                placeholder={t('songForm.contentPlaceholder')}
+                data-testid="song-content-input"
+              />
+            </div>
+          </div>
+        </div>
  </div>
 
  <ConfirmModal 

@@ -130,8 +130,8 @@ export const PlaylistsPage: React.FC = () => {
           </Button>
         </header>
 
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 pb-24 sm:pb-8 min-w-0">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+        <div className="flex-1 overflow-y-auto p-3.5 sm:p-6 pb-24 sm:pb-8 min-w-0">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5 sm:gap-6">
             {loading && playlists.length === 0 ? (
               <div className="col-span-full flex justify-center py-12">
                 <Spinner size="lg" />
@@ -150,10 +150,10 @@ export const PlaylistsPage: React.FC = () => {
                 <div 
                   key={pl.id} 
                   onClick={() => navigate(`/playlists/${pl.id}`)}
-                  className="bg-bg-card rounded-2xl border border-border-main p-4 sm:p-5 cursor-pointer hover:shadow-md hover:border-[#8629cc]/50 transition-all group min-w-0"
+                  className="bg-bg-card rounded-2xl border border-border-main p-3.5 sm:p-5 cursor-pointer hover:shadow-md hover:border-[#8629cc]/50 transition-all group min-w-0"
                   data-testid={`playlist-card-${pl.id}`}
                 >
-                  <div className="flex items-start justify-between mb-3 sm:mb-4">
+                  <div className="flex items-start justify-between mb-2.5 sm:mb-4">
                     <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#8629cc]/10 rounded-xl flex items-center justify-center group-hover:bg-[#8629cc]/20 transition-colors shrink-0">
                       <ListMusic className="w-5 h-5 sm:w-6 sm:h-6 text-[#8629cc]" />
                     </div>
@@ -181,33 +181,34 @@ export const PlaylistsPage: React.FC = () => {
         </div>
       </div>
 
- {/* Create Modal */}
- {showModal && (
- <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
- <div className="bg-bg-card rounded-xl max-w-md w-full p-6 shadow-2xl">
- <h2 className="text-xl font-bold text-text-main mb-4">{t('playlists.modalTitle')}</h2>
- <input 
- type="text" 
- value={newPlaylistName}
- onChange={(e) => setNewPlaylistName(e.target.value)}
- placeholder={t('playlists.modalPlaceholder')}
- className="w-full px-4 py-3 bg-bg-main border border-border-main rounded-lg mb-6 text-text-main focus:ring-2 focus:ring-[#8629cc] outline-none"
- data-testid="playlist-name-input"
- />
- <div className="flex justify-end gap-3">
- <Button onClick={() => setShowModal(false)} variant="ghost">{t('playlists.cancel')}</Button>
- <Button 
- onClick={handleCreatePlaylist} 
- disabled={!newPlaylistName.trim()}
- isLoading={isCreating}
- data-testid="save-playlist-btn"
- >
- {t('playlists.create')}
- </Button>
- </div>
- </div>
- </div>
- )}
+      {/* Create Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-bg-card rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl mx-auto">
+            <h2 className="text-lg sm:text-xl font-bold text-text-main mb-4">{t('playlists.modalTitle')}</h2>
+            <input 
+              type="text" 
+              value={newPlaylistName}
+              onChange={(e) => setNewPlaylistName(e.target.value)}
+              placeholder={t('playlists.modalPlaceholder')}
+              className="w-full px-4 py-3 bg-bg-main border border-border-main rounded-xl mb-6 text-text-main focus:ring-2 focus:ring-[#8629cc] outline-none text-sm sm:text-base"
+              data-testid="playlist-name-input"
+            />
+            <div className="flex justify-end gap-3">
+              <Button onClick={() => setShowModal(false)} variant="ghost" className="min-h-[44px]">{t('playlists.cancel')}</Button>
+              <Button 
+                onClick={handleCreatePlaylist} 
+                disabled={!newPlaylistName.trim()}
+                isLoading={isCreating}
+                data-testid="save-playlist-btn"
+                className="min-h-[44px]"
+              >
+                {t('playlists.create')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
  </>
  );

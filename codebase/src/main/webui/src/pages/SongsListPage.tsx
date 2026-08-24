@@ -151,9 +151,9 @@ export const SongsListPage: React.FC = () => {
           </OnboardingTooltip>
         </header>
 
-        <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 sm:p-6 pb-24 sm:pb-8 relative min-w-0">
-          <div className="sticky top-0 z-10 bg-bg-card/95 backdrop-blur -mx-4 sm:-mx-6 px-4 sm:px-6 pt-2 pb-4 mb-6 flex flex-col gap-3 border-b border-border-main/50">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+        <div ref={scrollRef} className="flex-1 overflow-y-auto p-3.5 sm:p-6 pb-24 sm:pb-8 relative min-w-0">
+          <div className="sticky top-0 z-10 bg-bg-card/95 backdrop-blur -mx-3.5 sm:-mx-6 px-3.5 sm:px-6 pt-2 pb-3 mb-4 sm:mb-6 flex flex-col gap-2.5 sm:gap-3 border-b border-border-main/50">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4">
               <div className="relative max-w-sm w-full">
                 <input
                   type="text"
@@ -163,7 +163,7 @@ export const SongsListPage: React.FC = () => {
                     setSearchQuery(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full pl-4 pr-10 py-2 bg-bg-card border border-border-main rounded-lg focus:ring-2 focus:ring-[#8629cc] outline-none "
+                  className="w-full pl-4 pr-10 py-2.5 sm:py-2 bg-bg-card border border-border-main rounded-xl focus:ring-2 focus:ring-[#8629cc] outline-none text-sm"
                 />
                 {searchQuery ? (
                   <button
@@ -171,17 +171,17 @@ export const SongsListPage: React.FC = () => {
                       setSearchQuery('');
                       setPage(1);
                     }}
-                    className="absolute right-3 top-2.5 text-gray-500 hover:text-text-mute dark:hover:text-gray-200 focus:outline-none"
+                    className="absolute right-3 top-2.5 text-gray-500 hover:text-text-mute dark:hover:text-gray-200 focus:outline-none min-h-[30px] min-w-[30px] flex items-center justify-center"
                     aria-label={t('songsList.clearSearch')}
                   >
-                    <X className="w-5 h-5" />
+                    <X className="w-4 h-4 sm:w-5 sm:h-5" />
                   </button>
                 ) : (
-                  <Filter className="absolute right-3 top-2.5 w-5 h-5 text-gray-500" />
+                  <Filter className="absolute right-3 top-3 sm:top-2.5 w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
                 )}
               </div>
-              <div className="flex flex-col sm:flex-row items-center gap-4">
-                <span className="text-sm text-text-mute whitespace-nowrap">{totalCount} {t('songsList.songsCount')}</span>
+              <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-4 flex-wrap">
+                <span className="text-xs sm:text-sm text-text-mute whitespace-nowrap">{totalCount} {t('songsList.songsCount')}</span>
                 <Pagination
                   currentPage={page}
                   totalCount={totalCount}
@@ -229,7 +229,7 @@ export const SongsListPage: React.FC = () => {
               />
             )
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5 sm:gap-6">
               {songs.map(song => (
                 <div key={song.id} onClick={() => navigate(`/song/${song.id}`)} className="cursor-pointer" data-testid={`view-song-${song.id}`}>
                   <MusicCard

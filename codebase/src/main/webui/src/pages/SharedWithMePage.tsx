@@ -115,7 +115,7 @@ export const SharedWithMePage: React.FC = () => {
           <h1 className="text-lg sm:text-xl font-bold text-text-main truncate">{t('sharedWithMe.title')}</h1>
         </header>
 
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 pb-24 sm:pb-8 space-y-6 sm:space-y-8 min-w-0">
+        <div className="flex-1 overflow-y-auto p-3.5 sm:p-6 pb-24 sm:pb-8 space-y-6 sm:space-y-8 min-w-0">
           {/* Músicas Recebidas / Compartilhadas */}
           <section>
             <div className="flex items-center gap-2 mb-3 sm:mb-4">
@@ -137,19 +137,19 @@ export const SharedWithMePage: React.FC = () => {
                 {t('songSharing.noPendingSongs')}
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-6">
                 {pendingShares.map(share => (
                   <div
                     key={share.shareId}
-                    className="bg-bg-card rounded-2xl border border-border-main p-5 hover:shadow-md transition-shadow flex flex-col justify-between"
+                    className="bg-bg-card rounded-2xl border border-border-main p-4 sm:p-5 hover:shadow-md transition-shadow flex flex-col justify-between min-w-0"
                   >
                     <div>
                       <div className="flex items-start justify-between gap-2 mb-2">
-                        <div className="flex items-center gap-2 min-w-0">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
                           <div className="p-2 rounded-xl bg-[#8629cc]/10 text-[#8629cc] shrink-0">
                             <Music className="w-5 h-5" />
                           </div>
-                          <div className="min-w-0">
+                          <div className="min-w-0 flex-1">
                             <h3 className="font-bold text-base text-text-main truncate">
                               {share.songTitle}
                             </h3>
@@ -163,16 +163,16 @@ export const SharedWithMePage: React.FC = () => {
                         )}
                       </div>
 
-                      <p className="text-xs text-text-mute mt-3 line-clamp-1">
+                      <p className="text-xs text-text-mute mt-2.5 line-clamp-1">
                         {t('songSharing.sharedBy', { email: share.inviteeEmail })}
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-2 mt-5 pt-3 border-t border-border-main/60">
+                    <div className="flex items-center gap-2 mt-4 pt-3 border-t border-border-main/60">
                       <button
                         onClick={() => handleDecline(share.shareId)}
                         disabled={actionLoading[share.shareId]}
-                        className="flex-1 py-2 px-3 rounded-xl text-xs font-medium text-text-mute hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 border border-border-main transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
+                        className="flex-1 py-2 px-3 min-h-[38px] sm:min-h-[44px] rounded-xl text-xs font-medium text-text-mute hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 border border-border-main transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
                       >
                         <X className="w-4 h-4" />
                         {t('songSharing.decline')}
@@ -180,7 +180,7 @@ export const SharedWithMePage: React.FC = () => {
                       <button
                         onClick={() => handleAccept(share.shareId)}
                         disabled={actionLoading[share.shareId]}
-                        className="flex-1 py-2 px-3 rounded-xl text-xs font-medium text-white bg-[#8629cc] hover:bg-[#721eb8] transition-colors flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50"
+                        className="flex-1 py-2 px-3 min-h-[38px] sm:min-h-[44px] rounded-xl text-xs font-medium text-white bg-[#8629cc] hover:bg-[#721eb8] transition-colors flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50"
                       >
                         <Check className="w-4 h-4" />
                         {t('songSharing.accept')}
@@ -194,37 +194,37 @@ export const SharedWithMePage: React.FC = () => {
 
           {/* Playlists Compartilhadas */}
           <section>
-            <h2 className="text-lg font-bold text-text-main mb-4">
+            <h2 className="text-base sm:text-lg font-bold text-text-main mb-3 sm:mb-4">
               {t('sidebar.playlists')}
             </h2>
 
             {loadingPlaylists ? (
               <div className="text-center py-6 text-text-mute text-sm">{t('sharedWithMe.loading')}</div>
             ) : playlists.length === 0 ? (
-              <div className="text-center py-8 text-text-mute bg-bg-card rounded-2xl border border-dashed border-border-main text-sm">
+              <div className="text-center py-8 text-text-mute bg-bg-card rounded-2xl border border-dashed border-border-main text-xs sm:text-sm">
                 {t('sharedWithMe.noPlaylists')}
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-6">
                 {playlists.map(playlist => (
-                  <div key={playlist.id} className="bg-bg-card rounded-2xl border border-border-main p-5 hover:shadow-md transition-shadow flex flex-col">
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex-1 cursor-pointer" onClick={() => navigate(`/playlists/${playlist.id}`)}>
-                        <h3 className="font-bold text-lg text-text-main mb-1 line-clamp-1">{playlist.name}</h3>
-                        <p className="text-sm text-text-mute">
+                  <div key={playlist.id} className="bg-bg-card rounded-2xl border border-border-main p-4 sm:p-5 hover:shadow-md transition-shadow flex flex-col min-w-0">
+                    <div className="flex justify-between items-start mb-3 sm:mb-4">
+                      <div className="flex-1 cursor-pointer min-w-0" onClick={() => navigate(`/playlists/${playlist.id}`)}>
+                        <h3 className="font-bold text-base sm:text-lg text-text-main mb-1 truncate">{playlist.name}</h3>
+                        <p className="text-xs sm:text-sm text-text-mute">
                           {playlist.songCount ?? playlist.songs?.length ?? 0} {t('playlists.songsCount')}
                         </p>
                       </div>
                       <button 
                         onClick={() => navigate(`/theater/${playlist.id}`)}
-                        className="p-2 bg-[#8629cc]/10 text-[#8629cc] hover:bg-[#8629cc]/20 rounded-full transition-colors ml-4 shrink-0"
+                        className="p-2 min-h-[38px] min-w-[38px] sm:min-h-[44px] sm:min-w-[44px] flex items-center justify-center bg-[#8629cc]/10 text-[#8629cc] hover:bg-[#8629cc]/20 rounded-full transition-colors ml-3 shrink-0"
                         title={t('sharedWithMe.playTheater')}
                       >
-                        <Play className="w-5 h-5 fill-current" />
+                        <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
                       </button>
                     </div>
                     <div className="mt-auto">
-                      <span className="text-xs font-bold text-text-mute uppercase tracking-wider bg-gray-100 dark:bg-gray-700 inline-block px-2 py-1 rounded">
+                      <span className="text-[11px] sm:text-xs font-bold text-text-mute uppercase tracking-wider bg-bg-elevated inline-block px-2 py-0.5 sm:py-1 rounded-md truncate max-w-full">
                         {t('sharedWithMe.from')}: {playlist.groupName}
                       </span>
                     </div>

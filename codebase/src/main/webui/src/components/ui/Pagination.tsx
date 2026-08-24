@@ -45,20 +45,20 @@ export const Pagination: React.FC<PaginationProps> = ({
   };
 
   return (
-    <div className="flex items-center justify-center gap-1 sm:gap-2">
+    <div className="flex items-center justify-center gap-1 sm:gap-1.5 flex-wrap">
       <button
         onClick={handlePrev}
         disabled={currentPage === 1}
         aria-label={t('pagination.prev', 'Previous page')}
-        className="flex items-center justify-center w-11 h-11 sm:w-10 sm:h-10 rounded-2xl bg-surface-card hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus-visible:ring-2 focus-visible:ring-[#8629cc] outline-none"
+        className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 min-w-[36px] min-h-[36px] rounded-xl sm:rounded-2xl bg-bg-card hover:bg-bg-elevated disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus-visible:ring-2 focus-visible:ring-[#8629cc] outline-none"
       >
-        <ChevronLeft className="w-5 h-5 text-text-main" />
+        <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-text-main" />
       </button>
 
       {getPageNumbers().map((page, index) => {
         if (page === '...') {
           return (
-            <span key={`ellipsis-${index}`} className="flex items-center justify-center w-11 h-11 sm:w-10 sm:h-10 text-text-mute">
+            <span key={`ellipsis-${index}`} className="flex items-center justify-center w-7 h-9 sm:w-9 sm:h-10 text-text-mute text-xs sm:text-sm">
               ...
             </span>
           );
@@ -71,10 +71,10 @@ export const Pagination: React.FC<PaginationProps> = ({
             onClick={() => onPageChange(page as number)}
             aria-label={t('pagination.page', `Page ${page}`)}
             aria-current={isCurrent ? 'page' : undefined}
-            className={`flex items-center justify-center w-11 h-11 sm:w-10 sm:h-10 rounded-2xl font-medium transition-colors focus-visible:ring-2 focus-visible:ring-[#8629cc] outline-none ${
+            className={`flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 min-w-[36px] min-h-[36px] rounded-xl sm:rounded-2xl font-medium text-xs sm:text-sm transition-colors focus-visible:ring-2 focus-visible:ring-[#8629cc] outline-none ${
               isCurrent
-                ? 'bg-[#aa3bff] text-white'
-                : 'bg-surface-card text-text-main hover:bg-gray-200'
+                ? 'bg-[#aa3bff] text-white font-bold'
+                : 'bg-bg-card text-text-main hover:bg-bg-elevated'
             }`}
           >
             {page}
@@ -86,9 +86,9 @@ export const Pagination: React.FC<PaginationProps> = ({
         onClick={handleNext}
         disabled={currentPage === totalPages}
         aria-label={t('pagination.next', 'Next page')}
-        className="flex items-center justify-center w-11 h-11 sm:w-10 sm:h-10 rounded-2xl bg-surface-card hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus-visible:ring-2 focus-visible:ring-[#8629cc] outline-none"
+        className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 min-w-[36px] min-h-[36px] rounded-xl sm:rounded-2xl bg-bg-card hover:bg-bg-elevated disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus-visible:ring-2 focus-visible:ring-[#8629cc] outline-none"
       >
-        <ChevronRight className="w-5 h-5 text-text-main" />
+        <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-text-main" />
       </button>
     </div>
   );

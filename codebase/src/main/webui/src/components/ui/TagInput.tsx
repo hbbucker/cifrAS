@@ -104,7 +104,7 @@ export const TagInput: React.FC<TagInputProps> = ({
 
       <div
         onClick={() => inputRef.current?.focus()}
-        className={`relative min-h-[44px] w-full bg-bg-card border border-border-main rounded-md px-2.5 py-1.5 flex flex-wrap items-center gap-1.5 focus-within:border-[#8629cc] focus-within:ring-2 focus-within:ring-[#8629cc]/20 transition-all ${
+        className={`relative min-h-[44px] w-full bg-bg-card border border-border-main rounded-xl px-3 py-1.5 flex flex-wrap items-center gap-1.5 focus-within:border-[#8629cc] focus-within:ring-2 focus-within:ring-[#8629cc]/20 transition-all ${
           disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-text'
         }`}
         data-testid="tag-input-container"
@@ -152,7 +152,7 @@ export const TagInput: React.FC<TagInputProps> = ({
 
         {isOpen && filteredSuggestions.length > 0 && !disabled && (
           <ul
-            className="absolute left-0 top-full mt-1.5 w-full bg-bg-card border border-border-main rounded-md shadow-lg z-50 py-1 max-h-48 overflow-y-auto"
+            className="absolute left-0 top-full mt-1.5 w-full bg-bg-card border border-border-main rounded-xl shadow-xl z-50 py-1 max-h-48 overflow-y-auto"
             role="listbox"
             data-testid="tag-suggestions-list"
           >

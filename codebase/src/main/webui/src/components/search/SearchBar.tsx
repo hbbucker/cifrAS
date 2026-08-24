@@ -150,26 +150,26 @@ export const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
  )}
  </div>
 
- {isDropdownOpen && results.length > 0 && (
- <div className="absolute top-full left-0 right-0 mt-2 bg-bg-card rounded-lg shadow-xl border border-border-main overflow-hidden z-50" data-testid="search-dropdown">
- {results.map((result) => (
- <button
- key={result.id}
- onClick={() => handleSelectResult(result)}
- className="w-full text-left px-4 py-3 hover:bg-bg-main flex justify-between items-center transition-colors border-b border-border-main last:border-0"
- data-testid={`search-result-${result.id}`}
- >
- <div>
- <p className="font-medium text-text-main line-clamp-1">{result.title}</p>
- <p className="text-sm text-text-mute line-clamp-1">{result.artist}</p>
- </div>
- <span className="text-xs font-bold text-[#8629cc] bg-[#8629cc]/10 px-2 py-1 rounded">
- {result.keySignature}
- </span>
- </button>
- ))}
- </div>
- )}
- </div>
- );
+  {isDropdownOpen && results.length > 0 && (
+    <div className="absolute top-full left-0 right-0 mt-2 bg-bg-card rounded-xl shadow-2xl border border-border-main overflow-hidden z-50 max-h-[60vh] overflow-y-auto" data-testid="search-dropdown">
+      {results.map((result) => (
+        <button
+          key={result.id}
+          onClick={() => handleSelectResult(result)}
+          className="w-full text-left px-3.5 sm:px-4 py-2.5 sm:py-3 hover:bg-bg-main flex justify-between items-center transition-colors border-b border-border-main last:border-0 gap-2"
+          data-testid={`search-result-${result.id}`}
+        >
+          <div className="min-w-0 flex-1">
+            <p className="font-medium text-sm sm:text-base text-text-main line-clamp-1">{result.title}</p>
+            <p className="text-xs sm:text-sm text-text-mute line-clamp-1">{result.artist}</p>
+          </div>
+          <span className="text-xs font-bold text-[#8629cc] bg-[#8629cc]/10 px-2 py-0.5 rounded shrink-0">
+            {result.keySignature}
+          </span>
+        </button>
+      ))}
+    </div>
+  )}
+  </div>
+  );
 };

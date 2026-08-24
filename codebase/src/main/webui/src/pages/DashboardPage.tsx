@@ -133,43 +133,43 @@ export const DashboardPage: React.FC = () => {
         </div>
       </header>
 
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6 pb-24 sm:pb-8 min-w-0">
- <div className="mb-8">
- <h2 className="text-2xl font-bold text-text-main mb-2">
- {t('dashboard.welcome', { name: user?.name?.split(' ')[0] || 'Musician' })}
- </h2>
- <p className="text-text-mute">{t('dashboard.subtitle')}</p>
- </div>
+      <div className="flex-1 overflow-y-auto p-3.5 sm:p-6 pb-24 sm:pb-8 min-w-0">
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-xl sm:text-2xl font-bold text-text-main mb-1 sm:mb-2">
+            {t('dashboard.welcome', { name: user?.name?.split(' ')[0] || 'Musician' })}
+          </h2>
+          <p className="text-xs sm:text-sm text-text-mute">{t('dashboard.subtitle')}</p>
+        </div>
 
- <div className="mb-6 flex justify-between items-center">
- <h3 className="text-lg font-bold text-text-main">
- {searchQuery ? t('dashboard.searchResults', { query: searchQuery }) : t('dashboard.favorites')}
- </h3>
- <button
- onClick={() => navigate('/songs')}
- className="text-sm font-medium text-[#8629cc] hover:underline"
- data-testid="view-all-btn"
- >
- {t('dashboard.viewAll')}
- </button>
- </div>
+        <div className="mb-4 sm:mb-6 flex justify-between items-center">
+          <h3 className="text-base sm:text-lg font-bold text-text-main">
+            {searchQuery ? t('dashboard.searchResults', { query: searchQuery }) : t('dashboard.favorites')}
+          </h3>
+          <button
+            onClick={() => navigate('/songs')}
+            className="text-xs sm:text-sm font-medium text-[#8629cc] hover:underline p-1 min-h-[36px] flex items-center"
+            data-testid="view-all-btn"
+          >
+            {t('dashboard.viewAll')}
+          </button>
+        </div>
 
- {loading ? (
- <SkeletonCard count={3} />
- ) : songs.length > 0 ? (
- <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
- {songs.map((song) => (
- <div key={song.id} onClick={() => navigate(`/song/${song.id}`)} className="cursor-pointer" data-testid={`view-song-${song.id}`}>
- <MusicCard
- {...song}
- onToggleFavorite={handleToggleFavorite}
- onEdit={(id) => navigate(`/songs/edit/${id}`)}
- onShare={() => setSharingSong({ id: song.id, title: song.title })}
- onDelete={handleDelete}
- />
- </div>
- ))}
- </div>
+        {loading ? (
+          <SkeletonCard count={3} />
+        ) : songs.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-6">
+            {songs.map((song) => (
+              <div key={song.id} onClick={() => navigate(`/song/${song.id}`)} className="cursor-pointer" data-testid={`view-song-${song.id}`}>
+                <MusicCard
+                  {...song}
+                  onToggleFavorite={handleToggleFavorite}
+                  onEdit={(id) => navigate(`/songs/edit/${id}`)}
+                  onShare={() => setSharingSong({ id: song.id, title: song.title })}
+                  onDelete={handleDelete}
+                />
+              </div>
+            ))}
+          </div>
  ) : totalSongsCount === 0 ? (
  <EducationalEmptyState
    icon={Music}

@@ -167,17 +167,18 @@ export const SongViewPage: React.FC = () => {
               currentKey={currentKey}
               onTransposeDown={() => setTransposeSteps(s => s - 1)}
               onTransposeUp={() => setTransposeSteps(s => s + 1)}
+              size="sm"
             />
             
             <div className="flex items-center gap-1 sm:gap-2">
               <div className="relative">
                 <button 
                   onClick={() => setShowSettings(!showSettings)}
-                  className="w-10 h-10 min-w-[40px] flex items-center justify-center text-text-mute hover:bg-bg-elevated rounded-xl transition-colors"
+                  className="w-9 h-9 sm:w-10 sm:h-10 min-w-[36px] min-h-[36px] sm:min-w-[40px] sm:min-h-[40px] flex items-center justify-center text-text-mute hover:bg-bg-elevated rounded-xl transition-colors"
                   title="Preferences"
                   aria-label="Preferences"
                 >
-                  <Settings2 className={`w-5 h-5 ${showSettings ? 'text-[#8629cc]' : ''}`} />
+                  <Settings2 className={`w-4 h-4 sm:w-5 sm:h-5 ${showSettings ? 'text-[#8629cc]' : ''}`} />
                 </button>
                 
                 {showSettings && (
@@ -222,26 +223,26 @@ export const SongViewPage: React.FC = () => {
 
               <button 
                 onClick={() => setShowShareModal(true)}
-                className="w-10 h-10 min-w-[40px] flex items-center justify-center text-text-mute hover:bg-bg-elevated rounded-xl transition-colors"
+                className="w-9 h-9 sm:w-10 sm:h-10 min-w-[36px] min-h-[36px] sm:min-w-[40px] sm:min-h-[40px] flex items-center justify-center text-text-mute hover:bg-bg-elevated rounded-xl transition-colors"
                 title={t('songSharing.shareSong')}
                 data-testid="share-song-btn"
                 aria-label={t('songSharing.shareSong')}
               >
-                <Share2 className="w-5 h-5" />
+                <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
               
               <button 
                 onClick={() => navigate(`/songs/edit/${id}`, { state: { wasTransposed: transposeSteps !== 0, originalKey: song.originalKey } })}
-                className="w-10 h-10 min-w-[40px] flex items-center justify-center text-text-mute hover:bg-bg-elevated rounded-xl transition-colors"
+                className="w-9 h-9 sm:w-10 sm:h-10 min-w-[36px] min-h-[36px] sm:min-w-[40px] sm:min-h-[40px] flex items-center justify-center text-text-mute hover:bg-bg-elevated rounded-xl transition-colors"
                 title={t('songView.editSong')}
                 aria-label={t('songView.editSong')}
               >
-                <Edit className="w-5 h-5" />
+                <Edit className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
               
               <button 
                 onClick={() => navigate(`/theater/song/${id}`, { state: { autoScrollSpeed, useBb, useEb, transposeSteps } })}
-                className="flex items-center gap-1.5 sm:gap-2 bg-[#8629cc] hover:bg-[#721eb8] text-white px-3 sm:px-4 py-2 min-h-[40px] sm:min-h-[44px] rounded-xl font-medium transition-colors shadow-sm text-xs sm:text-sm shrink-0"
+                className="flex items-center gap-1.5 sm:gap-2 bg-[#8629cc] hover:bg-[#721eb8] text-white px-3 sm:px-4 py-2 min-h-[36px] sm:min-h-[44px] rounded-xl font-medium transition-colors shadow-sm text-xs sm:text-sm shrink-0"
                 data-testid="theater-mode-btn"
               >
                 <PlayCircle className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -252,7 +253,7 @@ export const SongViewPage: React.FC = () => {
         </header>
 
         <div className="flex-1 overflow-y-auto p-3.5 sm:p-6 pb-24 sm:pb-8 bg-bg-main/50 min-w-0" ref={scrollContainerRef}>
-          <div className="max-w-3xl mx-auto h-full flex flex-col">
+          <div className="max-w-4xl mx-auto h-full flex flex-col">
             <ChordSheet content={transposedContent} fontSize={20} />
           </div>
         </div>
