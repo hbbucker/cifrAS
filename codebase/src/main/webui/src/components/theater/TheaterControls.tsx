@@ -149,7 +149,7 @@ export const TheaterControls: React.FC<TheaterControlsProps> = ({
       {/* ========================================================================= */}
       <nav 
         className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 bg-bg-card/95 backdrop-blur-xl text-text-main px-3.5 sm:px-6 py-2.5 sm:py-3.5 rounded-full shadow-2xl border border-border-main flex items-center gap-2 sm:gap-4 md:gap-5 pointer-events-auto transition-all max-w-[95%] w-auto"
-        aria-label="Controles de Performance"
+        aria-label={t('theater.performanceControls')}
       >
         {/* Playlist Navigation */}
         {!isLocked && (
@@ -158,7 +158,8 @@ export const TheaterControls: React.FC<TheaterControlsProps> = ({
               onClick={onPrevSong} 
               className="p-1.5 sm:p-2 min-h-[38px] min-w-[38px] sm:min-h-[42px] sm:min-w-[42px] flex items-center justify-center hover:bg-bg-elevated rounded-full transition-colors disabled:opacity-30 disabled:cursor-not-allowed" 
               disabled={!onPrevSong} 
-              aria-label="Música Anterior"
+              aria-label={t('theater.previousSong')}
+              title={t('theater.previousSong')}
               data-testid="prev-song-btn"
             >
               <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -167,7 +168,8 @@ export const TheaterControls: React.FC<TheaterControlsProps> = ({
               onClick={onNextSong} 
               className="p-1.5 sm:p-2 min-h-[38px] min-w-[38px] sm:min-h-[42px] sm:min-w-[42px] flex items-center justify-center hover:bg-bg-elevated rounded-full transition-colors disabled:opacity-30 disabled:cursor-not-allowed" 
               disabled={!onNextSong} 
-              aria-label="Próxima Música"
+              aria-label={t('theater.nextSong')}
+              title={t('theater.nextSong')}
               data-testid="next-song-btn"
             >
               <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -190,7 +192,7 @@ export const TheaterControls: React.FC<TheaterControlsProps> = ({
                 value={speed} onChange={(e) => onSpeedChange(Number(e.target.value))}
                 className="w-full accent-[#8629cc] h-1.5 bg-bg-elevated rounded-lg cursor-pointer"
                 data-testid="speed-slider"
-                aria-label="Velocidade da Rolagem"
+                aria-label={t('theater.scrollSpeed')}
               />
             </div>
           )}
@@ -200,7 +202,8 @@ export const TheaterControls: React.FC<TheaterControlsProps> = ({
             className="w-10 h-10 sm:w-12 sm:h-12 bg-[#8629cc] hover:bg-[#721eb8] flex items-center justify-center rounded-full transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-[#8629cc]/20 shrink-0 disabled:opacity-50"
             data-testid="play-pause-btn"
             disabled={isLocked}
-            aria-label={isScrolling ? 'Pausar Rolagem' : 'Iniciar Rolagem'}
+            aria-label={isScrolling ? t('theater.pauseScroll') : t('theater.startScroll')}
+            title={isScrolling ? t('theater.pauseScroll') : t('theater.startScroll')}
           >
             {isScrolling ? (
               <Pause className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 fill-white text-white" />

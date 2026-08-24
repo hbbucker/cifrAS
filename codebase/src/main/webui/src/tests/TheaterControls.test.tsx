@@ -19,6 +19,12 @@ vi.mock('react-i18next', () => ({
         'theater.exit': 'Sair do Modo Teatro',
         'theater.singerMode': 'Modo Cantor',
         'theater.chordsMode': 'Modo Cifras',
+        'theater.performanceControls': 'Controles de Performance',
+        'theater.previousSong': 'Música Anterior',
+        'theater.nextSong': 'Próxima Música',
+        'theater.scrollSpeed': 'Velocidade da Rolagem',
+        'theater.pauseScroll': 'Pausar Rolagem',
+        'theater.startScroll': 'Iniciar Rolagem',
       };
       return dict[key] || key;
     }

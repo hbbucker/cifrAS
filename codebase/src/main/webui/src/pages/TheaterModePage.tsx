@@ -142,7 +142,7 @@ export const TheaterModePage: React.FC = () => {
  }
  })
  .catch(() => {
- toast('Failed to load playlist queue', 'error');
+ toast(t('playlistView.failedLoadPlaylist'), 'error');
  });
  }
  }, [playlistId, toast, t, querySongId, stateSongId, queryIndex, stateIndex]);
@@ -164,7 +164,7 @@ export const TheaterModePage: React.FC = () => {
             content: stringifyLyrics(data.lyrics)
           });
         })
-        .catch(() => toast('Failed to load song details', 'error'));
+        .catch(() => toast(t('theater.failedLoadSongDetails'), 'error'));
 
       // Then fetch the theater preferences for this specific song
       if (!passedState) {
@@ -188,7 +188,7 @@ export const TheaterModePage: React.FC = () => {
           });
       }
     }
-  }, [activeSongId, isMobile, toast, passedState, setSpeed]);
+  }, [activeSongId, isMobile, toast, passedState, setSpeed, t]);
 
   // Persist preferences
   useEffect(() => {
