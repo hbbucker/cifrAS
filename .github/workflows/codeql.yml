@@ -51,20 +51,23 @@ jobs:
       with:
         node-version: '20'
         cache: 'npm'
+        cache-dependency-path: |
+          codebase/src/main/webui/package-lock.json
+          codebase-admin/src/main/webui/package-lock.json
 
     - if: matrix.build-mode == 'manual'
       name: Build Main Project
       working-directory: ./codebase
       run: |
-        cd src/main/webui && npm ci && cd ../../..
-        ./codebase/mvnw clean compile -DskipTests
+        npm --prefix src/main/webui ci
+        ./mvnw clean compile -DskipTests
 
     - if: matrix.build-mode == 'manual'
       name: Build Admin Project
       working-directory: ./codebase-admin
       run: |
-        cd src/main/webui && npm ci && cd ../../..
-        ./codebase-admin/mvnw clean compile -DskipTests
+        npm --prefix src/main/webui ci
+        ./mvnw clean compile -DskipTests
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
