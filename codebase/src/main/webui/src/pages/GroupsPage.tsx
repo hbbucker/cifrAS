@@ -227,7 +227,7 @@ export const GroupsPage: React.FC = () => {
           </button>
         </header>
 
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 pb-24 sm:pb-8 min-w-0">
+        <div className="flex-1 overflow-y-auto p-3.5 sm:p-6 pb-24 sm:pb-8 min-w-0">
           {declinedInvites.length > 0 && (
             <div className="mb-6 sm:mb-8">
               <h2 className="text-base sm:text-lg font-bold text-text-main mb-3">{t('groups.declinedInvitations')}</h2>
@@ -249,7 +249,7 @@ export const GroupsPage: React.FC = () => {
           {invites.length > 0 && (
             <div className="mb-6 sm:mb-8">
               <h2 className="text-base sm:text-lg font-bold text-text-main mb-3">{t('groups.pendingInvitations')}</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-6">
                 {invites.map(invite => (
                   <div key={invite.id} className="bg-bg-card rounded-2xl border border-yellow-200 dark:border-yellow-700/50 p-4 sm:p-5 shadow-sm relative">
                     <h3 className="text-base sm:text-lg font-bold text-text-main mb-1 truncate">{invite.groupName}</h3>
@@ -269,7 +269,7 @@ export const GroupsPage: React.FC = () => {
           ) : groups.length === 0 ? (
             <div className="text-center py-12 text-text-mute text-sm">{t('groups.noGroups')}</div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-6">
               {groups.map(group => (
                 <GroupCard 
                   key={group.id} 
