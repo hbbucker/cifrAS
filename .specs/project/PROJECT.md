@@ -61,3 +61,11 @@ O projeto roda como um monólito onde o Quarkus gerencia tanto o servidor de bac
 - Timeline: Não definido formalmente; MVP iterativo
 - Technical: Supabase como BaaS obrigatório; JWT emitido pelo Supabase
 - Resources: Time pequeno / projeto indie
+
+## Glossário & Termos Canônicos (D3)
+
+| Conceito | Termo Canônico | Termos Proibidos / Sinônimos Evitados | Descrição |
+|---|---|---|---|
+| Classificação de Músicas | `tags` | `labels`, `categories`, `genres` | Etiquetas textuais livres atribuídas a músicas para filtragem e organização. |
+| Tom Musical | `key` / `originalKey` | `tone`, `scale`, `tuning` | Tom de referência ou tom original de uma música. |
+| Estrutura de Cifra | `lyrics` | `chordsheet`, `tab`, `cifra` | Estrutura de seções, linhas e acordes serializada em JSON. |

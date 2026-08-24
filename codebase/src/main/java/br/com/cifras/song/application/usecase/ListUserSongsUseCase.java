@@ -14,8 +14,12 @@ public class ListUserSongsUseCase {
     SongRepository songRepository;
 
     public PagedResponse<Song> execute(String userId, int page, int size, String query) {
-        List<Song> songs = songRepository.findByUserIdActive(userId, page, size, query);
-        long total = songRepository.countByUserIdActive(userId, query);
+        return execute(userId, page, size, query, null);
+    }
+
+    public PagedResponse<Song> execute(String userId, int page, int size, String query, List<String> tags) {
+        List<Song> songs = songRepository.findByUserIdActive(userId, page, size, query, tags);
+        long total = songRepository.countByUserIdActive(userId, query, tags);
         return PagedResponse.of(songs, total, page, size);
     }
 }

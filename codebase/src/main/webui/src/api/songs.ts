@@ -8,18 +8,32 @@ export interface SongData {
   originalKey?: string;
   keySignature: string;
   isFavorite: boolean;
-  categories: string[];
+  categories?: string[];
+  tags?: string[];
   [key: string]: unknown;
+}
+
+export interface TagCount {
+  name: string;
+  count: number;
 }
 
 export const getSongs = async (
   page: number = 1,
   limit: number = 20,
-  search?: string
+  search?: string,
+  tags?: string[] | string
 ): Promise<PaginatedResponse<SongData> | SongData[]> => {
   const params: Record<string, string | number> = { page, size: limit };
-  if (search && search.trim().length >= 3) {
+  if (search && search.trim().length >= 1) {
     params.q = search.trim();
+  }
+  if (tags) {
+    if (Array.isArray(tags) && tags.length > 0) {
+      params.tags = tags.join(',');
+    } else if (typeof tags === 'string' && tags.trim().length > 0) {
+      params.tags = tags.trim();
+    }
   }
 
   const response = await apiClient.get('/songs', { params });
@@ -34,4 +48,9 @@ export const getSongs = async (
   }
 
   return data;
+};
+
+export const getUserTags = async (): Promise<TagCount[]> => {
+  const response = await apiClient.get('/songs/tags');
+  return response.data || [];
 };

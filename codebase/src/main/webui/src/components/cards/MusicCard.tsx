@@ -8,7 +8,8 @@ export interface MusicCardProps {
  artist: string;
  keySignature: string;
  isFavorite: boolean;
- categories: string[];
+ categories?: string[];
+ tags?: string[];
  onToggleFavorite: (id: string) => void;
  onEdit: (id: string) => void;
  onShare: (id: string) => void;
@@ -16,12 +17,14 @@ export interface MusicCardProps {
 }
 
 export const MusicCard: React.FC<MusicCardProps> = ({
- id, title, artist, keySignature, isFavorite: initialIsFavorite, categories,
+ id, title, artist, keySignature, isFavorite: initialIsFavorite, categories = [], tags = [],
  onToggleFavorite, onEdit, onShare, onDelete
 }) => {
   const { t } = useTranslation();
  const [menuOpen, setMenuOpen] = useState(false);
  const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
+
+ const displayTags = tags && tags.length > 0 ? tags : categories;
 
  const handleToggleFavorite = (e: React.MouseEvent) => {
  e.stopPropagation();
@@ -51,10 +54,10 @@ export const MusicCard: React.FC<MusicCardProps> = ({
  </div>
  </div>
 
- <div className="flex flex-wrap gap-2 mt-2 mb-4">
- {categories.map((cat) => (
- <span key={cat} className="text-xs bg-[#8629cc]/10 text-[#8629cc] px-2 py-0.5 rounded-full font-medium">
- {cat}
+ <div className="flex flex-wrap gap-1.5 mt-2 mb-4">
+ {displayTags.map((tag) => (
+ <span key={tag} className="text-xs bg-[#8629cc]/10 dark:bg-[#8629cc]/20 text-[#8629cc] dark:text-[#c084fc] px-2 py-0.5 rounded-full font-medium">
+ {tag}
  </span>
  ))}
  </div>

@@ -15,7 +15,7 @@ public class CreateSongUseCase {
 
     @Transactional
     public Song execute(CreateSongRequest req, String userId) {
-        Song song = Song.create(userId, req.title(), req.artist(), req.originalKey(), req.lyrics());
+        Song song = Song.create(userId, req.title(), req.artist(), req.originalKey(), req.lyrics(), req.tags());
         songRepository.persist(song);
         return song;
     }

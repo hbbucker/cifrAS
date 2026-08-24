@@ -124,6 +124,9 @@ class SongUseCasesTest extends BaseIntegrationTest {
             () -> getSongUseCase.execute(songId, USER_A));
     }
 
+    @Inject
+    GetUserTagsUseCase getUserTagsUseCase;
+
     /**
      * Test 6: findByIdAndUser() throws NotFoundException when USER_B accesses USER_A's song.
      */
@@ -134,5 +137,29 @@ class SongUseCasesTest extends BaseIntegrationTest {
 
         assertThrows(NotFoundException.class,
             () -> getSongUseCase.execute(song.getId(), USER_B));
+    }
+
+    /**
+     * Test 7: create, filter by tags and get tag counts.
+     */
+    @Test
+    @Transactional
+    void givenSongsWithTags_whenFilteredByTag_thenReturnsMatchingOnly() {
+        String testUser = "user-tags-test-" + java.util.UUID.randomUUID();
+        createSongUseCase.execute(new CreateSongRequest("Song Tag 1", "Artist 1", "C", LyricsStructure.empty(), java.util.List.of("Missa", "Entrada")), testUser);
+        createSongUseCase.execute(new CreateSongRequest("Song Tag 2", "Artist 2", "D", LyricsStructure.empty(), java.util.List.of("Missa", "Comunhao")), testUser);
+        createSongUseCase.execute(new CreateSongRequest("Song Tag 3", "Artist 3", "E", LyricsStructure.empty(), java.util.List.of("Rock")), testUser);
+
+        PagedResponse<Song> missaSongs = listUserSongsUseCase.execute(testUser, 1, 10, null, java.util.List.of("Missa"));
+        assertEquals(2, missaSongs.totalCount());
+
+        PagedResponse<Song> entradaSongs = listUserSongsUseCase.execute(testUser, 1, 10, null, java.util.List.of("Entrada"));
+        assertEquals(1, entradaSongs.totalCount());
+        assertEquals("Song Tag 1", entradaSongs.items().get(0).getTitle());
+
+        var tags = getUserTagsUseCase.execute(testUser);
+        assertEquals(4, tags.size());
+        assertEquals("Missa", tags.get(0).name());
+        assertEquals(2, tags.get(0).count());
     }
 }

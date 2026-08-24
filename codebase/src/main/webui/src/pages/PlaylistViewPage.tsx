@@ -5,6 +5,9 @@ import { ArrowLeft, PlayCircle, GripVertical, Trash2, ChevronUp, ChevronDown, Pl
 import { useNavigate, useParams } from 'react-router-dom';
 import { useToast } from '../context/ToastContext';
 import { ExportPlaylistPresentationModal } from '../components/modals/ExportPlaylistPresentationModal';
+import { TagFilterBar } from '../components/ui/TagFilterBar';
+import { getUserTags } from '../api/songs';
+import type { TagCount } from '../api/songs';
 import type { SongForPresentation } from '../utils/presentationGenerator';
 
 interface SongData {
@@ -13,6 +16,7 @@ interface SongData {
  artist: string;
  originalKey?: string;
  key?: string;
+ tags?: string[];
  [key: string]: unknown;
 }
 
@@ -36,6 +40,8 @@ export const PlaylistViewPage: React.FC = () => {
  const [loading, setLoading] = useState(true);
  const [showAddModal, setShowAddModal] = useState(false);
  const [allSongs, setAllSongs] = useState<SongData[]>([]);
+ const [userTags, setUserTags] = useState<TagCount[]>([]);
+ const [selectedTag, setSelectedTag] = useState<string | null>(null);
  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
  const [searchQuery, setSearchQuery] = useState('');
  const [isSearching, setIsSearching] = useState(false);
@@ -72,11 +78,22 @@ export const PlaylistViewPage: React.FC = () => {
   useEffect(() => {
     if (!showAddModal) return;
 
+    getUserTags()
+      .then((tags) => setUserTags(tags))
+      .catch(() => {});
+  }, [showAddModal]);
+
+  useEffect(() => {
+    if (!showAddModal) return;
+
     const timeoutId = setTimeout(() => {
       const params = new URLSearchParams();
       params.append('size', '50');
       if (searchQuery) {
         params.append('q', searchQuery);
+      }
+      if (selectedTag) {
+        params.append('tags', selectedTag);
       }
 
       fetch(`/api/songs?${params.toString()}`, {
@@ -92,7 +109,7 @@ export const PlaylistViewPage: React.FC = () => {
     }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [searchQuery, showAddModal, t, toast]);
+  }, [searchQuery, selectedTag, showAddModal, t, toast]);
 
   const moveSong = (index: number, direction: 'up' | 'down') => {
     if (direction === 'up' && index === 0) return;
@@ -346,7 +363,7 @@ export const PlaylistViewPage: React.FC = () => {
           </header>
 
           <div className="flex-1 flex flex-col max-w-3xl mx-auto w-full p-3 sm:p-6 pb-20 sm:pb-6 overflow-hidden min-w-0">
-            <div className="relative mb-4 sm:mb-6 shrink-0">
+            <div className="relative mb-3 shrink-0">
               <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
               <input
                 type="text"
@@ -359,6 +376,15 @@ export const PlaylistViewPage: React.FC = () => {
                 className="w-full pl-12 pr-4 py-2.5 sm:py-3 bg-bg-card border border-border-main rounded-xl text-text-main focus:ring-2 focus:ring-[#8629cc] outline-none shadow-sm text-sm sm:text-base"
               />
             </div>
+
+            {userTags.length > 0 && (
+              <TagFilterBar
+                tags={userTags}
+                selectedTag={selectedTag}
+                onSelectTag={setSelectedTag}
+                className="mb-3 shrink-0"
+              />
+            )}
 
             <div className="flex-1 overflow-y-auto bg-bg-card rounded-xl border border-border-main shadow-sm min-w-0">
               {isSearching ? (

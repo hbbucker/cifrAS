@@ -58,6 +58,9 @@ public class SongEntity extends PanacheEntityBase {
     @Column(name = "pref_transpose_steps")
     public Integer prefTransposeSteps = 0;
 
+    @Column(name = "tags", columnDefinition = "text[]")
+    public java.util.List<String> tags = new java.util.ArrayList<>();
+
     @Column(nullable = false, updatable = false)
     public Instant createdAt;
 

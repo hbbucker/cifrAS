@@ -1,7 +1,12 @@
 package br.com.cifras.song.model;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class Song {
 
@@ -12,6 +17,11 @@ public class Song {
     private String originalKey;
     private LyricsStructure lyrics;
     private Boolean isFavorite = false;
+    /**
+     * List of musical/repertoire classification tags.
+     * Invariants: Max 20 tags per song, max 30 characters per tag, trimmed, non-blank and deduplicated.
+     */
+    private List<String> tags = new ArrayList<>();
     
     private Boolean prefUseBb = false;
     private Boolean prefUseEb = false;
@@ -24,13 +34,43 @@ public class Song {
 
     protected Song() {}
 
+    /**
+     * Normalizes a raw list of tags enforcing business invariants:
+     * 1. Filters null or blank entries.
+     * 2. Trims leading/trailing whitespace.
+     * 3. Truncates individual tag names exceeding 30 characters.
+     * 4. Deduplicates identical tags.
+     * 5. Caps the maximum number of tags at 20 per song.
+     *
+     * @param rawTags the raw input list of tags (can be null)
+     * @return a normalized, non-null list of tags
+     */
+    public static List<String> normalizeTags(List<String> rawTags) {
+        if (rawTags == null || rawTags.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return rawTags.stream()
+            .filter(Objects::nonNull)
+            .map(String::trim)
+            .filter(t -> !t.isEmpty())
+            .map(t -> t.length() > 30 ? t.substring(0, 30) : t)
+            .distinct()
+            .limit(20)
+            .collect(Collectors.toCollection(ArrayList::new));
+    }
+
     public static Song create(String userId, String title, String artist, String originalKey, LyricsStructure lyrics) {
+        return create(userId, title, artist, originalKey, lyrics, null);
+    }
+
+    public static Song create(String userId, String title, String artist, String originalKey, LyricsStructure lyrics, List<String> tags) {
         Song song = new Song();
         song.userId = userId;
         song.title = title;
         song.artist = artist;
         song.originalKey = originalKey;
         song.lyrics = lyrics;
+        song.tags = normalizeTags(tags);
         song.createdAt = Instant.now();
         song.updatedAt = Instant.now();
         return song;
@@ -49,6 +89,7 @@ public class Song {
         clone.artist = original.getArtist();
         clone.originalKey = original.getOriginalKey();
         clone.lyrics = original.getLyrics();
+        clone.tags = new ArrayList<>(original.getTags());
         clone.isFavorite = false;
         clone.prefUseBb = false;
         clone.prefUseEb = false;
@@ -63,6 +104,13 @@ public class Song {
                                LyricsStructure lyrics, Boolean isFavorite, Boolean prefUseBb, Boolean prefUseEb, 
                                Integer prefAutoScrollSpeed, Integer prefTransposeSteps, 
                                Instant createdAt, Instant updatedAt, Instant deletedAt) {
+        return restore(id, userId, title, artist, originalKey, lyrics, isFavorite, null, prefUseBb, prefUseEb, prefAutoScrollSpeed, prefTransposeSteps, createdAt, updatedAt, deletedAt);
+    }
+
+    public static Song restore(UUID id, String userId, String title, String artist, String originalKey, 
+                               LyricsStructure lyrics, Boolean isFavorite, List<String> tags, Boolean prefUseBb, Boolean prefUseEb, 
+                               Integer prefAutoScrollSpeed, Integer prefTransposeSteps, 
+                               Instant createdAt, Instant updatedAt, Instant deletedAt) {
         Song song = new Song();
         song.id = id;
         song.userId = userId;
@@ -71,6 +119,7 @@ public class Song {
         song.originalKey = originalKey;
         song.lyrics = lyrics;
         song.isFavorite = isFavorite;
+        song.tags = tags != null ? normalizeTags(tags) : new ArrayList<>();
         song.prefUseBb = prefUseBb;
         song.prefUseEb = prefUseEb;
         song.prefAutoScrollSpeed = prefAutoScrollSpeed;
@@ -82,10 +131,17 @@ public class Song {
     }
 
     public void updateDetails(String title, String artist, String originalKey, LyricsStructure lyrics) {
+        updateDetails(title, artist, originalKey, lyrics, this.tags);
+    }
+
+    public void updateDetails(String title, String artist, String originalKey, LyricsStructure lyrics, List<String> tags) {
         this.title = title;
         this.artist = artist;
         this.originalKey = originalKey;
         this.lyrics = lyrics;
+        if (tags != null) {
+            this.tags = normalizeTags(tags);
+        }
         this.updatedAt = Instant.now();
     }
 
@@ -109,6 +165,7 @@ public class Song {
     public String getOriginalKey() { return originalKey; }
     public LyricsStructure getLyrics() { return lyrics; }
     public Boolean getIsFavorite() { return isFavorite; }
+    public List<String> getTags() { return tags != null ? Collections.unmodifiableList(tags) : Collections.emptyList(); }
     
     public void toggleFavorite() {
         this.isFavorite = !this.isFavorite;

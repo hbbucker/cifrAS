@@ -6,6 +6,7 @@ import br.com.cifras.song.model.LyricsStructure;
 import br.com.cifras.song.model.Song;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -20,6 +21,7 @@ public record SongDTO(
     LyricsStructure lyrics,
     String userPreferredKey,
     Boolean isFavorite,
+    List<String> tags,
     Boolean prefUseBb,
     Boolean prefUseEb,
     Integer prefAutoScrollSpeed,
@@ -40,6 +42,7 @@ public record SongDTO(
             song.getLyrics(),
             preferredKey,
             song.getIsFavorite(),
+            song.getTags(),
             song.getPrefUseBb(),
             song.getPrefUseEb(),
             song.getPrefAutoScrollSpeed(),

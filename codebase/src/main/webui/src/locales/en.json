@@ -144,7 +144,16 @@
     "discardBtn": "Discard",
     "editTitle": "Edit Song",
     "newTitle": "New Song",
-    "editingOriginalKeyWarning": "You are editing the song in its original key ({{key}}). Your transpose preferences will be kept when viewing."
+    "editingOriginalKeyWarning": "You are editing the song in its original key ({{key}}). Your transpose preferences will be kept when viewing.",
+    "tags": "Tags",
+    "tagsPlaceholder": "Add tags such as Rock, Gospel, Acoustic..."
+  },
+  "tags": {
+    "title": "Tags",
+    "all": "All",
+    "inputPlaceholder": "Add a tag...",
+    "suggested": "Suggested",
+    "remove": "Remove tag {{tag}}"
   },
   "songView": {
     "preferences": "Preferences",
