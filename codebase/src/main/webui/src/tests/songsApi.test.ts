@@ -16,7 +16,7 @@ describe('songs API client', () => {
 
   it('getSongs sends query and tag parameters', async () => {
     const mockResponse = { data: { items: [], totalCount: 0 } };
-    (apiClient.get as any).mockResolvedValue(mockResponse);
+    vi.mocked(apiClient.get).mockResolvedValueOnce(mockResponse);
 
     await getSongs(1, 20, 'rock', ['gospel', 'worship']);
 
@@ -27,7 +27,7 @@ describe('songs API client', () => {
 
   it('getSongs handles single string tag and string JSON response', async () => {
     const mockResponse = { data: JSON.stringify({ items: [], totalCount: 0 }) };
-    (apiClient.get as any).mockResolvedValue(mockResponse);
+    vi.mocked(apiClient.get).mockResolvedValueOnce(mockResponse);
 
     const result = await getSongs(2, 10, 'jazz', 'acoustic');
 
@@ -39,7 +39,7 @@ describe('songs API client', () => {
 
   it('getUserTags fetches tags list from /songs/tags', async () => {
     const mockTags = [{ name: 'Rock', count: 5 }];
-    (apiClient.get as any).mockResolvedValue({ data: mockTags });
+    vi.mocked(apiClient.get).mockResolvedValueOnce({ data: mockTags });
 
     const result = await getUserTags();
 
