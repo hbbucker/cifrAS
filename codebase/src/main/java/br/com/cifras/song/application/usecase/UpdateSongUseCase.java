@@ -25,7 +25,7 @@ public class UpdateSongUseCase {
             throw new ForbiddenException("You do not own this song");
         }
 
-        song.updateDetails(req.title(), req.artist(), req.originalKey(), req.lyrics());
+        song.updateDetails(req.title(), req.artist(), req.originalKey(), req.lyrics(), req.tags());
         songRepository.update(song);
         return song;
     }

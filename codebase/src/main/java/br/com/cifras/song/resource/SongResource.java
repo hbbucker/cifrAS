@@ -9,6 +9,7 @@ import br.com.cifras.song.dto.*;
 import br.com.cifras.song.application.usecase.ListUserSongsUseCase;
 import br.com.cifras.song.application.usecase.CreateSongUseCase;
 import br.com.cifras.song.application.usecase.GetSongUseCase;
+import br.com.cifras.song.application.usecase.GetUserTagsUseCase;
 import br.com.cifras.song.application.usecase.UpdateSongUseCase;
 import br.com.cifras.song.application.usecase.UpdateSongPreferencesUseCase;
 import br.com.cifras.song.application.usecase.DeleteSongUseCase;
@@ -22,6 +23,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import br.com.cifras.song.dto.SongPreferencesDTO;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,6 +41,9 @@ public class SongResource {
 
     @Inject
     ListUserSongsUseCase listUserSongsUseCase;
+
+    @Inject
+    GetUserTagsUseCase getUserTagsUseCase;
 
     @Inject
     CreateSongUseCase createSongUseCase;
@@ -67,6 +72,7 @@ public class SongResource {
     @GET
     public Response listSongs(
         @QueryParam("q") String query,
+        @QueryParam("tags") List<String> tags,
         @QueryParam("page") @DefaultValue("1") int page,
         @QueryParam("size") @DefaultValue("20") int size
     ) {
@@ -74,14 +80,28 @@ public class SongResource {
         if (size < 1) size = 20;
         if (size > 100) size = 100;
 
+        List<String> parsedTags = tags != null ? tags.stream()
+            .flatMap(t -> Arrays.stream(t.split(",")))
+            .map(String::trim)
+            .filter(t -> !t.isEmpty())
+            .toList() : List.of();
+
         String userId = securityUtils.getCurrentUserId();
-        PagedResponse<Song> songs = listUserSongsUseCase.execute(userId, page, size, query);
+        PagedResponse<Song> songs = listUserSongsUseCase.execute(userId, page, size, query, parsedTags);
 
         List<SongSummaryDTO> summaries = songs.items().stream()
             .map(SongSummaryDTO::from)
             .toList();
 
         return Response.ok(PagedResponse.of(summaries, songs.totalCount(), songs.page(), songs.size())).build();
+    }
+
+    @GET
+    @Path("/tags")
+    public Response getUserTags() {
+        String userId = securityUtils.getCurrentUserId();
+        List<TagCountDTO> tagCounts = getUserTagsUseCase.execute(userId);
+        return Response.ok(tagCounts).build();
     }
 
     @POST
@@ -104,7 +124,7 @@ public class SongResource {
             lyrics = transpositionService.transpose(lyrics, transpose, EnharmonicConvention.SHARPS);
         }
         SongDTO dto = new SongDTO(song.getId(), song.getTitle(), song.getArtist(), song.getOriginalKey(),
-            lyrics, null, song.getIsFavorite(), song.getPrefUseBb(), song.getPrefUseEb(), song.getPrefAutoScrollSpeed(), song.getPrefTransposeSteps(), song.getCreatedAt(), song.getUpdatedAt());
+            lyrics, null, song.getIsFavorite(), song.getTags(), song.getPrefUseBb(), song.getPrefUseEb(), song.getPrefAutoScrollSpeed(), song.getPrefTransposeSteps(), song.getCreatedAt(), song.getUpdatedAt());
         return Response.ok(dto).build();
     }
 
@@ -116,7 +136,7 @@ public class SongResource {
         LyricsStructure transposed = transpositionService.transpose(
             song.getLyrics(), request.semitones(), request.convention());
         SongDTO dto = new SongDTO(song.getId(), song.getTitle(), song.getArtist(), song.getOriginalKey(),
-            transposed, null, song.getIsFavorite(), song.getPrefUseBb(), song.getPrefUseEb(), song.getPrefAutoScrollSpeed(), song.getPrefTransposeSteps(), song.getCreatedAt(), song.getUpdatedAt());
+            transposed, null, song.getIsFavorite(), song.getTags(), song.getPrefUseBb(), song.getPrefUseEb(), song.getPrefAutoScrollSpeed(), song.getPrefTransposeSteps(), song.getCreatedAt(), song.getUpdatedAt());
         return Response.ok(dto).build();
     }
 

@@ -144,7 +144,16 @@
     "discardBtn": "Discard",
     "editTitle": "Editar Canción",
     "newTitle": "Nueva Canción",
-    "editingOriginalKeyWarning": "Estás editando la canción en su tono original ({{key}}). Tus preferencias de transposición se mantendrán al visualizar."
+    "editingOriginalKeyWarning": "Estás editando la canción en su tono original ({{key}}). Tus preferencias de transposición se mantendrán al visualizar.",
+    "tags": "Etiquetas",
+    "tagsPlaceholder": "Añade etiquetas como Rock, Gospel, Acústico..."
+  },
+  "tags": {
+    "title": "Etiquetas",
+    "all": "Todas",
+    "inputPlaceholder": "Añadir una etiqueta...",
+    "suggested": "Sugerida",
+    "remove": "Eliminar etiqueta {{tag}}"
   },
   "songView": {
     "preferences": "Preferences",

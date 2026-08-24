@@ -7,6 +7,8 @@ import { ConfirmModal } from '../components/modals/ConfirmModal';
 import { parseContentToLyrics, stringifyLyrics } from '../utils/lyricsParser';
 import { DriveFilePicker } from '../components/DriveFilePicker';
 import { Button } from '../components/ui/Button';
+import { TagInput } from '../components/ui/TagInput';
+import { getUserTags } from '../api/songs';
 import { CloudDownload } from 'lucide-react';
 export const SongFormPage: React.FC = () => {
   const { t } = useTranslation();
@@ -21,6 +23,8 @@ export const SongFormPage: React.FC = () => {
  const [artist, setArtist] = useState('');
  const [key, setKey] = useState('C');
  const [content, setContent] = useState('');
+ const [tags, setTags] = useState<string[]>([]);
+ const [availableTags, setAvailableTags] = useState<string[]>([]);
  const [showCancelModal, setShowCancelModal] = useState(false);
  const [showDrivePicker, setShowDrivePicker] = useState(false);
  const [isDirty, setIsDirty] = useState(false);
@@ -44,6 +48,14 @@ export const SongFormPage: React.FC = () => {
  };
 
  useEffect(() => {
+   getUserTags()
+     .then((tagCounts) => {
+       setAvailableTags(tagCounts.map((tc) => tc.name));
+     })
+     .catch(() => {});
+ }, []);
+
+ useEffect(() => {
  if (id) {
  fetch(`/api/songs/${id}`, {
  headers: {
@@ -59,6 +71,7 @@ export const SongFormPage: React.FC = () => {
  setArtist(song.artist || '');
  setKey(song.originalKey || song.keySignature || 'C');
  setContent(song.content || stringifyLyrics(song.lyrics) || '');
+ setTags(song.tags || []);
  setIsDirty(false);
  })
  .catch(err => {
@@ -75,7 +88,7 @@ export const SongFormPage: React.FC = () => {
  }
  
  try {
- const payload = { title, artist, originalKey: key, lyrics: parseContentToLyrics(content) };
+ const payload = { title, artist, originalKey: key, lyrics: parseContentToLyrics(content), tags };
  const res = await fetch(id ? `/api/songs/${id}` : '/api/songs', {
  method: id ? 'PUT' : 'POST',
  headers: {
@@ -154,6 +167,19 @@ export const SongFormPage: React.FC = () => {
  <label className="block text-xs font-semibold text-text-mute mb-1 uppercase tracking-wider">{t('songForm.tom')}</label>
  <input type="text" value={key} onChange={handleChange(setKey)} maxLength={5} className="w-full px-3 py-2 bg-transparent border-b border-border-main focus:border-primary text-text-main font-bold text-lg text-center focus:outline-none transition-colors" placeholder="C#" />
  </div>
+ </div>
+
+ <div className="bg-bg-card p-4 rounded-[16px] border border-border-main">
+   <TagInput
+     tags={tags}
+     onChange={(newTags) => {
+       setTags(newTags);
+       setIsDirty(true);
+     }}
+     availableSuggestions={availableTags}
+     label={t('songForm.tags', 'Tags')}
+     placeholder={t('songForm.tagsPlaceholder', 'Adicione tags como Rock, Gospel, Missa...')}
+   />
  </div>
  
  <div className="flex-1 flex flex-col bg-bg-card p-4 rounded-[16px] border border-border-main">

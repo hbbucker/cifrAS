@@ -144,7 +144,16 @@
     "discardBtn": "Descartar",
     "editTitle": "Editar Música",
     "newTitle": "Nova Música",
-    "editingOriginalKeyWarning": "Você está editando a cifra no tom original ({{key}}). Suas preferências de transposição serão mantidas ao visualizar."
+    "editingOriginalKeyWarning": "Você está editando a cifra no tom original ({{key}}). Suas preferências de transposição serão mantidas ao visualizar.",
+    "tags": "Tags",
+    "tagsPlaceholder": "Adicione tags como Rock, Gospel, Missa..."
+  },
+  "tags": {
+    "title": "Tags",
+    "all": "Todas",
+    "inputPlaceholder": "Adicione uma tag...",
+    "suggested": "Sugerida",
+    "remove": "Remover tag {{tag}}"
   },
   "songView": {
     "preferences": "Preferências",

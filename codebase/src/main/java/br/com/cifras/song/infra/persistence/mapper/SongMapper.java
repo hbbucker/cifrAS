@@ -3,6 +3,7 @@ package br.com.cifras.song.infra.persistence.mapper;
 import br.com.cifras.song.infra.persistence.entity.SongEntity;
 import br.com.cifras.song.model.Song;
 import jakarta.enterprise.context.ApplicationScoped;
+import java.util.ArrayList;
 
 @ApplicationScoped
 public class SongMapper {
@@ -11,7 +12,8 @@ public class SongMapper {
         if (entity == null) return null;
         return Song.restore(
             entity.id, entity.userId, entity.title, entity.artist, entity.originalKey, entity.lyrics,
-            entity.isFavorite != null ? entity.isFavorite : false, entity.prefUseBb, entity.prefUseEb, entity.prefAutoScrollSpeed, entity.prefTransposeSteps,
+            entity.isFavorite != null ? entity.isFavorite : false, entity.tags != null ? entity.tags : new ArrayList<>(),
+            entity.prefUseBb, entity.prefUseEb, entity.prefAutoScrollSpeed, entity.prefTransposeSteps,
             entity.createdAt, entity.updatedAt, entity.deletedAt
         );
     }
@@ -25,6 +27,7 @@ public class SongMapper {
         entity.artist = song.getArtist();
         entity.originalKey = song.getOriginalKey();
         entity.lyrics = song.getLyrics();
+        entity.tags = new ArrayList<>(song.getTags());
         entity.isFavorite = song.getIsFavorite();
         entity.prefUseBb = song.getPrefUseBb();
         entity.prefUseEb = song.getPrefUseEb();
@@ -41,6 +44,7 @@ public class SongMapper {
         entity.artist = song.getArtist();
         entity.originalKey = song.getOriginalKey();
         entity.lyrics = song.getLyrics();
+        entity.tags = new ArrayList<>(song.getTags());
         entity.isFavorite = song.getIsFavorite();
         entity.prefUseBb = song.getPrefUseBb();
         entity.prefUseEb = song.getPrefUseEb();

@@ -5,6 +5,7 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 import br.com.cifras.song.model.Song;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -17,6 +18,7 @@ public record SongSummaryDTO(
     String artist,
     String originalKey,
     Boolean isFavorite,
+    List<String> tags,
     Instant createdAt
 ) {
     public static SongSummaryDTO from(Song song) {
@@ -26,6 +28,7 @@ public record SongSummaryDTO(
             song.getArtist(),
             song.getOriginalKey(),
             song.getIsFavorite(),
+            song.getTags(),
             song.getCreatedAt()
         );
     }

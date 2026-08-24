@@ -200,4 +200,45 @@ class SongResourceTest extends BaseIntegrationTest {
             .when().get("/songs/" + songId)
             .then().statusCode(404);
     }
+
+    /**
+     * Test 8: POST /songs with tags, GET /songs?tags=... and GET /songs/tags.
+     */
+    @Test
+    @TestSecurity(user = "tags-resource-user", roles = {"user"})
+    void givenSongWithTags_whenQueriedByTag_thenFiltersCorrectly() {
+        given()
+            .contentType(ContentType.JSON)
+            .body("""
+                {"title":"Tag Song 1","artist":"Band 1","originalKey":"C","tags":["Rock","Pop"]}
+                """)
+            .when().post("/songs")
+            .then().statusCode(201)
+            .body("tags", hasItems("Rock", "Pop"));
+
+        given()
+            .contentType(ContentType.JSON)
+            .body("""
+                {"title":"Tag Song 2","artist":"Band 2","originalKey":"D","tags":["Gospel"]}
+                """)
+            .when().post("/songs")
+            .then().statusCode(201);
+
+        // Filter by Rock
+        given()
+            .queryParam("tags", "Rock")
+            .when().get("/songs")
+            .then()
+            .statusCode(200)
+            .body("items", hasSize(1))
+            .body("items[0].title", equalTo("Tag Song 1"));
+
+        // Get user tags
+        given()
+            .when().get("/songs/tags")
+            .then()
+            .statusCode(200)
+            .body("find { it.name == 'Rock' }.count", equalTo(1))
+            .body("find { it.name == 'Gospel' }.count", equalTo(1));
+    }
 }

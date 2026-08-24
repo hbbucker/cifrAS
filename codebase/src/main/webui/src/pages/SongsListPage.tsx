@@ -12,10 +12,11 @@ import { OnboardingTooltip } from '../components/ui/OnboardingTooltip';
 import { Spinner } from '../components/ui/Spinner';
 import { Pagination } from '../components/ui/Pagination';
 import { useRef } from 'react';
-import { getSongs } from '../api/songs';
-import type { SongData } from '../api/songs';
+import { getSongs, getUserTags } from '../api/songs';
+import type { SongData, TagCount } from '../api/songs';
 import { ShareSongModal } from '../components/modals/ShareSongModal';
 import { BrandLogo } from '../components/ui/BrandLogo';
+import { TagFilterBar } from '../components/ui/TagFilterBar';
 
 
 export const SongsListPage: React.FC = () => {
@@ -24,12 +25,20 @@ export const SongsListPage: React.FC = () => {
   const { logout } = useAuth();
   const { toast } = useToast();
   const [songs, setSongs] = useState<SongData[]>([]);
+  const [userTags, setUserTags] = useState<TagCount[]>([]);
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    getUserTags()
+      .then((tags) => setUserTags(tags))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -43,7 +52,7 @@ export const SongsListPage: React.FC = () => {
     setLoading(true);
     let isMounted = true;
 
-    getSongs(page, 20, debouncedQuery)
+    getSongs(page, 20, debouncedQuery, selectedTag || undefined)
       .then((data) => {
         if (!isMounted) return;
         const items = Array.isArray(data) ? data : data.items || [];
@@ -54,6 +63,7 @@ export const SongsListPage: React.FC = () => {
           keySignature: (song.originalKey as string) || (song.keySignature as string) || 'C',
           isFavorite: song.isFavorite || false,
           categories: song.categories || [],
+          tags: song.tags || [],
         }));
         setSongs(mappedSongs);
         setTotalCount(count);
@@ -77,7 +87,7 @@ export const SongsListPage: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, [debouncedQuery, page, logout, navigate, toast, t]);
+  }, [debouncedQuery, selectedTag, page, logout, navigate, toast, t]);
 
   const handleDelete = (id: string) => {
     if (!window.confirm(t('dashboard.confirmDelete'))) return;
@@ -142,42 +152,56 @@ export const SongsListPage: React.FC = () => {
         </header>
 
         <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 sm:p-6 pb-24 sm:pb-8 relative min-w-0">
-          <div className="sticky top-0 z-10 bg-bg-card/95 backdrop-blur -mx-4 sm:-mx-6 px-4 sm:px-6 pt-2 pb-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 border-b border-border-main/50">
-            <div className="relative max-w-sm w-full">
-              <input
-                type="text"
-                placeholder={t('songsList.searchPlaceholder')}
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setPage(1);
-                }}
-                className="w-full pl-4 pr-10 py-2 bg-bg-card border border-border-main rounded-lg focus:ring-2 focus:ring-[#8629cc] outline-none "
-              />
-              {searchQuery ? (
-                <button
-                  onClick={() => {
-                    setSearchQuery('');
+          <div className="sticky top-0 z-10 bg-bg-card/95 backdrop-blur -mx-4 sm:-mx-6 px-4 sm:px-6 pt-2 pb-4 mb-6 flex flex-col gap-3 border-b border-border-main/50">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+              <div className="relative max-w-sm w-full">
+                <input
+                  type="text"
+                  placeholder={t('songsList.searchPlaceholder')}
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
                     setPage(1);
                   }}
-                  className="absolute right-3 top-2.5 text-gray-500 hover:text-text-mute dark:hover:text-gray-200 focus:outline-none"
-                  aria-label={t('songsList.clearSearch')}
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              ) : (
-                <Filter className="absolute right-3 top-2.5 w-5 h-5 text-gray-500" />
-              )}
+                  className="w-full pl-4 pr-10 py-2 bg-bg-card border border-border-main rounded-lg focus:ring-2 focus:ring-[#8629cc] outline-none "
+                />
+                {searchQuery ? (
+                  <button
+                    onClick={() => {
+                      setSearchQuery('');
+                      setPage(1);
+                    }}
+                    className="absolute right-3 top-2.5 text-gray-500 hover:text-text-mute dark:hover:text-gray-200 focus:outline-none"
+                    aria-label={t('songsList.clearSearch')}
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                ) : (
+                  <Filter className="absolute right-3 top-2.5 w-5 h-5 text-gray-500" />
+                )}
+              </div>
+              <div className="flex flex-col sm:flex-row items-center gap-4">
+                <span className="text-sm text-text-mute whitespace-nowrap">{totalCount} {t('songsList.songsCount')}</span>
+                <Pagination
+                  currentPage={page}
+                  totalCount={totalCount}
+                  pageSize={20}
+                  onPageChange={setPage}
+                />
+              </div>
             </div>
-            <div className="flex flex-col sm:flex-row items-center gap-4">
-              <span className="text-sm text-text-mute whitespace-nowrap">{totalCount} {t('songsList.songsCount')}</span>
-              <Pagination
-                currentPage={page}
+
+            {userTags.length > 0 && (
+              <TagFilterBar
+                tags={userTags}
+                selectedTag={selectedTag}
+                onSelectTag={(tag) => {
+                  setSelectedTag(tag);
+                  setPage(1);
+                }}
                 totalCount={totalCount}
-                pageSize={20}
-                onPageChange={setPage}
               />
-            </div>
+            )}
           </div>
 
           {loading && songs.length === 0 ? (
