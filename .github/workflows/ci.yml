@@ -7,8 +7,8 @@ on:
     branches: [ master, main ]
 
 jobs:
-  build-and-test:
-    name: Fullstack Build and Tests
+  build-and-test-main:
+    name: CifrAS Main App — Build & Tests
     runs-on: ubuntu-latest
     environment: pipeline
     defaults:
@@ -72,3 +72,44 @@ jobs:
           E2E_USER: ${{ secrets.E2E_USER }}
           E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
         run: npm run e2e
+
+  build-and-test-admin:
+    name: CifrAS Admin App — Build & Tests
+    runs-on: ubuntu-latest
+    environment: pipeline
+    defaults:
+      run:
+        working-directory: ./codebase-admin
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: './codebase-admin/src/main/webui/package-lock.json'
+
+      - name: Install Admin Frontend Dependencies
+        working-directory: ./codebase-admin/src/main/webui
+        run: npm ci
+
+      - name: Run Admin Frontend Linter
+        working-directory: ./codebase-admin/src/main/webui
+        run: npm run lint
+
+      - name: Run Admin Frontend Unit Tests
+        working-directory: ./codebase-admin/src/main/webui
+        run: npm run test
+
+      - name: Build and Test Admin Backend (includes Quinoa Frontend Build)
+        run: ./mvnw clean verify
