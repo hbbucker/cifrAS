@@ -311,7 +311,16 @@
     "resume": "Resume",
     "singerMode": "Singer Mode",
     "chordsMode": "Chords Mode",
-    "singerModeDesc": "Hide chords and tabs to focus on lyrics"
+    "singerModeDesc": "Hide chords and tabs to focus on lyrics",
+    "lock": "Lock Screen",
+    "unlock": "Unlock Screen",
+    "performanceControls": "Performance Controls",
+    "previousSong": "Previous Song",
+    "nextSong": "Next Song",
+    "scrollSpeed": "Scroll Speed",
+    "pauseScroll": "Pause Scroll",
+    "startScroll": "Start Scroll",
+    "failedLoadSongDetails": "Failed to load song details"
   },
   "linkPlaylist": {
     "shareTitle": "Share a Playlist",

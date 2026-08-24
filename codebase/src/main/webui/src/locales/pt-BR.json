@@ -311,7 +311,16 @@
     "resume": "Continuar",
     "singerMode": "Modo Cantor",
     "chordsMode": "Modo Cifras",
-    "singerModeDesc": "Ocultar cifras e tablaturas para focar na letra"
+    "singerModeDesc": "Ocultar cifras e tablaturas para focar na letra",
+    "lock": "Bloquear Tela",
+    "unlock": "Desbloquear Tela",
+    "performanceControls": "Controles de Performance",
+    "previousSong": "Música Anterior",
+    "nextSong": "Próxima Música",
+    "scrollSpeed": "Velocidade da Rolagem",
+    "pauseScroll": "Pausar Rolagem",
+    "startScroll": "Iniciar Rolagem",
+    "failedLoadSongDetails": "Falha ao carregar detalhes da música"
   },
   "linkPlaylist": {
     "shareTitle": "Compartilhar uma Playlist",
