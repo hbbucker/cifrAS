@@ -1,0 +1,23 @@
+app = "cifras-adm"
+primary_region = "gru"
+
+[build]
+  dockerfile = "codebase-admin/Dockerfile"
+
+[env]
+  QUARKUS_HTTP_HOST = "0.0.0.0"
+  QUARKUS_HTTP_PORT = "8081"
+  QUARKUS_PROFILE = "prod"
+
+[http_service]
+  internal_port = 8081
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
+
+[[vm]]
+  memory = "256mb"
+  cpu_kind = "shared"
+  cpus = 1
