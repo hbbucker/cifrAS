@@ -413,12 +413,12 @@ export const TheaterModePage: React.FC = () => {
     >
       {/* Header becomes semi-transparent when scrolling */}
       <header 
-        className="p-4 flex flex-col md:flex-row items-start md:items-center justify-between absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-bg-main via-bg-main/80 to-transparent pointer-events-none transition-opacity duration-200"
+        className="px-4 py-3 sm:p-4 flex flex-col md:flex-row items-start md:items-center justify-between absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-bg-main via-bg-main/80 to-transparent pointer-events-none transition-opacity duration-200"
         style={{ opacity: headerOpacity }}
       >
-        <div className="pt-2 md:pt-0">
-          <h1 className="text-xl md:text-2xl font-bold truncate max-w-full">{song.title}</h1>
-          <p className="text-sm md:text-base text-text-mute truncate max-w-full">{song.artist}</p>
+        <div className="pt-1 md:pt-0">
+          <h1 className="text-lg sm:text-xl md:text-2xl font-bold truncate max-w-full">{song.title}</h1>
+          <p className="text-xs sm:text-sm md:text-base text-text-mute truncate max-w-full">{song.artist}</p>
         </div>
       </header>
 
@@ -427,7 +427,7 @@ export const TheaterModePage: React.FC = () => {
         key={activeSongId}
         ref={containerRef} 
         onScroll={handleScroll}
-        className="flex-1 overflow-y-auto px-4 md:px-12 pt-28 pb-48 no-scrollbar"
+        className="flex-1 overflow-y-auto px-3.5 sm:px-6 md:px-12 pt-20 sm:pt-24 md:pt-28 pb-48 no-scrollbar"
         style={{
           animation: `${slideDir === 'right' ? 'slideInRight' : 'slideInLeft'} 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards`
         }}
@@ -450,12 +450,13 @@ export const TheaterModePage: React.FC = () => {
       `}</style>
 
       {/* Floating Action Button (Mobile) to toggle controls */}
-      <div className="md:hidden fixed bottom-6 left-6 z-50">
+      <div className="md:hidden fixed bottom-4 left-4 sm:bottom-6 sm:left-6 z-50">
         <button 
           onClick={() => setShowControls(!showControls)}
-          className={`w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 ${showControls ? 'bg-bg-elevated text-text-mute' : 'bg-[#8629cc] text-white'}`}
+          className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 ${showControls ? 'bg-bg-elevated text-text-mute' : 'bg-[#8629cc] text-white'}`}
+          aria-label="Toggle Theater Controls"
         >
-          <Settings2 className="w-6 h-6" />
+          <Settings2 className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
       </div>
 
