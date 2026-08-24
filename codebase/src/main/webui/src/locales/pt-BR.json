@@ -311,7 +311,9 @@
     "resume": "Continuar",
     "singerMode": "Modo Cantor",
     "chordsMode": "Modo Cifras",
-    "singerModeDesc": "Ocultar cifras e tablaturas para focar na letra"
+    "singerModeDesc": "Ocultar cifras e tablaturas para focar na letra",
+    "lock": "Bloquear Tela",
+    "unlock": "Desbloquear Tela"
   },
   "linkPlaylist": {
     "shareTitle": "Compartilhar uma Playlist",

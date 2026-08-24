@@ -311,7 +311,9 @@
     "resume": "Reanudar",
     "singerMode": "Modo Cantante",
     "chordsMode": "Modo Acordes",
-    "singerModeDesc": "Ocultar acordes y tablaturas para enfocarse en la letra"
+    "singerModeDesc": "Ocultar acordes y tablaturas para enfocarse en la letra",
+    "lock": "Bloquear Pantalla",
+    "unlock": "Desbloquear Pantalla"
   },
   "linkPlaylist": {
     "shareTitle": "Compartir una Playlist",

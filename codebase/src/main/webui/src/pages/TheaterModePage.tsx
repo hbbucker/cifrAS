@@ -5,7 +5,6 @@ import { useAutoScroll } from '../hooks/useAutoScroll';
 import { ChordSheet } from '../components/music/ChordSheet';
 import { transposeContent } from '../utils/chordTransposer';
 import { stringifyLyrics } from '../utils/lyricsParser';
-import { Settings2 } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import { apiClient } from '../services/authService';
 import { usePerformanceSession } from '../hooks/usePerformanceSession';
@@ -393,9 +392,6 @@ export const TheaterModePage: React.FC = () => {
     }
   };
 
-  // Calculate opacity based on scroll position (1.0 at top, down to 0.2 after 200px)
-  const headerOpacity = Math.max(0.2, 1 - scrollTop / 200);
-
   const hasNextSong = Boolean(playlistId && playlistSongs.length > 0 && currentPlaylistIndex < playlistSongs.length - 1);
   const hasPrevSong = Boolean(playlistId && playlistSongs.length > 0 && currentPlaylistIndex > 0);
 
@@ -411,23 +407,12 @@ export const TheaterModePage: React.FC = () => {
         setShowControls(prev => !prev);
       }}
     >
-      {/* Header becomes semi-transparent when scrolling */}
-      <header 
-        className="px-4 py-3 sm:p-4 flex flex-col md:flex-row items-start md:items-center justify-between absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-bg-main via-bg-main/80 to-transparent pointer-events-none transition-opacity duration-200"
-        style={{ opacity: headerOpacity }}
-      >
-        <div className="pt-1 md:pt-0">
-          <h1 className="text-lg sm:text-xl md:text-2xl font-bold truncate max-w-full">{song.title}</h1>
-          <p className="text-xs sm:text-sm md:text-base text-text-mute truncate max-w-full">{song.artist}</p>
-        </div>
-      </header>
-
       {/* Main scrolling container */}
       <div 
         key={activeSongId}
         ref={containerRef} 
         onScroll={handleScroll}
-        className="flex-1 overflow-y-auto px-3.5 sm:px-6 md:px-12 pt-20 sm:pt-24 md:pt-28 pb-48 no-scrollbar"
+        className="flex-1 overflow-y-auto px-3.5 sm:px-6 md:px-12 pt-16 sm:pt-20 md:pt-24 pb-36 sm:pb-40 no-scrollbar"
         style={{
           animation: `${slideDir === 'right' ? 'slideInRight' : 'slideInLeft'} 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards`
         }}
@@ -448,17 +433,6 @@ export const TheaterModePage: React.FC = () => {
           to { transform: translateX(0); opacity: 1; }
         }
       `}</style>
-
-      {/* Floating Action Button (Mobile) to toggle controls */}
-      <div className="md:hidden fixed bottom-4 left-4 sm:bottom-6 sm:left-6 z-50">
-        <button 
-          onClick={() => setShowControls(!showControls)}
-          className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 ${showControls ? 'bg-bg-elevated text-text-mute' : 'bg-[#8629cc] text-white'}`}
-          aria-label="Toggle Theater Controls"
-        >
-          <Settings2 className="w-5 h-5 sm:w-6 sm:h-6" />
-        </button>
-      </div>
 
       {showResumePrompt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" data-testid="resume-prompt">
@@ -495,7 +469,9 @@ export const TheaterModePage: React.FC = () => {
       )}
 
       <TheaterControls 
-        className={!showControls ? 'translate-y-48 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}
+        className={!showControls ? 'opacity-0 pointer-events-none' : 'opacity-100'}
+        title={song.title}
+        artist={song.artist}
         isScrolling={isScrolling}
         speed={speed}
         currentKey={currentKey}

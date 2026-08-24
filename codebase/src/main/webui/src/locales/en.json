@@ -311,7 +311,9 @@
     "resume": "Resume",
     "singerMode": "Singer Mode",
     "chordsMode": "Chords Mode",
-    "singerModeDesc": "Hide chords and tabs to focus on lyrics"
+    "singerModeDesc": "Hide chords and tabs to focus on lyrics",
+    "lock": "Lock Screen",
+    "unlock": "Unlock Screen"
   },
   "linkPlaylist": {
     "shareTitle": "Share a Playlist",

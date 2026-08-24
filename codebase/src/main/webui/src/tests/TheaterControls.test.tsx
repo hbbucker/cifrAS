@@ -153,4 +153,18 @@ describe('TheaterControls Component', () => {
     fireEvent.click(screen.getByTestId('prev-song-btn'));
     expect(onPrevSong).toHaveBeenCalledTimes(1);
   });
+
+  it('renders song title and artist in the top header when provided', () => {
+    render(<TheaterControls {...defaultProps} title="Tempo Perdido" artist="Legião Urbana" />);
+
+    expect(screen.getByText('Tempo Perdido')).toBeInTheDocument();
+    expect(screen.getByText('Legião Urbana')).toBeInTheDocument();
+  });
+
+  it('renders Pause icon and proper aria-label when isScrolling is true', () => {
+    render(<TheaterControls {...defaultProps} isScrolling={true} />);
+
+    const playBtn = screen.getByTestId('play-pause-btn');
+    expect(playBtn).toHaveAttribute('aria-label', 'Pausar Rolagem');
+  });
 });
