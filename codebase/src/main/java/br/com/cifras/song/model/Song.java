@@ -17,6 +17,10 @@ public class Song {
     private String originalKey;
     private LyricsStructure lyrics;
     private Boolean isFavorite = false;
+    /**
+     * List of musical/repertoire classification tags.
+     * Invariants: Max 20 tags per song, max 30 characters per tag, trimmed, non-blank and deduplicated.
+     */
     private List<String> tags = new ArrayList<>();
     
     private Boolean prefUseBb = false;
@@ -30,6 +34,17 @@ public class Song {
 
     protected Song() {}
 
+    /**
+     * Normalizes a raw list of tags enforcing business invariants:
+     * 1. Filters null or blank entries.
+     * 2. Trims leading/trailing whitespace.
+     * 3. Truncates individual tag names exceeding 30 characters.
+     * 4. Deduplicates identical tags.
+     * 5. Caps the maximum number of tags at 20 per song.
+     *
+     * @param rawTags the raw input list of tags (can be null)
+     * @return a normalized, non-null list of tags
+     */
     public static List<String> normalizeTags(List<String> rawTags) {
         if (rawTags == null || rawTags.isEmpty()) {
             return new ArrayList<>();
