@@ -359,4 +359,69 @@ describe('TheaterModePage Component — Gesture & Interaction Navigation', () =>
     expect(screen.getByTestId('prev-song-btn')).toBeEnabled();
     expect(screen.getByTestId('next-song-btn')).toBeDisabled();
   });
+
+  it('isolates transpose steps per song and does not propagate transpose changes to next song in playlist', async () => {
+    vi.mocked(apiClient.get).mockImplementation((url: string) => {
+      if (url.includes('/playlists/p1')) {
+        return Promise.resolve({
+          data: {
+            id: 'p1',
+            name: 'Show Playlist',
+            songs: [
+              { id: 's1', title: 'Song 1', artist: 'Artist 1' },
+              { id: 's2', title: 'Song 2', artist: 'Artist 2' },
+            ]
+          }
+        });
+      }
+      if (url.includes('/songs/s1')) {
+        return Promise.resolve({
+          data: {
+            id: 's1',
+            title: 'Song 1',
+            artist: 'Artist 1',
+            originalKey: 'C',
+            lyrics: { sections: [{ label: 'Verso', lines: [{ chords: [], text: 'Line 1' }] }] }
+          }
+        });
+      }
+      if (url.includes('/songs/s2')) {
+        return Promise.resolve({
+          data: {
+            id: 's2',
+            title: 'Song 2',
+            artist: 'Artist 2',
+            originalKey: 'G',
+            lyrics: { sections: [{ label: 'Verso', lines: [{ chords: [], text: 'Line 2' }] }] }
+          }
+        });
+      }
+      if (url.includes('/theater/song-preferences/s1')) {
+        return Promise.resolve({
+          status: 200,
+          data: { autoScrollSpeed: 1, transposeSteps: 2, fontSize: 30 }
+        });
+      }
+      if (url.includes('/theater/song-preferences/s2')) {
+        return Promise.resolve({
+          status: 200,
+          data: { autoScrollSpeed: 2, transposeSteps: 0, fontSize: 24 }
+        });
+      }
+      return Promise.reject(new Error('Unknown url: ' + url));
+    });
+
+    renderComponent();
+
+    // Song 1 has transposeSteps = 2 (C -> D)
+    expect(await screen.findByText('Song 1')).toBeInTheDocument();
+    expect(screen.getByText('D')).toBeInTheDocument();
+
+    // Navigate to Song 2
+    fireEvent.click(screen.getByTestId('next-song-btn'));
+    expect(await screen.findByText('Song 2')).toBeInTheDocument();
+
+    // Song 2 has transposeSteps = 0 (G remains G, not transposed to A)
+    expect(await screen.findByText('G')).toBeInTheDocument();
+  });
 });

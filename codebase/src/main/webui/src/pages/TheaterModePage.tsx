@@ -147,52 +147,76 @@ export const TheaterModePage: React.FC = () => {
  }
  }, [playlistId, toast, t, querySongId, stateSongId, queryIndex, stateIndex]);
 
+  const isFirstMountRef = React.useRef(true);
+  const loadedSongIdRef = React.useRef<string | null>(null);
+  const hasCustomFontSizeRef = React.useRef(false);
+
   // Fetch full song details and preferences for the active song ID
   const activeSongId = playlistId && playlistSongs.length > 0 ? playlistSongs[currentPlaylistIndex].id : songId;
 
   useEffect(() => {
-    if (activeSongId) {
-      // First fetch the song details
-      apiClient.get(`/songs/${activeSongId}`)
-        .then(res => res.data)
-        .then(data => {
-          const key = data.originalKey || data.keySignature || 'C';
-          setSong({
-            title: data.title,
-            artist: data.artist,
-            originalKey: key,
-            content: stringifyLyrics(data.lyrics)
-          });
-        })
-        .catch(() => toast(t('theater.failedLoadSongDetails'), 'error'));
+    if (!activeSongId) return;
 
-      // Then fetch the theater preferences for this specific song
-      if (!passedState) {
-        apiClient.get(`/theater/song-preferences/${activeSongId}`)
-          .then(res => {
-            if (res.status === 200 && res.data) {
-              const pref = res.data;
-              if (pref.autoScrollSpeed != null) setSpeed(pref.autoScrollSpeed);
-              if (pref.transposeSteps != null) setTransposeSteps(pref.transposeSteps);
-              if (pref.fontSize != null) setFontSize(pref.fontSize);
-            } else {
-              setTransposeSteps(0);
-              setSpeed(1);
-              setFontSize(isMobile ? 24 : 32); // defaults if no preference
-            }
-          })
-          .catch(() => {
-            setTransposeSteps(0);
-            setSpeed(1);
+    let isMounted = true;
+    loadedSongIdRef.current = null;
+
+    const songPromise = apiClient.get(`/songs/${activeSongId}`);
+    const prefPromise = apiClient.get(`/theater/song-preferences/${activeSongId}`).catch(() => null);
+
+    Promise.all([songPromise, prefPromise])
+      .then(([songRes, prefRes]) => {
+        if (!isMounted) return;
+
+        const songData = songRes.data;
+        const key = songData.originalKey || songData.keySignature || 'C';
+        setSong({
+          title: songData.title,
+          artist: songData.artist,
+          originalKey: key,
+          content: stringifyLyrics(songData.lyrics)
+        });
+
+        const theaterPref = (prefRes && prefRes.status === 200 && prefRes.data) ? prefRes.data : null;
+
+        if (isFirstMountRef.current && passedState && passedState.transposeSteps !== undefined) {
+          setTransposeSteps(passedState.transposeSteps);
+          if (passedState.autoScrollSpeed !== undefined) setSpeed(passedState.autoScrollSpeed);
+          isFirstMountRef.current = false;
+        } else if (theaterPref) {
+          setTransposeSteps(theaterPref.transposeSteps ?? 0);
+          setSpeed(theaterPref.autoScrollSpeed ?? 1);
+          if (theaterPref.fontSize != null) {
+            setFontSize(theaterPref.fontSize);
+            hasCustomFontSizeRef.current = true;
+          } else {
+            hasCustomFontSizeRef.current = false;
             setFontSize(isMobile ? 24 : 32);
-          });
-      }
-    }
+          }
+        } else {
+          setTransposeSteps(songData.prefTransposeSteps ?? 0);
+          setSpeed(songData.prefAutoScrollSpeed ?? 1);
+          hasCustomFontSizeRef.current = false;
+          setFontSize(isMobile ? 24 : 32);
+        }
+
+        loadedSongIdRef.current = activeSongId;
+      })
+      .catch(() => {
+        if (!isMounted) return;
+        toast(t('theater.failedLoadSongDetails'), 'error');
+        loadedSongIdRef.current = activeSongId;
+      });
+
+    return () => {
+      isMounted = false;
+    };
   }, [activeSongId, isMobile, toast, passedState, setSpeed, t]);
 
-  // Persist preferences
+  // Persist preferences (only when active song is fully loaded)
   useEffect(() => {
-    if (song.title === t('playlistView.loading') || !activeSongId) return;
+    if (!activeSongId || loadedSongIdRef.current !== activeSongId || song.title === t('playlistView.loading')) {
+      return;
+    }
     
     const handler = setTimeout(() => {
       apiClient.put(`/theater/session`, {
@@ -248,6 +272,7 @@ export const TheaterModePage: React.FC = () => {
   }, [playlistId, currentPlaylistIndex]);
 
   const handleFontSizeChange = (delta: number) => {
+    hasCustomFontSizeRef.current = true;
     setFontSize(prev => Math.max(10, Math.min(60, prev + delta)));
   };
 
@@ -289,8 +314,8 @@ export const TheaterModePage: React.FC = () => {
       const maxFit = Math.floor(availableWidth / (maxLineLength * 0.601));
       const fitted = Math.max(10, maxFit);
 
-      // Apply only once per song load, and only when there are no saved preferences.
-      if (!autoFitAppliedRef.current && !passedState) {
+      // Apply only once per song load, and only when there are no custom/saved preferences.
+      if (!autoFitAppliedRef.current && !hasCustomFontSizeRef.current) {
         autoFitAppliedRef.current = true;
         setFontSize(prev => {
           const defaultSize = isMobile ? 24 : 32;
