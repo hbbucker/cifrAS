@@ -24,11 +24,27 @@ export interface AdminUser {
   email: string;
   fullName: string;
   role: string;
+  status: 'ACTIVE' | 'BLOCKED';
+  isBlocked: boolean;
+  lastBlockReason?: string;
   createdAt: string;
   lastSignInAt?: string;
+  updatedAt?: string;
   songCount: number;
   banned: boolean;
   isAdmin: boolean;
+}
+
+export interface UserAuditLog {
+  id: string;
+  userId: string;
+  adminId: string;
+  adminEmail: string;
+  action: 'BLOCK' | 'UNBLOCK';
+  reason: string;
+  previousStatus: string;
+  newStatus: string;
+  createdAt: string;
 }
 
 export interface AdminSong {

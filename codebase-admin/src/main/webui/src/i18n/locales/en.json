@@ -74,10 +74,59 @@
   },
   "auth": {
     "loginTitle": "Admin Access",
-    "loginSubtitle": "Log in with your authorized admin account.",
-    "tokenLabel": "Admin JWT Token or Access Key",
-    "tokenPlaceholder": "Paste Supabase JWT token...",
+    "loginSubtitle": "Sign in with your authorized Google admin account.",
+    "googleSignIn": "Sign in with Google",
+    "redirecting": "Redirecting to Google...",
+    "verifying": "Verifying credentials and permissions...",
     "enter": "Sign In to Admin",
-    "unauthorized": "Access denied. Administrative role required."
+    "unauthorized": "Access denied. Administrative role required.",
+    "notAdmin": "Access denied: your Google account does not have administrator privileges.",
+    "invalidCallback": "Invalid or incomplete authentication response.",
+    "loginFailed": "Failed to initialize Google login. Please try again."
+  },
+  "adminUsers": {
+    "status": {
+      "active": "Active",
+      "blocked": "Blocked"
+    },
+    "actions": {
+      "block": "Block",
+      "unblock": "Unblock",
+      "viewHistory": "Audit History",
+      "cannotBlockSelf": "You cannot block your own account"
+    },
+    "blockModal": {
+      "title": "Block User",
+      "description": "By blocking this user, access to CifrAS will be revoked immediately and active sessions will be invalidated.",
+      "targetUser": "User to block",
+      "reasonLabel": "Block reason (required)",
+      "reasonPlaceholder": "Provide a detailed reason for the block...",
+      "minCharsError": "The reason must contain at least 5 characters.",
+      "confirmButton": "Confirm Block",
+      "cancelButton": "Cancel",
+      "successToast": "User blocked successfully.",
+      "errorGeneric": "Failed to block user. Please try again."
+    },
+    "unblockModal": {
+      "title": "Unblock User",
+      "description": "Are you sure you want to restore access for this user?",
+      "reasonLabel": "Unblock reason (optional)",
+      "reasonPlaceholder": "Justification for unblocking...",
+      "confirmButton": "Confirm Unblock",
+      "cancelButton": "Cancel",
+      "successToast": "User unblocked successfully.",
+      "errorGeneric": "Failed to unblock user. Please try again."
+    },
+    "auditModal": {
+      "title": "User Audit Trail",
+      "noLogs": "No audit logs found for this user.",
+      "actionBlock": "Blocked",
+      "actionUnblock": "Unblocked",
+      "executedBy": "Executed by",
+      "reason": "Recorded reason",
+      "date": "Date and Time",
+      "close": "Close",
+      "loadError": "Failed to load audit trail."
+    }
   }
 }

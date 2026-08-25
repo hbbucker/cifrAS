@@ -126,6 +126,14 @@ export const AdminLayout: React.FC = () => {
               >
                 EN
               </button>
+              <button
+                onClick={() => changeLanguage('es')}
+                className={`px-2 py-1 rounded-sm text-xs font-semibold ${
+                  i18n.language.startsWith('es') ? 'bg-[#aa3bff] text-white' : 'bg-[#f6f6f3] hover:bg-[#dadad3]'
+                }`}
+              >
+                ES
+              </button>
             </div>
           </div>
 

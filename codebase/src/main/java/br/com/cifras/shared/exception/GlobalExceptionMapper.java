@@ -23,6 +23,17 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
 
     @Override
     public Response toResponse(Throwable exception) {
+        if (exception instanceof AccountBlockedException) {
+            Map<String, Object> body = new LinkedHashMap<>();
+            body.put("error", "ACCOUNT_BLOCKED");
+            body.put("message", exception.getMessage());
+            body.put("status", 403);
+            return Response.status(Response.Status.FORBIDDEN)
+                    .type(MediaType.APPLICATION_JSON)
+                    .entity(body)
+                    .build();
+        }
+
         if (exception instanceof ForbiddenException) {
             return buildResponse(403, "Forbidden", null);
         }

@@ -50,3 +50,18 @@ INSERT INTO songs (id, userid, title, artist, originalkey, lyrics, is_favorite, 
 ('62477cc8-679d-4350-bd5c-f275241c3670', '0503abef-1673-4048-95f3-031caf21573c', 'Música de Teste 31', 'Artista Teste', 'C', '{"sections": [{"label": "Verso", "lines": [{"text": "Letra da música 31", "chords": [{"position": 0, "chord": "C"}]}]}]}'::jsonb, false, NOW(), NOW(), 1, 0, false, false),
 ('e44578d4-3bad-4967-8ec7-189339cdd198', '0503abef-1673-4048-95f3-031caf21573c', 'Música de Teste 32', 'Artista Teste', 'C', '{"sections": [{"label": "Verso", "lines": [{"text": "Letra da música 32", "chords": [{"position": 0, "chord": "C"}]}]}]}'::jsonb, false, NOW(), NOW(), 1, 0, false, false)
 ON CONFLICT (id) DO NOTHING;
+
+CREATE TABLE IF NOT EXISTS user_audit_logs (
+    id VARCHAR(36) PRIMARY KEY,
+    user_id VARCHAR(36) NOT NULL,
+    admin_id VARCHAR(36) NOT NULL,
+    admin_email VARCHAR(255) NOT NULL,
+    action VARCHAR(20) NOT NULL,
+    reason TEXT NOT NULL,
+    previous_status VARCHAR(20) NOT NULL,
+    new_status VARCHAR(20) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_audit_logs_user_id ON user_audit_logs(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_user_audit_logs_admin_id ON user_audit_logs(admin_id);

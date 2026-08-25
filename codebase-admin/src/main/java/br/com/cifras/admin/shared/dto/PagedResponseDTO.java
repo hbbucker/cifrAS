@@ -1,7 +1,9 @@
 package br.com.cifras.admin.shared.dto;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import java.util.List;
 
+@RegisterForReflection
 public record PagedResponseDTO<T>(
     List<T> items,
     long totalElements,

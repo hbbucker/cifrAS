@@ -74,10 +74,59 @@
   },
   "auth": {
     "loginTitle": "Acesso Administrativo",
-    "loginSubtitle": "Faça login com sua conta autorizada para acessar o painel.",
-    "tokenLabel": "Token JWT de Administrador ou Chave de Acesso",
-    "tokenPlaceholder": "Cole o token JWT Supabase...",
+    "loginSubtitle": "Faça login com sua conta Google autorizada para acessar o painel.",
+    "googleSignIn": "Entrar com o Google",
+    "redirecting": "Redirecionando para o Google...",
+    "verifying": "Verificando credenciais e permissões...",
     "enter": "Entrar no Painel",
-    "unauthorized": "Acesso negado. Esta área é restrita a administradores."
+    "unauthorized": "Acesso negado. Esta área é restrita a administradores.",
+    "notAdmin": "Acesso negado: sua conta Google não possui permissões de administrador.",
+    "invalidCallback": "Resposta de autenticação inválida ou incompleta.",
+    "loginFailed": "Não foi possível iniciar o login com o Google. Tente novamente."
+  },
+  "adminUsers": {
+    "status": {
+      "active": "Ativo",
+      "blocked": "Bloqueado"
+    },
+    "actions": {
+      "block": "Bloquear",
+      "unblock": "Desbloquear",
+      "viewHistory": "Histórico de Auditoria",
+      "cannotBlockSelf": "Não é permitido bloquear a si próprio"
+    },
+    "blockModal": {
+      "title": "Bloquear Usuário",
+      "description": "Ao bloquear este usuário, o acesso ao CifrAS será revogado imediatamente e as sessões ativas serão invalidadas.",
+      "targetUser": "Usuário a ser bloqueado",
+      "reasonLabel": "Motivo do bloqueio (obrigatório)",
+      "reasonPlaceholder": "Informe o motivo detalhado do bloqueio...",
+      "minCharsError": "O motivo deve conter no mínimo 5 caracteres.",
+      "confirmButton": "Confirmar Bloqueio",
+      "cancelButton": "Cancelar",
+      "successToast": "Usuário bloqueado com sucesso.",
+      "errorGeneric": "Falha ao bloquear usuário. Tente novamente."
+    },
+    "unblockModal": {
+      "title": "Desbloquear Usuário",
+      "description": "Tem certeza de que deseja restabelecer o acesso deste usuário?",
+      "reasonLabel": "Motivo do desbloqueio (opcional)",
+      "reasonPlaceholder": "Justificativa da liberação...",
+      "confirmButton": "Confirmar Desbloqueio",
+      "cancelButton": "Cancelar",
+      "successToast": "Usuário desbloqueado com sucesso.",
+      "errorGeneric": "Falha ao desbloquear usuário. Tente novamente."
+    },
+    "auditModal": {
+      "title": "Trilha de Auditoria do Usuário",
+      "noLogs": "Nenhum registro de auditoria encontrado para este usuário.",
+      "actionBlock": "Bloqueio",
+      "actionUnblock": "Desbloqueio",
+      "executedBy": "Executado por",
+      "reason": "Motivo registrado",
+      "date": "Data e Hora",
+      "close": "Fechar",
+      "loadError": "Não foi possível carregar o histórico de auditoria."
+    }
   }
 }

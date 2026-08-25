@@ -16,8 +16,12 @@ public class AdminUserMapper {
             user.getEmail(),
             user.getFullName(),
             user.getRole(),
+            user.getStatus() != null ? user.getStatus().name() : "ACTIVE",
+            user.isBlocked(),
+            user.getLastBlockReason(),
             user.getCreatedAt(),
             user.getLastSignInAt(),
+            user.getUpdatedAt(),
             user.getSongCount(),
             user.isBanned(),
             user.isAdmin()

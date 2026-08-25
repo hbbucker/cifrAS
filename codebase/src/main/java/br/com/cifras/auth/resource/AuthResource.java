@@ -28,6 +28,9 @@ public class AuthResource {
     @RestClient
     SupabaseAuthClient supabaseClient;
 
+    @Inject
+    br.com.cifras.shared.security.UserService userService;
+
     @ConfigProperty(name = "quarkus.rest-client.supabase-auth.url")
     String supabaseUrl;
 
@@ -118,6 +121,23 @@ public class AuthResource {
             if (status == 200) {
                 @SuppressWarnings("unchecked")
                 Map<String, Object> supabaseBody = supabaseResponse.readEntity(Map.class);
+                String userId = null;
+                if (supabaseBody.containsKey("user") && supabaseBody.get("user") instanceof Map<?, ?> uMap && uMap.containsKey("id")) {
+                    userId = uMap.get("id").toString();
+                }
+                if (userId == null && request.email() != null) {
+                    userId = userService.getUserIdByEmail(request.email());
+                }
+                if (userId != null && userService.isUserBlocked(userId)) {
+                    return Response.status(Response.Status.FORBIDDEN)
+                            .entity(Map.of(
+                                "error", "ACCOUNT_BLOCKED",
+                                "message", "Sua conta foi suspensa temporariamente por violar os termos de uso. Entre em contato com o suporte para mais informações.",
+                                "status", 403
+                            ))
+                            .build();
+                }
+
                 Map<String, Object> result = new HashMap<>();
                 result.put("accessToken", supabaseBody.get("access_token"));
                 result.put("refreshToken", supabaseBody.get("refresh_token"));
@@ -154,6 +174,15 @@ public class AuthResource {
         } catch (Exception ex) {
             System.out.println("Supabase login failed or offline. Falling back to local/mock login: " + ex.getMessage());
             String fakeUserId = java.util.UUID.nameUUIDFromBytes(request.email().getBytes()).toString();
+            if (userService.isUserBlocked(fakeUserId)) {
+                return Response.status(Response.Status.FORBIDDEN)
+                        .entity(Map.of(
+                            "error", "ACCOUNT_BLOCKED",
+                            "message", "Sua conta foi suspensa temporariamente por violar os termos de uso. Entre em contato com o suporte para mais informações.",
+                            "status", 403
+                        ))
+                        .build();
+            }
             String name = request.name();
             if (name == null || name.isBlank()) {
                 name = request.email().split("@")[0];
@@ -203,6 +232,20 @@ public class AuthResource {
             if (status == 200) {
                 @SuppressWarnings("unchecked")
                 Map<String, Object> responseBody = supabaseResponse.readEntity(Map.class);
+                String userId = null;
+                if (responseBody.containsKey("user") && responseBody.get("user") instanceof Map<?, ?> uMap && uMap.containsKey("id")) {
+                    userId = uMap.get("id").toString();
+                }
+                if (userId != null && userService.isUserBlocked(userId)) {
+                    return Response.status(Response.Status.FORBIDDEN)
+                            .entity(Map.of(
+                                "error", "ACCOUNT_BLOCKED",
+                                "message", "Sua conta foi suspensa temporariamente por violar os termos de uso. Entre em contato com o suporte para mais informações.",
+                                "status", 403
+                            ))
+                            .build();
+                }
+
                 Map<String, Object> result = new HashMap<>();
                 result.put("accessToken", responseBody.get("access_token"));
                 result.put("refreshToken", responseBody.get("refresh_token"));
@@ -212,9 +255,19 @@ public class AuthResource {
             return Response.status(status).entity(Map.of("error", "Refresh token failed")).build();
         } catch (Exception ex) {
             System.out.println("Supabase refresh offline. Falling back to local token generation.");
+            String fakeUserId = java.util.UUID.nameUUIDFromBytes("mock@example.com".getBytes()).toString();
+            if (userService.isUserBlocked(fakeUserId)) {
+                return Response.status(Response.Status.FORBIDDEN)
+                        .entity(Map.of(
+                            "error", "ACCOUNT_BLOCKED",
+                            "message", "Sua conta foi suspensa temporariamente por violar os termos de uso. Entre em contato com o suporte para mais informações.",
+                            "status", 403
+                        ))
+                        .build();
+            }
             try {
                 String token = io.smallrye.jwt.build.Jwt.issuer("https://test.cifras.com")
-                        .subject(java.util.UUID.nameUUIDFromBytes("mock@example.com".getBytes()).toString())
+                        .subject(fakeUserId)
                         .upn("mock@example.com")
                         .audience("authenticated")
                         .claim("email", "mock@example.com")

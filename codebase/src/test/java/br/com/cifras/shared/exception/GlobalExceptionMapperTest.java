@@ -9,13 +9,6 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * T4: GlobalExceptionMapper unit tests
- * Tests: 3
- * 1. Generic Throwable → 500 with traceId (never stack trace in body)
- * 2. ForbiddenException → 403 with error message
- * 3. NotFoundException → 404 with error message
- */
 import br.com.cifras.BaseIntegrationTest;
 
 @QuarkusTest
@@ -24,10 +17,21 @@ class GlobalExceptionMapperTest extends BaseIntegrationTest {
     @Inject
     GlobalExceptionMapper mapper;
 
-    /**
-     * Test 1: Any unexpected RuntimeException returns 500 with a unique traceId.
-     * Stack trace must NOT be in the response body.
-     */
+    @Test
+    void givenAccountBlockedException_whenMapped_thenReturns403WithAccountBlockedCode() {
+        AccountBlockedException cause = new AccountBlockedException();
+
+        Response response = mapper.toResponse(cause);
+
+        assertEquals(403, response.getStatus());
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> body = (Map<String, Object>) response.getEntity();
+        assertEquals("ACCOUNT_BLOCKED", body.get("error"));
+        assertEquals(403, body.get("status"));
+        assertNotNull(body.get("message"));
+    }
+
     @Test
     void givenGenericThrowable_whenMapped_thenReturns500WithTraceId() {
         RuntimeException cause = new RuntimeException("Something exploded");
@@ -44,9 +48,6 @@ class GlobalExceptionMapperTest extends BaseIntegrationTest {
         assertFalse(body.containsKey("message"), "Exception message must NOT leak in response body");
     }
 
-    /**
-     * Test 2: ForbiddenException → 403 Forbidden with error description.
-     */
     @Test
     void givenForbiddenException_whenMapped_thenReturns403() {
         ForbiddenException cause = new ForbiddenException("Access denied");
@@ -60,9 +61,6 @@ class GlobalExceptionMapperTest extends BaseIntegrationTest {
         assertEquals("Forbidden", body.get("error"));
     }
 
-    /**
-     * Test 3: NotFoundException → 404 Not Found.
-     */
     @Test
     void givenNotFoundException_whenMapped_thenReturns404() {
         NotFoundException cause = new NotFoundException("Song not found");
@@ -76,10 +74,6 @@ class GlobalExceptionMapperTest extends BaseIntegrationTest {
         assertEquals("Not found", body.get("error"));
     }
 
-    /**
-     * Test 4: jakarta.ws.rs.NotFoundException → 404 Not Found.
-     * Often thrown by Quarkus Resteasy Reactive when an endpoint is not found.
-     */
     @Test
     void givenJakartaNotFoundException_whenMapped_thenReturns404() {
         jakarta.ws.rs.NotFoundException cause = new jakarta.ws.rs.NotFoundException("HTTP 404 Not Found");

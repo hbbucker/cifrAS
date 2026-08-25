@@ -12,6 +12,8 @@
     - Falha de validação/negócio: `400 Bad Request` com mensagens tratadas pelo `GlobalExceptionMapper`.
     - Falha de autorização: `401 Unauthorized` ou `403 Forbidden`.
 6. **Autenticação:** Recupere o usuário autenticado via `SecurityIdentity` do Quarkus. Use a claim `"sub"` do JWT como referência unívoca.
+7. **Compilação Nativa (GraalVM & Jackson Reflection):** Todas as classes DTO, records e modelos que trafegam em endpoints JAX-RS / JSON devem ser marcadas com `@RegisterForReflection` ou incluídas em `NativeReflectionConfig`. A omissão causa falhas de serialização no executável nativo.
+8. **Consultas a Banco & Nomenclatura de Colunas:** Dê prioridade a consultas HQL/JPQL sobre as entidades (`SongEntity`, `AdminSongEntity`). Se for estritamente necessário usar SQL nativo (`em.createNativeQuery`), atente-se aos nomes de colunas no PostgreSQL (atributos sem `@Column(name=...)` usam nomes contínuos em minúsculo, como `deletedat`, `originalkey`, `userid`).
 
 ## Frontend (React)
 

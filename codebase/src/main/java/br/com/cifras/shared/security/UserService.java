@@ -15,6 +15,31 @@ public class UserService {
     @Inject
     EntityManager em;
 
+    public boolean isUserBlocked(String userId) {
+        if (userId == null || userId.isBlank()) {
+            return false;
+        }
+        try {
+            List<?> result = em.createNativeQuery(
+                "SELECT raw_app_meta_data->>'status', raw_app_meta_data->>'is_blocked' FROM auth.users WHERE id::text = :id"
+            ).setParameter("id", userId.trim()).getResultList();
+
+            if (!result.isEmpty() && result.get(0) instanceof Object[] row) {
+                String status = row[0] != null ? row[0].toString() : null;
+                Object isBlockedObj = row.length > 1 ? row[1] : null;
+                if ("BLOCKED".equalsIgnoreCase(status)) {
+                    return true;
+                }
+                if (isBlockedObj != null && ("true".equalsIgnoreCase(isBlockedObj.toString()) || Boolean.TRUE.equals(isBlockedObj))) {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            // Fallback for tests or environments without auth schema
+        }
+        return false;
+    }
+
     public String getUserIdByEmail(String email) {
         try {
             // Note: In Supabase, auth.users contains registered users.

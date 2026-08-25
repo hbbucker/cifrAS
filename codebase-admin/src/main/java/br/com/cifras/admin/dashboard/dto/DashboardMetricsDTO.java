@@ -1,7 +1,9 @@
 package br.com.cifras.admin.dashboard.dto;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import java.util.Map;
 
+@RegisterForReflection
 public record DashboardMetricsDTO(
     long totalUsers,
     long totalSongs,

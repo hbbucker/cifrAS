@@ -1,0 +1,132 @@
+{
+  "common": {
+    "appName": "CifrAS Admin",
+    "dashboard": "Panel de Control",
+    "users": "Usuarios",
+    "songs": "Cifras y Moderación",
+    "settings": "Configuración",
+    "logout": "Cerrar sesión",
+    "search": "Buscar...",
+    "actions": "Acciones",
+    "loading": "Cargando datos...",
+    "error": "Ocurrió un error",
+    "retry": "Reintentar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "status": "Estado",
+    "active": "Activo",
+    "deleted": "Archivado / Eliminado",
+    "role": "Rol",
+    "admin": "Administrador",
+    "user": "Usuario",
+    "date": "Fecha",
+    "createdAt": "Creado el",
+    "lastAccess": "Último Acceso",
+    "total": "Total",
+    "page": "Página",
+    "of": "de",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "noData": "No se encontraron registros."
+  },
+  "dashboard": {
+    "title": "Visión General de la Plataforma",
+    "subtitle": "Métricas en tiempo real y monitoreo del estado del sistema.",
+    "totalUsers": "Total de Usuarios",
+    "activeSongs": "Cifras Activas",
+    "deletedSongs": "Cifras Moderadas",
+    "totalPlaylists": "Playlists Creadas",
+    "songsToday": "Creadas Hoy",
+    "songsMonth": "Creadas en los últimos 30 días",
+    "topArtists": "Top Artistas Más Cifrados",
+    "topKeys": "Tonalidades Más Usadas",
+    "recentActivity": "Actividad Reciente del Sistema"
+  },
+  "users": {
+    "title": "Gestión de Usuarios",
+    "subtitle": "Administración de cuentas, perfiles y permisos administrativos.",
+    "searchPlaceholder": "Filtrar por nombre o correo...",
+    "songCount": "Cifras",
+    "banned": "Suspendido",
+    "manageRole": "Cambiar Rol",
+    "userDetails": "Detalles del Usuario"
+  },
+  "songs": {
+    "title": "Moderación de Cifras",
+    "subtitle": "Supervisión de contenido, auditoría de acordes y control de eliminaciones.",
+    "searchPlaceholder": "Buscar por título, artista o ID...",
+    "tabAll": "Todas las Cifras",
+    "tabActive": "Activas",
+    "tabDeleted": "Archivadas / Eliminadas",
+    "author": "Autor",
+    "titleCol": "Título",
+    "artistCol": "Artista",
+    "keyCol": "Tono",
+    "tagsCol": "Etiquetas",
+    "softDelete": "Archivar",
+    "restore": "Restaurar",
+    "permanentDelete": "Eliminar Definitivamente",
+    "softDeleteConfirm": "¿Está seguro de que desea archivar esta cifra?",
+    "restoreConfirm": "¿Desea restaurar la cifra para exhibición pública?",
+    "deleteSuccess": "Cifra actualizada con éxito.",
+    "restoreSuccess": "Cifra restaurada con éxito."
+  },
+  "auth": {
+    "loginTitle": "Acceso Administrativo",
+    "loginSubtitle": "Inicie sesión con su cuenta autorizada de Google para acceder al panel.",
+    "googleSignIn": "Iniciar sesión con Google",
+    "redirecting": "Redirigiendo a Google...",
+    "verifying": "Verificando credenciales y permisos...",
+    "enter": "Entrar al Panel",
+    "unauthorized": "Acceso denegado. Se requieren permisos de administrador.",
+    "notAdmin": "Acceso denegado: su cuenta de Google no tiene privilegios de administrador.",
+    "invalidCallback": "Respuesta de autenticación inválida o incompleta.",
+    "loginFailed": "No se pudo iniciar el inicio de sesión con Google. Intente nuevamente."
+  },
+  "adminUsers": {
+    "status": {
+      "active": "Activo",
+      "blocked": "Bloqueado"
+    },
+    "actions": {
+      "block": "Bloquear",
+      "unblock": "Desbloquear",
+      "viewHistory": "Historial de Auditoría",
+      "cannotBlockSelf": "No está permitido bloquearse a sí mismo"
+    },
+    "blockModal": {
+      "title": "Bloquear Usuario",
+      "description": "Al bloquear este usuario, el acceso a CifrAS será revocado de inmediato y las sesiones activas quedarán invalidadas.",
+      "targetUser": "Usuario a bloquear",
+      "reasonLabel": "Motivo del bloqueo (obligatorio)",
+      "reasonPlaceholder": "Indique el motivo detallado del bloqueo...",
+      "minCharsError": "El motivo debe contener al menos 5 caracteres.",
+      "confirmButton": "Confirmar Bloqueo",
+      "cancelButton": "Cancelar",
+      "successToast": "Usuario bloqueado con éxito.",
+      "errorGeneric": "Error al bloquear al usuario. Inténtelo de nuevo."
+    },
+    "unblockModal": {
+      "title": "Desbloquear Usuario",
+      "description": "¿Está seguro de que desea restablecer el acceso de este usuario?",
+      "reasonLabel": "Motivo del desbloqueo (opcional)",
+      "reasonPlaceholder": "Justificación de la liberación...",
+      "confirmButton": "Confirmar Desbloqueo",
+      "cancelButton": "Cancelar",
+      "successToast": "Usuario desbloqueado con éxito.",
+      "errorGeneric": "Error al desbloquear al usuario. Inténtelo de nuevo."
+    },
+    "auditModal": {
+      "title": "Pista de Auditoría del Usuario",
+      "noLogs": "No se encontraron registros de auditoría para este usuario.",
+      "actionBlock": "Bloqueo",
+      "actionUnblock": "Desbloqueo",
+      "executedBy": "Ejecutado por",
+      "reason": "Motivo registrado",
+      "date": "Fecha y Hora",
+      "close": "Cerrar",
+      "loadError": "No se pudo cargar el historial de auditoría."
+    }
+  }
+}

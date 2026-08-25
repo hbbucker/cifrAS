@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { AdminDashboardMetrics, RecentActivity, AdminUser, AdminSong, PagedResponse } from '../types/admin';
+import type { AdminDashboardMetrics, RecentActivity, AdminUser, AdminSong, PagedResponse, UserAuditLog } from '../types/admin';
 
 export const adminClient = axios.create({
   baseURL: '/api/admin',
@@ -18,8 +18,9 @@ adminClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401 || error.response?.status === 403) {
       if (window.location.pathname !== '/login') {
-        // Redirection on unauthorized
         localStorage.removeItem('admin_token');
+        const reason = error.response?.status === 403 ? 'not_admin' : 'unauthorized';
+        window.location.href = `/login?error=${reason}`;
       }
     }
     return Promise.reject(error);
@@ -40,6 +41,21 @@ export const getAdminUsers = async (page: number = 0, pageSize: number = 20, sea
   const res = await adminClient.get<PagedResponse<AdminUser>>('/users', {
     params: { page, pageSize, search: search || undefined }
   });
+  return res.data;
+};
+
+export const blockUser = async (userId: string, reason: string): Promise<AdminUser> => {
+  const res = await adminClient.post<AdminUser>(`/users/${userId}/block`, { reason });
+  return res.data;
+};
+
+export const unblockUser = async (userId: string, reason?: string): Promise<AdminUser> => {
+  const res = await adminClient.post<AdminUser>(`/users/${userId}/unblock`, { reason });
+  return res.data;
+};
+
+export const getUserAuditLogs = async (userId: string): Promise<UserAuditLog[]> => {
+  const res = await adminClient.get<UserAuditLog[]>(`/users/${userId}/audit-logs`);
   return res.data;
 };
 

@@ -39,7 +39,7 @@ public class GetDashboardMetricsUseCase {
 
         long totalPlaylists = 0L;
         try {
-            Object playlistCount = em.createNativeQuery("SELECT count(*) FROM playlists WHERE deleted_at IS NULL").getSingleResult();
+            Object playlistCount = em.createNativeQuery("SELECT count(*) FROM playlists WHERE deletedat IS NULL").getSingleResult();
             if (playlistCount instanceof Number num) {
                 totalPlaylists = num.longValue();
             }
@@ -47,11 +47,12 @@ public class GetDashboardMetricsUseCase {
 
         Map<String, Long> topArtists = new HashMap<>();
         try {
-            List<?> rows = em.createNativeQuery(
-                "SELECT artist, count(*) as c FROM songs WHERE deleted_at IS NULL GROUP BY artist ORDER BY c DESC LIMIT 5"
-            ).getResultList();
-            for (Object item : rows) {
-                if (item instanceof Object[] row && row[0] != null && row[1] instanceof Number num) {
+            List<Object[]> rows = em.createQuery(
+                "SELECT s.artist, count(s) FROM AdminSongEntity s WHERE s.deletedAt IS NULL GROUP BY s.artist ORDER BY count(s) DESC",
+                Object[].class
+            ).setMaxResults(5).getResultList();
+            for (Object[] row : rows) {
+                if (row != null && row[0] != null && row[1] instanceof Number num) {
                     topArtists.put(row[0].toString(), num.longValue());
                 }
             }
@@ -59,11 +60,12 @@ public class GetDashboardMetricsUseCase {
 
         Map<String, Long> topKeys = new HashMap<>();
         try {
-            List<?> rows = em.createNativeQuery(
-                "SELECT original_key, count(*) as c FROM songs WHERE deleted_at IS NULL AND original_key IS NOT NULL GROUP BY original_key ORDER BY c DESC LIMIT 5"
-            ).getResultList();
-            for (Object item : rows) {
-                if (item instanceof Object[] row && row[0] != null && row[1] instanceof Number num) {
+            List<Object[]> rows = em.createQuery(
+                "SELECT s.originalKey, count(s) FROM AdminSongEntity s WHERE s.deletedAt IS NULL AND s.originalKey IS NOT NULL GROUP BY s.originalKey ORDER BY count(s) DESC",
+                Object[].class
+            ).setMaxResults(5).getResultList();
+            for (Object[] row : rows) {
+                if (row != null && row[0] != null && row[1] instanceof Number num) {
                     topKeys.put(row[0].toString(), num.longValue());
                 }
             }

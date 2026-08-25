@@ -3,6 +3,7 @@ package br.com.cifras.admin;
 import br.com.cifras.admin.user.dto.AdminUserDTO;
 import br.com.cifras.admin.user.infra.mapper.AdminUserMapper;
 import br.com.cifras.admin.user.model.AdminUser;
+import br.com.cifras.admin.user.model.UserStatus;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -24,7 +25,10 @@ public class AdminUserMapperTest {
             Instant.now(),
             Instant.now(),
             42,
-            false
+            UserStatus.BLOCKED,
+            true,
+            "Spam reason",
+            Instant.now()
         );
 
         AdminUserDTO dto = mapper.toDTO(user);
@@ -35,7 +39,11 @@ public class AdminUserMapperTest {
         assertEquals("admin", dto.role());
         assertTrue(dto.isAdmin());
         assertEquals(42, dto.songCount());
-        assertFalse(dto.banned());
+        assertTrue(dto.banned());
+        assertTrue(dto.isBlocked());
+        assertEquals("BLOCKED", dto.status());
+        assertEquals("Spam reason", dto.lastBlockReason());
+        assertNotNull(dto.updatedAt());
     }
 
     @Test
@@ -47,5 +55,11 @@ public class AdminUserMapperTest {
         assertEquals(2, list.size());
         assertFalse(list.get(0).isAdmin());
         assertTrue(list.get(1).isAdmin());
+    }
+
+    @Test
+    void shouldHandleNullInputs() {
+        assertNull(mapper.toDTO(null));
+        assertTrue(mapper.toDTOList(null).isEmpty());
     }
 }
