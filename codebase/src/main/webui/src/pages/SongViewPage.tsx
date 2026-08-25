@@ -151,7 +151,7 @@ export const SongViewPage: React.FC = () => {
   return (
     <>
       <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
-        <header className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-2.5 sm:py-0 sm:h-16 bg-bg-card border-b border-border-main shrink-0 gap-2.5 sm:gap-4 relative z-10">
+        <header className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-2.5 sm:py-0 sm:h-16 bg-bg-card border-b border-border-main shrink-0 gap-2.5 sm:gap-4 relative z-20">
           <div className="flex items-center gap-2.5 sm:gap-4 w-full sm:w-auto overflow-hidden">
             <button onClick={() => navigate('/songs')} className="w-10 h-10 min-w-[40px] flex items-center justify-center hover:bg-bg-elevated rounded-full text-text-mute shrink-0 -ml-1 sm:ml-0" aria-label="Back">
               <ArrowLeft className="w-5 h-5" />

@@ -30,7 +30,7 @@ export const Sidebar: React.FC = () => {
       <aside 
         className={`hidden sm:flex flex-col bg-bg-card border-r border-border-main transition-all duration-300 ${
           collapsed ? 'w-20' : 'w-64'
-        } h-screen sticky top-0`}
+        } h-screen sticky top-0 z-30`}
         data-testid="sidebar"
       >
         <div className={`flex items-center ${collapsed ? 'justify-center' : 'justify-between'} p-4 border-b border-border-main h-16`}>
