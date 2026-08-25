@@ -20,7 +20,6 @@ public class AdminSongEntity extends PanacheEntityBase {
     public UUID id;
 
     @NotBlank
-    @Column(name = "user_id", nullable = false)
     public String userId;
 
     @NotBlank
@@ -31,7 +30,6 @@ public class AdminSongEntity extends PanacheEntityBase {
     @Column(nullable = false)
     public String artist;
 
-    @Column(name = "original_key")
     public String originalKey;
 
     @Column(name = "is_favorite")
@@ -46,7 +44,6 @@ public class AdminSongEntity extends PanacheEntityBase {
     public Instant updatedAt;
 
     /** Soft delete timestamp. Null = active */
-    @Column(name = "deleted_at")
     public Instant deletedAt;
 
     @PrePersist
