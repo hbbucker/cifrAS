@@ -134,25 +134,25 @@ export const SongsListPage: React.FC = () => {
   return (
     <>
       <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
-        <header className="min-h-[52px] sm:min-h-[64px] flex items-center justify-between px-3.5 sm:px-6 bg-bg-card border-b border-border-main shrink-0" role="banner">
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            <BrandLogo iconOnly size="sm" asLink to="/dashboard" className="sm:hidden shrink-0" />
-            <h1 className="text-lg sm:text-xl font-bold text-text-main truncate">{t('songsList.title')}</h1>
+        <header className="bg-bg-card border-b border-border-main shrink-0" role="banner">
+          <div className="min-h-[52px] sm:min-h-[64px] flex items-center justify-between px-3.5 sm:px-6">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <BrandLogo iconOnly size="sm" asLink to="/dashboard" className="sm:hidden shrink-0" />
+              <h1 className="text-lg sm:text-xl font-bold text-text-main truncate">{t('songsList.title')}</h1>
+            </div>
+            <OnboardingTooltip tooltipId="add_song_btn">
+              <Button
+                onClick={() => navigate('/songs/new')}
+                data-testid="add-song-btn"
+                className="min-h-[40px] sm:min-h-[44px] px-3.5 sm:px-4 text-xs sm:text-sm"
+              >
+                <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-1" />
+                <span>{t('songsList.addSong')}</span>
+              </Button>
+            </OnboardingTooltip>
           </div>
-          <OnboardingTooltip tooltipId="add_song_btn">
-            <Button
-              onClick={() => navigate('/songs/new')}
-              data-testid="add-song-btn"
-              className="min-h-[40px] sm:min-h-[44px] px-3.5 sm:px-4 text-xs sm:text-sm"
-            >
-              <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-1" />
-              <span>{t('songsList.addSong')}</span>
-            </Button>
-          </OnboardingTooltip>
-        </header>
 
-        <div ref={scrollRef} className="flex-1 overflow-y-auto p-3.5 sm:p-6 pb-24 sm:pb-8 relative min-w-0">
-          <div className="sticky top-0 z-10 bg-bg-card/95 backdrop-blur -mx-3.5 sm:-mx-6 px-3.5 sm:px-6 pt-2 pb-3 mb-4 sm:mb-6 flex flex-col gap-2.5 sm:gap-3 border-b border-border-main/50">
+          <div className="px-3.5 sm:px-6 pb-3 pt-0 flex flex-col gap-2.5 sm:gap-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4">
               <div className="relative max-w-sm w-full">
                 <input
@@ -203,6 +203,9 @@ export const SongsListPage: React.FC = () => {
               />
             )}
           </div>
+        </header>
+
+        <div ref={scrollRef} className="flex-1 overflow-y-auto p-3.5 sm:p-6 pb-24 sm:pb-8 relative min-w-0">
 
           {loading && songs.length === 0 ? (
             <div className="flex justify-center py-12">
