@@ -19,8 +19,11 @@ import { SettingsPage } from './pages/SettingsPage';
 import { GoogleCallbackPage } from './pages/settings/GoogleCallbackPage';
 import { PrivacyPage } from './pages/PrivacyPage';
 import { LandingPage } from './pages/LandingPage';
+import { usePwaAutoUpdate } from './hooks/usePwaAutoUpdate';
 
 function App() {
+ usePwaAutoUpdate();
+
  return (
   <Routes>
   <Route path="/" element={<LandingPage />} />
