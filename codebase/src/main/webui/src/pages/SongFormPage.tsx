@@ -130,7 +130,7 @@ export const SongFormPage: React.FC = () => {
  return (
     <>
       <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
-        <header className="min-h-[56px] sm:min-h-[64px] flex items-center justify-between px-4 sm:px-6 bg-bg-card border-b border-border-main shrink-0">
+        <header className="relative z-20 min-h-[56px] sm:min-h-[64px] flex items-center justify-between px-4 sm:px-6 bg-bg-card border-b border-border-main shrink-0">
           <div className="flex items-center gap-3 sm:gap-4 min-w-0">
             <button onClick={handleBack} className="p-2 hover:bg-bg-elevated rounded-full text-text-mute shrink-0">
               <ArrowLeft className="w-5 h-5" />

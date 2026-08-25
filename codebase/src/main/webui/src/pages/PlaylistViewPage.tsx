@@ -174,7 +174,7 @@ export const PlaylistViewPage: React.FC = () => {
   return (
     <>
       <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
-        <header className="min-h-[56px] sm:min-h-[64px] py-2.5 sm:py-3 flex items-center justify-between px-3.5 sm:px-6 bg-bg-card border-b border-border-main shrink-0 gap-2">
+        <header className="relative z-20 min-h-[56px] sm:min-h-[64px] py-2.5 sm:py-3 flex items-center justify-between px-3.5 sm:px-6 bg-bg-card border-b border-border-main shrink-0 gap-2">
           <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
             <button 
               onClick={() => navigate('/playlists')} 

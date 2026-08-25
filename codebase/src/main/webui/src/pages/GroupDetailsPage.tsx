@@ -112,7 +112,7 @@ export const GroupDetailsPage: React.FC = () => {
     <>
       <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
         {/* Header */}
-        <header className="min-h-[56px] sm:min-h-[64px] flex items-center px-3.5 sm:px-6 bg-bg-card border-b border-border-main gap-2.5 sm:gap-4 shrink-0">
+        <header className="relative z-20 min-h-[56px] sm:min-h-[64px] flex items-center px-3.5 sm:px-6 bg-bg-card border-b border-border-main gap-2.5 sm:gap-4 shrink-0">
           <button
             onClick={() => navigate('/groups')}
             className="w-10 h-10 flex items-center justify-center hover:bg-bg-elevated rounded-full text-text-mute transition-colors shrink-0"

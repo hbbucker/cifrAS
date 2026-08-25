@@ -115,7 +115,7 @@ export const PlaylistsPage: React.FC = () => {
   return (
     <>
       <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
-        <header className="min-h-[52px] sm:min-h-[64px] flex items-center justify-between px-3.5 sm:px-6 bg-bg-card border-b border-border-main shrink-0" role="banner">
+        <header className="relative z-20 min-h-[52px] sm:min-h-[64px] flex items-center justify-between px-3.5 sm:px-6 bg-bg-card border-b border-border-main shrink-0" role="banner">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <BrandLogo iconOnly size="sm" asLink to="/dashboard" className="sm:hidden shrink-0" />
             <h1 className="text-lg sm:text-xl font-bold text-text-main truncate">{t('sidebar.playlists')}</h1>
