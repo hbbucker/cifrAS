@@ -10,6 +10,7 @@ import {
   X,
   ShieldAlert,
   Globe,
+  MessageSquare
 } from 'lucide-react';
 import { useAdminAuth } from '../../context/AdminAuthContext';
 
@@ -32,6 +33,7 @@ export const AdminLayout: React.FC = () => {
     { to: '/', label: t('common.dashboard'), icon: LayoutDashboard },
     { to: '/users', label: t('common.users'), icon: Users },
     { to: '/songs', label: t('common.songs'), icon: Music2 },
+    { to: '/feedbacks', label: 'Feedbacks', icon: MessageSquare },
   ];
 
   return (

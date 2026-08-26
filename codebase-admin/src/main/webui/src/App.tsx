@@ -4,6 +4,7 @@ import { AdminLayout } from './components/layout/AdminLayout';
 import { DashboardPage } from './pages/DashboardPage';
 import { UsersPage } from './pages/UsersPage';
 import { SongsModerationPage } from './pages/SongsModerationPage';
+import { FeedbacksPage } from './pages/FeedbacksPage';
 import { LoginPage } from './pages/LoginPage';
 import { AuthCallbackPage } from './pages/AuthCallbackPage';
 import { useAdminAuth } from './context/AdminAuthContext';
@@ -32,6 +33,7 @@ export const App: React.FC = () => {
         <Route index element={<DashboardPage />} />
         <Route path="users" element={<UsersPage />} />
         <Route path="songs" element={<SongsModerationPage />} />
+        <Route path="feedbacks" element={<FeedbacksPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
