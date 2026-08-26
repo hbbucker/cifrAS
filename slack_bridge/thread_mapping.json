@@ -1383,9 +1383,28 @@
     "pendingId": null,
     "offset": 0,
     "participantRoles": [
-      "CEO"
+      "CEO",
+      "CTO",
+      "Frontend Staff",
+      "QA Lead"
     ],
-    "subagents": {},
+    "subagents": {
+      "1ba0dbb7-177b-47f8-8fa0-94a5444dc3a7": {
+        "conversationId": "1ba0dbb7-177b-47f8-8fa0-94a5444dc3a7",
+        "role": "CTO",
+        "offset": 0
+      },
+      "1ede2e57-2a1f-4074-bf89-76ff8dc195f7": {
+        "conversationId": "1ede2e57-2a1f-4074-bf89-76ff8dc195f7",
+        "role": "Frontend Staff",
+        "offset": 0
+      },
+      "64744dba-7969-43cb-94da-4954a17d9a78": {
+        "conversationId": "64744dba-7969-43cb-94da-4954a17d9a78",
+        "role": "QA Lead",
+        "offset": 0
+      }
+    },
     "publication": {
       "publishedNarratives": [],
       "lastStatus": "",

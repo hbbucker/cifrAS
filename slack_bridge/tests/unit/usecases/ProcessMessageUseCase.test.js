@@ -34,13 +34,64 @@ class InMemoryNotificationService {
   async sendIntermediateNarrative(threadId, channelId, role, markdown) {
     this.events.push({ type: 'narrative', threadId, channelId, role, markdown });
   }
+  async sendMilestoneNotification(threadId, channelId, role, markdown) {
+    this.events.push({ type: 'milestone', threadId, channelId, role, markdown });
+  }
   async sendFinalConsolidation(threadId, channelId, role, markdown, filePaths) {
     this.events.push({ type: 'final', threadId, channelId, role, markdown, filePaths });
+  }
+  async setAssistantStatus(threadId, channelId, statusText) {
+    this.events.push({ type: 'assistant_status', threadId, channelId, statusText });
   }
   async sendErrorMessage(threadId, channelId, errorText) {
     this.events.push({ type: 'error', threadId, channelId, errorText });
   }
 }
+
+test('ProcessMessageUseCase: dispatches MILESTONE_COMPLETED to notification gateway', async () => {
+  const repository = new InMemoryThreadRepository();
+  const notifier = new InMemoryNotificationService();
+
+  const mockEngine = new MockEngineAdapter({
+    events: async function* () {
+      yield EngineEvent.sessionBound('mock-session-456');
+      yield EngineEvent.subagentDiscovered('sub-cto-789', 'CTO');
+      yield EngineEvent.milestoneCompleted('sub-cto-789', 'CTO', 'DTOs e migrações finalizados com sucesso.');
+      yield EngineEvent.milestoneCompleted('mock-session-456', 'CEO', 'Branch criada e implementação iniciada.');
+      yield EngineEvent.executionCompleted(new TurnResultDTO({
+        exitCode: 0,
+        responseText: 'Entrega final concluída com sucesso.',
+        filePaths: [],
+      }));
+    },
+  });
+
+  const useCase = new ProcessMessageUseCase({
+    llmEngine: mockEngine,
+    notificationGateway: notifier,
+    sessionRepository: repository,
+    workspaceDir: '/test/workspace',
+  });
+
+  const result = await useCase.execute({
+    threadId: '2000.3000',
+    channelId: 'C_TEST',
+    userText: 'crie uma branch nova e inicie a implementação',
+  });
+
+  assert.equal(result.success, true);
+
+  const milestoneEvents = notifier.events.filter(e => e.type === 'milestone');
+  assert.equal(milestoneEvents.length, 2);
+  assert.ok(milestoneEvents[0].markdown.includes('DTOs e migrações'));
+  assert.equal(milestoneEvents[0].role.name, 'CTO');
+  assert.ok(milestoneEvents[1].markdown.includes('Branch criada'));
+  assert.equal(milestoneEvents[1].role.name, 'CEO');
+
+  // Marco duplicado não deve ser reenviado na consolidação final
+  const finalEvents = notifier.events.filter(e => e.type === 'final');
+  assert.equal(finalEvents.length, 1);
+});
 
 test('ProcessMessageUseCase: successfully orchestrates end-to-end turn with mock event stream', async () => {
   const repository = new InMemoryThreadRepository();
@@ -93,6 +144,9 @@ test('ProcessMessageUseCase: successfully orchestrates end-to-end turn with mock
   assert.ok(finalEvent);
   assert.ok(finalEvent.markdown.includes('Entrega final concluída'));
 });
+
+
+
 
 test('ProcessMessageUseCase: handles engine failure and triggers session recovery', async () => {
   const repository = new InMemoryThreadRepository();

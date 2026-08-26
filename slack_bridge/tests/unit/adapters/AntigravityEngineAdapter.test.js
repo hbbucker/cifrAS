@@ -80,13 +80,27 @@ test('AntigravityEngineAdapter: translateStreamEvent correctly maps NDJSON event
     },
   }, queue, context);
 
-  // 3. Evento agent_response
+  // 3. Evento agent_response ativo (delta) seguido de DONE (marco)
   adapter.translateStreamEvent({
     event: 'step_update',
     step_update: {
       step_type: 'agent_response',
       conversation_id: 'sub-456',
+      step_index: 2,
+      state: 'ACTIVE',
       text_delta: 'Configurando migrations...',
+    },
+  }, queue, context);
+
+  adapter.translateStreamEvent({
+    event: 'step_update',
+    step_update: {
+      step_type: 'agent_response',
+      conversation_id: 'sub-456',
+      step_index: 2,
+      state: 'DONE',
+      text_delta: ' e tabelas prontas.',
+      duration_seconds: 4.2,
     },
   }, queue, context);
 
@@ -113,12 +127,19 @@ test('AntigravityEngineAdapter: translateStreamEvent correctly maps NDJSON event
   assert.equal(events[1].payload.typeName, 'CTO');
 
   assert.equal(events[2].type, 'TEXT_DELTA_EMITTED');
-  assert.equal(events[2].payload.conversationId, 'sub-456');
   assert.equal(events[2].payload.textChunk, 'Configurando migrations...');
 
-  assert.equal(events[3].type, 'STATUS_UPDATED');
-  assert.equal(events[3].payload.conversationId, 'session-bound-999');
-  assert.equal(events[3].payload.statusText, 'Executando comando no terminal');
+  assert.equal(events[3].type, 'TEXT_DELTA_EMITTED');
+  assert.equal(events[3].payload.textChunk, ' e tabelas prontas.');
+
+  assert.equal(events[4].type, 'MILESTONE_COMPLETED');
+  assert.equal(events[4].payload.conversationId, 'sub-456');
+  assert.equal(events[4].payload.milestoneText, 'Configurando migrations... e tabelas prontas.');
+  assert.equal(events[4].payload.metadata.stepIndex, 2);
+
+  assert.equal(events[5].type, 'STATUS_UPDATED');
+  assert.equal(events[5].payload.conversationId, 'session-bound-999');
+  assert.equal(events[5].payload.statusText, 'Executando comando no terminal');
 });
 
 test('AntigravityEngineAdapter: readTranscriptResponse asynchronously reads and extracts the latest PLANNER_RESPONSE', async () => {
