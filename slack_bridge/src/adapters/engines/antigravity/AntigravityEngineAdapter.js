@@ -169,12 +169,36 @@ class AntigravityEngineAdapter extends ILLMEnginePort {
       }
     }
 
-    // 3. Streaming de deltas de pensamento / texto por conversation_id
+    // 3. Streaming de deltas de pensamento / texto e emissão de marcos por conversation_id
     if (event.event === 'step_update' && event.step_update && event.step_update.step_type === 'agent_response') {
       const convId = event.step_update.conversation_id || executionContext.boundSessionId;
-      const text = event.step_update.text_delta || event.step_update.text;
-      if (text && convId) {
-        queue.push(EngineEvent.textDeltaEmitted(convId, text));
+      const stepIndex = event.step_update.step_index ?? 0;
+      const bufferKey = `${convId}:${stepIndex}`;
+      const textChunk = event.step_update.text_delta || event.step_update.text || '';
+
+      if (!executionContext.stepBuffers) {
+        executionContext.stepBuffers = new Map();
+      }
+
+      const currentBuffer = (executionContext.stepBuffers.get(bufferKey) || '') + textChunk;
+      executionContext.stepBuffers.set(bufferKey, currentBuffer);
+
+      if (textChunk && convId) {
+        queue.push(EngineEvent.textDeltaEmitted(convId, textChunk));
+      }
+
+      // Quando o passo cognitivo é concluído (DONE), emite o marco completo
+      if (event.step_update.state === 'DONE') {
+        const fullStepText = currentBuffer.trim();
+        if (fullStepText && convId) {
+          queue.push(EngineEvent.milestoneCompleted(
+            convId,
+            null,
+            fullStepText,
+            { stepIndex, durationSeconds: event.step_update.duration_seconds }
+          ));
+        }
+        executionContext.stepBuffers.delete(bufferKey);
       }
     }
 

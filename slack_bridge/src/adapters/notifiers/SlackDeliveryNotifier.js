@@ -96,6 +96,17 @@ class SlackDeliveryNotifier extends INotificationPort {
     return this.sendStatus(threadId, channelId, statusText, { bypassInterval: true });
   }
 
+  async sendMilestoneNotification(threadId, channelId, agentRole, markdownText) {
+    const queue = this._getQueue(threadId);
+    const header = `*${agentRole.formattedName} — marco concluído*`;
+    const formattedBody = this.formatter.format(markdownText);
+    const fullMessage = `${header}\n\n${formattedBody}`;
+
+    return queue.add(async () => {
+      await this._postMessageBlock(channelId, threadId, fullMessage);
+    });
+  }
+
   async sendFinalConsolidation(threadId, channelId, agentRole, markdownText, filePaths = []) {
     const queue = this._getQueue(threadId);
     const header = `*${agentRole.formattedName} — consolidação*`;
