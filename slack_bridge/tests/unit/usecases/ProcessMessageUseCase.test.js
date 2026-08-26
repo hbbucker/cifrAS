@@ -86,10 +86,8 @@ test('ProcessMessageUseCase: successfully orchestrates end-to-end turn with mock
   const ackEvent = notifier.events.find(e => e.type === 'ack');
   assert.ok(ackEvent);
 
-  const narrativeEvents = notifier.events.filter(e => e.type === 'narrative');
-  assert.ok(narrativeEvents.length >= 2);
-  assert.equal(narrativeEvents[0].role.name, 'CEO');
-  assert.equal(narrativeEvents[1].role.name, 'CTO');
+  const statusEvents = notifier.events.filter(e => e.type === 'status');
+  assert.ok(statusEvents.length >= 1);
 
   const finalEvent = notifier.events.find(e => e.type === 'final');
   assert.ok(finalEvent);

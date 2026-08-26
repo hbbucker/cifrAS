@@ -23,17 +23,37 @@ class SlackDeliveryNotifier extends INotificationPort {
     return this.queues.get(threadId);
   }
 
+  async setAssistantStatus(threadId, channelId, statusText) {
+    if (this.client?.assistant?.threads?.setStatus && typeof this.client.assistant.threads.setStatus === 'function') {
+      try {
+        await this.client.assistant.threads.setStatus({
+          channel_id: channelId,
+          thread_ts: threadId,
+          status: statusText || '',
+        });
+        return true;
+      } catch (err) {
+        if (global.logDebug) global.logDebug('assistant_set_status_failed');
+        return false;
+      }
+    }
+    return false;
+  }
+
   async sendAcknowledgement(threadId, channelId) {
     const queue = this._getQueue(threadId);
     return queue.add(async () => {
-      try {
-        await this.client.chat.postMessage({
-          channel: channelId,
-          thread_ts: threadId,
-          text: ACKNOWLEDGEMENT_STATUS,
-        });
-      } catch (err) {
-        if (global.logDebug) global.logDebug('ack_failed');
+      const assistantUpdated = await this.setAssistantStatus(threadId, channelId, ACKNOWLEDGEMENT_STATUS);
+      if (!assistantUpdated) {
+        try {
+          await this.client.chat.postMessage({
+            channel: channelId,
+            thread_ts: threadId,
+            text: ACKNOWLEDGEMENT_STATUS,
+          });
+        } catch (err) {
+          if (global.logDebug) global.logDebug('ack_failed');
+        }
       }
     });
   }
@@ -54,27 +74,26 @@ class SlackDeliveryNotifier extends INotificationPort {
 
     const queue = this._getQueue(threadId);
     return queue.add(async () => {
-      try {
-        await this.client.chat.postMessage({
-          channel: channelId,
-          thread_ts: threadId,
-          text: cleanStatus,
-        });
-      } catch (err) {
-        if (global.logDebug) global.logDebug('status_failed');
+      const assistantUpdated = await this.setAssistantStatus(threadId, channelId, cleanStatus);
+      if (!assistantUpdated) {
+        try {
+          await this.client.chat.postMessage({
+            channel: channelId,
+            thread_ts: threadId,
+            text: cleanStatus,
+          });
+        } catch (err) {
+          if (global.logDebug) global.logDebug('status_failed');
+        }
       }
     });
   }
 
   async sendIntermediateNarrative(threadId, channelId, agentRole, markdownText) {
-    const queue = this._getQueue(threadId);
-    const header = `*${agentRole.formattedName} — atualização durante o processamento*`;
-    const formattedBody = this.formatter.format(markdownText);
-    const fullMessage = `${header}\n\n${formattedBody}`;
-
-    return queue.add(async () => {
-      await this._postMessageBlock(channelId, threadId, fullMessage);
-    });
+    // Evita envio de pedaços quebrados de texto para a thread.
+    // Atualiza status do assistente sem poluição visual.
+    const statusText = `${agentRole.formattedName} em atividade...`;
+    return this.sendStatus(threadId, channelId, statusText, { bypassInterval: true });
   }
 
   async sendFinalConsolidation(threadId, channelId, agentRole, markdownText, filePaths = []) {
@@ -84,6 +103,9 @@ class SlackDeliveryNotifier extends INotificationPort {
     const fullMessage = `${header}\n\n${formattedBody}`;
 
     return queue.add(async () => {
+      // Limpa status do Slack Assistant ao concluir
+      await this.setAssistantStatus(threadId, channelId, '');
+
       await this._postMessageBlock(channelId, threadId, fullMessage);
 
       // Upload de arquivos
@@ -106,6 +128,7 @@ class SlackDeliveryNotifier extends INotificationPort {
   async sendErrorMessage(threadId, channelId, errorText) {
     const queue = this._getQueue(threadId);
     return queue.add(async () => {
+      await this.setAssistantStatus(threadId, channelId, '');
       try {
         await this.client.chat.postMessage({
           channel: channelId,

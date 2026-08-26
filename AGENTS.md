@@ -38,44 +38,39 @@ O **CifrAS** é uma plataforma moderna e responsiva projetada para músicos (ama
 
 ## 3. Arquitetura e Estrutura de Diretórios (Monorepo)
 
-O projeto adota uma arquitetura unificada sob a pasta `codebase/` onde o servidor Quarkus serve tanto os endpoints REST (`/api/*`) quanto os arquivos estáticos compilados do React na raiz (`/`).
+O projeto adota uma arquitetura dividida em dois projetos principais sob a raiz: `codebase/` (aplicativo principal) e `codebase-admin/` (painel administrativo). Ambos utilizam Quarkus para servir tanto os endpoints REST (`/api/*`) quanto os arquivos estáticos compilados do React na raiz (`/`).
 
 ```text
-codebase/
-├── .mvn/                     # Wrapper do Maven
-├── src/
-│   ├── main/
-│   │   ├── java/             # Backend Quarkus (Java 21)
-│   │   │   └── br/com/cifras/
-│   │   │       ├── shared/   # Código compartilhado (Exceções globais, DTOs genéricos, Security)
-│   │   │       ├── config/   # Configurações do framework (ObjectMapper, Cors, etc.)
-│   │   │       └── [feature]/# Módulos organizados por Feature (song, group, playlist, user)
-│   │   │           ├── model/        # Modelos de Domínio Puros (POJOs ricos, sem anotações JPA)
-│   │   │           ├── application/  # Casos de Uso / Services (Vertical Slicing)
-│   │   │           ├── infra/        # Adapters de Infraestrutura (Entities JPA, Repositories, Mappers)
-│   │   │           ├── resource/     # Controladores REST JAX-RS
-│   │   │           └── dto/          # Records DTO (Requests e Responses)
-│   │   │
-│   │   ├── resources/        # Recursos do backend (application.properties)
-│   │   │
-│   │   └── webui/            # Frontend React (Vite + Quinoa)
-│   │       ├── src/
-│   │       │   ├── api/      # Clientes HTTP (Axios) apontando para /api
-│   │       │   ├── components/ # Componentes UI genéricos e de layout
-│   │       │   ├── context/  # Contextos globais (AuthContext)
-│   │       │   ├── features/ # Funcionalidades isoladas (groups, songs, playlists)
-│   │       │   ├── hooks/    # Custom hooks (e.g., useSupabaseAuth)
-│   │       │   ├── pages/    # Telas completas da aplicação
-│   │       │   ├── types/    # Tipagem TypeScript compartilhada
-│   │       │   └── utils/    # Utilitários (lyricsParser, formatting)
-│   │       ├── e2e/          # Testes E2E com Playwright
-│   │       ├── package.json
-│   │       └── vite.config.ts
-│   │
-│   └── test/
-│       └── java/             # Testes integrados e unitários do backend (Testcontainers)
-└── pom.xml                   # Build Maven
+/
+├── codebase/                 # Aplicativo Principal (Usuários Finais)
+│   ├── .mvn/                 # Wrapper do Maven
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/         # Backend Quarkus (Java 21)
+│   │   │   │   └── br/com/cifras/
+│   │   │   │       ├── shared/   # Código compartilhado
+│   │   │   │       ├── config/   # Configurações
+│   │   │   │       └── [feature]/# song, group, playlist, user
+│   │   │   ├── resources/
+│   │   │   └── webui/        # Frontend React (Vite + Quinoa)
+│   │   └── test/
+│   └── pom.xml
+│
+├── codebase-admin/           # Painel Administrativo
+│   ├── .mvn/
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/         # Backend Quarkus Admin
+│   │   │   │   └── br/com/cifras/admin/
+│   │   │   │       ├── shared/
+│   │   │   │       ├── config/
+│   │   │   │       └── [feature]/# audit, auth, dashboard, song (moderation)
+│   │   │   ├── resources/
+│   │   │   └── webui/        # Frontend React Admin (Vite + Quinoa)
+│   │   └── test/
+│   └── pom.xml
 ```
+
 
 ---
 

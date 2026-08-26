@@ -70,16 +70,7 @@ class ProcessMessageUseCase {
           }
 
           case 'TEXT_DELTA_EMITTED': {
-            const { conversationId, textChunk } = event.payload;
-            const sanitized = this.sanitizerService.sanitize(textChunk);
-            if (!sanitized) break;
-
-            const role = session.getRoleForConversation(conversationId);
-            const duplicate = this.sanitizerService.isDuplicate(role.name, sanitized, session.publishedNarratives);
-            if (duplicate) break;
-
-            session.addPublishedNarrative(`${role.name}:${sanitized}`);
-            await this.notificationGateway.sendIntermediateNarrative(threadId, channelId, role, sanitized);
+            // Streaming de texto puro: não envia fragmentos cortados para a thread
             break;
           }
 

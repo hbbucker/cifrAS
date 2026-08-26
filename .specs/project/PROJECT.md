@@ -14,7 +14,7 @@
 ## Tech Stack
 
 **Arquitetura Unificada (Quarkus Quinoa):**
-O projeto roda como um monólito onde o Quarkus gerencia tanto o servidor de backend REST quanto a compilação e entrega do frontend estático gerado pelo Vite/React.
+O projeto roda com dois projetos isolados (`codebase/` para o app principal e `codebase-admin/` para o painel administrativo) onde o Quarkus gerencia tanto o servidor de backend REST quanto a compilação e entrega do frontend estático gerado pelo Vite/React em cada um.
 
 **Backend (Java Quarkus):**
 - Framework: Quarkus 3.x

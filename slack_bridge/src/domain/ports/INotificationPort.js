@@ -19,6 +19,10 @@ class INotificationPort {
     throw new Error('INotificationPort.sendFinalConsolidation() must be implemented');
   }
 
+  async setAssistantStatus(threadId, channelId, statusText) {
+    throw new Error('INotificationPort.setAssistantStatus() must be implemented');
+  }
+
   async sendErrorMessage(threadId, channelId, errorText) {
     throw new Error('INotificationPort.sendErrorMessage() must be implemented');
   }
