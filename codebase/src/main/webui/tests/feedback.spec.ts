@@ -21,10 +21,10 @@ test.describe('Feedback feature', () => {
 
   test('should open feedback modal, submit and show success', async ({ page }) => {
     // Open user menu
-    await page.getByTestId('user-menu-btn').click();
+    await page.getByTestId('user-menu-btn').first().click();
     
     // Click feedback button
-    await page.getByTestId('feedback-btn').click();
+    await page.getByTestId('feedback-btn').first().click();
     
     // Check modal is visible
     const modalHeading = page.getByRole('heading', { name: 'Envie seu Feedback' });
