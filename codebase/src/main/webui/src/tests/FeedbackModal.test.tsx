@@ -19,7 +19,7 @@ describe('FeedbackModal', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useToast as any).mockReturnValue({ showToast: mockShowToast });
+    (useToast as any).mockReturnValue({ toast: mockShowToast });
   });
 
   it('does not render when isOpen is false', () => {

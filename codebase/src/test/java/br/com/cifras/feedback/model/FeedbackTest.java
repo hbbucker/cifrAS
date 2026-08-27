@@ -3,9 +3,11 @@ package br.com.cifras.feedback.model;
 import org.junit.jupiter.api.Test;
 import java.time.Instant;
 import java.util.UUID;
+import io.quarkus.test.junit.QuarkusTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@QuarkusTest
 class FeedbackTest {
 
     @Test

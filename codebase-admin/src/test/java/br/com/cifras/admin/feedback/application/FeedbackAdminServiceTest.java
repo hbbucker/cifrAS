@@ -10,22 +10,22 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
+import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.InjectMock;
+import jakarta.inject.Inject;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+@QuarkusTest
 class FeedbackAdminServiceTest {
 
-    private FeedbackAdminService service;
-    private FeedbackAdminRepository repository;
+    @Inject
+    FeedbackAdminService service;
 
-    @BeforeEach
-    void setUp() {
-        repository = Mockito.mock(FeedbackAdminRepository.class);
-        service = new FeedbackAdminService();
-        service.repository = repository;
-    }
+    @InjectMock
+    FeedbackAdminRepository repository;
 
     @Test
     void testListAllFeedbacks() {

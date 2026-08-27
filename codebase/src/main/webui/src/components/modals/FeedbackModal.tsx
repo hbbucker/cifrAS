@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { sendFeedback } from '../../api/feedback';
 import { useToast } from '../../context/ToastContext';
+import { Button } from '../ui/Button';
 
 interface FeedbackModalProps {
   isOpen: boolean;
@@ -11,7 +12,7 @@ interface FeedbackModalProps {
 export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose }) => {
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { showToast } = useToast();
+  const { toast: showToast } = useToast();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -57,21 +58,22 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose })
             disabled={isSubmitting}
           />
           <div className="flex justify-end gap-3">
-            <button
+            <Button
+              variant="secondary"
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="px-4 py-2 rounded-xl font-medium text-sm text-gray-700 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 transition-colors"
             >
               Cancelar
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="primary"
               type="submit"
+              isLoading={isSubmitting}
               disabled={isSubmitting || !message.trim()}
-              className="px-4 py-2 rounded-xl font-medium text-sm text-white bg-brand-primary hover:bg-brand-secondary transition-colors disabled:opacity-50"
             >
-              {isSubmitting ? 'Enviando...' : 'Enviar'}
-            </button>
+              Enviar
+            </Button>
           </div>
         </form>
       </div>

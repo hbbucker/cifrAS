@@ -7,21 +7,21 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.InjectMock;
+import jakarta.inject.Inject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 
+@QuarkusTest
 class FeedbackServiceTest {
 
-    private FeedbackService service;
-    private FeedbackRepository repository;
+    @Inject
+    FeedbackService service;
 
-    @BeforeEach
-    void setUp() {
-        repository = Mockito.mock(FeedbackRepository.class);
-        service = new FeedbackService();
-        service.repository = repository;
-    }
+    @InjectMock
+    FeedbackRepository repository;
 
     @Test
     void testSubmitFeedback() {
