@@ -17,13 +17,13 @@ describe('FeedbacksPage', () => {
   });
 
   it('renders loading state initially', () => {
-    (getFeedbacks as any).mockReturnValue(new Promise(() => {}));
+    vi.mocked(getFeedbacks).mockReturnValue(new Promise(() => {}));
     render(<FeedbacksPage />);
     expect(screen.getByText('Carregando feedbacks...')).toBeInTheDocument();
   });
 
   it('renders error state on fetch failure', async () => {
-    (getFeedbacks as any).mockRejectedValue(new Error('Fetch Error'));
+    vi.mocked(getFeedbacks).mockRejectedValue(new Error('Fetch Error'));
     render(<FeedbacksPage />);
     
     await waitFor(() => {
@@ -33,7 +33,7 @@ describe('FeedbacksPage', () => {
   });
 
   it('renders empty feedbacks message', async () => {
-    (getFeedbacks as any).mockResolvedValue([]);
+    vi.mocked(getFeedbacks).mockResolvedValue([]);
     render(<FeedbacksPage />);
     
     await waitFor(() => {
@@ -61,7 +61,7 @@ describe('FeedbacksPage', () => {
         updatedAt: '2023-01-02T12:00:00Z'
       }
     ];
-    (getFeedbacks as any).mockResolvedValue(mockData);
+    vi.mocked(getFeedbacks).mockResolvedValue(mockData);
 
     render(<FeedbacksPage />);
 
@@ -76,7 +76,7 @@ describe('FeedbacksPage', () => {
 
   it('opens and closes modal using X button', async () => {
     const mockData = [{ id: '1', userId: 'UserA', message: 'Test', status: 'PENDING', createdAt: '2023-01-01T12:00:00Z' }];
-    (getFeedbacks as any).mockResolvedValue(mockData);
+    vi.mocked(getFeedbacks).mockResolvedValue(mockData);
     render(<FeedbacksPage />);
 
     await waitFor(() => screen.getByText('Test'));
@@ -91,7 +91,7 @@ describe('FeedbacksPage', () => {
 
   it('opens and closes modal using Cancel button', async () => {
     const mockData = [{ id: '1', userId: 'UserA', message: 'Test', status: 'PENDING', createdAt: '2023-01-01T12:00:00Z' }];
-    (getFeedbacks as any).mockResolvedValue(mockData);
+    vi.mocked(getFeedbacks).mockResolvedValue(mockData);
     render(<FeedbacksPage />);
 
     await waitFor(() => screen.getByText('Test'));
@@ -106,8 +106,8 @@ describe('FeedbacksPage', () => {
 
   it('submits reply correctly', async () => {
     const mockData = [{ id: '1', userId: 'UserA', message: 'Need dark mode', status: 'PENDING', createdAt: '2023-01-01T12:00:00Z' }];
-    (getFeedbacks as any).mockResolvedValue(mockData);
-    (replyFeedback as any).mockResolvedValue();
+    vi.mocked(getFeedbacks).mockResolvedValue(mockData);
+    vi.mocked(replyFeedback).mockResolvedValue();
 
     render(<FeedbacksPage />);
 
@@ -131,7 +131,7 @@ describe('FeedbacksPage', () => {
 
   it('prevents submission with empty message', async () => {
     const mockData = [{ id: '1', userId: 'UserA', message: 'Need dark mode', status: 'PENDING', createdAt: '2023-01-01T12:00:00Z' }];
-    (getFeedbacks as any).mockResolvedValue(mockData);
+    vi.mocked(getFeedbacks).mockResolvedValue(mockData);
 
     render(<FeedbacksPage />);
     await waitFor(() => screen.getByText('Need dark mode'));
@@ -146,8 +146,8 @@ describe('FeedbacksPage', () => {
 
   it('handles reply failure', async () => {
     const mockData = [{ id: '1', userId: 'UserA', message: 'Test', status: 'PENDING', createdAt: '2023-01-01T12:00:00Z' }];
-    (getFeedbacks as any).mockResolvedValue(mockData);
-    (replyFeedback as any).mockRejectedValue(new Error('Reply Error'));
+    vi.mocked(getFeedbacks).mockResolvedValue(mockData);
+    vi.mocked(replyFeedback).mockRejectedValue(new Error('Reply Error'));
 
     render(<FeedbacksPage />);
     await waitFor(() => screen.getByText('Test'));
@@ -168,7 +168,7 @@ describe('FeedbacksPage', () => {
 
   it('shows replied message in readonly mode when status is REPLIED', async () => {
     const mockData = [{ id: '1', userId: 'UserA', message: 'Bug', status: 'REPLIED', adminReply: 'Fixed bug', createdAt: '2023-01-01T12:00:00Z' }];
-    (getFeedbacks as any).mockResolvedValue(mockData);
+    vi.mocked(getFeedbacks).mockResolvedValue(mockData);
 
     render(<FeedbacksPage />);
     await waitFor(() => screen.getByText('Bug'));

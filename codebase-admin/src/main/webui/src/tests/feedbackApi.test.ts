@@ -11,7 +11,7 @@ vi.mock('../api/adminApi', () => ({
 
 describe('feedbackApi', () => {
   it('gets feedbacks correctly', async () => {
-    (adminClient.get as any).mockResolvedValueOnce({ data: [{ id: '1' }] });
+    vi.mocked(adminClient.get).mockResolvedValueOnce({ data: [{ id: '1' }] } as never);
     
     const data = await getFeedbacks();
     
@@ -20,7 +20,7 @@ describe('feedbackApi', () => {
   });
 
   it('replies to feedback correctly', async () => {
-    (adminClient.put as any).mockResolvedValueOnce({ data: {} });
+    vi.mocked(adminClient.put).mockResolvedValueOnce({ data: {} } as never);
     
     await replyFeedback('1', { replyMessage: 'Thanks' });
     

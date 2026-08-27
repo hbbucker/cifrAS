@@ -19,7 +19,7 @@ describe('FeedbackModal', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useToast as any).mockReturnValue({ toast: mockShowToast });
+    vi.mocked(useToast).mockReturnValue({ toast: mockShowToast });
   });
 
   it('does not render when isOpen is false', () => {
@@ -65,7 +65,7 @@ describe('FeedbackModal', () => {
   });
 
   it('submits feedback and shows success toast', async () => {
-    (sendFeedback as any).mockResolvedValueOnce();
+    vi.mocked(sendFeedback).mockResolvedValueOnce(undefined as never);
     
     render(<FeedbackModal isOpen={true} onClose={mockOnClose} />);
     
@@ -87,7 +87,7 @@ describe('FeedbackModal', () => {
   });
 
   it('shows error toast if submission fails', async () => {
-    (sendFeedback as any).mockRejectedValueOnce(new Error('API Error'));
+    vi.mocked(sendFeedback).mockRejectedValueOnce(new Error('API Error'));
     
     render(<FeedbackModal isOpen={true} onClose={mockOnClose} />);
     

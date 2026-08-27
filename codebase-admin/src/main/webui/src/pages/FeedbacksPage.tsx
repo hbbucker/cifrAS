@@ -9,11 +9,7 @@ export const FeedbacksPage: React.FC = () => {
   const [replyMessage, setReplyMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    fetchFeedbacks();
-  }, []);
-
-  const fetchFeedbacks = async () => {
+  const fetchFeedbacks = React.useCallback(async () => {
     setLoading(true);
     try {
       const data = await getFeedbacks();
@@ -23,7 +19,12 @@ export const FeedbacksPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchFeedbacks();
+  }, [fetchFeedbacks]);
 
   const handleReplySubmit = async (e: React.FormEvent) => {
     e.preventDefault();

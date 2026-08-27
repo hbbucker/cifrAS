@@ -10,7 +10,7 @@ vi.mock('../services/authService', () => ({
 
 describe('feedbackApi', () => {
   it('sends feedback correctly', async () => {
-    (apiClient.post as any).mockResolvedValueOnce({ data: {} });
+    vi.mocked(apiClient.post).mockResolvedValueOnce({ data: {} } as never);
     
     await sendFeedback({ message: 'Great app' });
     

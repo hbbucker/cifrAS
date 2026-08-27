@@ -36,7 +36,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose })
       showToast('Recebemos seu feedback! Obrigado por nos ajudar a melhorar o CifrAS.', 'success');
       setMessage('');
       onClose();
-    } catch (error) {
+    } catch {
       showToast('Erro ao enviar feedback. Tente novamente mais tarde.', 'error');
     } finally {
       setIsSubmitting(false);
