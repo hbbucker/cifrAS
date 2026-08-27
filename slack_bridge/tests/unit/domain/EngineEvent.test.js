@@ -23,6 +23,13 @@ test('EngineEvent: factory methods produce immutable, typed domain events', () =
   assert.equal(status.type, 'STATUS_UPDATED');
   assert.equal(status.payload.statusText, 'Rodando testes');
 
+  const milestone = EngineEvent.milestoneCompleted('conv-456', 'CTO', 'DTOs criados', { stepIndex: 1 });
+  assert.equal(milestone.type, 'MILESTONE_COMPLETED');
+  assert.equal(milestone.payload.conversationId, 'conv-456');
+  assert.equal(milestone.payload.roleName, 'CTO');
+  assert.equal(milestone.payload.milestoneText, 'DTOs criados');
+  assert.equal(milestone.payload.metadata.stepIndex, 1);
+
   const completed = EngineEvent.executionCompleted(new TurnResultDTO({ responseText: 'Feito!' }));
   assert.equal(completed.type, 'EXECUTION_COMPLETED');
   assert.equal(completed.payload.result.responseText, 'Feito!');

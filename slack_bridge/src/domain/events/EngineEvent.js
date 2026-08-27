@@ -50,6 +50,18 @@ class EngineEvent {
   }
 
   /**
+   * Conclusão de um marco/passo cognitivo intermediário relevante.
+   */
+  static milestoneCompleted(conversationId, roleName, milestoneText, metadata = {}) {
+    return new EngineEvent('MILESTONE_COMPLETED', {
+      conversationId: String(conversationId),
+      roleName: roleName ? String(roleName) : null,
+      milestoneText: String(milestoneText || '').trim(),
+      metadata,
+    });
+  }
+
+  /**
    * Conclusão com sucesso do turno cognitivo.
    */
   static executionCompleted(resultDTO) {

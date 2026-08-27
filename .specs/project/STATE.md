@@ -34,3 +34,4 @@ Based on board approval, we are pausing new feature development (including Epic 
 
 
 
+- **USER-FEEDBACK-01:** (DONE) Canal de Feedback do Usuário (`user-feedback-channel`). Permite que usuários enviem sugestões, relatos e problemas diretamente pelo aplicativo. Painel administrativo para visualização e resposta. Deploy realizado no Fly.io para o aplicativo principal e painel administrativo.

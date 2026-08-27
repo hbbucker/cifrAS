@@ -75,10 +75,14 @@ test('SlackDeliveryNotifier: assistant mode uses assistant.threads.setStatus and
   assert.equal(assistantStatuses.length, 2);
   assert.equal(assistantStatuses[1].status, 'CTO gerando DTOs');
 
+  await notifier.sendMilestoneNotification('100.200', 'C_CHAN', AgentRole.from('CTO'), 'DTOs finalizados com sucesso');
+  assert.equal(postedMessages.length, 1);
+  assert.ok(postedMessages[0].text.includes('DTOs finalizados') || (postedMessages[0].blocks && postedMessages[0].blocks[0].text.text.includes('DTOs finalizados')));
+
   await notifier.sendFinalConsolidation('100.200', 'C_CHAN', AgentRole.from('CEO'), 'Resultado final pronto', []);
   // Clears status (status: '') and posts final message
   assert.equal(assistantStatuses.length, 3);
   assert.equal(assistantStatuses[2].status, '');
-  assert.equal(postedMessages.length, 1);
-  assert.ok(postedMessages[0].text.includes('Resultado final pronto') || (postedMessages[0].blocks && postedMessages[0].blocks[0].text.text.includes('Resultado final')));
+  assert.equal(postedMessages.length, 2);
+  assert.ok(postedMessages[1].text.includes('Resultado final pronto') || (postedMessages[1].blocks && postedMessages[1].blocks[0].text.text.includes('Resultado final')));
 });

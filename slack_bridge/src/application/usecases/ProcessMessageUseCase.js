@@ -74,6 +74,22 @@ class ProcessMessageUseCase {
             break;
           }
 
+          case 'MILESTONE_COMPLETED': {
+            const { conversationId, milestoneText, roleName } = event.payload;
+            const sanitized = this.sanitizerService.sanitize(milestoneText);
+            if (!sanitized) break;
+
+            const role = roleName ? AgentRole.from(roleName) : session.getRoleForConversation(conversationId);
+            const duplicate = this.sanitizerService.isDuplicate(role.name, sanitized, session.publishedNarratives);
+            if (duplicate) break;
+
+            session.addPublishedNarrative(`${role.name}:${sanitized}`);
+            await this.sessionRepository.save(session);
+
+            await this.notificationGateway.sendMilestoneNotification(threadId, channelId, role, sanitized);
+            break;
+          }
+
           case 'STATUS_UPDATED': {
             await this.notificationGateway.sendStatus(threadId, channelId, event.payload.statusText);
             break;
@@ -96,13 +112,20 @@ class ProcessMessageUseCase {
 
       // 3. Consolidação Final
       const ceoRole = AgentRole.from('CEO');
-      await this.notificationGateway.sendFinalConsolidation(
-        threadId,
-        channelId,
-        ceoRole,
-        finalResult.responseText,
-        finalResult.filePaths || []
-      );
+      const sanitizedFinal = this.sanitizerService.sanitize(finalResult.responseText);
+      const isAlreadyPublished = this.sanitizerService.isDuplicate(ceoRole.name, sanitizedFinal, session.publishedNarratives);
+
+      if (!isAlreadyPublished || (finalResult.filePaths && finalResult.filePaths.length > 0)) {
+        await this.notificationGateway.sendFinalConsolidation(
+          threadId,
+          channelId,
+          ceoRole,
+          finalResult.responseText,
+          finalResult.filePaths || []
+        );
+      } else {
+        await this.notificationGateway.setAssistantStatus(threadId, channelId, '');
+      }
 
       session.markActive(false);
       await this.sessionRepository.save(session);
