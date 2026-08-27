@@ -75,7 +75,7 @@ describe('FeedbacksPage', () => {
   });
 
   it('opens and closes modal using X button', async () => {
-    const mockData = [{ id: '1', userId: 'UserA', message: 'Test', status: 'PENDING', createdAt: '2023-01-01T12:00:00Z' }];
+    const mockData = [{ id: '1', userId: 'UserA', message: 'Test', status: 'PENDING', createdAt: '2023-01-01T12:00:00Z', updatedAt: '2023-01-01T12:00:00Z' }];
     vi.mocked(getFeedbacks).mockResolvedValue(mockData);
     render(<FeedbacksPage />);
 
@@ -90,7 +90,7 @@ describe('FeedbacksPage', () => {
   });
 
   it('opens and closes modal using Cancel button', async () => {
-    const mockData = [{ id: '1', userId: 'UserA', message: 'Test', status: 'PENDING', createdAt: '2023-01-01T12:00:00Z' }];
+    const mockData = [{ id: '1', userId: 'UserA', message: 'Test', status: 'PENDING', createdAt: '2023-01-01T12:00:00Z', updatedAt: '2023-01-01T12:00:00Z' }];
     vi.mocked(getFeedbacks).mockResolvedValue(mockData);
     render(<FeedbacksPage />);
 
@@ -105,7 +105,7 @@ describe('FeedbacksPage', () => {
   });
 
   it('submits reply correctly', async () => {
-    const mockData = [{ id: '1', userId: 'UserA', message: 'Need dark mode', status: 'PENDING', createdAt: '2023-01-01T12:00:00Z' }];
+    const mockData = [{ id: '1', userId: 'UserA', message: 'Need dark mode', status: 'PENDING', createdAt: '2023-01-01T12:00:00Z', updatedAt: '2023-01-01T12:00:00Z' }];
     vi.mocked(getFeedbacks).mockResolvedValue(mockData);
     vi.mocked(replyFeedback).mockResolvedValue();
 
@@ -130,7 +130,7 @@ describe('FeedbacksPage', () => {
   });
 
   it('prevents submission with empty message', async () => {
-    const mockData = [{ id: '1', userId: 'UserA', message: 'Need dark mode', status: 'PENDING', createdAt: '2023-01-01T12:00:00Z' }];
+    const mockData = [{ id: '1', userId: 'UserA', message: 'Need dark mode', status: 'PENDING', createdAt: '2023-01-01T12:00:00Z', updatedAt: '2023-01-01T12:00:00Z' }];
     vi.mocked(getFeedbacks).mockResolvedValue(mockData);
 
     render(<FeedbacksPage />);
@@ -145,7 +145,7 @@ describe('FeedbacksPage', () => {
   });
 
   it('handles reply failure', async () => {
-    const mockData = [{ id: '1', userId: 'UserA', message: 'Test', status: 'PENDING', createdAt: '2023-01-01T12:00:00Z' }];
+    const mockData = [{ id: '1', userId: 'UserA', message: 'Test', status: 'PENDING', createdAt: '2023-01-01T12:00:00Z', updatedAt: '2023-01-01T12:00:00Z' }];
     vi.mocked(getFeedbacks).mockResolvedValue(mockData);
     vi.mocked(replyFeedback).mockRejectedValue(new Error('Reply Error'));
 
@@ -167,7 +167,7 @@ describe('FeedbacksPage', () => {
   });
 
   it('shows replied message in readonly mode when status is REPLIED', async () => {
-    const mockData = [{ id: '1', userId: 'UserA', message: 'Bug', status: 'REPLIED', adminReply: 'Fixed bug', createdAt: '2023-01-01T12:00:00Z' }];
+    const mockData = [{ id: '1', userId: 'UserA', message: 'Bug', status: 'REPLIED', adminReply: 'Fixed bug', createdAt: '2023-01-01T12:00:00Z', updatedAt: '2023-01-01T12:00:00Z' }];
     vi.mocked(getFeedbacks).mockResolvedValue(mockData);
 
     render(<FeedbacksPage />);
