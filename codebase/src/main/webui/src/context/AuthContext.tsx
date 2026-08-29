@@ -50,7 +50,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
        if (storedUser) {
          setUser(JSON.parse(storedUser));
        } else {
-         const payload = JSON.parse(atob(token.split('.')[1]));
+         const base64Url = token.split('.')[1];
+         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+         const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+             return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+         }).join(''));
+         const payload = JSON.parse(jsonPayload);
          const rawName = payload.user_metadata?.full_name || payload.user_metadata?.name || payload.name;
          let displayName = rawName;
          if (!displayName && payload.email) {

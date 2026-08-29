@@ -159,7 +159,8 @@ export const SongsListPage: React.FC = () => {
                 onClick={() => setIsImportModalOpen(true)}
                 className="min-h-[40px] sm:min-h-[44px] px-3.5 sm:px-4 text-xs sm:text-sm "
               >
-                <span>{t('common.import', 'Importar')}</span>
+                <Download className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-1" />
+                <span className="hidden sm:inline">{t('common.import', 'Importar')}</span>
               </Button>
               <OnboardingTooltip tooltipId="add_song_btn">
                 <Button

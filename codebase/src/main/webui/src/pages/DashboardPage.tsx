@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { Button } from '../components/ui/Button';
 import { SearchBar } from '../components/search/SearchBar';
 import { MusicCard } from '../components/cards/MusicCard';
 import { SkeletonCard } from '../components/ui/SkeletonCard';
@@ -10,7 +11,7 @@ import { useToast } from '../context/ToastContext';
 import { UserMenu } from '../components/layout/UserMenu';
 import { EmptyState } from '../components/ui/EmptyState';
 import { EducationalEmptyState } from '../components/ui/EducationalEmptyState';
-import { Music } from 'lucide-react';
+import { Music, Download, Plus } from 'lucide-react';
 import { ShareSongModal } from '../components/modals/ShareSongModal';
 import { BrandLogo } from '../components/ui/BrandLogo';
 import { ImportSongModal } from '../components/modals/ImportSongModal';
@@ -141,12 +142,22 @@ export const DashboardPage: React.FC = () => {
           <SearchBar onSearch={setSearchQuery} />
         </div>
         <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-          <button
+          <Button
+            variant="secondary"
             onClick={() => setIsImportModalOpen(true)}
-            className="hidden sm:flex text-sm font-medium text-text-main bg-bg-main hover:bg-bg-hover px-3 py-1.5 rounded-md border border-border-main"
+            className="min-h-[40px] sm:min-h-[44px] px-3.5 sm:px-4 text-xs sm:text-sm"
           >
-            {t("common.import", "Importar")}
-          </button>
+            <Download className="w-4 h-4 sm:w-5 sm:h-5 mr-1" />
+            <span className="hidden sm:inline">{t("common.import", "Importar")}</span>
+          </Button>
+          <Button
+            onClick={() => navigate('/songs/new')}
+            variant="primary"
+            className="hidden sm:flex min-h-[40px] sm:min-h-[44px] px-3.5 sm:px-4 text-xs sm:text-sm"
+          >
+            <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-1" />
+            <span>{t('dashboard.addSong', 'Adicionar')}</span>
+          </Button>
           <UserMenu />
         </div>
       </header>

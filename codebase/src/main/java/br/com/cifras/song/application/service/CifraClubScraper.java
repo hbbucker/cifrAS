@@ -22,7 +22,7 @@ public class CifraClubScraper {
     ObjectMapper objectMapper;
 
     private static final Pattern NEXT_F_PATTERN = Pattern.compile("self\\.__next_f\\.push\\(\\[\\d+,\"(.*?)\"\\]\\)");
-    private static final Pattern PRE_PATTERN = Pattern.compile("<pre class=\"_crVx\"[^>]*>(.*?)</pre>", Pattern.DOTALL);
+    private static final Pattern PRE_PATTERN = Pattern.compile("<pre[^>]*>(.*?)</pre>", Pattern.DOTALL);
     private static final Pattern TAGS_PATTERN = Pattern.compile("<[^>]+>");
     private static final Pattern TITLE_PATTERN = Pattern.compile("<title>(.*?)</title>");
 
@@ -52,27 +52,8 @@ public class CifraClubScraper {
                 }
             }
 
-            Matcher m = NEXT_F_PATTERN.matcher(html);
-            StringBuilder sb = new StringBuilder();
-            while (m.find()) {
-                String chunk = m.group(1);
-                // Safe JSON unescaping using Jackson
-                try {
-                    String decoded = objectMapper.readValue("\"" + chunk + "\"", String.class);
-                    sb.append(decoded);
-                } catch (Exception e) {
-                    // Fallback to manual unescaping if Jackson fails
-                    chunk = chunk.replace("\\n", "\n")
-                                 .replace("\\u003c", "<")
-                                 .replace("\\u003e", ">")
-                                 .replace("\\\"", "\"")
-                                 .replace("\\\\", "\\");
-                    sb.append(chunk);
-                }
-            }
-
-            String full = sb.toString();
-            Matcher pre = PRE_PATTERN.matcher(full);
+            // removed useless __next_f logic
+            Matcher pre = PRE_PATTERN.matcher(html);
             LyricsStructure lyrics = LyricsStructure.empty();
             if (pre.find()) {
                 String content = pre.group(1);
