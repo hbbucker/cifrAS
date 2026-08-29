@@ -243,6 +243,7 @@ export const SongsListPage: React.FC = () => {
                   t('dashboard.educationalEmptyStep2'),
                   t('dashboard.educationalEmptyStep3')
                 ]}
+                secondaryAction={{ label: t("common.import", "Importar"), onClick: () => setIsImportModalOpen(true) }}
                 action={{ label: t('songsList.addFirstSong'), onClick: () => navigate('/songs/new') }}
               />
             ) : (
@@ -250,7 +251,6 @@ export const SongsListPage: React.FC = () => {
                 icon={Music}
                 title={t('dashboard.emptyTitle')}
                 description={t('songsList.emptyDesc')}
- secondaryAction={{ label: t("common.import", "Importar"), onClick: () => setIsImportModalOpen(true) }}
                 secondaryAction={{ label: t("common.import", "Importar"), onClick: () => setIsImportModalOpen(true) }}
                 action={{ label: t('songsList.addSong'), onClick: () => navigate('/songs/new') }}
               />
