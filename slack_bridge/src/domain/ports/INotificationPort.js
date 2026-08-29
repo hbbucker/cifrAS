@@ -19,6 +19,10 @@ class INotificationPort {
     throw new Error('INotificationPort.sendMilestoneNotification() must be implemented');
   }
 
+  async sendPrimaryResponse(threadId, channelId, agentRole, markdownText) {
+    throw new Error('INotificationPort.sendPrimaryResponse() must be implemented');
+  }
+
   async sendFinalConsolidation(threadId, channelId, agentRole, markdownText, filePaths = []) {
     throw new Error('INotificationPort.sendFinalConsolidation() must be implemented');
   }

@@ -111,21 +111,42 @@ class SlackDeliveryNotifier extends INotificationPort {
     });
   }
 
-  async sendFinalConsolidation(threadId, channelId, agentRole, markdownText, filePaths = []) {
+  async sendPrimaryResponse(threadId, channelId, agentRole, markdownText) {
     const queue = this._getQueue(threadId);
     
     const { filePaths: extractedFiles, markdown: cleanMarkdown } = this.formatter.extractLocalFiles(markdownText);
-    const allFiles = [...new Set([...(filePaths || []), ...extractedFiles])];
     
-    const header = `*${agentRole.formattedName} — consolidação*`;
+    const header = `*${agentRole.formattedName}*`;
     const formattedBody = this.formatter.format(cleanMarkdown);
     const fullMessage = `${header}\n\n${formattedBody}`;
+
+    return queue.add(async () => {
+      await this.setAssistantStatus(threadId, channelId, '');
+      await this._postMessageBlock(channelId, threadId, fullMessage);
+      await this._uploadFiles(channelId, threadId, extractedFiles);
+    });
+  }
+
+  async sendFinalConsolidation(threadId, channelId, agentRole, markdownText, filePaths = []) {
+    const queue = this._getQueue(threadId);
+    
+    const { filePaths: extractedFiles, markdown: cleanMarkdown } = this.formatter.extractLocalFiles(markdownText || '');
+    const allFiles = [...new Set([...(filePaths || []), ...extractedFiles])];
+    
+    const formattedBody = this.formatter.format(cleanMarkdown);
+    let fullMessage = '';
+    if (formattedBody.trim()) {
+      const header = `*${agentRole.formattedName} — consolidação*`;
+      fullMessage = `${header}\n\n${formattedBody}`;
+    }
 
     return queue.add(async () => {
       // Limpa status do Slack Assistant ao concluir
       await this.setAssistantStatus(threadId, channelId, '');
 
-      await this._postMessageBlock(channelId, threadId, fullMessage);
+      if (fullMessage) {
+        await this._postMessageBlock(channelId, threadId, fullMessage);
+      }
       await this._uploadFiles(channelId, threadId, allFiles);
     });
   }

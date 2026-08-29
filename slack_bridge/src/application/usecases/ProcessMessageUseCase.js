@@ -86,7 +86,14 @@ class ProcessMessageUseCase {
             session.addPublishedNarrative(`${role.name}:${sanitized}`);
             await this.sessionRepository.save(session);
 
-            await this.notificationGateway.sendMilestoneNotification(threadId, channelId, role, sanitized);
+            if (conversationId === session.sessionId) {
+              // Primary response from CEO (non-blocking)
+              this.notificationGateway.sendPrimaryResponse(threadId, channelId, role, sanitized).catch(err => {
+                if (global.logDebug) global.logDebug('Error sending primary response: ' + err.message);
+              });
+            } else {
+              await this.notificationGateway.sendMilestoneNotification(threadId, channelId, role, sanitized);
+            }
             break;
           }
 
@@ -120,7 +127,7 @@ class ProcessMessageUseCase {
           threadId,
           channelId,
           ceoRole,
-          finalResult.responseText,
+          isAlreadyPublished ? '' : finalResult.responseText,
           finalResult.filePaths || []
         );
       } else {
