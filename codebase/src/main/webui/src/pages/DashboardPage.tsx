@@ -13,6 +13,8 @@ import { EducationalEmptyState } from '../components/ui/EducationalEmptyState';
 import { Music } from 'lucide-react';
 import { ShareSongModal } from '../components/modals/ShareSongModal';
 import { BrandLogo } from '../components/ui/BrandLogo';
+import { ImportSongModal } from '../components/modals/ImportSongModal';
+import { importSong } from '../api/songs';
 
 interface SongData {
  id: string;
@@ -114,6 +116,16 @@ export const DashboardPage: React.FC = () => {
     .catch(() => toast('Error toggling favorite', 'error'));
   };
 
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const handleImport = async (url: string) => {
+    try {
+      const newSong = await importSong(url);
+      toast(t("songsList.importSuccess", "Música importada com sucesso!"), "success");
+      navigate(`/songs/${newSong.id}`);
+    } catch {
+      toast(t("songsList.importError", "Erro ao importar a música. Verifique a URL."), "error");
+    }
+  };
   const [sharingSong, setSharingSong] = useState<{ id: string; title: string } | null>(null);
 
   return (
@@ -129,6 +141,12 @@ export const DashboardPage: React.FC = () => {
           <SearchBar onSearch={setSearchQuery} />
         </div>
         <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+          <button
+            onClick={() => setIsImportModalOpen(true)}
+            className="hidden sm:flex text-sm font-medium text-text-main bg-bg-main hover:bg-bg-hover px-3 py-1.5 rounded-md border border-border-main"
+          >
+            {t("common.import", "Importar")}
+          </button>
           <UserMenu />
         </div>
       </header>
@@ -199,5 +217,10 @@ export const DashboardPage: React.FC = () => {
     />
   )}
   </div>
+      <ImportSongModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onImport={handleImport}
+      />
  );
 };
