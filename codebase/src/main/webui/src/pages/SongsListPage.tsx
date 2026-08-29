@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MusicCard } from '../components/cards/MusicCard';
-import { Filter, Plus, Music, X } from 'lucide-react';
+import { Filter, Plus, Music, X, Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
