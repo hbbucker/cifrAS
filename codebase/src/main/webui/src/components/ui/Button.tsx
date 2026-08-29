@@ -16,11 +16,11 @@ export const Button: React.FC<ButtonProps> = ({
  disabled,
  ...props
 }) => {
- const baseClasses = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none';
+ const baseClasses = 'inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none';
  
  const variantClasses = {
- primary: 'bg-[#8629cc] hover:bg-[#721eb8] text-white disabled:bg-[#8629cc]/50',
- secondary: 'bg-gray-100 hover:bg-gray-200 text-text-main disabled:opacity-50',
+ primary: 'bg-[#aa3bff] hover:bg-[#9226e6] text-white disabled:bg-[#aa3bff]/50 border border-transparent',
+ secondary: 'bg-bg-card hover:bg-bg-elevated text-text-main border border-border-main disabled:opacity-50',
  danger: 'bg-red-600 hover:bg-red-700 text-white disabled:bg-red-600/50',
  ghost: 'hover:bg-bg-elevated text-gray-700 disabled:opacity-50',
  };

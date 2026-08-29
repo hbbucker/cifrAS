@@ -168,8 +168,8 @@ export const SongsListPage: React.FC = () => {
                   data-testid="add-song-btn"
                   size="sm"
                 >
-                  <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-1" />
-                  <span>{t('songsList.addSong')}</span>
+                  <Plus className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-1" />
+                  <span className="hidden sm:inline">{t('songsList.addSong')}</span>
                 </Button>
               </OnboardingTooltip>
             </div>
