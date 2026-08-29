@@ -10,6 +10,10 @@ interface EducationalEmptyStateProps {
     label: string;
     onClick: () => void;
   };
+  secondaryAction?: {
+    label: string;
+    onClick: () => void;
+  };
   className?: string;
 }
 
@@ -18,6 +22,7 @@ export const EducationalEmptyState: React.FC<EducationalEmptyStateProps> = ({
   title,
   steps,
   action,
+  secondaryAction,
   className = '',
 }) => {
   return (
@@ -38,11 +43,18 @@ export const EducationalEmptyState: React.FC<EducationalEmptyStateProps> = ({
         ))}
       </div>
 
-      {action && (
-        <Button onClick={action.onClick} variant="primary" className="px-8 py-3 text-base shadow-lg shadow-[#8629cc]/30 animate-bounce">
-          {action.label}
-        </Button>
-      )}
+      <div className="flex gap-4">
+        {secondaryAction && (
+          <Button onClick={secondaryAction.onClick} variant="secondary" className="px-8 py-3 text-base">
+            {secondaryAction.label}
+          </Button>
+        )}
+        {action && (
+          <Button onClick={action.onClick} variant="primary" className="px-8 py-3 text-base shadow-lg shadow-[#8629cc]/30 animate-bounce">
+            {action.label}
+          </Button>
+        )}
+      </div>
     </div>
   );
 };

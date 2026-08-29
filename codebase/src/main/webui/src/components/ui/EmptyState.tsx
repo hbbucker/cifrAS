@@ -10,6 +10,10 @@ interface EmptyStateProps {
  label: string;
  onClick: () => void;
  };
+ secondaryAction?: {
+ label: string;
+ onClick: () => void;
+ };
  className?: string;
 }
 
@@ -18,6 +22,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
  title,
  description,
  action,
+ secondaryAction,
  className = '',
 }) => {
  return (
@@ -27,11 +32,18 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
  </div>
  <h3 className="text-lg font-bold text-text-main mb-2">{title}</h3>
  <p className="text-text-mute max-w-sm mb-6">{description}</p>
+ <div className="flex gap-3">
+ {secondaryAction && (
+ <Button onClick={secondaryAction.onClick} variant="secondary">
+ {secondaryAction.label}
+ </Button>
+ )}
  {action && (
  <Button onClick={action.onClick} variant="primary">
  {action.label}
  </Button>
  )}
+ </div>
  </div>
  );
 };

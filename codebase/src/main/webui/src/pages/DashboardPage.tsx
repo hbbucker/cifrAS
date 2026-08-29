@@ -197,6 +197,7 @@ export const DashboardPage: React.FC = () => {
      t('dashboard.educationalEmptyStep2'),
      t('dashboard.educationalEmptyStep3')
    ]}
+ secondaryAction={{ label: t("common.import", "Importar"), onClick: () => setIsImportModalOpen(true) }}
    action={{ label: t('dashboard.addSong'), onClick: () => navigate('/songs/new') }}
  />
  ) : (
@@ -204,6 +205,7 @@ export const DashboardPage: React.FC = () => {
  icon={Music}
  title={t('dashboard.emptyTitle')}
  description={t('dashboard.emptyDesc')}
+ secondaryAction={{ label: t("common.import", "Importar"), onClick: () => setIsImportModalOpen(true) }}
  action={{ label: t('dashboard.addSong'), onClick: () => navigate('/songs/new') }}
  />
  )}
