@@ -8,6 +8,7 @@ import br.com.cifras.song.model.Song;
 import br.com.cifras.song.dto.*;
 import br.com.cifras.song.application.usecase.ListUserSongsUseCase;
 import br.com.cifras.song.application.usecase.CreateSongUseCase;
+import br.com.cifras.song.application.usecase.ImportSongUseCase;
 import br.com.cifras.song.application.usecase.GetSongUseCase;
 import br.com.cifras.song.application.usecase.GetUserTagsUseCase;
 import br.com.cifras.song.application.usecase.UpdateSongUseCase;
@@ -44,6 +45,9 @@ public class SongResource {
 
     @Inject
     GetUserTagsUseCase getUserTagsUseCase;
+
+    @Inject
+    ImportSongUseCase importSongUseCase;
 
     @Inject
     CreateSongUseCase createSongUseCase;
@@ -102,6 +106,14 @@ public class SongResource {
         String userId = securityUtils.getCurrentUserId();
         List<TagCountDTO> tagCounts = getUserTagsUseCase.execute(userId);
         return Response.ok(tagCounts).build();
+    }
+
+    @POST
+    @Path("/import")
+    public Response importSong(@Valid br.com.cifras.song.dto.ImportSongRequest request) {
+        String userId = securityUtils.getCurrentUserId();
+        Song song = importSongUseCase.execute(request.url(), userId);
+        return Response.status(Response.Status.CREATED).entity(SongDTO.from(song)).build();
     }
 
     @POST

@@ -18,11 +18,10 @@ test('NarrativeSanitizerService: sanitizes secrets and raw commands', () => {
   const humanText = 'Andamento: analisei o código e preparei o plano de migração.';
   assert.equal(sanitizer.sanitize(humanText), humanText);
 
-  // Trunca textos excessivamente longos
+  // Permite textos longos passarem inteiros (a divisão é responsabilidade do Formatter)
   const longText = 'A'.repeat(3500);
   const sanitizedLong = sanitizer.sanitize(longText);
-  assert.ok(sanitizedLong.length <= 3000);
-  assert.ok(sanitizedLong.includes('(texto truncado pelo limite do Slack)'));
+  assert.equal(sanitizedLong.length, 3500);
 });
 
 test('NarrativeSanitizerService: handles anti-echo duplicates', () => {

@@ -26,9 +26,8 @@ test('SlackMrkdwnFormatter: splitMarkdownForSlack splits large blocks cleanly', 
   const hugeChunks = formatter.splitMarkdownForSlack(hugeWord);
   assert.ok(hugeChunks.length >= 2);
 
-  // Bloco de código gigante que excede o limite (deve lançar erro tratado)
-  const hugeCodeBlock = '```bash\n' + 'echo test;\n'.repeat(2000) + '```';
-  assert.throws(() => {
-    formatter.splitMarkdownForSlack(hugeCodeBlock);
-  }, /code block exceeds Slack Markdown limit/);
+  // Bloco de código gigante que excede o limite (agora é dividido em chunks)
+  const hugeCodeBlock = '```bash\n' + 'echo test;\n'.repeat(1000) + '```';
+  const hugeCodeChunks = formatter.splitMarkdownForSlack(hugeCodeBlock);
+  assert.ok(hugeCodeChunks.length >= 2);
 });

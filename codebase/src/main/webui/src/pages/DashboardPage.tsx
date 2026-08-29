@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { Button } from '../components/ui/Button';
 import { SearchBar } from '../components/search/SearchBar';
 import { MusicCard } from '../components/cards/MusicCard';
 import { SkeletonCard } from '../components/ui/SkeletonCard';
@@ -10,9 +11,11 @@ import { useToast } from '../context/ToastContext';
 import { UserMenu } from '../components/layout/UserMenu';
 import { EmptyState } from '../components/ui/EmptyState';
 import { EducationalEmptyState } from '../components/ui/EducationalEmptyState';
-import { Music } from 'lucide-react';
+import { Music, Download, Plus } from 'lucide-react';
 import { ShareSongModal } from '../components/modals/ShareSongModal';
 import { BrandLogo } from '../components/ui/BrandLogo';
+import { ImportSongModal } from '../components/modals/ImportSongModal';
+import { importSong } from '../api/songs';
 
 interface SongData {
  id: string;
@@ -114,22 +117,56 @@ export const DashboardPage: React.FC = () => {
     .catch(() => toast('Error toggling favorite', 'error'));
   };
 
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const handleImport = async (url: string) => {
+    try {
+      const newSong = await importSong(url);
+      toast(t("songsList.importSuccess", "Música importada com sucesso!"), "success");
+      navigate(`/songs/${newSong.id}`);
+    } catch {
+      toast(t("songsList.importError", "Erro ao importar a música. Verifique a URL."), "error");
+    }
+  };
   const [sharingSong, setSharingSong] = useState<{ id: string; title: string } | null>(null);
 
   return (
     <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
-      <header className="relative z-20 min-h-[52px] sm:min-h-[64px] flex items-center justify-between px-3.5 sm:px-6 bg-bg-card/95 backdrop-blur border-b border-border-main gap-2 sm:gap-4 shrink-0" role="banner">
-        <div className="flex items-center gap-3 shrink-0">
-          <div className="sm:hidden">
-            <BrandLogo size="sm" asLink to="/dashboard" />
+      <header className="relative z-20 bg-bg-card/95 backdrop-blur border-b border-border-main shrink-0" role="banner">
+        <div className="min-h-[52px] sm:min-h-[64px] flex items-center justify-between px-3.5 sm:px-6 gap-2 sm:gap-4">
+          <div className="flex items-center gap-3 shrink-0">
+            <div className="sm:hidden">
+              <BrandLogo size="sm" asLink to="/dashboard" />
+            </div>
+            <h1 className="text-xl font-bold text-text-main hidden sm:block">{t('dashboard.title')}</h1>
           </div>
-          <h1 className="text-xl font-bold text-text-main hidden sm:block">{t('dashboard.title')}</h1>
+          
+          <div className="hidden sm:block flex-1 min-w-0 sm:ml-4 max-w-xl">
+            <SearchBar onSearch={setSearchQuery} />
+          </div>
+
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+            <Button
+              variant="secondary"
+              onClick={() => setIsImportModalOpen(true)}
+              size="sm"
+            >
+              <Download className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-1" />
+              <span className="hidden sm:inline">{t("common.import", "Importar")}</span>
+            </Button>
+            <Button
+              onClick={() => navigate('/songs/new')}
+              variant="primary"
+              size="sm"
+            >
+              <Plus className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-1" />
+              <span className="hidden sm:inline">{t('dashboard.addSong', 'Adicionar')}</span>
+            </Button>
+            <UserMenu />
+          </div>
         </div>
-        <div className="flex-1 min-w-0 sm:ml-4 max-w-xl">
+
+        <div className="sm:hidden px-3.5 pb-3 pt-0">
           <SearchBar onSearch={setSearchQuery} />
-        </div>
-        <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-          <UserMenu />
         </div>
       </header>
 
@@ -179,6 +216,7 @@ export const DashboardPage: React.FC = () => {
      t('dashboard.educationalEmptyStep2'),
      t('dashboard.educationalEmptyStep3')
    ]}
+ secondaryAction={{ label: t("common.import", "Importar"), onClick: () => setIsImportModalOpen(true) }}
    action={{ label: t('dashboard.addSong'), onClick: () => navigate('/songs/new') }}
  />
  ) : (
@@ -186,6 +224,7 @@ export const DashboardPage: React.FC = () => {
  icon={Music}
  title={t('dashboard.emptyTitle')}
  description={t('dashboard.emptyDesc')}
+ secondaryAction={{ label: t("common.import", "Importar"), onClick: () => setIsImportModalOpen(true) }}
  action={{ label: t('dashboard.addSong'), onClick: () => navigate('/songs/new') }}
  />
  )}
@@ -198,6 +237,11 @@ export const DashboardPage: React.FC = () => {
       onClose={() => setSharingSong(null)}
     />
   )}
-  </div>
- );
+  <ImportSongModal
+    isOpen={isImportModalOpen}
+    onClose={() => setIsImportModalOpen(false)}
+    onImport={handleImport}
+  />
+</div>
+);
 };

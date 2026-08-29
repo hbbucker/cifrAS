@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MusicCard } from '../components/cards/MusicCard';
-import { Filter, Plus, Music, X } from 'lucide-react';
+import { Filter, Plus, Music, X, Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -15,6 +15,8 @@ import { useRef } from 'react';
 import { getSongs, getUserTags } from '../api/songs';
 import type { SongData, TagCount } from '../api/songs';
 import { ShareSongModal } from '../components/modals/ShareSongModal';
+import { ImportSongModal } from '../components/modals/ImportSongModal';
+import { importSong } from '../api/songs';
 import { BrandLogo } from '../components/ui/BrandLogo';
 import { TagFilterBar } from '../components/ui/TagFilterBar';
 
@@ -32,7 +34,18 @@ export const SongsListPage: React.FC = () => {
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const handleImport = async (url: string) => {
+    try {
+      const newSong = await importSong(url);
+      toast(t('songsList.importSuccess', 'Música importada com sucesso!'), 'success');
+      navigate(`/songs/${newSong.id}`);
+    } catch {
+      toast(t('songsList.importError', 'Erro ao importar a música. Verifique a URL e tente novamente.'), 'error');
+    }
+  };
 
   useEffect(() => {
     getUserTags()
@@ -140,16 +153,26 @@ export const SongsListPage: React.FC = () => {
               <BrandLogo iconOnly size="sm" asLink to="/dashboard" className="sm:hidden shrink-0" />
               <h1 className="text-lg sm:text-xl font-bold text-text-main truncate">{t('songsList.title')}</h1>
             </div>
-            <OnboardingTooltip tooltipId="add_song_btn">
+            <div className="flex gap-2">
               <Button
-                onClick={() => navigate('/songs/new')}
-                data-testid="add-song-btn"
-                className="min-h-[40px] sm:min-h-[44px] px-3.5 sm:px-4 text-xs sm:text-sm"
+                variant="secondary"
+                onClick={() => setIsImportModalOpen(true)}
+                size="sm"
               >
-                <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-1" />
-                <span>{t('songsList.addSong')}</span>
+                <Download className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-1" />
+                <span className="hidden sm:inline">{t('common.import', 'Importar')}</span>
               </Button>
-            </OnboardingTooltip>
+              <OnboardingTooltip tooltipId="add_song_btn">
+                <Button
+                  onClick={() => navigate('/songs/new')}
+                  data-testid="add-song-btn"
+                  size="sm"
+                >
+                  <Plus className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-1" />
+                  <span className="hidden sm:inline">{t('songsList.addSong')}</span>
+                </Button>
+              </OnboardingTooltip>
+            </div>
           </div>
 
           <div className="px-3.5 sm:px-6 pb-3 pt-0 flex flex-col gap-2.5 sm:gap-3">
@@ -221,6 +244,7 @@ export const SongsListPage: React.FC = () => {
                   t('dashboard.educationalEmptyStep2'),
                   t('dashboard.educationalEmptyStep3')
                 ]}
+                secondaryAction={{ label: t("common.import", "Importar"), onClick: () => setIsImportModalOpen(true) }}
                 action={{ label: t('songsList.addFirstSong'), onClick: () => navigate('/songs/new') }}
               />
             ) : (
@@ -228,6 +252,7 @@ export const SongsListPage: React.FC = () => {
                 icon={Music}
                 title={t('dashboard.emptyTitle')}
                 description={t('songsList.emptyDesc')}
+                secondaryAction={{ label: t("common.import", "Importar"), onClick: () => setIsImportModalOpen(true) }}
                 action={{ label: t('songsList.addSong'), onClick: () => navigate('/songs/new') }}
               />
             )
@@ -256,6 +281,11 @@ export const SongsListPage: React.FC = () => {
           onClose={() => setSharingSong(null)}
         />
       )}
+      <ImportSongModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onImport={handleImport}
+      />
     </>
   );
 };

@@ -98,19 +98,27 @@ class SlackDeliveryNotifier extends INotificationPort {
 
   async sendMilestoneNotification(threadId, channelId, agentRole, markdownText) {
     const queue = this._getQueue(threadId);
+    
+    const { filePaths: extractedFiles, markdown: cleanMarkdown } = this.formatter.extractLocalFiles(markdownText);
+    
     const header = `*${agentRole.formattedName} — marco concluído*`;
-    const formattedBody = this.formatter.format(markdownText);
+    const formattedBody = this.formatter.format(cleanMarkdown);
     const fullMessage = `${header}\n\n${formattedBody}`;
 
     return queue.add(async () => {
       await this._postMessageBlock(channelId, threadId, fullMessage);
+      await this._uploadFiles(channelId, threadId, extractedFiles);
     });
   }
 
   async sendFinalConsolidation(threadId, channelId, agentRole, markdownText, filePaths = []) {
     const queue = this._getQueue(threadId);
+    
+    const { filePaths: extractedFiles, markdown: cleanMarkdown } = this.formatter.extractLocalFiles(markdownText);
+    const allFiles = [...new Set([...(filePaths || []), ...extractedFiles])];
+    
     const header = `*${agentRole.formattedName} — consolidação*`;
-    const formattedBody = this.formatter.format(markdownText);
+    const formattedBody = this.formatter.format(cleanMarkdown);
     const fullMessage = `${header}\n\n${formattedBody}`;
 
     return queue.add(async () => {
@@ -118,22 +126,25 @@ class SlackDeliveryNotifier extends INotificationPort {
       await this.setAssistantStatus(threadId, channelId, '');
 
       await this._postMessageBlock(channelId, threadId, fullMessage);
-
-      // Upload de arquivos
-      for (const filePath of filePaths) {
-        if (!fs.existsSync(filePath)) continue;
-        try {
-          await this.client.files.uploadV2({
-            channel_id: channelId,
-            thread_ts: threadId,
-            file: fs.createReadStream(filePath),
-            filename: path.basename(filePath),
-          });
-        } catch (err) {
-          if (global.logDebug) global.logDebug('file_upload_failed');
-        }
-      }
+      await this._uploadFiles(channelId, threadId, allFiles);
     });
+  }
+
+  async _uploadFiles(channelId, threadId, filePaths) {
+    if (!filePaths || filePaths.length === 0) return;
+    for (const filePath of filePaths) {
+      if (!fs.existsSync(filePath)) continue;
+      try {
+        await this.client.files.uploadV2({
+          channel_id: channelId,
+          thread_ts: threadId,
+          file: fs.createReadStream(filePath),
+          filename: path.basename(filePath),
+        });
+      } catch (err) {
+        if (global.logDebug) global.logDebug('file_upload_failed');
+      }
+    }
   }
 
   async sendErrorMessage(threadId, channelId, errorText) {

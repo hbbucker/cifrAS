@@ -2,7 +2,9 @@
   "common": {
     "cancel": "Cancelar",
     "save": "Salvar",
-    "confirm": "Confirmar"
+    "confirm": "Confirmar",
+    "import": "Importar",
+    "loading": "Carregando..."
   },
   "sidebar": {
     "home": "Início",
@@ -90,7 +92,11 @@
     "clearSearch": "Limpar busca",
     "songsCount": "músicas",
     "emptyDesc": "Seu repertório está vazio. Comece adicionando músicas.",
-    "addFirstSong": "Adicionar Primeira Música"
+    "addFirstSong": "Adicionar Primeira Música",
+    "importTitle": "Importar do CifraClub",
+    "importDesc": "Cole o link de uma música do CifraClub para importá-la diretamente para o seu repertório.",
+    "importSuccess": "Música importada com sucesso!",
+    "importError": "Erro ao importar a música. Verifique a URL."
   },
   "landing": {
     "getStarted": "Comece de Graça",

@@ -54,3 +54,7 @@ export const getUserTags = async (): Promise<TagCount[]> => {
   const response = await apiClient.get('/songs/tags');
   return response.data || [];
 };
+export const importSong = async (url: string): Promise<SongData> => {
+  const response = await apiClient.post<SongData>('/songs/import', { url });
+  return response.data;
+};

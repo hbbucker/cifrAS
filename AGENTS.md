@@ -382,6 +382,10 @@ O papel de **QA Lead** é estritamente **read-only**:
 
 Podem executar código, escrever arquivos e usar ferramentas de implementação, mas **não podem** validar seu próprio trabalho.
 
+### 3.3 Bots Autônomos e Wrappers (CLI)
+
+Qualquer ponte, integração (como `slack_bridge`) ou wrapper que invoque a CLI do AGY de forma autônoma e silenciosa para operar em background **deve** usar a flag `--sandbox` em sua matriz de argumentos. Essa restrição de segurança no terminal garante que, embora o bot possua privilégios para atuar nos arquivos (`--dangerously-skip-permissions`), ele estará operando sob barreiras controladas em relação a comandos de shell perigosos.
+
 ---
 
 ## 4. Workflow de Governança
