@@ -146,6 +146,7 @@ export const DashboardPage: React.FC = () => {
             variant="secondary"
             onClick={() => setIsImportModalOpen(true)}
             size="sm"
+            className="hidden sm:flex"
           >
             <Download className="w-4 h-4 sm:w-5 sm:h-5 mr-1" />
             <span className="hidden sm:inline">{t("common.import", "Importar")}</span>
