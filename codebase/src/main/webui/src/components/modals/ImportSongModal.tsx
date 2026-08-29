@@ -1,20 +1,23 @@
 import React, { useState } from 'react';
 import { X, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from '../../context/ToastContext';
 import { Button } from '../ui/Button';
+import { importSong } from '../../api/songs';
 
 interface ImportSongModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onImport: (url: string) => Promise<void>;
 }
 
 export const ImportSongModal: React.FC<ImportSongModalProps> = ({
   isOpen,
   onClose,
-  onImport,
 }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -26,9 +29,13 @@ export const ImportSongModal: React.FC<ImportSongModalProps> = ({
     
     setLoading(true);
     try {
-      await onImport(url);
+      const newSong = await importSong(url);
       setUrl('');
       onClose();
+      toast(t('songsList.importSuccess', 'Música importada com sucesso!'), 'success');
+      navigate(`/songs/edit/${newSong.id}`);
+    } catch {
+      toast(t('songsList.importError', 'Erro ao importar a música. Verifique a URL e tente novamente.'), 'error');
     } finally {
       setLoading(false);
     }

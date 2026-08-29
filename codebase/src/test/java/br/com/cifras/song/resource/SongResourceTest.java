@@ -241,4 +241,24 @@ class SongResourceTest extends BaseIntegrationTest {
             .body("find { it.name == 'Rock' }.count", equalTo(1))
             .body("find { it.name == 'Gospel' }.count", equalTo(1));
     }
+
+    /**
+     * Test 9: POST /songs/import
+     */
+    @Test
+    @TestSecurity(user = OWNER, roles = {"user"})
+    void givenValidImportRequest_whenImport_thenReturns201WithSongDTOId() {
+        io.restassured.response.Response res = given()
+            .contentType(ContentType.JSON)
+            .body("""
+                {"url":"https://www.cifraclub.com.br/julliany-souza/ah-jesus-coracao-igual-ao-teu/"}
+                """)
+            .when().post("/songs/import");
+            
+        System.out.println("RESPONSE BODY: " + res.getBody().asString());
+            
+        res.then()
+            .statusCode(201)
+            .body("id", notNullValue());
+    }
 }
