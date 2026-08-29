@@ -131,35 +131,42 @@ export const DashboardPage: React.FC = () => {
 
   return (
     <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
-      <header className="relative z-20 min-h-[52px] sm:min-h-[64px] flex items-center justify-between px-3.5 sm:px-6 bg-bg-card/95 backdrop-blur border-b border-border-main gap-2 sm:gap-4 shrink-0" role="banner">
-        <div className="flex items-center gap-3 shrink-0">
-          <div className="sm:hidden">
-            <BrandLogo size="sm" asLink to="/dashboard" />
+      <header className="relative z-20 bg-bg-card/95 backdrop-blur border-b border-border-main shrink-0" role="banner">
+        <div className="min-h-[52px] sm:min-h-[64px] flex items-center justify-between px-3.5 sm:px-6 gap-2 sm:gap-4">
+          <div className="flex items-center gap-3 shrink-0">
+            <div className="sm:hidden">
+              <BrandLogo size="sm" asLink to="/dashboard" />
+            </div>
+            <h1 className="text-xl font-bold text-text-main hidden sm:block">{t('dashboard.title')}</h1>
           </div>
-          <h1 className="text-xl font-bold text-text-main hidden sm:block">{t('dashboard.title')}</h1>
+          
+          <div className="hidden sm:block flex-1 min-w-0 sm:ml-4 max-w-xl">
+            <SearchBar onSearch={setSearchQuery} />
+          </div>
+
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+            <Button
+              variant="secondary"
+              onClick={() => setIsImportModalOpen(true)}
+              size="sm"
+            >
+              <Download className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-1" />
+              <span className="hidden sm:inline">{t("common.import", "Importar")}</span>
+            </Button>
+            <Button
+              onClick={() => navigate('/songs/new')}
+              variant="primary"
+              size="sm"
+            >
+              <Plus className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-1" />
+              <span className="hidden sm:inline">{t('dashboard.addSong', 'Adicionar')}</span>
+            </Button>
+            <UserMenu />
+          </div>
         </div>
-        <div className="flex-1 min-w-0 sm:ml-4 max-w-xl">
+
+        <div className="sm:hidden px-3.5 pb-3 pt-0">
           <SearchBar onSearch={setSearchQuery} />
-        </div>
-        <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-          <Button
-            variant="secondary"
-            onClick={() => setIsImportModalOpen(true)}
-            size="sm"
-            className="hidden sm:flex"
-          >
-            <Download className="w-4 h-4 sm:w-5 sm:h-5 mr-1" />
-            <span className="hidden sm:inline">{t("common.import", "Importar")}</span>
-          </Button>
-          <Button
-            onClick={() => navigate('/songs/new')}
-            variant="primary"
-            size="sm" className="hidden sm:flex"
-          >
-            <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-1" />
-            <span>{t('dashboard.addSong', 'Adicionar')}</span>
-          </Button>
-          <UserMenu />
         </div>
       </header>
 
