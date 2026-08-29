@@ -216,11 +216,11 @@ export const DashboardPage: React.FC = () => {
       onClose={() => setSharingSong(null)}
     />
   )}
-  </div>
-      <ImportSongModal
-        isOpen={isImportModalOpen}
-        onClose={() => setIsImportModalOpen(false)}
-        onImport={handleImport}
-      />
- );
+  <ImportSongModal
+    isOpen={isImportModalOpen}
+    onClose={() => setIsImportModalOpen(false)}
+    onImport={handleImport}
+  />
+</div>
+);
 };
