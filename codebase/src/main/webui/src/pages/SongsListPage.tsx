@@ -157,7 +157,7 @@ export const SongsListPage: React.FC = () => {
               <Button
                 variant="secondary"
                 onClick={() => setIsImportModalOpen(true)}
-                className="min-h-[40px] sm:min-h-[44px] px-3.5 sm:px-4 text-xs sm:text-sm "
+                size="sm"
               >
                 <Download className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-1" />
                 <span className="hidden sm:inline">{t('common.import', 'Importar')}</span>
@@ -166,7 +166,7 @@ export const SongsListPage: React.FC = () => {
                 <Button
                   onClick={() => navigate('/songs/new')}
                   data-testid="add-song-btn"
-                  className="min-h-[40px] sm:min-h-[44px] px-3.5 sm:px-4 text-xs sm:text-sm"
+                  size="sm"
                 >
                   <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-1" />
                   <span>{t('songsList.addSong')}</span>

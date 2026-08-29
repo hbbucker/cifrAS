@@ -2,7 +2,9 @@
   "common": {
     "cancel": "Cancel",
     "save": "Save",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "import": "Import",
+    "loading": "Loading..."
   },
   "sidebar": {
     "home": "Home",
@@ -90,7 +92,11 @@
     "clearSearch": "Clear search",
     "songsCount": "songs",
     "emptyDesc": "Your repertoire is empty. Start adding songs to build your library.",
-    "addFirstSong": "Add First Song"
+    "addFirstSong": "Add First Song",
+    "importTitle": "Import from CifraClub",
+    "importDesc": "Paste a CifraClub song link to import it directly to your repertoire.",
+    "importSuccess": "Song imported successfully!",
+    "importError": "Error importing song. Check the URL."
   },
   "landing": {
     "getStarted": "Get Started for Free",
