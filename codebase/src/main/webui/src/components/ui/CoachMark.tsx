@@ -38,13 +38,13 @@ export const CoachMark: React.FC<CoachMarkProps> = ({
 
   return (
     <div className="relative inline-block">
-      <div className="relative z-10 ring-4 ring-[#8629cc]/40 ring-offset-2 ring-offset-bg-main rounded-md animate-pulse">
+      <div className="relative z-10 ring-4 ring-[#aa3bff]/40 ring-offset-2 ring-offset-bg-main rounded-md animate-pulse">
         {children}
       </div>
 
       <div className={`absolute w-64 z-50 animate-in fade-in zoom-in-95 duration-300 ${positionClasses[position]}`}>
-        <div className="relative bg-[#8629cc] text-white p-4 rounded-xl shadow-xl shadow-[#8629cc]/20">
-          <div className={`absolute w-4 h-4 bg-[#8629cc] rotate-45 ${arrowClasses[position]}`} />
+        <div className="relative bg-[#aa3bff] text-white p-4 rounded-md">
+          <div className={`absolute w-4 h-4 bg-[#aa3bff] rotate-45 ${arrowClasses[position]}`} />
           
           <div className="relative flex justify-between items-start mb-2">
             <h4 className="font-bold text-sm leading-tight pr-4">{title}</h4>
@@ -55,7 +55,7 @@ export const CoachMark: React.FC<CoachMarkProps> = ({
           <p className="text-sm text-white/90 mb-3">{description}</p>
           <button 
             onClick={endTour}
-            className="text-xs font-bold bg-white text-[#8629cc] hover:bg-white/90 px-4 py-2 rounded-lg transition-colors w-full"
+            className="text-xs font-bold bg-white text-[#aa3bff] hover:bg-white/90 px-4 py-2 rounded-md transition-colors w-full"
           >
             Entendi
           </button>
