@@ -15,6 +15,8 @@ import { Music, Download, Plus } from 'lucide-react';
 import { ShareSongModal } from '../components/modals/ShareSongModal';
 import { BrandLogo } from '../components/ui/BrandLogo';
 import { ImportSongModal } from '../components/modals/ImportSongModal';
+import { CoachMark } from '../components/ui/CoachMark';
+import { useTour } from '../context/TourContext';
 
 interface SongData {
  id: string;
@@ -36,6 +38,14 @@ export const DashboardPage: React.FC = () => {
  const [songs, setSongs] = useState<SongData[]>([]);
  const [totalSongsCount, setTotalSongsCount] = useState(0);
  const [searchQuery, setSearchQuery] = useState('');
+ const { startTour } = useTour();
+
+ useEffect(() => {
+   const timer = setTimeout(() => {
+     startTour('import-cifraclub');
+   }, 1000);
+   return () => clearTimeout(timer);
+ }, [startTour]);
 
  useEffect(() => {
  // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -135,14 +145,21 @@ export const DashboardPage: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-            <Button
-              variant="secondary"
-              onClick={() => setIsImportModalOpen(true)}
-              size="sm"
+            <CoachMark
+              tourId="import-cifraclub"
+              title={t('songsList.importTitle', 'Importar do CifraClub')}
+              description={t('songsList.importDesc', 'Cole o link de uma música do CifraClub para importá-la diretamente para o seu repertório.')}
+              position="bottom"
             >
-              <Download className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-1" />
-              <span className="hidden sm:inline">{t("common.import", "Importar")}</span>
-            </Button>
+              <Button
+                variant="secondary"
+                onClick={() => setIsImportModalOpen(true)}
+                size="sm"
+              >
+                <Download className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-1" />
+                <span className="hidden sm:inline">{t("common.import", "Importar")}</span>
+              </Button>
+            </CoachMark>
             <Button
               onClick={() => navigate('/songs/new')}
               variant="primary"
