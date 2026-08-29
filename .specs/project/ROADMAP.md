@@ -30,6 +30,7 @@
 - [x] `TRANSP-03` — Persistência de tom preferido por usuário/música
 - [x] `FE-GROUP-01` / `FE-COLLAB-01` — UI de grupos e playlists colaborativas
 - [x] `FE-FAV-01` — Sistema de favoritos
+- [x] `FE-IMPORT-01` — Importação automática do CifraClub (Web Scraper + UI)
 - [ ] Acessibilidade: auditoria WCAG 2.1 AA completa
 - [ ] Performance: LCP < 3s (Lighthouse) + p95 < 300ms no backend
 
