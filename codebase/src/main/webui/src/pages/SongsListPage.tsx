@@ -16,7 +16,6 @@ import { getSongs, getUserTags } from '../api/songs';
 import type { SongData, TagCount } from '../api/songs';
 import { ShareSongModal } from '../components/modals/ShareSongModal';
 import { ImportSongModal } from '../components/modals/ImportSongModal';
-import { importSong } from '../api/songs';
 import { BrandLogo } from '../components/ui/BrandLogo';
 import { TagFilterBar } from '../components/ui/TagFilterBar';
 
@@ -37,15 +36,7 @@ export const SongsListPage: React.FC = () => {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const handleImport = async (url: string) => {
-    try {
-      const newSong = await importSong(url);
-      toast(t('songsList.importSuccess', 'Música importada com sucesso!'), 'success');
-      navigate(`/songs/${newSong.id}`);
-    } catch {
-      toast(t('songsList.importError', 'Erro ao importar a música. Verifique a URL e tente novamente.'), 'error');
-    }
-  };
+
 
   useEffect(() => {
     getUserTags()
@@ -284,7 +275,6 @@ export const SongsListPage: React.FC = () => {
       <ImportSongModal
         isOpen={isImportModalOpen}
         onClose={() => setIsImportModalOpen(false)}
-        onImport={handleImport}
       />
     </>
   );
