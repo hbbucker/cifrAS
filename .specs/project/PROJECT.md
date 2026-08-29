@@ -28,6 +28,7 @@ O projeto roda com dois projetos isolados (`codebase/` para o app principal e `c
 **Frontend (React):**
 - Framework: React 19 + TypeScript
 - Build/Server: Vite (integrado via Quinoa em `src/main/webui`)
+- Padrão Arquitetural: Vertical Slice Architecture (Separação rigida por domínio), aplicando Smart Componente (Reaproveitamento de componentes)
 - Estilização: TailwindCSS
 - Gerenciamento de Estado: Context API (v1), Zustand (se necessário)
 - HTTP Client: Axios

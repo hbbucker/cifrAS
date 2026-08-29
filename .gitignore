@@ -42,3 +42,7 @@ codebase/src/main/webui/playwright-report/**
 
 slack_bridge/downloads/**
 slack_bridge/mock_brain*/**
+codebase/src/main/webui/playwright-report/index.html
+.serena/
+fix_*.js
+slack_bridge/thread_mapping.json
