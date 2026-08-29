@@ -1,6 +1,6 @@
 const path = require('node:path');
 
-const SLACK_MARKDOWN_LIMIT = 11_500;
+const SLACK_MARKDOWN_LIMIT = 2900;
 
 class SlackMrkdwnFormatter {
   format(text) {
@@ -55,12 +55,10 @@ class SlackMrkdwnFormatter {
     let currentChunk = '';
 
     for (const block of blocks) {
-      if (block.length > SLACK_MARKDOWN_LIMIT && /^```/.test(block)) {
-        throw new Error('code block exceeds Slack Markdown limit');
-      }
       if (block.length > SLACK_MARKDOWN_LIMIT) {
-        // Divide o bloco por palavras ou quebra direta de caracteres
+        // Divide o bloco por quebra direta de caracteres, respeitando o limite
         let remaining = block;
+        let isCodeBlock = /^```/.test(block);
         while (remaining.length > 0) {
           const slice = remaining.slice(0, SLACK_MARKDOWN_LIMIT);
           remaining = remaining.slice(SLACK_MARKDOWN_LIMIT);

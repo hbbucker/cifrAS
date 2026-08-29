@@ -43,6 +43,7 @@ test('AntigravityEngineAdapter: buildCliArgs generates correct flag array with a
     '--add-dir', '/path/to/project',
     '--print-timeout', '1h',
     '--dangerously-skip-permissions',
+    '--sandbox',
     '--output-format', 'stream-json',
   ]);
 
@@ -57,6 +58,7 @@ test('AntigravityEngineAdapter: buildCliArgs generates correct flag array with a
     '--conversation', 'session-xyz-123',
     '--print-timeout', '1h',
     '--dangerously-skip-permissions',
+    '--sandbox',
     '--output-format', 'stream-json',
   ]);
 });

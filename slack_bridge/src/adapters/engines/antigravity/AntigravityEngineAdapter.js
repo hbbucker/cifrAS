@@ -7,8 +7,32 @@ const { EngineEvent } = require('../../../domain/events/EngineEvent');
 const { TurnResultDTO } = require('../../../domain/dtos/TurnResultDTO');
 const { AntigravityStreamParser } = require('./AntigravityStreamParser');
 
+const net = require('node:net');
+
 const DEFAULT_BRAIN_DIR = path.join(os.homedir(), '.gemini', 'antigravity-cli', 'brain');
 const TRANSCRIPT_RELATIVE_PATH = path.join('.system_generated', 'logs', 'transcript.jsonl');
+
+/**
+ * Helper para checar se o proxy de tokens (RTK/Headroom) está rodando na porta local.
+ */
+function isProxyRunning(port = 8787) {
+  return new Promise((resolve) => {
+    const socket = new net.Socket();
+    socket.setTimeout(200);
+    socket.on('connect', () => {
+      socket.destroy();
+      resolve(true);
+    });
+    socket.on('timeout', () => {
+      socket.destroy();
+      resolve(false);
+    });
+    socket.on('error', () => {
+      resolve(false);
+    });
+    socket.connect(port, '127.0.0.1');
+  });
+}
 
 /**
  * Fila assíncrona pura para transformar fluxos push de eventos em AsyncIterable (Pull/Push).
@@ -87,9 +111,17 @@ class AntigravityEngineAdapter extends ILLMEnginePort {
     const executionContext = { boundSessionId: instruction.sessionId || null };
     const queue = new AsyncEventQueue();
 
+    const env = { ...process.env };
+    const proxyIsActive = await isProxyRunning(8787);
+    
+    if (proxyIsActive) {
+      env.CLOUD_CODE_URL = 'http://localhost:8787';
+    }
+
     const child = this.spawn(this.agyBin, args, {
       cwd: instruction.workspaceDir,
       stdio: ['ignore', 'pipe', 'pipe'],
+      env,
     });
 
     if (child.stderr) {
@@ -139,7 +171,7 @@ class AntigravityEngineAdapter extends ILLMEnginePort {
     if (typeof sessionId === 'string' && sessionId.trim()) {
       args.push('--conversation', sessionId.trim());
     }
-    args.push('--print-timeout', '1h', '--dangerously-skip-permissions', '--output-format', 'stream-json');
+    args.push('--print-timeout', '1h', '--dangerously-skip-permissions', '--sandbox', '--output-format', 'stream-json');
     return args;
   }
 
