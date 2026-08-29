@@ -26,10 +26,10 @@ export const GroupCard: React.FC<GroupCardProps> = ({
   return (
     <div 
       onClick={() => navigate(`/groups/${id}`)}
-      className="bg-bg-card rounded-2xl border border-border-main p-3.5 sm:p-5 hover:shadow-md transition-all relative cursor-pointer min-w-0"
+      className="bg-bg-card rounded-lg border border-border-main p-3.5 sm:p-5 hover:shadow-md transition-all relative cursor-pointer min-w-0"
     >
       <div className="flex justify-between items-start mb-2.5 sm:mb-4">
-        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center shrink-0">
+        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 rounded-md flex items-center justify-center shrink-0">
           <Users className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400" />
         </div>
         
@@ -44,7 +44,7 @@ export const GroupCard: React.FC<GroupCardProps> = ({
           </button>
 
           {menuOpen && (
-            <div className="absolute right-0 top-10 w-48 bg-bg-card rounded-2xl shadow-xl border border-border-main z-20 py-1.5 overflow-hidden">
+            <div className="absolute right-0 top-10 w-48 bg-bg-card rounded-lg shadow-xl border border-border-main z-20 py-1.5 overflow-hidden">
               {role === 'Admin' && (
                 <button 
                   onClick={() => { setMenuOpen(false); onInvite(id); }}
@@ -67,7 +67,7 @@ export const GroupCard: React.FC<GroupCardProps> = ({
       <h3 className="text-base sm:text-lg font-bold text-text-main mb-1 truncate">{name}</h3>
       <div className="flex items-center justify-between mt-3 sm:mt-4">
         <p className="text-xs sm:text-sm text-text-mute">{memberCountText}</p>
-        <span className={`text-[11px] sm:text-xs font-bold px-2 py-0.5 sm:py-1 rounded-full ${role === 'Admin' ? 'bg-[#8629cc]/10 text-[#8629cc]' : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'}`}>
+        <span className={`text-[11px] sm:text-xs font-bold px-2 py-0.5 sm:py-1 rounded-full ${role === 'Admin' ? 'bg-[#aa3bff]/10 text-[#aa3bff]' : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'}`}>
           {role === 'Admin' ? t('group.members.roles.admin') : t('group.members.roles.member')}
         </span>
       </div>

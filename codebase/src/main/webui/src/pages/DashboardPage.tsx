@@ -174,7 +174,7 @@ export const DashboardPage: React.FC = () => {
           </h3>
           <button
             onClick={() => navigate('/songs')}
-            className="text-xs sm:text-sm font-medium text-[#8629cc] hover:underline p-1 min-h-[36px] flex items-center"
+            className="text-xs sm:text-sm font-medium text-[#aa3bff] hover:underline p-1 min-h-[36px] flex items-center"
             data-testid="view-all-btn"
           >
             {t('dashboard.viewAll')}

@@ -461,7 +461,7 @@ export const TheaterModePage: React.FC = () => {
 
       {showResumePrompt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" data-testid="resume-prompt">
-          <div className="bg-bg-card p-6 rounded-2xl shadow-xl border border-border-main max-w-sm w-full mx-4">
+          <div className="bg-bg-card p-6 rounded-lg shadow-xl border border-border-main max-w-sm w-full mx-4">
             <h3 className="text-xl font-bold mb-2">{t('theater.resumeSessionPromptTitle')}</h3>
             <p className="text-text-mute mb-6">{t('theater.resumeSessionPromptDesc')}</p>
             <div className="flex justify-end gap-3">
@@ -483,7 +483,7 @@ export const TheaterModePage: React.FC = () => {
                     containerRef.current.scrollTop = activeSession?.scrollPosition || 0;
                   }
                 }}
-                className="px-4 py-2 rounded-lg font-medium bg-[#8629cc] text-white hover:bg-[#721eb8] transition-colors shadow-lg shadow-[#8629cc]/20"
+                className="px-4 py-2 rounded-lg font-medium bg-[#aa3bff] text-white hover:bg-[#9926f0] transition-colors shadow-lg shadow-[#aa3bff]/20"
                 data-testid="resume-yes-btn"
               >
                 {t('theater.resume')}

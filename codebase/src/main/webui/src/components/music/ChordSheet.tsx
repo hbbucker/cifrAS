@@ -96,7 +96,7 @@ export const ChordSheet: React.FC<ChordSheetProps> = ({
     return (
       <>
         {spaces}
-        <span className="text-[#8629cc] font-bold">{prefix}</span>
+        <span className="text-[#aa3bff] font-bold">{prefix}</span>
         {chunks.map((chunk, i) => {
           if (/[0-9hpsx/\\b~v^]+/i.test(chunk)) {
             return <span key={i} className="text-text-main font-bold">{chunk}</span>;
@@ -132,7 +132,7 @@ export const ChordSheet: React.FC<ChordSheetProps> = ({
             // All lines use whitespace-pre to preserve chord/lyric column alignment.
             let lineClasses = transparent ? 'text-inherit' : 'text-text-main';
             if (isChordLine) {
-              lineClasses = 'text-[#8629cc] font-bold';
+              lineClasses = 'text-[#aa3bff] font-bold';
             } else if (isSectionHeader) {
               lineClasses = 'text-text-main font-bold bg-bg-elevated inline-block px-3 py-1 rounded-md mt-6 mb-2 text-sm tracking-wider uppercase shadow-sm border border-border-main';
             } else if (isStrumLine) {

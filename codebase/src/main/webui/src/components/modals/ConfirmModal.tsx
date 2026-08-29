@@ -49,13 +49,13 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
         <div className="flex justify-center gap-3">
           <button
             onClick={onCancel}
-            className="flex-1 px-4 py-2.5 min-h-[44px] rounded-xl font-medium text-xs sm:text-sm text-gray-700 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 transition-colors"
+            className="flex-1 px-4 py-2.5 min-h-[44px] rounded-md font-medium text-xs sm:text-sm text-gray-700 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 transition-colors"
           >
             {cancelText || t('common.cancel')}
           </button>
           <button
             onClick={onConfirm}
-            className={`flex-1 px-4 py-2.5 min-h-[44px] rounded-xl font-medium text-xs sm:text-sm text-white transition-colors ${btnBg}`}
+            className={`flex-1 px-4 py-2.5 min-h-[44px] rounded-md font-medium text-xs sm:text-sm text-white transition-colors ${btnBg}`}
           >
             {confirmText || t('common.confirm')}
           </button>

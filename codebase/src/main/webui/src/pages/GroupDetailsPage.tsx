@@ -123,7 +123,7 @@ export const GroupDetailsPage: React.FC = () => {
           </button>
 
           <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-blue-100 dark:bg-blue-900/30 rounded-md flex items-center justify-center shrink-0">
               <Users className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div className="min-w-0 flex-1">
@@ -133,7 +133,7 @@ export const GroupDetailsPage: React.FC = () => {
               <span
                 className={`inline-block text-[11px] sm:text-xs font-bold px-2 py-0.5 rounded ${
                   group.role === 'Admin'
-                    ? 'bg-[#8629cc]/10 text-[#8629cc]'
+                    ? 'bg-[#aa3bff]/10 text-[#aa3bff]'
                     : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
                 }`}
               >
@@ -148,7 +148,7 @@ export const GroupDetailsPage: React.FC = () => {
             <div className="shrink-0 ml-auto">
               <button
                 onClick={() => setShowInviteModal(true)}
-                className="flex items-center gap-1.5 sm:gap-2 bg-[#8629cc] hover:bg-[#721eb8] text-white px-3 sm:px-4 py-2 min-h-[40px] sm:min-h-[44px] rounded-xl font-medium transition-colors text-xs sm:text-sm"
+                className="flex items-center gap-1.5 sm:gap-2 bg-[#aa3bff] hover:bg-[#9926f0] text-white px-3 sm:px-4 py-2 min-h-[40px] sm:min-h-[44px] rounded-md font-medium transition-colors text-xs sm:text-sm"
                 data-testid="header-invite-btn"
               >
                 <UserPlus className="w-4 h-4" />
@@ -230,7 +230,7 @@ export const GroupDetailsPage: React.FC = () => {
             </h2>
 
             {inviteError && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl">
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-md">
                 {inviteError}
               </div>
             )}
@@ -243,7 +243,7 @@ export const GroupDetailsPage: React.FC = () => {
                 setInviteError('');
               }}
               placeholder={t('groups.memberEmail')}
-              className="w-full px-4 py-3 bg-bg-main border border-border-main rounded-xl mb-6 text-text-main focus:ring-2 focus:ring-[#8629cc] outline-none text-sm sm:text-base"
+              className="w-full px-4 py-3 bg-bg-main border border-border-main rounded-md mb-6 text-text-main focus:ring-2 focus:ring-[#aa3bff] outline-none text-sm sm:text-base"
               data-testid="invite-email-input"
             />
             <div className="flex justify-end gap-3">
@@ -252,7 +252,7 @@ export const GroupDetailsPage: React.FC = () => {
                   setShowInviteModal(false);
                   setInviteError('');
                 }}
-                className="px-4 py-2.5 min-h-[44px] font-medium text-text-mute hover:bg-bg-elevated rounded-xl transition-colors text-sm"
+                className="px-4 py-2.5 min-h-[44px] font-medium text-text-mute hover:bg-bg-elevated rounded-md transition-colors text-sm"
                 disabled={inviting}
               >
                 {t('common.cancel')}
@@ -260,7 +260,7 @@ export const GroupDetailsPage: React.FC = () => {
               <button
                 onClick={handleInvite}
                 disabled={inviting || !inviteEmail.trim()}
-                className="px-4 py-2.5 min-h-[44px] font-medium bg-[#8629cc] hover:bg-[#721eb8] text-white rounded-xl transition-colors disabled:opacity-50 text-sm"
+                className="px-4 py-2.5 min-h-[44px] font-medium bg-[#aa3bff] hover:bg-[#9926f0] text-white rounded-md transition-colors disabled:opacity-50 text-sm"
                 data-testid="send-invite-btn"
               >
                 {inviting ? '...' : t('groups.sendInvite')}

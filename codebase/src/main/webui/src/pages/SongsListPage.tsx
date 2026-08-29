@@ -195,7 +195,7 @@ export const SongsListPage: React.FC = () => {
                     setSearchQuery(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full pl-4 pr-10 py-2.5 sm:py-2 bg-bg-card border border-border-main rounded-xl focus:ring-2 focus:ring-[#8629cc] outline-none text-sm"
+                  className="w-full pl-4 pr-10 py-2.5 sm:py-2 bg-bg-card border border-border-main rounded-md focus:ring-2 focus:ring-[#aa3bff] outline-none text-sm"
                 />
                 {searchQuery ? (
                   <button

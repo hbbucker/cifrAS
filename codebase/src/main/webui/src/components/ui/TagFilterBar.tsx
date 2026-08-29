@@ -34,7 +34,7 @@ export const TagFilterBar: React.FC<TagFilterBarProps> = ({
         onClick={() => onSelectTag(null)}
         className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-medium transition-all focus:outline-none min-h-[36px] ${
           selectedTag === null
-            ? 'bg-[#8629cc] text-white shadow-sm'
+            ? 'bg-[#aa3bff] text-white shadow-sm'
             : 'bg-bg-card hover:bg-bg-elevated text-text-main border border-border-main'
         }`}
         data-testid="tag-chip-all"
@@ -44,7 +44,7 @@ export const TagFilterBar: React.FC<TagFilterBarProps> = ({
         {totalCount !== undefined && (
           <span
             className={`text-xs px-1.5 py-0.2 rounded-full font-bold ${
-              selectedTag === null ? 'bg-white/20 text-white' : 'bg-[#8629cc]/10 text-[#8629cc]'
+              selectedTag === null ? 'bg-white/20 text-white' : 'bg-[#aa3bff]/10 text-[#aa3bff]'
             }`}
           >
             {totalCount}
@@ -61,7 +61,7 @@ export const TagFilterBar: React.FC<TagFilterBarProps> = ({
             onClick={() => onSelectTag(isSelected ? null : tag.name)}
             className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-medium transition-all focus:outline-none min-h-[36px] ${
               isSelected
-                ? 'bg-[#8629cc] text-white shadow-sm'
+                ? 'bg-[#aa3bff] text-white shadow-sm'
                 : 'bg-bg-card hover:bg-bg-elevated text-text-main border border-border-main'
             }`}
             data-testid={`tag-filter-chip-${tag.name}`}
@@ -69,7 +69,7 @@ export const TagFilterBar: React.FC<TagFilterBarProps> = ({
             <span>{tag.name}</span>
             <span
               className={`text-xs px-1.5 py-0.2 rounded-full font-bold ${
-                isSelected ? 'bg-white/20 text-white' : 'bg-[#8629cc]/10 text-[#8629cc]'
+                isSelected ? 'bg-white/20 text-white' : 'bg-[#aa3bff]/10 text-[#aa3bff]'
               }`}
             >
               {tag.count}

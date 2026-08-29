@@ -201,7 +201,7 @@ export const PlaylistViewPage: React.FC = () => {
                   setIsSearching(true);
                   setShowAddModal(true);
                 }}
-                className="flex items-center justify-center gap-1.5 bg-bg-card hover:bg-bg-elevated border border-border-main text-text-main px-2.5 sm:px-4 py-2 sm:py-2.5 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] rounded-xl font-bold text-xs sm:text-sm transition-colors shadow-xs"
+                className="flex items-center justify-center gap-1.5 bg-bg-card hover:bg-bg-elevated border border-border-main text-text-main px-2.5 sm:px-4 py-2 sm:py-2.5 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] rounded-md font-bold text-xs sm:text-sm transition-colors shadow-xs"
                 title={t('playlistView.addSong')}
                 aria-label={t('playlistView.addSong')}
               >
@@ -217,7 +217,7 @@ export const PlaylistViewPage: React.FC = () => {
                 }
                 setShowPresentationModal(true);
               }}
-              className="flex items-center justify-center gap-1.5 bg-[#aa3bff] hover:bg-[#9926f0] text-white px-2.5 sm:px-4 py-2 sm:py-2.5 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] rounded-xl font-bold text-xs sm:text-sm transition-colors shadow-xs"
+              className="flex items-center justify-center gap-1.5 bg-[#aa3bff] hover:bg-[#9926f0] text-white px-2.5 sm:px-4 py-2 sm:py-2.5 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] rounded-md font-bold text-xs sm:text-sm transition-colors shadow-xs"
               data-testid="export-presentation-btn"
               title={t('playlistPresentation.generateSlides')}
               aria-label={t('playlistPresentation.generateSlides')}
@@ -227,7 +227,7 @@ export const PlaylistViewPage: React.FC = () => {
             </button>
             <button 
               onClick={() => navigate(`/theater/${id}`)}
-              className="flex items-center justify-center gap-1.5 bg-[#10B981] hover:bg-[#059669] text-white px-3 sm:px-5 py-2 sm:py-2.5 min-h-[36px] sm:min-h-[44px] rounded-xl font-bold text-xs sm:text-sm transition-colors shadow-lg shadow-emerald-500/20"
+              className="flex items-center justify-center gap-1.5 bg-[#10B981] hover:bg-[#059669] text-white px-3 sm:px-5 py-2 sm:py-2.5 min-h-[36px] sm:min-h-[44px] rounded-md font-bold text-xs sm:text-sm transition-colors shadow-lg shadow-emerald-500/20"
               data-testid="start-theater-btn"
               title={t('playlistView.startTheater')}
               aria-label={t('playlistView.startTheater')}
@@ -242,12 +242,12 @@ export const PlaylistViewPage: React.FC = () => {
           {loading ? (
             <div className="text-center py-8 text-text-mute">{t('playlistView.loading')}</div>
           ) : songs.length === 0 ? (
-            <div className="text-center py-12 bg-bg-card rounded-2xl border border-dashed border-border-main">
+            <div className="text-center py-12 bg-bg-card rounded-lg border border-dashed border-border-main">
               <h3 className="text-base sm:text-lg font-medium text-text-main mb-2">{t('playlistView.noSongs')}</h3>
               <p className="text-xs sm:text-sm text-text-mute">{t('playlistView.addDesc')}</p>
             </div>
           ) : (
-            <div className="bg-bg-card rounded-2xl border border-border-main shadow-xs overflow-hidden">
+            <div className="bg-bg-card rounded-lg border border-border-main shadow-xs overflow-hidden">
               {songs.map((song, index) => (
                 <div 
                   key={song.id} 
@@ -275,7 +275,7 @@ export const PlaylistViewPage: React.FC = () => {
                     <div className="flex flex-col sm:flex-row gap-0.5 sm:gap-1 items-center justify-center shrink-0">
                       <button 
                         onClick={() => moveSong(index, 'up')} 
-                        className="p-1 sm:p-1.5 text-text-mute hover:text-[#8629cc] bg-bg-elevated hover:bg-[#8629cc]/10 rounded-lg transition-colors active:scale-95 min-h-[30px] min-w-[30px] sm:min-h-[36px] sm:min-w-[36px] flex items-center justify-center" 
+                        className="p-1 sm:p-1.5 text-text-mute hover:text-[#aa3bff] bg-bg-elevated hover:bg-[#aa3bff]/10 rounded-lg transition-colors active:scale-95 min-h-[30px] min-w-[30px] sm:min-h-[36px] sm:min-w-[36px] flex items-center justify-center" 
                         data-testid={`move-up-${song.id}`}
                         aria-label={t('playlistView.moveUp')}
                       >
@@ -283,7 +283,7 @@ export const PlaylistViewPage: React.FC = () => {
                       </button>
                       <button 
                         onClick={() => moveSong(index, 'down')} 
-                        className="p-1 sm:p-1.5 text-text-mute hover:text-[#8629cc] bg-bg-elevated hover:bg-[#8629cc]/10 rounded-lg transition-colors active:scale-95 min-h-[30px] min-w-[30px] sm:min-h-[36px] sm:min-w-[36px] flex items-center justify-center" 
+                        className="p-1 sm:p-1.5 text-text-mute hover:text-[#aa3bff] bg-bg-elevated hover:bg-[#aa3bff]/10 rounded-lg transition-colors active:scale-95 min-h-[30px] min-w-[30px] sm:min-h-[36px] sm:min-w-[36px] flex items-center justify-center" 
                         data-testid={`move-down-${song.id}`}
                         aria-label={t('playlistView.moveDown')}
                       >
@@ -293,7 +293,7 @@ export const PlaylistViewPage: React.FC = () => {
                   )}
                   
                   {isOwner && (
-                    <div className="hidden sm:block text-gray-500 cursor-grab active:cursor-grabbing hover:text-[#8629cc] shrink-0">
+                    <div className="hidden sm:block text-gray-500 cursor-grab active:cursor-grabbing hover:text-[#aa3bff] shrink-0">
                       <GripVertical className="w-5 h-5 pointer-events-none" />
                     </div>
                   )}
@@ -373,7 +373,7 @@ export const PlaylistViewPage: React.FC = () => {
                   setSearchQuery(e.target.value);
                   setIsSearching(true);
                 }}
-                className="w-full pl-12 pr-4 py-2.5 sm:py-3 bg-bg-card border border-border-main rounded-xl text-text-main focus:ring-2 focus:ring-[#8629cc] outline-none shadow-sm text-sm sm:text-base"
+                className="w-full pl-12 pr-4 py-2.5 sm:py-3 bg-bg-card border border-border-main rounded-md text-text-main focus:ring-2 focus:ring-[#aa3bff] outline-none shadow-sm text-sm sm:text-base"
               />
             </div>
 
@@ -386,7 +386,7 @@ export const PlaylistViewPage: React.FC = () => {
               />
             )}
 
-            <div className="flex-1 overflow-y-auto bg-bg-card rounded-xl border border-border-main shadow-sm min-w-0">
+            <div className="flex-1 overflow-y-auto bg-bg-card rounded-md border border-border-main shadow-sm min-w-0">
               {isSearching ? (
                 <div className="text-center py-12 text-text-mute">
                   {t('playlistView.loading')}
@@ -432,7 +432,7 @@ export const PlaylistViewPage: React.FC = () => {
                           })
                           .catch(() => toast(t('playlistView.failedAddSong'), 'error'));
                         }}
-                        className="flex items-center gap-1 px-3 sm:px-4 py-1.5 sm:py-2 bg-gray-100 hover:bg-[#8629cc] hover:text-white dark:bg-gray-700 dark:hover:bg-[#8629cc] text-gray-700 dark:text-gray-200 rounded-lg font-bold text-xs sm:text-sm transition-colors min-h-[36px]"
+                        className="flex items-center gap-1 px-3 sm:px-4 py-1.5 sm:py-2 bg-gray-100 hover:bg-[#aa3bff] hover:text-white dark:bg-gray-700 dark:hover:bg-[#aa3bff] text-gray-700 dark:text-gray-200 rounded-lg font-bold text-xs sm:text-sm transition-colors min-h-[36px]"
                       >
                         <Plus className="w-4 h-4" />
                         <span>{t('playlistView.add')}</span>

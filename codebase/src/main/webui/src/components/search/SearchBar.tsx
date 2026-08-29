@@ -133,7 +133,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
  onChange={(e) => setQuery(e.target.value)}
  onKeyDown={handleKeyDown}
  placeholder={t('search.placeholder')}
- className="w-full pl-10 pr-10 py-2 bg-bg-elevated border-none rounded-lg focus:ring-2 focus:ring-[#8629cc] focus:outline-none transition-all "
+ className="w-full pl-10 pr-10 py-2 bg-bg-elevated border-none rounded-lg focus:ring-2 focus:ring-[#aa3bff] focus:outline-none transition-all "
  data-testid="search-input"
  />
  {query && !isLoading && (
@@ -151,7 +151,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
  </div>
 
   {isDropdownOpen && results.length > 0 && (
-    <div className="absolute top-full left-0 right-0 mt-2 bg-bg-card rounded-xl shadow-2xl border border-border-main overflow-hidden z-50 max-h-[60vh] overflow-y-auto" data-testid="search-dropdown">
+    <div className="absolute top-full left-0 right-0 mt-2 bg-bg-card rounded-md shadow-2xl border border-border-main overflow-hidden z-50 max-h-[60vh] overflow-y-auto" data-testid="search-dropdown">
       {results.map((result) => (
         <button
           key={result.id}
@@ -163,7 +163,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
             <p className="font-medium text-sm sm:text-base text-text-main line-clamp-1">{result.title}</p>
             <p className="text-xs sm:text-sm text-text-mute line-clamp-1">{result.artist}</p>
           </div>
-          <span className="text-xs font-bold text-[#8629cc] bg-[#8629cc]/10 px-2 py-0.5 rounded shrink-0">
+          <span className="text-xs font-bold text-[#aa3bff] bg-[#aa3bff]/10 px-2 py-0.5 rounded shrink-0">
             {result.keySignature}
           </span>
         </button>

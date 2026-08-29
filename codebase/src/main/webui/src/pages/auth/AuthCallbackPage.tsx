@@ -58,8 +58,8 @@ export const AuthCallbackPage: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4">
       <div className="flex flex-col items-center">
-        <div className="w-16 h-16 bg-[#8629cc]/20 rounded-full flex items-center justify-center mb-4 animate-pulse">
-          <Music className="w-8 h-8 text-[#8629cc]" />
+        <div className="w-16 h-16 bg-[#aa3bff]/20 rounded-full flex items-center justify-center mb-4 animate-pulse">
+          <Music className="w-8 h-8 text-[#aa3bff]" />
         </div>
         <h2 className="text-xl font-medium text-white text-center">Completing login...</h2>
       </div>

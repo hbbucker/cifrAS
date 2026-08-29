@@ -122,11 +122,11 @@ export const ExportPlaylistPresentationModal: React.FC<ExportPlaylistPresentatio
       aria-modal="true"
       aria-labelledby="export-presentation-title"
     >
-      <div className="bg-bg-card border border-border-main rounded-2xl sm:rounded-3xl max-w-xl w-full p-4 sm:p-6 relative flex flex-col max-h-[92vh] shadow-2xl">
+      <div className="bg-bg-card border border-border-main rounded-lg sm:rounded-3xl max-w-xl w-full p-4 sm:p-6 relative flex flex-col max-h-[92vh] shadow-2xl">
         {/* Header */}
         <div className="flex items-start justify-between pb-3.5 border-b border-border-main shrink-0">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-[#aa3bff]/10 text-[#aa3bff] rounded-xl flex items-center justify-center">
+            <div className="p-2.5 bg-[#aa3bff]/10 text-[#aa3bff] rounded-md flex items-center justify-center">
               <Presentation className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div>
@@ -162,7 +162,7 @@ export const ExportPlaylistPresentationModal: React.FC<ExportPlaylistPresentatio
               <button
                 type="button"
                 onClick={() => setTheme('dark')}
-                className={`flex flex-col items-center justify-center gap-1 py-2 px-1 sm:p-3 rounded-xl border text-center transition-all min-h-[58px] sm:min-h-[64px] ${
+                className={`flex flex-col items-center justify-center gap-1 py-2 px-1 sm:p-3 rounded-md border text-center transition-all min-h-[58px] sm:min-h-[64px] ${
                   theme === 'dark'
                     ? 'border-[#aa3bff] bg-black text-white ring-2 ring-[#aa3bff]/20'
                     : 'border-border-main bg-bg-elevated/40 text-text-main hover:bg-bg-elevated'
@@ -178,7 +178,7 @@ export const ExportPlaylistPresentationModal: React.FC<ExportPlaylistPresentatio
               <button
                 type="button"
                 onClick={() => setTheme('light')}
-                className={`flex flex-col items-center justify-center gap-1 py-2 px-1 sm:p-3 rounded-xl border text-center transition-all min-h-[58px] sm:min-h-[64px] ${
+                className={`flex flex-col items-center justify-center gap-1 py-2 px-1 sm:p-3 rounded-md border text-center transition-all min-h-[58px] sm:min-h-[64px] ${
                   theme === 'light'
                     ? 'border-[#aa3bff] bg-white text-gray-900 ring-2 ring-[#aa3bff]/20 shadow-xs'
                     : 'border-border-main bg-bg-elevated/40 text-text-main hover:bg-bg-elevated'
@@ -194,7 +194,7 @@ export const ExportPlaylistPresentationModal: React.FC<ExportPlaylistPresentatio
               <button
                 type="button"
                 onClick={() => setTheme('liturgic')}
-                className={`flex flex-col items-center justify-center gap-1 py-2 px-1 sm:p-3 rounded-xl border text-center transition-all min-h-[58px] sm:min-h-[64px] ${
+                className={`flex flex-col items-center justify-center gap-1 py-2 px-1 sm:p-3 rounded-md border text-center transition-all min-h-[58px] sm:min-h-[64px] ${
                   theme === 'liturgic'
                     ? 'border-[#aa3bff] bg-[#0A1128] text-blue-50 ring-2 ring-[#aa3bff]/20'
                     : 'border-border-main bg-bg-elevated/40 text-text-main hover:bg-bg-elevated'
@@ -210,7 +210,7 @@ export const ExportPlaylistPresentationModal: React.FC<ExportPlaylistPresentatio
           </div>
 
           {/* Options Checkboxes */}
-          <div className="bg-bg-elevated/40 rounded-xl p-3.5 border border-border-main space-y-2.5">
+          <div className="bg-bg-elevated/40 rounded-md p-3.5 border border-border-main space-y-2.5">
             <label className="text-xs font-semibold uppercase tracking-wider text-text-mute block mb-1">
               {t('playlistPresentation.optionsTitle')}
             </label>
@@ -261,7 +261,7 @@ export const ExportPlaylistPresentationModal: React.FC<ExportPlaylistPresentatio
               </div>
             </div>
 
-            <div className="space-y-1.5 max-h-48 overflow-y-auto border border-border-main rounded-xl p-2 bg-bg-card">
+            <div className="space-y-1.5 max-h-48 overflow-y-auto border border-border-main rounded-md p-2 bg-bg-card">
               {songs.map((song, index) => {
                 const isSelected = !excludedSongIds.includes(song.id);
                 return (
@@ -305,7 +305,7 @@ export const ExportPlaylistPresentationModal: React.FC<ExportPlaylistPresentatio
             type="button"
             onClick={handleCopyLyrics}
             disabled={isGenerating || filteredSongs.length === 0}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl border border-border-main bg-bg-elevated hover:bg-bg-elevated/80 text-text-main text-xs sm:text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-md border border-border-main bg-bg-elevated hover:bg-bg-elevated/80 text-text-main text-xs sm:text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             data-testid="copy-lyrics-btn"
           >
             {copied ? (
@@ -325,7 +325,7 @@ export const ExportPlaylistPresentationModal: React.FC<ExportPlaylistPresentatio
             type="button"
             onClick={handleDownload}
             disabled={isGenerating || filteredSongs.length === 0}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#aa3bff] hover:bg-[#9926f0] text-white text-xs sm:text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-98"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 rounded-md bg-[#aa3bff] hover:bg-[#9926f0] text-white text-xs sm:text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-98"
             data-testid="download-pptx-btn"
           >
             {isGenerating ? (

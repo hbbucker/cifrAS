@@ -44,7 +44,7 @@ export const BrandIcon: React.FC<BrandIconProps> = ({
           gradientUnits="userSpaceOnUse"
         >
           <stop offset="0%" stopColor="#aa3bff" />
-          <stop offset="100%" stopColor="#8629cc" />
+          <stop offset="100%" stopColor="#aa3bff" />
         </linearGradient>
       </defs>
       {/* Pick Silhouette */}
@@ -126,7 +126,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
       <BrandIcon size={size} className={iconClassName} />
       {!iconOnly && (
         <span
-          className={`font-bold tracking-tight text-[#8629cc] dark:text-[#aa3bff] select-none ${textSizes[size]} ${textClassName}`.trim()}
+          className={`font-bold tracking-tight text-[#aa3bff] dark:text-[#aa3bff] select-none ${textSizes[size]} ${textClassName}`.trim()}
           data-testid="brand-logo-text"
         >
           CifrAS
@@ -141,7 +141,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
     return (
       <Link
         to={to}
-        className={`${containerClasses} hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-[#8629cc]/50 rounded-lg`}
+        className={`${containerClasses} hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-[#aa3bff]/50 rounded-lg`}
         aria-label={ariaLabel}
         data-testid={testId}
         onClick={onClick}

@@ -83,7 +83,7 @@ export const GroupPlaylistsSection: React.FC<GroupPlaylistsSectionProps> = ({ gr
   };
 
   return (
-    <div className="bg-bg-card rounded-2xl border border-border-main p-4 sm:p-6 min-w-0">
+    <div className="bg-bg-card rounded-lg border border-border-main p-4 sm:p-6 min-w-0">
       <div className="flex justify-between items-center mb-4 sm:mb-6 gap-2">
         <h2 className="text-lg sm:text-xl font-bold text-text-main truncate">{t('group.sharedPlaylists')}</h2>
         {role === 'Admin' && (
@@ -107,7 +107,7 @@ export const GroupPlaylistsSection: React.FC<GroupPlaylistsSectionProps> = ({ gr
       ) : (
         <div className="flex flex-col gap-2.5 sm:gap-3">
           {playlists.map(playlist => (
-            <div key={playlist.id} className="flex justify-between items-center p-3 sm:p-4 border border-border-main rounded-2xl hover:bg-bg-main/50 transition-colors gap-2 sm:gap-3">
+            <div key={playlist.id} className="flex justify-between items-center p-3 sm:p-4 border border-border-main rounded-lg hover:bg-bg-main/50 transition-colors gap-2 sm:gap-3">
               <div 
                 className="min-w-0 flex-1 cursor-pointer"
                 onClick={() => navigate(`/playlists/${playlist.id}`)}
@@ -121,7 +121,7 @@ export const GroupPlaylistsSection: React.FC<GroupPlaylistsSectionProps> = ({ gr
               <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                 <button 
                   onClick={() => navigate(`/theater/${playlist.id}`)}
-                  className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-colors shrink-0"
+                  className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-colors shrink-0"
                   title={t('sharedWithMe.playTheater')}
                   aria-label={t('sharedWithMe.playTheater')}
                 >
@@ -130,7 +130,7 @@ export const GroupPlaylistsSection: React.FC<GroupPlaylistsSectionProps> = ({ gr
                 {role === 'Admin' && (
                   <button 
                     onClick={() => handleUnlinkClick(playlist.id.toString())}
-                    className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors shrink-0"
+                    className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors shrink-0"
                     title={t('group.remove')}
                     aria-label={t('group.remove')}
                   >

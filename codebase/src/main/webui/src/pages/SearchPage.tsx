@@ -40,7 +40,7 @@ export const SearchPage: React.FC = () => {
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 pb-24 sm:pb-8 min-w-0">
  {loading ? (
  <div className="flex justify-center items-center h-32">
- <div className="animate-spin w-8 h-8 border-4 border-[#8629cc] border-t-transparent rounded-full" />
+ <div className="animate-spin w-8 h-8 border-4 border-[#aa3bff] border-t-transparent rounded-full" />
  </div>
  ) : mockResults.length > 0 ? (
  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

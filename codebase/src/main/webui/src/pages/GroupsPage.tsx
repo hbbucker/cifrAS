@@ -220,7 +220,7 @@ export const GroupsPage: React.FC = () => {
           </div>
           <button 
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-1.5 sm:gap-2 bg-[#8629cc] hover:bg-[#721eb8] text-white px-3.5 sm:px-4 py-2 min-h-[40px] sm:min-h-[44px] rounded-xl font-medium transition-colors text-xs sm:text-sm"
+            className="flex items-center gap-1.5 sm:gap-2 bg-[#aa3bff] hover:bg-[#9926f0] text-white px-3.5 sm:px-4 py-2 min-h-[40px] sm:min-h-[44px] rounded-md font-medium transition-colors text-xs sm:text-sm"
           >
             <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
             <span>{t('groups.newGroup')}</span>
@@ -233,7 +233,7 @@ export const GroupsPage: React.FC = () => {
               <h2 className="text-base sm:text-lg font-bold text-text-main mb-3">{t('groups.declinedInvitations')}</h2>
               <div className="flex flex-col gap-2.5 sm:gap-3">
                 {declinedInvites.map(invite => (
-                  <div key={invite.id} className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-3.5 sm:p-4 flex items-center justify-between gap-3">
+                  <div key={invite.id} className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3.5 sm:p-4 flex items-center justify-between gap-3">
                     <p className="text-xs sm:text-sm text-red-800 dark:text-red-200 min-w-0 flex-1">
                       <strong>{invite.inviteeEmail}</strong> {t('groups.declinedInvitation')} <strong>{invite.groupName}</strong>.
                     </p>
@@ -251,12 +251,12 @@ export const GroupsPage: React.FC = () => {
               <h2 className="text-base sm:text-lg font-bold text-text-main mb-3">{t('groups.pendingInvitations')}</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-6">
                 {invites.map(invite => (
-                  <div key={invite.id} className="bg-bg-card rounded-2xl border border-yellow-200 dark:border-yellow-700/50 p-4 sm:p-5 shadow-sm relative">
+                  <div key={invite.id} className="bg-bg-card rounded-lg border border-yellow-200 dark:border-yellow-700/50 p-4 sm:p-5 shadow-sm relative">
                     <h3 className="text-base sm:text-lg font-bold text-text-main mb-1 truncate">{invite.groupName}</h3>
                     <p className="text-xs sm:text-sm text-text-mute mb-3 sm:mb-4">{t('groups.invitedToJoin')}</p>
                     <div className="flex gap-2">
-                      <button onClick={() => handleAcceptInvite(invite.id)} className="flex-1 py-2 min-h-[40px] bg-[#8629cc] hover:bg-[#721eb8] text-white rounded-xl text-xs sm:text-sm font-medium transition-colors">{t('groups.accept')}</button>
-                      <button onClick={() => handleDeclineInvite(invite.id)} className="flex-1 py-2 min-h-[40px] bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-xl text-xs sm:text-sm font-medium transition-colors">{t('groups.decline')}</button>
+                      <button onClick={() => handleAcceptInvite(invite.id)} className="flex-1 py-2 min-h-[40px] bg-[#aa3bff] hover:bg-[#9926f0] text-white rounded-md text-xs sm:text-sm font-medium transition-colors">{t('groups.accept')}</button>
+                      <button onClick={() => handleDeclineInvite(invite.id)} className="flex-1 py-2 min-h-[40px] bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md text-xs sm:text-sm font-medium transition-colors">{t('groups.decline')}</button>
                     </div>
                   </div>
                 ))}
@@ -293,14 +293,14 @@ export const GroupsPage: React.FC = () => {
               value={newGroupName}
               onChange={(e) => setNewGroupName(e.target.value)}
               placeholder={t('groups.groupName')}
-              className="w-full px-4 py-3 bg-bg-main border border-border-main rounded-xl mb-6 text-text-main focus:ring-2 focus:ring-[#8629cc] outline-none text-sm sm:text-base"
+              className="w-full px-4 py-3 bg-bg-main border border-border-main rounded-md mb-6 text-text-main focus:ring-2 focus:ring-[#aa3bff] outline-none text-sm sm:text-base"
               data-testid="create-group-name-input"
             />
             <div className="flex justify-end gap-3">
-              <button onClick={() => setShowCreateModal(false)} className="px-4 py-2.5 min-h-[44px] font-medium text-text-mute hover:bg-bg-elevated rounded-xl transition-colors text-sm">{t('common.cancel')}</button>
+              <button onClick={() => setShowCreateModal(false)} className="px-4 py-2.5 min-h-[44px] font-medium text-text-mute hover:bg-bg-elevated rounded-md transition-colors text-sm">{t('common.cancel')}</button>
               <button 
                 onClick={handleCreateGroup} 
-                className="px-4 py-2.5 min-h-[44px] font-medium bg-[#8629cc] hover:bg-[#721eb8] text-white rounded-xl transition-colors text-sm"
+                className="px-4 py-2.5 min-h-[44px] font-medium bg-[#aa3bff] hover:bg-[#9926f0] text-white rounded-md transition-colors text-sm"
               >
                 {t('groups.create')}
               </button>
@@ -316,7 +316,7 @@ export const GroupsPage: React.FC = () => {
             <h2 className="text-lg sm:text-xl font-bold text-text-main mb-4">{t('groups.inviteToGroup')}</h2>
             
             {inviteError && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl">
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-md">
                 {inviteError}
               </div>
             )}
@@ -326,14 +326,14 @@ export const GroupsPage: React.FC = () => {
               value={inviteEmail}
               onChange={(e) => { setInviteEmail(e.target.value); setInviteError(''); }}
               placeholder={t('groups.memberEmail')}
-              className="w-full px-4 py-3 bg-bg-main border border-border-main rounded-xl mb-6 text-text-main focus:ring-2 focus:ring-[#8629cc] outline-none text-sm sm:text-base"
+              className="w-full px-4 py-3 bg-bg-main border border-border-main rounded-md mb-6 text-text-main focus:ring-2 focus:ring-[#aa3bff] outline-none text-sm sm:text-base"
               data-testid="invite-email-input"
             />
             <div className="flex justify-end gap-3">
-              <button onClick={() => { setShowInviteModal(false); setInviteError(''); }} className="px-4 py-2.5 min-h-[44px] font-medium text-text-mute hover:bg-bg-elevated rounded-xl transition-colors text-sm">{t('common.cancel')}</button>
+              <button onClick={() => { setShowInviteModal(false); setInviteError(''); }} className="px-4 py-2.5 min-h-[44px] font-medium text-text-mute hover:bg-bg-elevated rounded-md transition-colors text-sm">{t('common.cancel')}</button>
               <button 
                 onClick={handleInvite} 
-                className="px-4 py-2.5 min-h-[44px] font-medium bg-[#8629cc] hover:bg-[#721eb8] text-white rounded-xl transition-colors text-sm" 
+                className="px-4 py-2.5 min-h-[44px] font-medium bg-[#aa3bff] hover:bg-[#9926f0] text-white rounded-md transition-colors text-sm" 
                 data-testid="send-invite-btn"
               >
                 {t('groups.sendInvite')}

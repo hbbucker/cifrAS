@@ -17,7 +17,7 @@ export const TransposePad: React.FC<TransposePadProps> = ({
   const isSmall = size === 'sm';
 
   return (
-    <div className={`inline-flex items-center bg-bg-elevated rounded-xl ${isSmall ? 'p-0.5' : 'p-1'} border border-border-main shadow-inner`}>
+    <div className={`inline-flex items-center bg-bg-elevated rounded-md ${isSmall ? 'p-0.5' : 'p-1'} border border-border-main shadow-inner`}>
       <button
         onClick={onTransposeDown}
         disabled={disabled}
@@ -28,7 +28,7 @@ export const TransposePad: React.FC<TransposePadProps> = ({
         <Minus className={isSmall ? 'w-3.5 h-3.5 sm:w-4 sm:h-4' : 'w-4 h-4 sm:w-5 sm:h-5'} />
       </button>
       
-      <div className={`${isSmall ? 'w-10 sm:w-14 h-8 sm:h-10 text-sm sm:text-base' : 'w-13 sm:w-16 h-10 sm:h-12 text-base sm:text-lg'} flex items-center justify-center font-bold text-[#8629cc] select-none`} aria-live="polite" data-testid="current-key">
+      <div className={`${isSmall ? 'w-10 sm:w-14 h-8 sm:h-10 text-sm sm:text-base' : 'w-13 sm:w-16 h-10 sm:h-12 text-base sm:text-lg'} flex items-center justify-center font-bold text-[#aa3bff] select-none`} aria-live="polite" data-testid="current-key">
         {currentKey}
       </div>
       

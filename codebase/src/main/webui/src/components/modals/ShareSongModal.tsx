@@ -82,7 +82,7 @@ export const ShareSongModal: React.FC<ShareSongModalProps> = ({
       aria-modal="true"
       aria-labelledby="share-song-title"
     >
-      <div className="bg-bg-card border border-border-main rounded-2xl max-w-md w-full p-6 relative">
+      <div className="bg-bg-card border border-border-main rounded-lg max-w-md w-full p-6 relative">
         <button
           onClick={handleClose}
           className="absolute top-4 right-4 p-2 text-text-mute hover:text-text-main rounded-full hover:bg-bg-elevated transition-colors"
@@ -92,7 +92,7 @@ export const ShareSongModal: React.FC<ShareSongModalProps> = ({
         </button>
 
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-3 bg-[#8629cc]/10 text-[#8629cc] rounded-xl">
+          <div className="p-3 bg-[#aa3bff]/10 text-[#aa3bff] rounded-md">
             <Mail className="w-6 h-6" />
           </div>
           <div>
@@ -122,14 +122,14 @@ export const ShareSongModal: React.FC<ShareSongModalProps> = ({
                 if (errorMsg) setErrorMsg(null);
               }}
               placeholder={t('songSharing.emailPlaceholder')}
-              className="w-full px-4 py-2.5 rounded-xl border border-border-main bg-bg-main text-text-main focus:outline-none focus:ring-2 focus:ring-[#8629cc] transition-colors text-sm"
+              className="w-full px-4 py-2.5 rounded-md border border-border-main bg-bg-main text-text-main focus:outline-none focus:ring-2 focus:ring-[#aa3bff] transition-colors text-sm"
               disabled={loading}
               autoFocus
             />
           </div>
 
           {errorMsg && (
-            <div className="p-3 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm font-medium">
+            <div className="p-3 rounded-md bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm font-medium">
               {errorMsg}
             </div>
           )}
@@ -138,7 +138,7 @@ export const ShareSongModal: React.FC<ShareSongModalProps> = ({
             <button
               type="button"
               onClick={handleClose}
-              className="px-4 py-2 rounded-xl text-sm font-medium text-text-main bg-bg-elevated hover:bg-bg-card border border-border-main transition-colors"
+              className="px-4 py-2 rounded-md text-sm font-medium text-text-main bg-bg-elevated hover:bg-bg-card border border-border-main transition-colors"
               disabled={loading}
             >
               {t('common.cancel')}

@@ -120,7 +120,7 @@ export const GroupMembersSection: React.FC<GroupMembersSectionProps> = ({
   const getRoleBadge = (memberRole: string) => {
     if (memberRole === 'OWNER') {
       return (
-        <span className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-semibold px-2.5 py-1 rounded-full bg-[#8629cc]/15 text-[#8629cc] border border-[#8629cc]/30 shrink-0">
+        <span className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-semibold px-2.5 py-1 rounded-full bg-[#aa3bff]/15 text-[#aa3bff] border border-[#aa3bff]/30 shrink-0">
           <ShieldCheck className="w-3.5 h-3.5" />
           {t('group.members.roles.owner')}
         </span>
@@ -152,7 +152,7 @@ export const GroupMembersSection: React.FC<GroupMembersSectionProps> = ({
   };
 
   return (
-    <div className="bg-bg-card rounded-2xl border border-border-main p-3.5 sm:p-6 space-y-5 sm:space-y-8 min-w-0">
+    <div className="bg-bg-card rounded-lg border border-border-main p-3.5 sm:p-6 space-y-5 sm:space-y-8 min-w-0">
       {/* Header with Members count and Invite Button */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="min-w-0">
@@ -185,7 +185,7 @@ export const GroupMembersSection: React.FC<GroupMembersSectionProps> = ({
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-16 bg-bg-elevated/60 animate-pulse rounded-2xl border border-border-main" />
+            <div key={i} className="h-16 bg-bg-elevated/60 animate-pulse rounded-lg border border-border-main" />
           ))}
         </div>
       ) : members.length === 0 ? (
@@ -201,12 +201,12 @@ export const GroupMembersSection: React.FC<GroupMembersSectionProps> = ({
             return (
               <div
                 key={member.id || member.userId}
-                className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 sm:p-4 border border-border-main rounded-2xl bg-bg-card hover:bg-bg-main/50 transition-colors gap-3"
+                className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 sm:p-4 border border-border-main rounded-lg bg-bg-card hover:bg-bg-main/50 transition-colors gap-3"
                 data-testid={`member-row-${member.userId}`}
               >
                 {/* Member Info */}
                 <div className="flex items-center gap-3 min-w-0 flex-1">
-                  <div className="w-10 h-10 rounded-full bg-[#8629cc]/15 text-[#8629cc] flex items-center justify-center font-bold text-xs sm:text-sm shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-[#aa3bff]/15 text-[#aa3bff] flex items-center justify-center font-bold text-xs sm:text-sm shrink-0">
                     {getInitials(member.name, member.email)}
                   </div>
                   <div className="min-w-0 flex-1">
@@ -232,7 +232,7 @@ export const GroupMembersSection: React.FC<GroupMembersSectionProps> = ({
                     {canRemove && (
                       <button
                         onClick={() => setSelectedMemberToRemove(member)}
-                        className="min-h-[36px] sm:min-h-[40px] px-2.5 sm:px-3 py-1.5 flex items-center gap-1.5 text-xs font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors shrink-0"
+                        className="min-h-[36px] sm:min-h-[40px] px-2.5 sm:px-3 py-1.5 flex items-center gap-1.5 text-xs font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors shrink-0"
                         title={t('group.members.removeMember')}
                         data-testid={`remove-member-btn-${member.userId}`}
                         aria-label={t('group.members.removeMember')}
@@ -245,7 +245,7 @@ export const GroupMembersSection: React.FC<GroupMembersSectionProps> = ({
                     {isSelf && member.role !== 'OWNER' && (
                       <button
                         onClick={() => setShowLeaveModal(true)}
-                        className="min-h-[36px] sm:min-h-[40px] px-2.5 sm:px-3 py-1.5 flex items-center gap-1.5 text-xs font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors shrink-0"
+                        className="min-h-[36px] sm:min-h-[40px] px-2.5 sm:px-3 py-1.5 flex items-center gap-1.5 text-xs font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors shrink-0"
                         title={t('group.members.leaveGroup')}
                         data-testid="leave-group-btn"
                         aria-label={t('group.members.leaveGroup')}
@@ -278,7 +278,7 @@ export const GroupMembersSection: React.FC<GroupMembersSectionProps> = ({
               {invitations.map((inv) => (
                 <div
                   key={inv.id}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 sm:p-4 border border-border-main rounded-2xl bg-bg-main/40 gap-3"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 sm:p-4 border border-border-main rounded-lg bg-bg-main/40 gap-3"
                   data-testid={`invite-row-${inv.id}`}
                 >
                   <div className="min-w-0 flex-1">
@@ -302,7 +302,7 @@ export const GroupMembersSection: React.FC<GroupMembersSectionProps> = ({
 
                   <button
                     onClick={() => handleCancelInvite(inv.id)}
-                    className="w-full sm:w-auto text-xs font-medium px-4 py-2 min-h-[38px] sm:min-h-[40px] flex items-center justify-center rounded-xl border border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900/40 dark:text-red-400 dark:hover:bg-red-950/30 transition-colors shrink-0"
+                    className="w-full sm:w-auto text-xs font-medium px-4 py-2 min-h-[38px] sm:min-h-[40px] flex items-center justify-center rounded-md border border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900/40 dark:text-red-400 dark:hover:bg-red-950/30 transition-colors shrink-0"
                     data-testid={`cancel-invite-btn-${inv.id}`}
                   >
                     {inv.status === 'PENDING' ? t('group.invitations.cancel') : t('group.invitations.dismiss')}

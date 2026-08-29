@@ -57,7 +57,7 @@ export const LinkPlaylistModal: React.FC<LinkPlaylistModalProps> = ({ onClose, o
 
   return createPortal(
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-bg-card rounded-xl max-w-md w-full p-6 shadow-2xl relative">
+      <div className="bg-bg-card rounded-md max-w-md w-full p-6 shadow-2xl relative">
         <button 
           onClick={onClose}
           className="absolute top-4 right-4 text-text-mute hover:text-gray-700 dark:hover:text-gray-300"

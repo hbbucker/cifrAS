@@ -150,16 +150,16 @@ export const PlaylistsPage: React.FC = () => {
                 <div 
                   key={pl.id} 
                   onClick={() => navigate(`/playlists/${pl.id}`)}
-                  className="bg-bg-card rounded-2xl border border-border-main p-3.5 sm:p-5 cursor-pointer hover:shadow-md hover:border-[#8629cc]/50 transition-all group min-w-0"
+                  className="bg-bg-card rounded-lg border border-border-main p-3.5 sm:p-5 cursor-pointer hover:shadow-md hover:border-[#aa3bff]/50 transition-all group min-w-0"
                   data-testid={`playlist-card-${pl.id}`}
                 >
                   <div className="flex items-start justify-between mb-2.5 sm:mb-4">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#8629cc]/10 rounded-xl flex items-center justify-center group-hover:bg-[#8629cc]/20 transition-colors shrink-0">
-                      <ListMusic className="w-5 h-5 sm:w-6 sm:h-6 text-[#8629cc]" />
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#aa3bff]/10 rounded-md flex items-center justify-center group-hover:bg-[#aa3bff]/20 transition-colors shrink-0">
+                      <ListMusic className="w-5 h-5 sm:w-6 sm:h-6 text-[#aa3bff]" />
                     </div>
                     <button
                       onClick={(e) => handleDeletePlaylist(e, pl.id)}
-                      className="w-10 h-10 min-w-[40px] min-h-[40px] flex items-center justify-center text-text-mute hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-colors opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+                      className="w-10 h-10 min-w-[40px] min-h-[40px] flex items-center justify-center text-text-mute hover:text-red-500 hover:bg-red-500/10 rounded-md transition-colors opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
                       title={t('playlists.deleteTooltip')}
                       aria-label={t('playlists.deleteTooltip')}
                     >
@@ -184,14 +184,14 @@ export const PlaylistsPage: React.FC = () => {
       {/* Create Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-bg-card rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl mx-auto">
+          <div className="bg-bg-card rounded-lg max-w-md w-full p-5 sm:p-6 shadow-2xl mx-auto">
             <h2 className="text-lg sm:text-xl font-bold text-text-main mb-4">{t('playlists.modalTitle')}</h2>
             <input 
               type="text" 
               value={newPlaylistName}
               onChange={(e) => setNewPlaylistName(e.target.value)}
               placeholder={t('playlists.modalPlaceholder')}
-              className="w-full px-4 py-3 bg-bg-main border border-border-main rounded-xl mb-6 text-text-main focus:ring-2 focus:ring-[#8629cc] outline-none text-sm sm:text-base"
+              className="w-full px-4 py-3 bg-bg-main border border-border-main rounded-md mb-6 text-text-main focus:ring-2 focus:ring-[#aa3bff] outline-none text-sm sm:text-base"
               data-testid="playlist-name-input"
             />
             <div className="flex justify-end gap-3">

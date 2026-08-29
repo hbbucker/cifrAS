@@ -27,7 +27,7 @@ export const LoginPage: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4">
-      <div className="max-w-md w-full bg-gray-800 rounded-xl shadow-2xl p-8 border border-gray-700">
+      <div className="max-w-md w-full bg-gray-800 rounded-md shadow-2xl p-8 border border-gray-700">
         <div className="flex flex-col items-center mb-8">
           <div className="mb-4">
             <BrandLogo iconOnly size="lg" />
@@ -66,9 +66,9 @@ export const LoginPage: React.FC = () => {
         </div>
 
         <div className="mt-8 flex justify-center space-x-4 text-xs text-gray-500">
-          <a href="/privacy?lang=pt" className="hover:text-[#8629cc] transition-colors">{t('landing.privacy')}</a>
+          <a href="/privacy?lang=pt" className="hover:text-[#aa3bff] transition-colors">{t('landing.privacy')}</a>
           <span>•</span>
-          <a href="/privacy?lang=en" className="hover:text-[#8629cc] transition-colors">{t('landing.privacy')}</a>
+          <a href="/privacy?lang=en" className="hover:text-[#aa3bff] transition-colors">{t('landing.privacy')}</a>
         </div>
       </div>
     </div>

@@ -83,7 +83,7 @@ export const TheaterControls: React.FC<TheaterControlsProps> = ({
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           <button 
             onClick={onLockToggle}
-            className={`p-2 min-h-[38px] min-w-[38px] sm:min-h-[42px] sm:min-w-[42px] flex items-center justify-center rounded-full bg-bg-card/90 hover:bg-bg-elevated transition-colors border border-border-main/50 shadow-sm ${isLocked ? 'text-[#8629cc] ring-1 ring-[#8629cc]/40' : 'text-text-mute hover:text-text-main'}`}
+            className={`p-2 min-h-[38px] min-w-[38px] sm:min-h-[42px] sm:min-w-[42px] flex items-center justify-center rounded-full bg-bg-card/90 hover:bg-bg-elevated transition-colors border border-border-main/50 shadow-sm ${isLocked ? 'text-[#aa3bff] ring-1 ring-[#aa3bff]/40' : 'text-text-mute hover:text-text-main'}`}
             title={isLocked ? t('theater.unlock') : t('theater.lock')} 
             aria-label={isLocked ? t('theater.unlock') : t('theater.lock')}
             data-testid="lock-mode-btn"
@@ -109,10 +109,10 @@ export const TheaterControls: React.FC<TheaterControlsProps> = ({
       {/* 2. SIDE DOCK (Typography & View Mode)                                     */}
       {/* ========================================================================= */}
       {!isLocked && (
-        <aside className="fixed right-3 sm:right-6 top-1/3 -translate-y-1/2 flex flex-col items-center gap-1 sm:gap-1.5 p-1.5 bg-bg-card/90 backdrop-blur-xl border border-border-main rounded-2xl shadow-xl pointer-events-auto transition-all">
+        <aside className="fixed right-3 sm:right-6 top-1/3 -translate-y-1/2 flex flex-col items-center gap-1 sm:gap-1.5 p-1.5 bg-bg-card/90 backdrop-blur-xl border border-border-main rounded-lg shadow-xl pointer-events-auto transition-all">
           <button 
             onClick={onFontSizeIncrease} 
-            className="p-2 min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center hover:bg-bg-elevated rounded-xl transition-colors text-text-mute hover:text-text-main font-bold text-sm sm:text-base" 
+            className="p-2 min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center hover:bg-bg-elevated rounded-md transition-colors text-text-mute hover:text-text-main font-bold text-sm sm:text-base" 
             title={t('theater.increaseFont')} 
             aria-label={t('theater.increaseFont')}
             data-testid="increase-font-btn"
@@ -122,7 +122,7 @@ export const TheaterControls: React.FC<TheaterControlsProps> = ({
           
           <button 
             onClick={onFontSizeDecrease} 
-            className="p-2 min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center hover:bg-bg-elevated rounded-xl transition-colors text-text-mute hover:text-text-main font-bold text-xs sm:text-sm" 
+            className="p-2 min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center hover:bg-bg-elevated rounded-md transition-colors text-text-mute hover:text-text-main font-bold text-xs sm:text-sm" 
             title={t('theater.decreaseFont')} 
             aria-label={t('theater.decreaseFont')}
             data-testid="decrease-font-btn"
@@ -134,7 +134,7 @@ export const TheaterControls: React.FC<TheaterControlsProps> = ({
 
           <button 
             onClick={onToggleSingerMode}
-            className={`p-2 min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center hover:bg-bg-elevated rounded-xl transition-colors ${isSingerMode ? 'bg-[#8629cc]/15 text-[#8629cc] ring-1 ring-[#8629cc]/30' : 'text-text-mute hover:text-text-main'}`}
+            className={`p-2 min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center hover:bg-bg-elevated rounded-md transition-colors ${isSingerMode ? 'bg-[#aa3bff]/15 text-[#aa3bff] ring-1 ring-[#aa3bff]/30' : 'text-text-mute hover:text-text-main'}`}
             title={isSingerMode ? t('theater.chordsMode') : t('theater.singerMode')} 
             aria-label={isSingerMode ? t('theater.chordsMode') : t('theater.singerMode')}
             data-testid="singer-mode-btn"
@@ -190,7 +190,7 @@ export const TheaterControls: React.FC<TheaterControlsProps> = ({
               <input 
                 type="range" min="1" max="10" step="1" 
                 value={speed} onChange={(e) => onSpeedChange(Number(e.target.value))}
-                className="w-full accent-[#8629cc] h-1.5 bg-bg-elevated rounded-lg cursor-pointer"
+                className="w-full accent-[#aa3bff] h-1.5 bg-bg-elevated rounded-lg cursor-pointer"
                 data-testid="speed-slider"
                 aria-label={t('theater.scrollSpeed')}
               />
@@ -199,7 +199,7 @@ export const TheaterControls: React.FC<TheaterControlsProps> = ({
 
           <button 
             onClick={onPlayPause}
-            className="w-10 h-10 sm:w-12 sm:h-12 bg-[#8629cc] hover:bg-[#721eb8] flex items-center justify-center rounded-full transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-[#8629cc]/20 shrink-0 disabled:opacity-50"
+            className="w-10 h-10 sm:w-12 sm:h-12 bg-[#aa3bff] hover:bg-[#9926f0] flex items-center justify-center rounded-full transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-[#aa3bff]/20 shrink-0 disabled:opacity-50"
             data-testid="play-pause-btn"
             disabled={isLocked}
             aria-label={isScrolling ? t('theater.pauseScroll') : t('theater.startScroll')}
