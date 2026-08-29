@@ -157,7 +157,7 @@ export const SongsListPage: React.FC = () => {
               <Button
                 variant="secondary"
                 onClick={() => setIsImportModalOpen(true)}
-                className="min-h-[40px] sm:min-h-[44px] px-3.5 sm:px-4 text-xs sm:text-sm hidden sm:flex"
+                className="min-h-[40px] sm:min-h-[44px] px-3.5 sm:px-4 text-xs sm:text-sm "
               >
                 <span>{t('common.import', 'Importar')}</span>
               </Button>
