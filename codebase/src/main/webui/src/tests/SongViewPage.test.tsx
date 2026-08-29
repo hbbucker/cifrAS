@@ -34,29 +34,4 @@ describe('SongViewPage Component', () => {
   expect(await screen.findByText('Wonderwall')).toBeInTheDocument();
  });
 
- it('shows FeatureDiscoveryModal when feature_discovery_03_seen is false or not set', async () => {
-   // Clear local storage
-   localStorage.clear();
-   vi.useFakeTimers();
-
-   render(
-     <AuthProvider>
-       <ThemeProvider>
-         <ToastProvider>
-           <BrowserRouter>
-             <SongViewPage />
-           </BrowserRouter>
-         </ToastProvider>
-       </ThemeProvider>
-     </AuthProvider>
-   );
-
-   // Fast forward the timer to trigger the modal
-   vi.advanceTimersByTime(1100);
-   vi.useRealTimers();
-
-   // The modal title should appear
-   // The button text is "Entendi!", "Got it!", or "featureDiscovery.button"
-   expect(await screen.findByText(/Entendi!|Got it!|featureDiscovery\.button/i)).toBeInTheDocument();
  });
-});

@@ -7,7 +7,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { stringifyLyrics } from '../utils/lyricsParser';
 import { transposeContent } from '../utils/chordTransposer';
 import { useToast } from '../context/ToastContext';
-import { FeatureDiscoveryModal } from '../components/FeatureDiscoveryModal';
 import { ShareSongModal } from '../components/modals/ShareSongModal';
 
 export const SongViewPage: React.FC = () => {
@@ -31,22 +30,6 @@ export const SongViewPage: React.FC = () => {
  const [useEb, setUseEb] = useState(false);
   const [autoScrollSpeed, setAutoScrollSpeed] = useState(1);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [showFeatureModal, setShowFeatureModal] = useState(false);
-
-  useEffect(() => {
-    const seen = localStorage.getItem('feature_discovery_03_seen');
-    if (!seen || seen === 'false') {
-      const timer = setTimeout(() => {
-        setShowFeatureModal(true);
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, []);
-
-  const handleCloseFeatureModal = () => {
-    localStorage.setItem('feature_discovery_03_seen', 'true');
-    setShowFeatureModal(false);
-  };
 
  useEffect(() => {
  if (id) {
@@ -258,7 +241,6 @@ export const SongViewPage: React.FC = () => {
           </div>
         </div>
       </div>
-      {showFeatureModal && <FeatureDiscoveryModal onClose={handleCloseFeatureModal} />}
       {id && (
         <ShareSongModal
           isOpen={showShareModal}

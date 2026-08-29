@@ -16,6 +16,8 @@ import { getSongs, getUserTags } from '../api/songs';
 import type { SongData, TagCount } from '../api/songs';
 import { ShareSongModal } from '../components/modals/ShareSongModal';
 import { ImportSongModal } from '../components/modals/ImportSongModal';
+import { CoachMark } from '../components/ui/CoachMark';
+import { useTour } from '../context/TourContext';
 import { BrandLogo } from '../components/ui/BrandLogo';
 import { TagFilterBar } from '../components/ui/TagFilterBar';
 
@@ -37,6 +39,15 @@ export const SongsListPage: React.FC = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
 
+
+  const { startTour } = useTour();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      startTour('import-cifraclub');
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [startTour]);
 
   useEffect(() => {
     getUserTags()
@@ -145,14 +156,21 @@ export const SongsListPage: React.FC = () => {
               <h1 className="text-lg sm:text-xl font-bold text-text-main truncate">{t('songsList.title')}</h1>
             </div>
             <div className="flex gap-2">
-              <Button
-                variant="secondary"
-                onClick={() => setIsImportModalOpen(true)}
-                size="sm"
+              <CoachMark
+                tourId="import-cifraclub"
+                title={t('songsList.importTitle', 'Importar do CifraClub')}
+                description={t('songsList.importDesc', 'Cole o link de uma música do CifraClub para importá-la diretamente para o seu repertório.')}
+                position="bottom"
               >
-                <Download className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-1" />
-                <span className="hidden sm:inline">{t('common.import', 'Importar')}</span>
-              </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => setIsImportModalOpen(true)}
+                  size="sm"
+                >
+                  <Download className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-1" />
+                  <span className="hidden sm:inline">{t('common.import', 'Importar')}</span>
+                </Button>
+              </CoachMark>
               <OnboardingTooltip tooltipId="add_song_btn">
                 <Button
                   onClick={() => navigate('/songs/new')}
