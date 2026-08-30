@@ -2,6 +2,7 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GroupDetailsPage } from '../pages/GroupDetailsPage';
 import * as groupsApi from '../api/groups';
+import * as shareLinksApi from '../api/shareLinks';
 import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/vitest';
 
@@ -36,6 +37,10 @@ vi.mock('../context/ToastContext', () => ({
   })
 }));
 
+vi.mock('../api/shareLinks', () => ({
+  createShareLink: vi.fn(),
+}));
+
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => {
@@ -45,7 +50,8 @@ vi.mock('react-i18next', () => ({
       if (key === 'group.members.roles.member') return 'Membro';
       if (key === 'group.invite') return 'Convidar Membro';
       if (key === 'groups.inviteToGroup') return 'Convidar para o Grupo';
-      if (key === 'groups.sendInvite') return 'Enviar Convite';
+      if (key === 'songSharing.generateLink') return 'Gerar Link';
+      if (key === 'songSharing.generalError') return 'Ocorreu um erro';
       if (key === 'common.cancel') return 'Cancelar';
       if (key === 'group.sharePlaylist') return 'Compartilhar Playlist';
       if (key === 'group.sharedPlaylists') return 'Playlists Compartilhadas';
@@ -107,14 +113,11 @@ describe('GroupDetailsPage Component', () => {
     expect(screen.getByTestId('tab-playlists')).toBeInTheDocument();
     expect(screen.getByTestId('tab-members')).toBeInTheDocument();
 
-    // Default tab is Playlists
     expect(screen.getByText('Playlists Compartilhadas')).toBeInTheDocument();
 
-    // Back to groups button
     fireEvent.click(screen.getByTestId('back-to-groups-btn'));
     expect(mockNavigate).toHaveBeenCalledWith('/groups');
 
-    // Switch to Members tab
     fireEvent.click(screen.getByTestId('tab-members'));
 
     await waitFor(() => {
@@ -122,7 +125,17 @@ describe('GroupDetailsPage Component', () => {
     });
   });
 
-  it('opens invite modal and submits invite', async () => {
+  it('opens invite modal and generates link', async () => {
+    vi.mocked(shareLinksApi.createShareLink).mockResolvedValueOnce({
+      token: 'group-token',
+      type: 'GROUP',
+      resourceId: 'group-1',
+      resourceName: 'The Awesome Band',
+      authorName: 'Owner',
+      expiresAt: new Date().toISOString(),
+      url: 'http://localhost/invite/group-token',
+    });
+
     render(
       <BrowserRouter>
         <GroupDetailsPage />
@@ -137,21 +150,19 @@ describe('GroupDetailsPage Component', () => {
 
     expect(screen.getByText('Convidar para o Grupo')).toBeInTheDocument();
 
-    const emailInput = screen.getByTestId('invite-email-input');
-    fireEvent.change(emailInput, { target: { value: 'newmember@band.com' } });
-
-    const sendBtn = screen.getByTestId('send-invite-btn');
-    fireEvent.click(sendBtn);
+    const generateBtn = screen.getByRole('button', { name: /Gerar Link/i });
+    fireEvent.click(generateBtn);
 
     await waitFor(() => {
-      expect(groupsApi.inviteGroupMember).toHaveBeenCalledWith('group-1', 'newmember@band.com');
+      expect(shareLinksApi.createShareLink).toHaveBeenCalledWith({ type: 'GROUP', resourceId: 'group-1' });
     });
+
+    const urlInput = await screen.findByRole('textbox');
+    expect((urlInput as HTMLInputElement).value).toContain("/invite/group-token");
   });
 
-  it('handles invite error response gracefully', async () => {
-    vi.spyOn(groupsApi, 'inviteGroupMember').mockRejectedValueOnce({
-      response: { data: { error: 'User is already a member' } }
-    });
+  it('handles invite error response gracefully when API fails', async () => {
+    vi.mocked(shareLinksApi.createShareLink).mockRejectedValueOnce(new Error('API error'));
 
     render(
       <BrowserRouter>
@@ -165,14 +176,11 @@ describe('GroupDetailsPage Component', () => {
 
     fireEvent.click(screen.getByTestId('header-invite-btn'));
 
-    const emailInput = screen.getByTestId('invite-email-input');
-    fireEvent.change(emailInput, { target: { value: 'existing@band.com' } });
-
-    const sendBtn = screen.getByTestId('send-invite-btn');
-    fireEvent.click(sendBtn);
+    const generateBtn = screen.getByRole('button', { name: /Gerar Link/i });
+    fireEvent.click(generateBtn);
 
     await waitFor(() => {
-      expect(screen.getByText('User is already a member')).toBeInTheDocument();
+      expect(screen.getByText(/Ocorreu um erro/i)).toBeInTheDocument();
     });
   });
 

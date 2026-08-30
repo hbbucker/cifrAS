@@ -16,6 +16,8 @@ export default defineConfig({
   use: {
     baseURL: 'http://localhost:8080',
     trace: 'on-first-retry',
+    screenshot: 'on',
+    video: 'on'
   },
   projects: [
     {
@@ -23,7 +25,6 @@ export default defineConfig({
       use: { 
         ...devices['Desktop Chrome'],
         locale: 'en-US',
-        channel: 'chrome',
         launchOptions: {
           args: ['--disable-blink-features=AutomationControlled']
         }
