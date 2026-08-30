@@ -50,6 +50,7 @@ class ProcessMessageUseCase {
 
       // 2. Itera de forma sequencial e atômica sobre o fluxo de eventos tipados
       for await (const event of this.llmEngine.executeStream(instruction)) {
+        if (global.logDebug && event.type !== 'TEXT_DELTA_EMITTED') global.logDebug('USECASE PROCESSING EVENT:', event.type);
         switch (event.type) {
           case 'SESSION_BOUND': {
             session.bindSessionId(event.payload.sessionId);
@@ -69,8 +70,10 @@ class ProcessMessageUseCase {
             break;
           }
 
-          case 'TEXT_DELTA_EMITTED': {
-            // Streaming de texto puro: não envia fragmentos cortados para a thread
+                    case 'TEXT_DELTA_EMITTED': {
+            const { conversationId, textChunk } = event.payload;
+            const role = session.getRoleForConversation(conversationId) || AgentRole.from('Especialista');
+            await this.notificationGateway.streamNarrative(threadId, channelId, role, textChunk);
             break;
           }
 

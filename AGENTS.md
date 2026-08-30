@@ -234,96 +234,6 @@ Para economizar tokens de contexto nas interações com o terminal e o git, todo
 fly deploy --local-only --verbose
 ```
 
----
-
-## 9. Princípios Fundamentais
-
-### 9.1 Spec-Driven Development (TLC)
-Toda implementação regular deve ser precedida por uma especificação clara. O fluxo padrão é:
-> **Specify → Clarify/Plan (Fundidos) → Tasks → Implement → Validate**
-
-**Fast-Track**: Alterações de baixa complexidade ou ajustes de UI podem pular do `Specify` direto para o `Implement`.
-
-### 9.2 Maker-Checker Separation
-O agente que gera o artefato (Maker) **nunca** pode validá-lo. A validação é responsabilidade exclusiva do Checker (QA Lead). O QA Lead atua também com viés adversarial caso os Makers excedam 3 rejeições.
-
-### 9.3 Autoridade de Domínio (Domain Authority)
-Para evitar o "Paradoxo do Árbitro" e poupar o fundador humano:
-- O **CPO** tem a decisão final irrevogável em regras de produto e negócio.
-- O **CTO** tem a decisão final irrevogável em arquitetura e stack técnica.
-O humano (CEO/Fundador) só deve ser escalado para pivotagens de roadmap, aumento crítico de escopo ou decisões financeiras/tempo.
-
-### 9.4 Paralelismo Contract-First
-Ao iniciar a etapa de `Implement`, o CTO deve gerar os DTOs (Contratos de API) primeiro. A partir da selagem do contrato, CTO e Frontend codificam em paralelo.
-
----
-
-## 10. Papéis (Agents)
-
-| Papel | Responsabilidade | Ferramentas Permitidas | Modelo Sugerido | Skill Correspondente |
-|-------|------------------|------------------------|-----------------|----------------------|
-| **CEO & Orquestrador** | Roteamento do workflow, aplicação da Autoridade, escalação | Leitura/Escrita completa | Sonnet / Opus / Pro | `startupos-ceo` |
-| **CTO** | Arquitetura, backend, DTOs, banco de dados | Leitura/Escrita/Execução | Sonnet / Opus / Pro | `startupos-cto` |
-| **CPO** | Produto, UX, critérios de aceite, roadmap | Leitura/Escrita (docs) | Sonnet / Opus / Pro | `startupos-cpo` |
-| **QA Lead** | Checker único. Testes, aprovação de release | **Somente Leitura** | Sonnet / Pro | `startupos-qa-lead` |
-| **Frontend Staff** | UX, jornadas, UI (React/Vite) | Leitura/Escrita/Execução | Sonnet / Opus / Pro | `startupos-frontend-staff` |
-
----
-
-## 11. Regras de Ferramentas por Papel
-
-### 11.1 Restrições Estritas de QA Lead
-
-O papel de **QA Lead** é estritamente **read-only**:
-
-- `Read` — Permitido
-- `Grep` — Permitido
-- `Glob` — Permitido
-- `Write` — **Proibido**
-- `Exec` — **Proibido**
-- `Edit` — **Proibido**
-
-### 11.2 Makers (CTO e Frontend Staff)
-
-Podem executar código, escrever arquivos e usar ferramentas de implementação, mas **não podem** validar seu próprio trabalho.
-
----
-
-## 12. Workflow de Governança
-
-### 12.1 Workflow Operacional
-1. **Specify** — CPO captura requisitos e cria critérios de aceite.
-2. **Clarify/Plan** — CTO levanta viabilidade técnica e define DTOs/Banco.
-3. **Implement (Paralelo)** — CTO (Backend) e Frontend codificam simultaneamente guiados pelos DTOs.
-4. **Validate** — QA Lead avalia. Se reprovar, devolve ao Maker. 
-5. **Adversarial Mode** — Se o QA Lead rejeitar 3 vezes a mesma entrega, ele congela a feature e força a Autoridade de Domínio (CTO ou CPO) a assumir a responsabilidade técnica/funcional.
-
-### 12.2 Escalação Humana (CEO/Fundador)
-A IA (Orquestrador) só deve pausar o workflow e chamar o humano se:
-1. Houver necessidade de alterar `.specs/project/ROADMAP.md` ou `.specs/project/PROJECT.md`.
-2. O risco financeiro, de tempo ou de segurança for muito alto para a IA assumir.
-
----
-
-## 13. Princípios de Trade-Off (Startup Principles)
-
-1. **Progresso sobre Perfeição** — Entregue valor incremental (Fast-Track para coisas simples).
-2. **Especifique antes de Codificar** — Para features complexas, o contrato é inegociável.
-3. **Separe Maker de Checker** — Quem escreve código não pode dar "Go" para release.
-4. **Autoridade de Domínio** — Deixe a engenharia decidir engenharia e o produto decidir produto. Poupe o fundador.
-5. **Contexto Fresco** — O QA Lead não deve ler o histórico de pensamento do Maker para não contaminar seu viés.
-
----
-
-## 14. Documentação do Projeto
-
-Os documentos de referência do projeto vivem em `.specs/project/`:
-
-- **[`PROJECT.md`](.specs/project/PROJECT.md)** — Constituição: visão, objetivos, stack e escopo.
-- **[`ROADMAP.md`](.specs/project/ROADMAP.md)** — Milestones e status de entrega.
-- **[`STATE.md`](.specs/project/STATE.md)** — Estado atual do projeto (contexto operacional).
-- **[`.specs/features/`](.specs/features/)** — Especificações técnicas por feature.
-
 <!-- startupos-governance:start -->
 # Startup OS Governance
 
@@ -396,6 +306,8 @@ Qualquer ponte, integração (como `slack_bridge`) ou wrapper que invoque a CLI 
 3. **Implement (Paralelo)** — CTO (Backend) e Frontend codificam simultaneamente guiados pelos DTOs. Ambos devem avaliar e registrar ADRs caso tomem decisões arquiteturais complexas em suas áreas.
 4. **Validate** — QA Lead avalia contra o nível consolidado, gates e evidências. O parecer de integração é `PRONTA PARA INTEGRAÇÃO` ou `REJEITADA`; ele não autoriza release. O QA produz o texto do parecer read-only e o CEO/Orquestrador o persiste verbatim em `.specs/features/<feature>/qa/`.
 5. **Adversarial Mode** — Se o QA Lead rejeitar 3 vezes a mesma entrega, ele congela a feature e força a Autoridade de Domínio (CTO ou CPO) a assumir a responsabilidade técnica/funcional.
+6. **Gerenciamento de Alterações** - Sempre que uma alteração de código for iniciada, abra uma worktree com uma nova branch, e ao encerrar a release e o deploy remova a worktree local.
+7. **Deploy e Release** - Nunca feche uma release e um deploy em produção sem autorização explicita do humano.
 
 ### 4.2 Fast-Track com Gate de Qualidade
 1. Registrar uma microespecificação com objetivo, escopo, critérios de aceite e riscos conhecidos.

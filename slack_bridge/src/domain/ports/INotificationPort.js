@@ -11,6 +11,10 @@ class INotificationPort {
     throw new Error('INotificationPort.sendStatus() must be implemented');
   }
 
+  async streamNarrative(threadId, channelId, agentRole, textChunk) {
+    throw new Error('INotificationPort.streamNarrative() must be implemented');
+  }
+
   async sendIntermediateNarrative(threadId, channelId, agentRole, markdownText) {
     throw new Error('INotificationPort.sendIntermediateNarrative() must be implemented');
   }

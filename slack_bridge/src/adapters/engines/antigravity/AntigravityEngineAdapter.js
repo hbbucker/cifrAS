@@ -129,6 +129,7 @@ class AntigravityEngineAdapter extends ILLMEnginePort {
     }
 
     const streamParser = AntigravityStreamParser.create((event) => {
+      if (global.logDebug) global.logDebug('[AGY] Stream Event:', event.event, event.step_update ? (event.step_update.step_type || event.step_update.state) : '');
       this.translateStreamEvent(event, queue, executionContext);
     });
 
@@ -235,6 +236,11 @@ class AntigravityEngineAdapter extends ILLMEnginePort {
     }
 
     // 4. Mudança de status da execução
+    if (event.event === 'step_update' && event.step_update && event.step_update.step_type === 'tool' && event.step_update.state === 'ACTIVE') {
+      const convId = event.step_update.conversation_id || executionContext.boundSessionId;
+      queue.push(EngineEvent.statusUpdated(convId, 'Usando ferramenta: ' + event.step_update.tool_name));
+    }
+    
     if (event.event === 'step_update' && event.step_update && event.step_update.status_text) {
       const convId = event.step_update.conversation_id || executionContext.boundSessionId;
       queue.push(EngineEvent.statusUpdated(convId, event.step_update.status_text));

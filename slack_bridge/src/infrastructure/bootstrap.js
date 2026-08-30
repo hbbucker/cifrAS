@@ -20,6 +20,10 @@ function createEngine(engineName) {
 
 async function bootstrap() {
   const config = EnvironmentConfig.load();
+  if (config.isDebug) {
+    global.logDebug = (...args) => console.log(`[DEBUG ${new Date().toISOString()}]`, ...args);
+    console.log('[DEBUG] Debug mode enabled');
+  }
 
   if (!config.slackBotToken || !config.slackAppToken) {
     throw new Error('Missing SLACK_BOT_TOKEN or SLACK_APP_TOKEN in environment configuration');
@@ -53,7 +57,8 @@ async function bootstrap() {
   controller.register(app);
 
   await app.start();
-  console.log('⚡ Slack Bridge is running cleanly with Clean Architecture!');
+  const pkg = require('../../package.json');
+  console.log(`⚡ Slack Bridge v${pkg.version} is running cleanly with Clean Architecture!`);
   if (global.logDebug) global.logDebug('bridge_started');
 
   return { app, processMessageUseCase };
