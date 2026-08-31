@@ -3,7 +3,27 @@ const { AgentRole } = require('../../domain/value-objects/AgentRole');
 const { GovernanceContract } = require('../../domain/value-objects/GovernanceContract');
 const { NarrativeSanitizerService } = require('../../domain/services/NarrativeSanitizerService');
 const { EngineInstructionDTO } = require('../../domain/dtos/EngineInstructionDTO');
+const { EngineQuotaExhaustedError } = require('../../domain/errors/EngineQuotaExhaustedError');
 const { ExecutionResultDTO } = require('../dtos/IncomingMessageDTO');
+
+function formatRetryDuration(retryAfterSeconds) {
+  const hours = Math.floor(retryAfterSeconds / 3600);
+  const minutes = Math.floor((retryAfterSeconds % 3600) / 60);
+  const seconds = retryAfterSeconds % 60;
+  const components = [];
+  if (hours > 0) components.push(`${hours} h`);
+  if (minutes > 0) components.push(`${minutes} min`);
+  if (seconds > 0) components.push(`${seconds} s`);
+  return components.join(' ');
+}
+
+function buildQuotaMessage(retryAfterSeconds) {
+  if (Number.isInteger(retryAfterSeconds) && retryAfterSeconds > 0) {
+    const duration = formatRetryDuration(retryAfterSeconds);
+    return `⚠️ O limite individual do Antigravity foi atingido. A plataforma informou nova tentativa em aproximadamente ${duration}. Sua sessão foi preservada.`;
+  }
+  return '⚠️ O limite individual do Antigravity foi atingido. Tente novamente mais tarde. Sua sessão foi preservada.';
+}
 
 class ProcessMessageUseCase {
   constructor({
@@ -147,6 +167,23 @@ class ProcessMessageUseCase {
         filePaths: finalResult.filePaths || [],
       });
     } catch (error) {
+      if (error instanceof EngineQuotaExhaustedError) {
+        session.markActive(false);
+        await this.sessionRepository.save(session);
+
+        await this.notificationGateway.sendErrorMessage(
+          threadId,
+          channelId,
+          buildQuotaMessage(error.retryAfterSeconds)
+        );
+
+        return new ExecutionResultDTO({
+          success: false,
+          sessionId: session.sessionId,
+          error,
+        });
+      }
+
       // 4. Tratamento de Recuperação (Auto-Recovery)
       if (session.sessionId) {
         session.resetSession();
