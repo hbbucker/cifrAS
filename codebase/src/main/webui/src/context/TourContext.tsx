@@ -36,6 +36,7 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useTour = () => {
   const context = useContext(TourContext);
   if (context === undefined) {

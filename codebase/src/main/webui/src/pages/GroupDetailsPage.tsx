@@ -6,7 +6,7 @@ import { ArrowLeft, Users, UserPlus, ListMusic } from 'lucide-react';
 import { GroupPlaylistsSection } from '../components/groups/GroupPlaylistsSection';
 import { GroupMembersSection } from '../components/groups/GroupMembersSection';
 import { LinkPlaylistModal } from '../components/modals/LinkPlaylistModal';
-import { linkPlaylist, inviteGroupMember } from '../api/groups';
+import { linkPlaylist } from '../api/groups';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 
@@ -35,7 +35,6 @@ export const GroupDetailsPage: React.FC = () => {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const [showInviteModal, setShowInviteModal] = useState(false);
-  const [inviteEmail, setInviteEmail] = useState('');
   const [inviteError, setInviteError] = useState('');
   const [inviting, setInviting] = useState(false);
 
@@ -87,7 +86,7 @@ export const GroupDetailsPage: React.FC = () => {
       const data = await createShareLink({ type: 'GROUP', resourceId: id });
       const url = `${window.location.origin}/invite/${data.token}`;
       setShareUrl(url);
-    } catch (err: unknown) {
+    } catch {
       setInviteError(t('songSharing.generalError', 'Ocorreu um erro ao gerar o link.'));
     } finally {
       setInviting(false);
@@ -101,7 +100,7 @@ export const GroupDetailsPage: React.FC = () => {
       setCopied(true);
       toast(t('songSharing.copySuccess', 'Link copiado!'), 'success');
       setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
+    } catch {
       toast(t('songSharing.copyError', 'Erro ao copiar o link.'), 'error');
     }
   };

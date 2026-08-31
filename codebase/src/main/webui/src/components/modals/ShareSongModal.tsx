@@ -11,7 +11,6 @@ interface ShareSongModalProps {
   songId: string;
   songTitle: string;
   onClose: () => void;
-  onSuccess?: () => void;
 }
 
 export const ShareSongModal: React.FC<ShareSongModalProps> = ({
@@ -19,7 +18,6 @@ export const ShareSongModal: React.FC<ShareSongModalProps> = ({
   songId,
   songTitle,
   onClose,
-  onSuccess,
 }) => {
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -56,7 +54,7 @@ export const ShareSongModal: React.FC<ShareSongModalProps> = ({
       const data = await createShareLink({ type: 'SONG', resourceId: songId });
       const url = `${window.location.origin}/invite/${data.token}`;
       setShareUrl(url);
-    } catch (err: unknown) {
+    } catch {
       setErrorMsg(t('songSharing.generalError', 'Ocorreu um erro ao gerar o link.'));
     } finally {
       setLoading(false);
@@ -70,7 +68,7 @@ export const ShareSongModal: React.FC<ShareSongModalProps> = ({
       setCopied(true);
       toast(t('songSharing.copySuccess', 'Link copiado!'), 'success');
       setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
+    } catch {
       toast(t('songSharing.copyError', 'Erro ao copiar o link.'), 'error');
     }
   };
