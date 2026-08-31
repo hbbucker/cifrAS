@@ -23,7 +23,7 @@ vi.mock('../api/shareLinks', () => ({
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string, defaultText: string) => defaultText
+    t: (_key: string, defaultText: string) => defaultText
   })
 }));
 
@@ -44,12 +44,10 @@ describe('InvitePage Component', () => {
   it('sets pendingShareToken in localStorage and redirects to /login when user is not logged in', async () => {
     vi.spyOn(authContext, 'useAuth').mockReturnValue({
       user: null,
-      authLoading: false,
+      loading: false,
       isAuthenticated: false,
-      token: null,
       login: vi.fn(),
-      logout: vi.fn(),
-      updateUser: vi.fn()
+      logout: vi.fn()
     });
 
     renderComponent();
@@ -63,12 +61,10 @@ describe('InvitePage Component', () => {
   it('accepts invite and redirects to song page when user is logged in (SONG type)', async () => {
     vi.spyOn(authContext, 'useAuth').mockReturnValue({
       user: { id: 'u1', email: 'test@test.com', name: 'Test' },
-      authLoading: false,
+      loading: false,
       isAuthenticated: true,
-      token: 'jwt',
       login: vi.fn(),
-      logout: vi.fn(),
-      updateUser: vi.fn()
+      logout: vi.fn()
     });
 
     vi.mocked(shareLinksApi.acceptShareLink).mockResolvedValueOnce({ success: true, message: 'Accepted' });
@@ -94,12 +90,10 @@ describe('InvitePage Component', () => {
   it('accepts invite and redirects to group page when user is logged in (GROUP type)', async () => {
     vi.spyOn(authContext, 'useAuth').mockReturnValue({
       user: { id: 'u1', email: 'test@test.com', name: 'Test' },
-      authLoading: false,
+      loading: false,
       isAuthenticated: true,
-      token: 'jwt',
       login: vi.fn(),
-      logout: vi.fn(),
-      updateUser: vi.fn()
+      logout: vi.fn()
     });
 
     vi.mocked(shareLinksApi.acceptShareLink).mockResolvedValueOnce({ success: true, message: 'Accepted' });
@@ -123,12 +117,10 @@ describe('InvitePage Component', () => {
   it('shows error state when accept API fails with 404', async () => {
     vi.spyOn(authContext, 'useAuth').mockReturnValue({
       user: { id: 'u1', email: 'test@test.com', name: 'Test' },
-      authLoading: false,
+      loading: false,
       isAuthenticated: true,
-      token: 'jwt',
       login: vi.fn(),
-      logout: vi.fn(),
-      updateUser: vi.fn()
+      logout: vi.fn()
     });
 
     vi.mocked(shareLinksApi.acceptShareLink).mockRejectedValueOnce({
@@ -145,12 +137,10 @@ describe('InvitePage Component', () => {
   it('redirects to /login when accept API fails with 401', async () => {
     vi.spyOn(authContext, 'useAuth').mockReturnValue({
       user: { id: 'u1', email: 'test@test.com', name: 'Test' },
-      authLoading: false,
+      loading: false,
       isAuthenticated: true,
-      token: 'jwt',
       login: vi.fn(),
-      logout: vi.fn(),
-      updateUser: vi.fn()
+      logout: vi.fn()
     });
 
     vi.mocked(shareLinksApi.acceptShareLink).mockRejectedValueOnce({
