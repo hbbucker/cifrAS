@@ -77,7 +77,7 @@ export const InvitePage: React.FC = () => {
   if (error) {
     return (
       <div className="flex h-screen items-center justify-center p-4">
-        <ErrorState title={t('common.error', 'Erro')} message={error} onRetry={() => navigate('/')} retryText={t('common.goHome', 'Ir para Home')} />
+        <ErrorState title={t('common.error', 'Erro')} message={error} onRetry={() => navigate('/')} />
       </div>
     );
   }
