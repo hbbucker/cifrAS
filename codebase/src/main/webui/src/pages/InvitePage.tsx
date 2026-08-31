@@ -40,7 +40,7 @@ export const InvitePage: React.FC = () => {
         const info = await getShareLinkInfo(token);
         
         if (info.type === 'SONG') {
-          navigate(`/songs/${info.resourceId}`, { replace: true });
+          navigate(`/song/${info.resourceId}`, { replace: true });
         } else if (info.type === 'GROUP') {
           navigate(`/groups/${info.resourceId}`, { replace: true });
         } else {

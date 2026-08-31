@@ -83,7 +83,7 @@ describe('InvitePage Component', () => {
     await waitFor(() => {
       expect(shareLinksApi.acceptShareLink).toHaveBeenCalledWith('token123');
       expect(shareLinksApi.getShareLinkInfo).toHaveBeenCalledWith('token123');
-      expect(mockNavigate).toHaveBeenCalledWith('/songs/song-1', { replace: true });
+      expect(mockNavigate).toHaveBeenCalledWith('/song/song-1', { replace: true });
     });
   });
 

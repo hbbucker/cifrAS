@@ -3,6 +3,7 @@ import { test, expect } from '@playwright/test';
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
     localStorage.setItem('feature_discovery_03_seen', 'true');
+    localStorage.setItem('tour_seen_import-cifraclub', 'true');
     localStorage.setItem('tooltip_seen_add_song_btn', 'true');
   });
 });
@@ -66,7 +67,7 @@ test('generate share link for a song and process invite', async ({ page }) => {
   await expect(page).toHaveURL(/.*\/dashboard/);
   
   // Go to song page
-  await page.goto('/songs/song-123');
+  await page.goto('/song/song-123');
   
   // Wait for title
   await expect(page.getByText('Mock Share Song')).toBeVisible();
@@ -102,6 +103,6 @@ test('generate share link for a song and process invite', async ({ page }) => {
   await page.goto(inviteUrl);
   
   // Should redirect to song page
-  await expect(page).toHaveURL(/\/songs\/song-123/);
+  await expect(page).toHaveURL(/\/song\/song-123/);
   await expect(page.getByText('Mock Share Song')).toBeVisible();
 });
