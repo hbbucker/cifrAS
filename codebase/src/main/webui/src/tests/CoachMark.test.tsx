@@ -4,18 +4,18 @@ import { describe, it, expect } from 'vitest';
 import { CoachMark } from '../components/ui/CoachMark';
 import { TourProvider, useTour } from '../context/TourContext';
 
-const TestWrapper = ({ children, startTourId }: { children: React.ReactNode, startTourId?: string }) => {
-  const Inner = () => {
-    const { startTour } = useTour();
-    React.useEffect(() => {
-      if (startTourId) startTour(startTourId);
-    }, [startTour]);
-    return <>{children}</>;
-  };
+const Inner = ({ children, startTourId }: { children: React.ReactNode; startTourId?: string }) => {
+  const { startTour } = useTour();
+  React.useEffect(() => {
+    if (startTourId) startTour(startTourId);
+  }, [startTour, startTourId]);
+  return <>{children}</>;
+};
 
+const TestWrapper = ({ children, startTourId }: { children: React.ReactNode; startTourId?: string }) => {
   return (
     <TourProvider>
-      <Inner />
+      <Inner startTourId={startTourId}>{children}</Inner>
     </TourProvider>
   );
 };
