@@ -1,3 +1,4 @@
+import { createShareLink } from "../api/shareLinks";
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -5,7 +6,7 @@ import { ArrowLeft, Users, UserPlus, ListMusic } from 'lucide-react';
 import { GroupPlaylistsSection } from '../components/groups/GroupPlaylistsSection';
 import { GroupMembersSection } from '../components/groups/GroupMembersSection';
 import { LinkPlaylistModal } from '../components/modals/LinkPlaylistModal';
-import { linkPlaylist, inviteGroupMember } from '../api/groups';
+import { linkPlaylist } from '../api/groups';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 
@@ -34,7 +35,6 @@ export const GroupDetailsPage: React.FC = () => {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const [showInviteModal, setShowInviteModal] = useState(false);
-  const [inviteEmail, setInviteEmail] = useState('');
   const [inviteError, setInviteError] = useState('');
   const [inviting, setInviting] = useState(false);
 
@@ -75,27 +75,33 @@ export const GroupDetailsPage: React.FC = () => {
     setRefreshTrigger(prev => prev + 1);
   };
 
-  const handleInvite = async () => {
-    if (!inviteEmail.trim() || !id) return;
-    setInviteError('');
-    setInviting(true);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
+  const handleGenerateLink = async () => {
+    if (!id) return;
+    setInviting(true);
+    setInviteError('');
     try {
-      await inviteGroupMember(id, inviteEmail);
-      toast(t('group.members.inviteSuccess'), 'success');
-      setShowInviteModal(false);
-      setInviteEmail('');
-      setRefreshTrigger(prev => prev + 1);
-    } catch (err: unknown) {
-      let errorMsg = 'Failed to invite member. Please check if the email is correct and registered.';
-      if (err && typeof err === 'object' && 'response' in err) {
-        const axiosErr = err as { response?: { data?: { error?: string; message?: string } } };
-        if (axiosErr.response?.data?.error) errorMsg = axiosErr.response.data.error;
-        else if (axiosErr.response?.data?.message) errorMsg = axiosErr.response.data.message;
-      }
-      setInviteError(errorMsg);
+      const data = await createShareLink({ type: 'GROUP', resourceId: id });
+      const url = `${window.location.origin}/invite/${data.token}`;
+      setShareUrl(url);
+    } catch {
+      setInviteError(t('songSharing.generalError', 'Ocorreu um erro ao gerar o link.'));
     } finally {
       setInviting(false);
+    }
+  };
+
+  const handleCopy = async () => {
+    if (!shareUrl) return;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      toast(t('songSharing.copySuccess', 'Link copiado!'), 'success');
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast(t('songSharing.copyError', 'Erro ao copiar o link.'), 'error');
     }
   };
 
@@ -226,7 +232,7 @@ export const GroupDetailsPage: React.FC = () => {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-bg-card rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl mx-auto">
             <h2 className="text-lg sm:text-xl font-bold text-text-main mb-4">
-              {t('groups.inviteToGroup')}
+              {t('groups.inviteToGroup', 'Convidar para o Grupo')}
             </h2>
 
             {inviteError && (
@@ -235,37 +241,57 @@ export const GroupDetailsPage: React.FC = () => {
               </div>
             )}
 
-            <input
-              type="email"
-              value={inviteEmail}
-              onChange={(e) => {
-                setInviteEmail(e.target.value);
-                setInviteError('');
-              }}
-              placeholder={t('groups.memberEmail')}
-              className="w-full px-4 py-3 bg-bg-main border border-border-main rounded-md mb-6 text-text-main focus:ring-2 focus:ring-[#aa3bff] outline-none text-sm sm:text-base"
-              data-testid="invite-email-input"
-            />
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => {
-                  setShowInviteModal(false);
-                  setInviteError('');
-                }}
-                className="px-4 py-2.5 min-h-[44px] font-medium text-text-mute hover:bg-bg-elevated rounded-md transition-colors text-sm"
-                disabled={inviting}
-              >
-                {t('common.cancel')}
-              </button>
-              <button
-                onClick={handleInvite}
-                disabled={inviting || !inviteEmail.trim()}
-                className="px-4 py-2.5 min-h-[44px] font-medium bg-[#aa3bff] hover:bg-[#9926f0] text-white rounded-md transition-colors disabled:opacity-50 text-sm"
-                data-testid="send-invite-btn"
-              >
-                {inviting ? '...' : t('groups.sendInvite')}
-              </button>
-            </div>
+            {!shareUrl ? (
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  onClick={() => {
+                    setShowInviteModal(false);
+                    setInviteError('');
+                  }}
+                  className="px-4 py-2.5 min-h-[44px] font-medium text-text-mute hover:bg-bg-elevated rounded-md transition-colors text-sm"
+                  disabled={inviting}
+                >
+                  {t('common.cancel', 'Cancelar')}
+                </button>
+                <button
+                  onClick={handleGenerateLink}
+                  disabled={inviting}
+                  className="px-4 py-2.5 min-h-[44px] font-medium bg-[#aa3bff] hover:bg-[#9926f0] text-white rounded-md transition-colors disabled:opacity-50 text-sm"
+                >
+                  {inviting ? '...' : t('songSharing.generateLink', 'Gerar Link')}
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={shareUrl}
+                    className="flex-1 px-4 py-2.5 rounded-md border border-border-main bg-bg-main text-text-main focus:outline-none focus:ring-2 focus:ring-[#aa3bff] transition-colors text-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCopy}
+                    className="px-4 py-2.5 bg-[#aa3bff] hover:bg-[#9926f0] text-white rounded-md transition-colors"
+                  >
+                    {copied ? t('songSharing.copySuccess', 'Copiado!') : t('songSharing.copy', 'Copiar')}
+                  </button>
+                </div>
+                <div className="flex justify-end gap-3 pt-2">
+                  <button
+                    onClick={() => {
+                      setShowInviteModal(false);
+                      setShareUrl(null);
+                      setCopied(false);
+                    }}
+                    className="px-4 py-2.5 min-h-[44px] font-medium bg-bg-elevated text-text-main hover:bg-border-main rounded-md transition-colors text-sm"
+                  >
+                    {t('common.close', 'Fechar')}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

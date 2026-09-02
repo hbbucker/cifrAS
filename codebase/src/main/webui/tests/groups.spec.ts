@@ -35,6 +35,10 @@ test('create group, verify tabs, member list and invite button', async ({ page }
 
   // Open invite modal
   await page.getByTestId('invite-member-btn').click();
-  await expect(page.getByPlaceholder('member@example.com')).toBeVisible();
-  await page.getByRole('button', { name: 'Cancel' }).click();
+  
+  // Now it's a share link modal
+  await expect(page.getByRole('button', { name: /Gerar Link|Generate Link/i })).toBeVisible();
+  
+  // Click Cancel to dismiss
+  await page.getByRole('button', { name: /Cancel|Cancelar/i }).click();
 });

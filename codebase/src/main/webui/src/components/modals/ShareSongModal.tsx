@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { X, Mail } from 'lucide-react';
-import { shareSong } from '../../api/songShares';
+import { X, Link, Copy, Check } from 'lucide-react';
+import { createShareLink } from '../../api/shareLinks';
 import { useToast } from '../../context/ToastContext';
 import { Button } from '../ui/Button';
 
@@ -11,7 +11,6 @@ interface ShareSongModalProps {
   songId: string;
   songTitle: string;
   onClose: () => void;
-  onSuccess?: () => void;
 }
 
 export const ShareSongModal: React.FC<ShareSongModalProps> = ({
@@ -19,18 +18,19 @@ export const ShareSongModal: React.FC<ShareSongModalProps> = ({
   songId,
   songTitle,
   onClose,
-  onSuccess,
 }) => {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const handleClose = useCallback(() => {
-    setEmail('');
+    setShareUrl(null);
     setErrorMsg(null);
     setLoading(false);
+    setCopied(false);
     onClose();
   }, [onClose]);
 
@@ -46,32 +46,30 @@ export const ShareSongModal: React.FC<ShareSongModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.trim()) return;
-
+  const handleGenerate = async () => {
     setLoading(true);
     setErrorMsg(null);
 
     try {
-      await shareSong(songId, email.trim());
-      toast(t('songSharing.shareSuccess'), 'success');
-      if (onSuccess) onSuccess();
-      onClose();
-    } catch (err: unknown) {
-      const axiosErr = err as { response?: { status?: number; data?: { error?: string } } };
-      const status = axiosErr.response?.status;
-      if (status === 404) {
-        setErrorMsg(t('songSharing.userNotFound'));
-      } else if (status === 400) {
-        setErrorMsg(t('songSharing.selfShareError'));
-      } else if (status === 409) {
-        setErrorMsg(t('songSharing.conflictError'));
-      } else {
-        setErrorMsg(t('songSharing.generalError'));
-      }
+      const data = await createShareLink({ type: 'SONG', resourceId: songId });
+      const url = `${window.location.origin}/invite/${data.token}`;
+      setShareUrl(url);
+    } catch {
+      setErrorMsg(t('songSharing.generalError', 'Ocorreu um erro ao gerar o link.'));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCopy = async () => {
+    if (!shareUrl) return;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      toast(t('songSharing.copySuccess', 'Link copiado!'), 'success');
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast(t('songSharing.copyError', 'Erro ao copiar o link.'), 'error');
     }
   };
 
@@ -93,47 +91,27 @@ export const ShareSongModal: React.FC<ShareSongModalProps> = ({
 
         <div className="flex items-center gap-3 mb-4">
           <div className="p-3 bg-[#aa3bff]/10 text-[#aa3bff] rounded-md">
-            <Mail className="w-6 h-6" />
+            <Link className="w-6 h-6" />
           </div>
           <div>
             <h3 id="share-song-title" className="text-xl font-bold text-text-main">
-              {t('songSharing.shareSong')}
+              {t('songSharing.shareSong', 'Compartilhar Cifra')}
             </h3>
             <p className="text-sm text-text-mute line-clamp-1">{songTitle}</p>
           </div>
         </div>
 
         <p className="text-sm text-text-mute mb-5">
-          {t('songSharing.shareDesc')}
+          {t('songSharing.shareLinkDesc', 'Gere um link para que outras pessoas possam acessar esta cifra.')}
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="share-email" className="block text-sm font-medium text-text-main mb-1.5">
-              {t('songSharing.emailLabel')}
-            </label>
-            <input
-              id="share-email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                if (errorMsg) setErrorMsg(null);
-              }}
-              placeholder={t('songSharing.emailPlaceholder')}
-              className="w-full px-4 py-2.5 rounded-md border border-border-main bg-bg-main text-text-main focus:outline-none focus:ring-2 focus:ring-[#aa3bff] transition-colors text-sm"
-              disabled={loading}
-              autoFocus
-            />
+        {errorMsg && (
+          <div className="mb-4 p-3 rounded-md bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm font-medium">
+            {errorMsg}
           </div>
+        )}
 
-          {errorMsg && (
-            <div className="p-3 rounded-md bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm font-medium">
-              {errorMsg}
-            </div>
-          )}
-
+        {!shareUrl ? (
           <div className="flex justify-end gap-3 pt-2">
             <button
               type="button"
@@ -141,19 +119,49 @@ export const ShareSongModal: React.FC<ShareSongModalProps> = ({
               className="px-4 py-2 rounded-md text-sm font-medium text-text-main bg-bg-elevated hover:bg-bg-card border border-border-main transition-colors"
               disabled={loading}
             >
-              {t('common.cancel')}
+              {t('common.cancel', 'Cancelar')}
             </button>
             <Button
-              type="submit"
+              type="button"
               variant="primary"
               size="sm"
               isLoading={loading}
-              disabled={!email.trim() || loading}
+              disabled={loading}
+              onClick={handleGenerate}
             >
-              {t('songSharing.sendInvite')}
+              {t('songSharing.generateLink', 'Gerar Link')}
             </Button>
           </div>
-        </form>
+        ) : (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                readOnly
+                value={shareUrl}
+                className="flex-1 px-4 py-2.5 rounded-md border border-border-main bg-bg-main text-text-main focus:outline-none focus:ring-2 focus:ring-[#aa3bff] transition-colors text-sm"
+              />
+              <Button
+                type="button"
+                variant="primary"
+                size="sm"
+                onClick={handleCopy}
+              >
+                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+              </Button>
+            </div>
+            <div className="flex justify-end gap-3 pt-2">
+              <Button
+                type="button"
+                onClick={handleClose}
+                variant="primary"
+                size="sm"
+              >
+                {t('common.close', 'Fechar')}
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>,
     document.body
