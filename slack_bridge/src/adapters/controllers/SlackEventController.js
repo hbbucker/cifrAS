@@ -5,9 +5,10 @@ const os = require('node:os');
 const { pipeline } = require('node:stream/promises');
 
 class SlackEventController {
-  constructor({ processMessageUseCase }) {
+  constructor({ processMessageUseCase, allowedChannelId }) {
     this.processMessageUseCase = processMessageUseCase;
     this.threadQueues = new Map();
+    this.allowedChannelId = allowedChannelId;
   }
 
   _getThreadQueue(threadId) {
@@ -24,8 +25,14 @@ class SlackEventController {
         return;
       }
 
-      const threadId = event.thread_ts || event.ts;
       const channelId = event.channel;
+
+      // Filtra pelo ID do canal caso tenha sido configurado (multi-projetos no mesmo workspace)
+      if (this.allowedChannelId && channelId !== this.allowedChannelId) {
+        return;
+      }
+
+      const threadId = event.thread_ts || event.ts;
       let userText = (event.text || '').trim() || 'O usuário enviou um anexo para análise.';
 
       const queue = this._getThreadQueue(threadId);

@@ -2,6 +2,10 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Feedback feature', () => {
   test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem('feature_discovery_03_seen', 'true');
+      localStorage.setItem('tour_seen_import-cifraclub', 'true');
+    });
     // Basic auth bypass/mock or navigate and login
     // Depending on project, we might need a custom login command or mock route
     await page.route('/api/auth/me', async route => {

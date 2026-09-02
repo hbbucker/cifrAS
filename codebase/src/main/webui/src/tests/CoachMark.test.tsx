@@ -4,7 +4,7 @@ import { describe, it, expect } from 'vitest';
 import { CoachMark } from '../components/ui/CoachMark';
 import { TourProvider, useTour } from '../context/TourContext';
 
-const Inner = ({ children, startTourId }: { children: React.ReactNode, startTourId?: string }) => {
+const Inner = ({ children, startTourId }: { children: React.ReactNode; startTourId?: string }) => {
   const { startTour } = useTour();
   React.useEffect(() => {
     if (startTourId) startTour(startTourId);
@@ -12,7 +12,7 @@ const Inner = ({ children, startTourId }: { children: React.ReactNode, startTour
   return <>{children}</>;
 };
 
-const TestWrapper = ({ children, startTourId }: { children: React.ReactNode, startTourId?: string }) => {
+const TestWrapper = ({ children, startTourId }: { children: React.ReactNode; startTourId?: string }) => {
   return (
     <TourProvider>
       <Inner startTourId={startTourId}>{children}</Inner>

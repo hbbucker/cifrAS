@@ -5,12 +5,38 @@ const os = require('node:os');
 const { ILLMEnginePort } = require('../../../domain/ports/ILLMEnginePort');
 const { EngineEvent } = require('../../../domain/events/EngineEvent');
 const { TurnResultDTO } = require('../../../domain/dtos/TurnResultDTO');
+const { EngineQuotaExhaustedError } = require('../../../domain/errors/EngineQuotaExhaustedError');
 const { AntigravityStreamParser } = require('./AntigravityStreamParser');
 
 const net = require('node:net');
 
 const DEFAULT_BRAIN_DIR = path.join(os.homedir(), '.gemini', 'antigravity-cli', 'brain');
 const TRANSCRIPT_RELATIVE_PATH = path.join('.system_generated', 'logs', 'transcript.jsonl');
+const QUOTA_SIGNATURE = 'Individual quota reached';
+const QUOTA_BUFFER_BYTE_LIMIT = 4096;
+
+function truncateQuotaBuffer(bufferText) {
+  const combinedBuffer = Buffer.from(bufferText, 'utf8');
+  return combinedBuffer.subarray(Math.max(0, combinedBuffer.length - QUOTA_BUFFER_BYTE_LIMIT)).toString('utf8');
+}
+
+function parseRetryAfterSeconds(quotaBuffer, allowEndOfInput = true) {
+  const terminator = allowEndOfInput ? '(?=[.\\s]|$)' : '(?=[.\\s])';
+  const resetPattern = new RegExp(`Resets in\\s+([^\\s.]+)${terminator}`, 'g');
+  for (const match of quotaBuffer.matchAll(resetPattern)) {
+    const durationMatch = match[1].match(/^(?:(\d{1,3})h)?(?:(\d{1,2})m)?(?:(\d{1,2})s)?$/);
+    if (!durationMatch || !durationMatch[0]) continue;
+
+    const hours = durationMatch[1] === undefined ? 0 : Number(durationMatch[1]);
+    const minutes = durationMatch[2] === undefined ? 0 : Number(durationMatch[2]);
+    const seconds = durationMatch[3] === undefined ? 0 : Number(durationMatch[3]);
+    if (minutes > 59 || seconds > 59) continue;
+
+    const totalSeconds = (hours * 3600) + (minutes * 60) + seconds;
+    if (totalSeconds > 0) return totalSeconds;
+  }
+  return null;
+}
 
 /**
  * Helper para checar se o proxy de tokens (RTK/Headroom) está rodando na porta local.
@@ -108,8 +134,15 @@ class AntigravityEngineAdapter extends ILLMEnginePort {
    */
   async *executeStream(instruction) {
     const args = this.buildCliArgs(instruction);
-    const executionContext = { boundSessionId: instruction.sessionId || null };
+    const executionContext = {
+      boundSessionId: instruction.sessionId || null,
+      quotaBuffer: '',
+      quotaDetected: false,
+      quotaSignatureOverlap: '',
+      retryAfterSeconds: null,
+    };
     const queue = new AsyncEventQueue();
+    let terminalClaimed = false;
 
     const env = { ...process.env };
     const proxyIsActive = await isProxyRunning(8787);
@@ -125,10 +158,29 @@ class AntigravityEngineAdapter extends ILLMEnginePort {
     });
 
     if (child.stderr) {
-      child.stderr.on('data', (chunk) => this.handleStderr(chunk));
+      child.stderr.on('data', (chunk) => {
+        this.handleStderr(chunk);
+        const chunkText = chunk.toString('utf8');
+        const signatureSearchText = executionContext.quotaSignatureOverlap + chunkText;
+        if (signatureSearchText.includes(QUOTA_SIGNATURE)) {
+          executionContext.quotaDetected = true;
+        }
+        executionContext.quotaSignatureOverlap = executionContext.quotaDetected
+          ? ''
+          : signatureSearchText.slice(-(QUOTA_SIGNATURE.length - 1));
+
+        if (executionContext.quotaDetected && executionContext.retryAfterSeconds === null) {
+          const durationSearchText = executionContext.quotaBuffer + chunkText;
+          executionContext.retryAfterSeconds = parseRetryAfterSeconds(durationSearchText, false);
+          executionContext.quotaBuffer = executionContext.retryAfterSeconds === null
+            ? truncateQuotaBuffer(durationSearchText)
+            : '';
+        }
+      });
     }
 
     const streamParser = AntigravityStreamParser.create((event) => {
+      if (executionContext.quotaDetected) return;
       if (global.logDebug) global.logDebug('[AGY] Stream Event:', event.event, event.step_update ? (event.step_update.step_type || event.step_update.state) : '');
       this.translateStreamEvent(event, queue, executionContext);
     });
@@ -136,14 +188,30 @@ class AntigravityEngineAdapter extends ILLMEnginePort {
     child.stdout.on('data', streamParser);
 
     const finish = async (exitCode, error = null) => {
+      if (terminalClaimed) return;
+      terminalClaimed = true;
       streamParser.flush();
 
+      if (executionContext.quotaDetected) {
+        const retryAfterSeconds = executionContext.retryAfterSeconds
+          || parseRetryAfterSeconds(executionContext.quotaBuffer);
+        queue.push(EngineEvent.executionFailed(
+          new EngineQuotaExhaustedError(retryAfterSeconds),
+          exitCode
+        ));
+        executionContext.quotaBuffer = '';
+        executionContext.quotaSignatureOverlap = '';
+        queue.close();
+        return;
+      }
+
       const responseText = await this.readTranscriptResponse(executionContext.boundSessionId);
-      const isSuccess = (typeof exitCode === 'number' ? exitCode : 0) === 0 || Boolean(responseText);
+      const normalizedExitCode = typeof exitCode === 'number' ? exitCode : 0;
+      const isSuccess = normalizedExitCode === 0 || Boolean(responseText);
 
       if (isSuccess) {
         queue.push(EngineEvent.executionCompleted(new TurnResultDTO({
-          exitCode: typeof exitCode === 'number' ? exitCode : 0,
+          exitCode: normalizedExitCode,
           responseText,
           filePaths: [],
           error,
@@ -155,6 +223,7 @@ class AntigravityEngineAdapter extends ILLMEnginePort {
         ));
       }
 
+      executionContext.quotaBuffer = '';
       queue.close();
     };
 
@@ -284,4 +353,5 @@ module.exports = {
   AsyncEventQueue,
   DEFAULT_BRAIN_DIR,
   TRANSCRIPT_RELATIVE_PATH,
+  parseRetryAfterSeconds,
 };

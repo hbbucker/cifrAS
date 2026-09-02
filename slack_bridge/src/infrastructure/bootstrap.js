@@ -5,11 +5,14 @@ const { SlackMrkdwnFormatter } = require('../adapters/formatters/SlackMrkdwnForm
 const { SlackDeliveryNotifier } = require('../adapters/notifiers/SlackDeliveryNotifier');
 const { AntigravityEngineAdapter } = require('../adapters/engines/antigravity/AntigravityEngineAdapter');
 const { MockEngineAdapter } = require('../adapters/engines/mock/MockEngineAdapter');
+const { CodexEngineAdapter } = require('../adapters/engines/codex/CodexEngineAdapter');
 const { ProcessMessageUseCase } = require('../application/usecases/ProcessMessageUseCase');
 const { SlackEventController } = require('../adapters/controllers/SlackEventController');
 
 function createEngine(engineName) {
   switch (String(engineName || '').toLowerCase()) {
+    case 'codex':
+      return new CodexEngineAdapter();
     case 'mock':
       return new MockEngineAdapter();
     case 'antigravity':
@@ -52,6 +55,7 @@ async function bootstrap() {
 
   const controller = new SlackEventController({
     processMessageUseCase,
+    allowedChannelId: config.allowedChannelId,
   });
 
   controller.register(app);
