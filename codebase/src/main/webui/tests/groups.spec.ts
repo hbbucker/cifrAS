@@ -40,5 +40,5 @@ test('create group, verify tabs, member list and invite button', async ({ page }
   await expect(page.getByRole('button', { name: /Gerar Link|Generate Link/i })).toBeVisible();
   
   // Click Cancel to dismiss
-  await page.getByRole('button', { name: /Cancel/i }).click();
+  await page.getByRole('button', { name: /Cancel|Cancelar/i }).click();
 });

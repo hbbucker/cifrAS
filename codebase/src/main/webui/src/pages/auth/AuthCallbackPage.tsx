@@ -57,7 +57,7 @@ export const AuthCallbackPage: React.FC = () => {
               await acceptShareLink(pendingToken);
               const info = await getShareLinkInfo(pendingToken);
               if (info.type === 'SONG') {
-                navigate(`/songs/${info.resourceId}`, { replace: true });
+                navigate(`/song/${info.resourceId}`, { replace: true });
                 return;
               } else if (info.type === 'GROUP') {
                 navigate(`/groups/${info.resourceId}`, { replace: true });
