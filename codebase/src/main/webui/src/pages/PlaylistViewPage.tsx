@@ -9,6 +9,8 @@ import { TagFilterBar } from '../components/ui/TagFilterBar';
 import { getUserTags } from '../api/songs';
 import type { TagCount } from '../api/songs';
 import type { SongForPresentation } from '../utils/presentationGenerator';
+import { CoachMark } from '../components/ui/CoachMark';
+import { useTour } from '../context/TourContext';
 
 interface SongData {
  id: string;
@@ -50,6 +52,15 @@ export const PlaylistViewPage: React.FC = () => {
  const availableSongs = allSongs.filter(s => !songs.some(ps => ps.id === s.id));
 
  const isOwner = playlist?.userId === user?.id;
+ const { startTour } = useTour();
+
+ useEffect(() => {
+   if (!isOwner) return;
+   const timer = setTimeout(() => {
+     startTour('playlist-add-song');
+   }, 800);
+   return () => clearTimeout(timer);
+ }, [isOwner, startTour]);
 
   useEffect(() => {
     fetch(`/api/playlists/${id}`, {
@@ -195,19 +206,27 @@ export const PlaylistViewPage: React.FC = () => {
           
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {isOwner && (
-              <button 
-                onClick={() => {
-                  setSearchQuery('');
-                  setIsSearching(true);
-                  setShowAddModal(true);
-                }}
-                className="flex items-center justify-center gap-1.5 bg-bg-card hover:bg-bg-elevated border border-border-main text-text-main px-2.5 sm:px-4 py-2 sm:py-2.5 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] rounded-md font-bold text-xs sm:text-sm transition-colors shadow-xs"
-                title={t('playlistView.addSong')}
-                aria-label={t('playlistView.addSong')}
+              <CoachMark
+                tourId="playlist-add-song"
+                title={t('playlistView.tourTitle', 'Adicione Músicas à Playlist')}
+                description={t('playlistView.tourDesc', 'Busque cifras do seu repertório e adicione-as nesta playlist para montar seu setlist.')}
+                position="bottom"
               >
-                <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span className="hidden sm:inline">{t('playlistView.addSong')}</span>
-              </button>
+                <button 
+                  onClick={() => {
+                    setSearchQuery('');
+                    setIsSearching(true);
+                    setShowAddModal(true);
+                  }}
+                  className="flex items-center justify-center gap-1.5 bg-bg-card hover:bg-bg-elevated border border-border-main text-text-main px-2.5 sm:px-4 py-2 sm:py-2.5 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] rounded-md font-bold text-xs sm:text-sm transition-colors shadow-xs"
+                  title={t('playlistView.addSong')}
+                  aria-label={t('playlistView.addSong')}
+                  data-testid="playlist-add-song-header-btn"
+                >
+                  <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="hidden sm:inline">{t('playlistView.addSong')}</span>
+                </button>
+              </CoachMark>
             )}
             <button 
               onClick={() => {
@@ -242,9 +261,23 @@ export const PlaylistViewPage: React.FC = () => {
           {loading ? (
             <div className="text-center py-8 text-text-mute">{t('playlistView.loading')}</div>
           ) : songs.length === 0 ? (
-            <div className="text-center py-12 bg-bg-card rounded-lg border border-dashed border-border-main">
+            <div className="text-center py-12 bg-bg-card rounded-lg border border-dashed border-border-main p-6">
               <h3 className="text-base sm:text-lg font-medium text-text-main mb-2">{t('playlistView.noSongs')}</h3>
-              <p className="text-xs sm:text-sm text-text-mute">{t('playlistView.addDesc')}</p>
+              <p className="text-xs sm:text-sm text-text-mute mb-6">{t('playlistView.addDesc')}</p>
+              {isOwner && (
+                <button
+                  onClick={() => {
+                    setSearchQuery('');
+                    setIsSearching(true);
+                    setShowAddModal(true);
+                  }}
+                  className="inline-flex items-center justify-center gap-2 bg-[#aa3bff] hover:bg-[#9926f0] text-white px-5 py-2.5 min-h-[44px] rounded-md font-bold text-sm transition-colors shadow-sm"
+                  data-testid="playlist-empty-add-btn"
+                >
+                  <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span>{t('playlistView.emptyAction', 'Adicionar Músicas')}</span>
+                </button>
+              )}
             </div>
           ) : (
             <div className="bg-bg-card rounded-lg border border-border-main shadow-xs overflow-hidden">

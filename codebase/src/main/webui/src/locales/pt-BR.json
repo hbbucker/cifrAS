@@ -4,7 +4,8 @@
     "save": "Salvar",
     "confirm": "Confirmar",
     "import": "Importar",
-    "loading": "Carregando..."
+    "loading": "Carregando...",
+    "gotIt": "Entendi"
   },
   "sidebar": {
     "home": "Início",
@@ -75,6 +76,12 @@
     "emptyTitle": "Nenhuma playlist ainda",
     "emptyDesc": "Crie sua primeira playlist para organizar suas músicas.",
     "createPlaylist": "Criar Playlist",
+    "tourTitle": "Crie sua primeira Playlist",
+    "tourDesc": "Organize seu repertório para ensaios, apresentações e eventos criando uma playlist personalizada.",
+    "educationalEmptyTitle": "Organize seu repertório em Playlists",
+    "educationalEmptyStep1": "1. Crie sua playlist dando um nome ao seu setlist",
+    "educationalEmptyStep2": "2. Adicione músicas do seu repertório",
+    "educationalEmptyStep3": "3. Abra no Modo Teatro para tocar sem interrupções",
     "deleteTooltip": "Excluir Playlist",
     "songsCount": "músicas",
     "collab": "Colab",
@@ -173,6 +180,9 @@
     "addSongs": "Adicionar Músicas",
     "noSongs": "Nenhuma música nesta playlist",
     "addSong": "Adicionar Música",
+    "emptyAction": "Adicionar Músicas",
+    "tourTitle": "Adicione Músicas à Playlist",
+    "tourDesc": "Busque cifras do seu repertório e adicione-as nesta playlist para montar seu setlist.",
     "loading": "Carregando músicas...",
     "selectSongs": "Selecione músicas para adicionar à sua playlist",
     "startTheater": "Iniciar Modo Teatro",

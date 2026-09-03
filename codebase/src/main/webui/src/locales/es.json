@@ -4,7 +4,8 @@
     "save": "Guardar",
     "confirm": "Confirm",
     "import": "Importar",
-    "loading": "Cargando..."
+    "loading": "Cargando...",
+    "gotIt": "Entendido"
   },
   "sidebar": {
     "home": "Inicio",
@@ -75,6 +76,12 @@
     "emptyTitle": "Ninguna lista todavía",
     "emptyDesc": "Crea tu primera lista para organizar tus canciones.",
     "createPlaylist": "Crear Lista",
+    "tourTitle": "Crea tu primera Playlist",
+    "tourDesc": "Organiza tu repertorio para ensayos, presentaciones y eventos creando una lista personalizada.",
+    "educationalEmptyTitle": "Organiza tu repertorio en Playlists",
+    "educationalEmptyStep1": "1. Crea tu playlist asignándole un nombre",
+    "educationalEmptyStep2": "2. Añade canciones de tu repertorio",
+    "educationalEmptyStep3": "3. Abre en Modo Teatro para tocar sin interrupciones",
     "deleteTooltip": "Eliminar Lista",
     "songsCount": "canciones",
     "collab": "Colab",
@@ -173,6 +180,9 @@
     "addSongs": "Add Songs",
     "noSongs": "No songs in this playlist",
     "addSong": "Add Song",
+    "emptyAction": "Añadir Canciones",
+    "tourTitle": "Añade Canciones a la Playlist",
+    "tourDesc": "Busca acordes de tu biblioteca y añádelos a esta playlist para armar tu setlist.",
     "loading": "Loading songs...",
     "selectSongs": "Select songs to add to your playlist",
     "startTheater": "Start Theater Mode",

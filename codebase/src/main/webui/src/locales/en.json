@@ -4,7 +4,8 @@
     "save": "Save",
     "confirm": "Confirm",
     "import": "Import",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "gotIt": "Got it"
   },
   "sidebar": {
     "home": "Home",
@@ -75,6 +76,12 @@
     "emptyTitle": "No playlists yet",
     "emptyDesc": "Create your first playlist to organize your songs.",
     "createPlaylist": "Create Playlist",
+    "tourTitle": "Create your first Playlist",
+    "tourDesc": "Organize your repertoire for rehearsals, gigs and services by creating a custom playlist.",
+    "educationalEmptyTitle": "Organize your repertoire into Playlists",
+    "educationalEmptyStep1": "1. Create your playlist by naming your setlist",
+    "educationalEmptyStep2": "2. Add songs from your repertoire",
+    "educationalEmptyStep3": "3. Open in Theater Mode to play without interruptions",
     "deleteTooltip": "Delete Playlist",
     "songsCount": "songs",
     "collab": "Collab",
@@ -173,6 +180,9 @@
     "addSongs": "Add Songs",
     "noSongs": "No songs in this playlist",
     "addSong": "Add Song",
+    "emptyAction": "Add Songs",
+    "tourTitle": "Add Songs to Playlist",
+    "tourDesc": "Search chords from your library and add them to this playlist to build your setlist.",
     "loading": "Loading songs...",
     "selectSongs": "Select songs to add to your playlist",
     "startTheater": "Start Theater Mode",

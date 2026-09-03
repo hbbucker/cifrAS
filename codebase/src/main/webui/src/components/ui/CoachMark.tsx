@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTour } from '../../context/TourContext';
+import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 
 interface CoachMarkProps {
@@ -8,6 +9,7 @@ interface CoachMarkProps {
   title: string;
   description: string;
   position?: 'top' | 'bottom' | 'left' | 'right';
+  confirmText?: string;
 }
 
 export const CoachMark: React.FC<CoachMarkProps> = ({ 
@@ -15,8 +17,10 @@ export const CoachMark: React.FC<CoachMarkProps> = ({
   tourId, 
   title, 
   description,
-  position = 'bottom'
+  position = 'bottom',
+  confirmText
 }) => {
+  const { t } = useTranslation();
   const { activeTourId, endTour } = useTour();
   const isActive = activeTourId === tourId;
 
@@ -48,7 +52,11 @@ export const CoachMark: React.FC<CoachMarkProps> = ({
           
           <div className="relative flex justify-between items-start mb-2">
             <h4 className="font-bold text-sm leading-tight pr-4">{title}</h4>
-            <button onClick={endTour} className="text-white/80 hover:text-white p-1 -mr-2 -mt-2 shrink-0">
+            <button 
+              onClick={endTour} 
+              className="text-white/80 hover:text-white p-1 -mr-2 -mt-2 shrink-0"
+              aria-label="Close"
+            >
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -57,7 +65,7 @@ export const CoachMark: React.FC<CoachMarkProps> = ({
             onClick={endTour}
             className="text-xs font-bold bg-white text-[#aa3bff] hover:bg-white/90 px-4 py-2 rounded-md transition-colors w-full"
           >
-            Entendi
+            {confirmText || t('common.gotIt', 'Entendi')}
           </button>
         </div>
       </div>
