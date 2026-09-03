@@ -47,6 +47,7 @@
 - [x] `FE-ONBOARDING-02` — Tooltips e Onboarding Interativo para Novos Comportamentos (Persistência, Transposição)
 - [x] `FE-ONBOARDING-04` — Coach Marks, Tour e Empty State Educativo para Playlists e Músicas
 - [x] `FE-ONBOARDING-05` — Tour Sequencial para Gerador de Slides (PPTX) e Modo Teatro
+- [x] `FE-ONBOARDING-06` — Coach Marks, Tour Guiado e Empty State Educativo para Grupos, Membros e Playlists Compartilhadas
 - [x] Observabilidade: logs estruturados, tracing, health checks
 - [x] CI/CD: pipeline automatizado com testes e deploy
 - [x] Deploy: Fly.io (monolito Quarkus + Quinoa)
