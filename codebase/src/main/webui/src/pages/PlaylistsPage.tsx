@@ -5,9 +5,11 @@ import { Plus, ListMusic, Users, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../context/ToastContext';
 import { Button } from '../components/ui/Button';
-import { EmptyState } from '../components/ui/EmptyState';
+import { EducationalEmptyState } from '../components/ui/EducationalEmptyState';
 import { Spinner } from '../components/ui/Spinner';
 import { BrandLogo } from '../components/ui/BrandLogo';
+import { CoachMark } from '../components/ui/CoachMark';
+import { useTour } from '../context/TourContext';
 interface PlaylistData {
  id: string;
  name: string;
@@ -26,6 +28,14 @@ export const PlaylistsPage: React.FC = () => {
  const [playlists, setPlaylists] = useState<PlaylistData[]>([]);
  const [loading, setLoading] = useState(true);
  const [isCreating, setIsCreating] = useState(false);
+ const { startTour } = useTour();
+
+ useEffect(() => {
+   const timer = setTimeout(() => {
+     startTour('playlist-create');
+   }, 800);
+   return () => clearTimeout(timer);
+ }, [startTour]);
 
  const fetchPlaylists = useCallback(() => {
  fetch('/api/playlists', {
@@ -120,14 +130,21 @@ export const PlaylistsPage: React.FC = () => {
             <BrandLogo iconOnly size="sm" asLink to="/dashboard" className="sm:hidden shrink-0" />
             <h1 className="text-lg sm:text-xl font-bold text-text-main truncate">{t('sidebar.playlists')}</h1>
           </div>
-          <Button 
-            onClick={() => setShowModal(true)}
-            data-testid="create-playlist-btn"
-            className="min-h-[40px] sm:min-h-[44px] px-3.5 sm:px-4 text-xs sm:text-sm"
+          <CoachMark
+            tourId="playlist-create"
+            title={t('playlists.tourTitle', 'Crie sua primeira Playlist')}
+            description={t('playlists.tourDesc', 'Organize seu repertório para ensaios, apresentações e eventos criando uma playlist personalizada.')}
+            position="bottom"
           >
-            <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-1" />
-            <span>{t('playlists.newPlaylist')}</span>
-          </Button>
+            <Button 
+              onClick={() => setShowModal(true)}
+              data-testid="create-playlist-btn"
+              className="min-h-[40px] sm:min-h-[44px] px-3.5 sm:px-4 text-xs sm:text-sm"
+            >
+              <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-1" />
+              <span>{t('playlists.newPlaylist')}</span>
+            </Button>
+          </CoachMark>
         </header>
 
         <div className="flex-1 overflow-y-auto p-3.5 sm:p-6 pb-24 sm:pb-8 min-w-0">
@@ -138,10 +155,14 @@ export const PlaylistsPage: React.FC = () => {
               </div>
             ) : playlists.length === 0 ? (
               <div className="col-span-full">
-                <EmptyState 
+                <EducationalEmptyState 
                   icon={ListMusic} 
-                  title={t('playlists.emptyTitle')} 
-                  description={t('playlists.emptyDesc')} 
+                  title={t('playlists.educationalEmptyTitle')} 
+                  steps={[
+                    t('playlists.educationalEmptyStep1'),
+                    t('playlists.educationalEmptyStep2'),
+                    t('playlists.educationalEmptyStep3')
+                  ]} 
                   action={{ label: t('playlists.createPlaylist'), onClick: () => setShowModal(true) }} 
                 />
               </div>

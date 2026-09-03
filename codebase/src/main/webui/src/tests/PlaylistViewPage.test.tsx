@@ -1,10 +1,11 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { PlaylistViewPage } from '../pages/PlaylistViewPage';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from '../context/AuthContext';
 import { ToastProvider } from '../context/ToastContext';
 import { ThemeProvider } from '../context/ThemeContext';
+import { TourProvider } from '../context/TourContext';
 import '@testing-library/jest-dom/vitest';
 
 const mockNavigate = vi.fn();
@@ -39,11 +40,28 @@ const mockLibraryPagedResponse = {
   size: 50
 };
 
+const renderWithProviders = (ui: React.ReactElement = <PlaylistViewPage />, { route = '/playlists/pl-1' } = {}) => {
+  return render(
+    <AuthProvider>
+      <ThemeProvider>
+        <ToastProvider>
+          <TourProvider>
+            <MemoryRouter initialEntries={[route]}>
+              <Routes>
+                <Route path="/playlists/:id" element={ui} />
+              </Routes>
+            </MemoryRouter>
+          </TourProvider>
+        </ToastProvider>
+      </ThemeProvider>
+    </AuthProvider>
+  );
+};
+
 describe('PlaylistViewPage Component', () => {
   beforeEach(() => {
     localStorage.setItem('token', 'fake-jwt');
     localStorage.setItem('user', JSON.stringify({ id: 'user-1', email: 'user1@example.com', name: 'User 1' }));
-    // Mock user in auth context
     vi.stubGlobal('fetch', vi.fn((url: string, options?: RequestInit) => {
       const urlStr = url.toString();
       if (urlStr.includes('/api/playlists/pl-1/songs') && options?.method === 'POST') {
@@ -83,19 +101,7 @@ describe('PlaylistViewPage Component', () => {
   });
 
   it('renders playlist and existing songs', async () => {
-    render(
-      <AuthProvider>
-        <ThemeProvider>
-          <ToastProvider>
-            <MemoryRouter initialEntries={['/playlists/pl-1']}>
-              <Routes>
-                <Route path="/playlists/:id" element={<PlaylistViewPage />} />
-              </Routes>
-            </MemoryRouter>
-          </ToastProvider>
-        </ThemeProvider>
-      </AuthProvider>
-    );
+    renderWithProviders();
 
     expect(await screen.findByText('Minha Playlist')).toBeInTheDocument();
     expect(screen.getByText('Música 1')).toBeInTheDocument();
@@ -103,19 +109,7 @@ describe('PlaylistViewPage Component', () => {
   });
 
   it('renders play-theater-song button for each song with proper a11y labels and touch target', async () => {
-    render(
-      <AuthProvider>
-        <ThemeProvider>
-          <ToastProvider>
-            <MemoryRouter initialEntries={['/playlists/pl-1']}>
-              <Routes>
-                <Route path="/playlists/:id" element={<PlaylistViewPage />} />
-              </Routes>
-            </MemoryRouter>
-          </ToastProvider>
-        </ThemeProvider>
-      </AuthProvider>
-    );
+    renderWithProviders();
 
     expect(await screen.findByText('Minha Playlist')).toBeInTheDocument();
 
@@ -135,19 +129,7 @@ describe('PlaylistViewPage Component', () => {
   });
 
   it('navigates to theater mode with songId and songIndex in state when play button is clicked', async () => {
-    render(
-      <AuthProvider>
-        <ThemeProvider>
-          <ToastProvider>
-            <MemoryRouter initialEntries={['/playlists/pl-1']}>
-              <Routes>
-                <Route path="/playlists/:id" element={<PlaylistViewPage />} />
-              </Routes>
-            </MemoryRouter>
-          </ToastProvider>
-        </ThemeProvider>
-      </AuthProvider>
-    );
+    renderWithProviders();
 
     expect(await screen.findByText('Minha Playlist')).toBeInTheDocument();
 
@@ -163,19 +145,7 @@ describe('PlaylistViewPage Component', () => {
     // Current user is user-2 (not the owner)
     localStorage.setItem('user', JSON.stringify({ id: 'user-2', email: 'user2@example.com', name: 'User 2' }));
 
-    render(
-      <AuthProvider>
-        <ThemeProvider>
-          <ToastProvider>
-            <MemoryRouter initialEntries={['/playlists/pl-1']}>
-              <Routes>
-                <Route path="/playlists/:id" element={<PlaylistViewPage />} />
-              </Routes>
-            </MemoryRouter>
-          </ToastProvider>
-        </ThemeProvider>
-      </AuthProvider>
-    );
+    renderWithProviders();
 
     expect(await screen.findByText('Minha Playlist')).toBeInTheDocument();
 
@@ -191,23 +161,11 @@ describe('PlaylistViewPage Component', () => {
     // Owner-only actions should NOT be visible
     expect(screen.queryByTestId('move-up-song-1')).not.toBeInTheDocument();
     expect(screen.queryByTestId('move-down-song-1')).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /addSong/i })).not.toBeInTheDocument();
+    expect(screen.queryByTestId('playlist-add-song-header-btn')).not.toBeInTheDocument();
   });
 
   it('navigates to theater mode from header button starting at index 0', async () => {
-    render(
-      <AuthProvider>
-        <ThemeProvider>
-          <ToastProvider>
-            <MemoryRouter initialEntries={['/playlists/pl-1']}>
-              <Routes>
-                <Route path="/playlists/:id" element={<PlaylistViewPage />} />
-              </Routes>
-            </MemoryRouter>
-          </ToastProvider>
-        </ThemeProvider>
-      </AuthProvider>
-    );
+    renderWithProviders();
 
     expect(await screen.findByText('Minha Playlist')).toBeInTheDocument();
 
@@ -218,24 +176,12 @@ describe('PlaylistViewPage Component', () => {
   });
 
   it('opens add songs modal and renders unadded songs from PagedResponse items', async () => {
-    render(
-      <AuthProvider>
-        <ThemeProvider>
-          <ToastProvider>
-            <MemoryRouter initialEntries={['/playlists/pl-1']}>
-              <Routes>
-                <Route path="/playlists/:id" element={<PlaylistViewPage />} />
-              </Routes>
-            </MemoryRouter>
-          </ToastProvider>
-        </ThemeProvider>
-      </AuthProvider>
-    );
+    renderWithProviders();
 
     await screen.findByText('Minha Playlist');
 
     // Click "Add Song" button
-    const addBtn = screen.getByRole('button', { name: /addSong/i });
+    const addBtn = screen.getByTestId('playlist-add-song-header-btn');
     fireEvent.click(addBtn);
 
     // Modal should appear and load songs from library
@@ -249,19 +195,7 @@ describe('PlaylistViewPage Component', () => {
   });
 
   it('handles reorder and delete actions', async () => {
-    render(
-      <AuthProvider>
-        <ThemeProvider>
-          <ToastProvider>
-            <MemoryRouter initialEntries={['/playlists/pl-1']}>
-              <Routes>
-                <Route path="/playlists/:id" element={<PlaylistViewPage />} />
-              </Routes>
-            </MemoryRouter>
-          </ToastProvider>
-        </ThemeProvider>
-      </AuthProvider>
-    );
+    renderWithProviders();
 
     expect(await screen.findByText('Minha Playlist')).toBeInTheDocument();
     expect(screen.getByTestId('playlist-item-song-1')).toBeInTheDocument();
@@ -276,19 +210,7 @@ describe('PlaylistViewPage Component', () => {
   });
 
   it('opens export presentation modal when Gerar Slides button is clicked', async () => {
-    render(
-      <AuthProvider>
-        <ThemeProvider>
-          <ToastProvider>
-            <MemoryRouter initialEntries={['/playlists/pl-1']}>
-              <Routes>
-                <Route path="/playlists/:id" element={<PlaylistViewPage />} />
-              </Routes>
-            </MemoryRouter>
-          </ToastProvider>
-        </ThemeProvider>
-      </AuthProvider>
-    );
+    renderWithProviders();
 
     expect(await screen.findByText('Minha Playlist')).toBeInTheDocument();
 
@@ -300,19 +222,7 @@ describe('PlaylistViewPage Component', () => {
   });
 
   it('handles drag and drop reordering of playlist items', async () => {
-    render(
-      <AuthProvider>
-        <ThemeProvider>
-          <ToastProvider>
-            <MemoryRouter initialEntries={['/playlists/pl-1']}>
-              <Routes>
-                <Route path="/playlists/:id" element={<PlaylistViewPage />} />
-              </Routes>
-            </MemoryRouter>
-          </ToastProvider>
-        </ThemeProvider>
-      </AuthProvider>
-    );
+    renderWithProviders();
 
     expect(await screen.findByText('Minha Playlist')).toBeInTheDocument();
     const item1 = screen.getByTestId('playlist-item-song-1');
@@ -327,19 +237,7 @@ describe('PlaylistViewPage Component', () => {
   it('handles song removal with confirm dialog', async () => {
     vi.spyOn(window, 'confirm').mockReturnValue(true);
 
-    render(
-      <AuthProvider>
-        <ThemeProvider>
-          <ToastProvider>
-            <MemoryRouter initialEntries={['/playlists/pl-1']}>
-              <Routes>
-                <Route path="/playlists/:id" element={<PlaylistViewPage />} />
-              </Routes>
-            </MemoryRouter>
-          </ToastProvider>
-        </ThemeProvider>
-      </AuthProvider>
-    );
+    renderWithProviders();
 
     expect(await screen.findByText('Minha Playlist')).toBeInTheDocument();
 
@@ -348,34 +246,97 @@ describe('PlaylistViewPage Component', () => {
     fireEvent.click(removeBtns[0]);
   });
 
-  it('renders empty playlist state when no songs are present', async () => {
+  it('renders empty playlist state when no songs are present and opens add modal via CTA button', async () => {
     vi.stubGlobal('fetch', vi.fn((url: string) => {
-      if (url.toString().includes('/api/playlists/pl-1')) {
+      const urlStr = url.toString();
+      if (urlStr.includes('/api/playlists/pl-1')) {
         return Promise.resolve({
           ok: true,
           status: 200,
           json: () => Promise.resolve({ id: 'pl-1', name: 'Empty Playlist', userId: 'user-1', songs: [] })
         } as Response);
       }
+      if (urlStr.includes('/api/songs')) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve(mockLibraryPagedResponse)
+        } as Response);
+      }
       return Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve({}) } as Response);
     }));
 
-    render(
-      <AuthProvider>
-        <ThemeProvider>
-          <ToastProvider>
-            <MemoryRouter initialEntries={['/playlists/pl-1']}>
-              <Routes>
-                <Route path="/playlists/:id" element={<PlaylistViewPage />} />
-              </Routes>
-            </MemoryRouter>
-          </ToastProvider>
-        </ThemeProvider>
-      </AuthProvider>
-    );
+    renderWithProviders();
 
     expect(await screen.findByText('Empty Playlist')).toBeInTheDocument();
     expect(screen.getByText(/noSongs/i)).toBeInTheDocument();
+
+    const emptyAddBtn = screen.getByTestId('playlist-empty-add-btn');
+    expect(emptyAddBtn).toBeInTheDocument();
+    fireEvent.click(emptyAddBtn);
+
+    expect(await screen.findByPlaceholderText(/searchPlaceholder/i)).toBeInTheDocument();
+  });
+
+  it('triggers sequential coach mark tour (add song -> slides pptx -> theater mode) for playlist owner', async () => {
+    renderWithProviders();
+
+    await waitFor(() => {
+      expect(screen.getByText('Minha Playlist')).toBeInTheDocument();
+    });
+
+    // Step 1: Add song coach mark
+    await waitFor(() => {
+      expect(screen.getByText(/Adicione Músicas à Playlist|tourTitle/i)).toBeInTheDocument();
+    }, { timeout: 2500 });
+
+    const nextToSlidesBtn = screen.getByRole('button', { name: /Próximo|next/i });
+    act(() => {
+      fireEvent.click(nextToSlidesBtn);
+    });
+
+    expect(screen.queryByText(/Adicione Músicas à Playlist|tourTitle/i)).not.toBeInTheDocument();
+    expect(localStorage.getItem('tour_seen_playlist-add-song')).toBe('true');
+
+    // Step 2: Slides PPTX coach mark
+    expect(screen.getByText(/Gerar Slides \(PPTX\)|tourPresentationTitle/i)).toBeInTheDocument();
+    const nextToTheaterBtn = screen.getByRole('button', { name: /Próximo|next/i });
+    act(() => {
+      fireEvent.click(nextToTheaterBtn);
+    });
+
+    expect(screen.queryByText(/Gerar Slides \(PPTX\)|tourPresentationTitle/i)).not.toBeInTheDocument();
+    expect(localStorage.getItem('tour_seen_playlist-presentation')).toBe('true');
+
+    // Step 3: Theater Mode coach mark
+    expect(screen.getByText(/Modo Teatro|tourTheaterTitle/i)).toBeInTheDocument();
+    const gotItBtn = screen.getByRole('button', { name: /Entendi|gotIt/i });
+    act(() => {
+      fireEvent.click(gotItBtn);
+    });
+
+    expect(screen.queryByText(/Modo Teatro|tourTheaterTitle/i)).not.toBeInTheDocument();
+    expect(localStorage.getItem('tour_seen_playlist-theater')).toBe('true');
+  });
+
+  it('closes active tour immediately when close (X) button is clicked on playlist coach mark', async () => {
+    renderWithProviders();
+
+    await waitFor(() => {
+      expect(screen.getByText('Minha Playlist')).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(/Adicione Músicas à Playlist|tourTitle/i)).toBeInTheDocument();
+    }, { timeout: 2500 });
+
+    const closeBtn = screen.getByLabelText('Close');
+    act(() => {
+      fireEvent.click(closeBtn);
+    });
+
+    expect(screen.queryByText(/Adicione Músicas à Playlist|tourTitle/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Gerar Slides|tourPresentationTitle/i)).not.toBeInTheDocument();
   });
 });
 

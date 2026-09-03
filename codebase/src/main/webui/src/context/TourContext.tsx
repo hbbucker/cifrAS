@@ -4,6 +4,7 @@ interface TourContextType {
   activeTourId: string | null;
   startTour: (tourId: string) => void;
   endTour: () => void;
+  nextTour: (nextTourId: string) => void;
   hasSeenTour: (tourId: string) => boolean;
 }
 
@@ -25,12 +26,23 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const nextTour = (nextTourId: string) => {
+    if (activeTourId) {
+      localStorage.setItem(`tour_seen_${activeTourId}`, 'true');
+    }
+    if (!hasSeenTour(nextTourId)) {
+      setActiveTourId(nextTourId);
+    } else {
+      setActiveTourId(null);
+    }
+  };
+
   const hasSeenTour = (tourId: string) => {
     return localStorage.getItem(`tour_seen_${tourId}`) === 'true';
   };
 
   return (
-    <TourContext.Provider value={{ activeTourId, startTour, endTour, hasSeenTour }}>
+    <TourContext.Provider value={{ activeTourId, startTour, endTour, nextTour, hasSeenTour }}>
       {children}
     </TourContext.Provider>
   );

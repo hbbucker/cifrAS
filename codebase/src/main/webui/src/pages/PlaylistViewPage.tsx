@@ -9,6 +9,8 @@ import { TagFilterBar } from '../components/ui/TagFilterBar';
 import { getUserTags } from '../api/songs';
 import type { TagCount } from '../api/songs';
 import type { SongForPresentation } from '../utils/presentationGenerator';
+import { CoachMark } from '../components/ui/CoachMark';
+import { useTour } from '../context/TourContext';
 
 interface SongData {
  id: string;
@@ -50,6 +52,15 @@ export const PlaylistViewPage: React.FC = () => {
  const availableSongs = allSongs.filter(s => !songs.some(ps => ps.id === s.id));
 
  const isOwner = playlist?.userId === user?.id;
+ const { startTour } = useTour();
+
+ useEffect(() => {
+   if (!isOwner) return;
+   const timer = setTimeout(() => {
+     startTour('playlist-add-song');
+   }, 800);
+   return () => clearTimeout(timer);
+ }, [isOwner, startTour]);
 
   useEffect(() => {
     fetch(`/api/playlists/${id}`, {
@@ -195,46 +206,70 @@ export const PlaylistViewPage: React.FC = () => {
           
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {isOwner && (
+              <CoachMark
+                tourId="playlist-add-song"
+                nextTourId="playlist-presentation"
+                title={t('playlistView.tourTitle', 'Adicione Músicas à Playlist')}
+                description={t('playlistView.tourDesc', 'Busque cifras do seu repertório e adicione-as nesta playlist para montar seu setlist.')}
+                position="bottom"
+              >
+                <button 
+                  onClick={() => {
+                    setSearchQuery('');
+                    setIsSearching(true);
+                    setShowAddModal(true);
+                  }}
+                  className="flex items-center justify-center gap-1.5 bg-bg-card hover:bg-bg-elevated border border-border-main text-text-main px-2.5 sm:px-4 py-2 sm:py-2.5 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] rounded-md font-bold text-xs sm:text-sm transition-colors shadow-xs"
+                  title={t('playlistView.addSong')}
+                  aria-label={t('playlistView.addSong')}
+                  data-testid="playlist-add-song-header-btn"
+                >
+                  <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="hidden sm:inline">{t('playlistView.addSong')}</span>
+                </button>
+              </CoachMark>
+            )}
+            <CoachMark
+              tourId="playlist-presentation"
+              nextTourId="playlist-theater"
+              title={t('playlistView.tourPresentationTitle', 'Gerar Slides (PPTX)')}
+              description={t('playlistView.tourPresentationDesc', 'Exporte e apresente slides com as letras das músicas da sua playlist para projeção em cultos, missas ou shows.')}
+              position="bottom"
+            >
               <button 
                 onClick={() => {
-                  setSearchQuery('');
-                  setIsSearching(true);
-                  setShowAddModal(true);
+                  if (songs.length === 0) {
+                    toast(t('playlistView.noSongsToExport'), 'error');
+                    return;
+                  }
+                  setShowPresentationModal(true);
                 }}
-                className="flex items-center justify-center gap-1.5 bg-bg-card hover:bg-bg-elevated border border-border-main text-text-main px-2.5 sm:px-4 py-2 sm:py-2.5 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] rounded-md font-bold text-xs sm:text-sm transition-colors shadow-xs"
-                title={t('playlistView.addSong')}
-                aria-label={t('playlistView.addSong')}
+                className="flex items-center justify-center gap-1.5 bg-[#aa3bff] hover:bg-[#9926f0] text-white px-2.5 sm:px-4 py-2 sm:py-2.5 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] rounded-md font-bold text-xs sm:text-sm transition-colors shadow-xs"
+                data-testid="export-presentation-btn"
+                title={t('playlistPresentation.generateSlides')}
+                aria-label={t('playlistPresentation.generateSlides')}
               >
-                <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span className="hidden sm:inline">{t('playlistView.addSong')}</span>
+                <Presentation className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="hidden sm:inline">{t('playlistPresentation.generateSlides')}</span>
               </button>
-            )}
-            <button 
-              onClick={() => {
-                if (songs.length === 0) {
-                  toast(t('playlistView.noSongsToExport'), 'error');
-                  return;
-                }
-                setShowPresentationModal(true);
-              }}
-              className="flex items-center justify-center gap-1.5 bg-[#aa3bff] hover:bg-[#9926f0] text-white px-2.5 sm:px-4 py-2 sm:py-2.5 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] rounded-md font-bold text-xs sm:text-sm transition-colors shadow-xs"
-              data-testid="export-presentation-btn"
-              title={t('playlistPresentation.generateSlides')}
-              aria-label={t('playlistPresentation.generateSlides')}
+            </CoachMark>
+            <CoachMark
+              tourId="playlist-theater"
+              title={t('playlistView.tourTheaterTitle', 'Modo Teatro')}
+              description={t('playlistView.tourTheaterDesc', 'Toque ao vivo com visualização limpa em tela cheia, rolagem automática suave e transposição instantânea.')}
+              position="bottom"
             >
-              <Presentation className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span className="hidden sm:inline">{t('playlistPresentation.generateSlides')}</span>
-            </button>
-            <button 
-              onClick={() => navigate(`/theater/${id}`)}
-              className="flex items-center justify-center gap-1.5 bg-[#10B981] hover:bg-[#059669] text-white px-3 sm:px-5 py-2 sm:py-2.5 min-h-[36px] sm:min-h-[44px] rounded-md font-bold text-xs sm:text-sm transition-colors shadow-lg shadow-emerald-500/20"
-              data-testid="start-theater-btn"
-              title={t('playlistView.startTheater')}
-              aria-label={t('playlistView.startTheater')}
-            >
-              <PlayCircle className="w-4 h-4 sm:w-6 sm:h-6" />
-              <span className="hidden sm:inline">{t('playlistView.startTheater')}</span>
-            </button>
+              <button 
+                onClick={() => navigate(`/theater/${id}`)}
+                className="flex items-center justify-center gap-1.5 bg-[#10B981] hover:bg-[#059669] text-white px-3 sm:px-5 py-2 sm:py-2.5 min-h-[36px] sm:min-h-[44px] rounded-md font-bold text-xs sm:text-sm transition-colors shadow-lg shadow-emerald-500/20"
+                data-testid="start-theater-btn"
+                title={t('playlistView.startTheater')}
+                aria-label={t('playlistView.startTheater')}
+              >
+                <PlayCircle className="w-4 h-4 sm:w-6 sm:h-6" />
+                <span className="hidden sm:inline">{t('playlistView.startTheater')}</span>
+              </button>
+            </CoachMark>
           </div>
         </header>
 
@@ -242,9 +277,23 @@ export const PlaylistViewPage: React.FC = () => {
           {loading ? (
             <div className="text-center py-8 text-text-mute">{t('playlistView.loading')}</div>
           ) : songs.length === 0 ? (
-            <div className="text-center py-12 bg-bg-card rounded-lg border border-dashed border-border-main">
+            <div className="text-center py-12 bg-bg-card rounded-lg border border-dashed border-border-main p-6">
               <h3 className="text-base sm:text-lg font-medium text-text-main mb-2">{t('playlistView.noSongs')}</h3>
-              <p className="text-xs sm:text-sm text-text-mute">{t('playlistView.addDesc')}</p>
+              <p className="text-xs sm:text-sm text-text-mute mb-6">{t('playlistView.addDesc')}</p>
+              {isOwner && (
+                <button
+                  onClick={() => {
+                    setSearchQuery('');
+                    setIsSearching(true);
+                    setShowAddModal(true);
+                  }}
+                  className="inline-flex items-center justify-center gap-2 bg-[#aa3bff] hover:bg-[#9926f0] text-white px-5 py-2.5 min-h-[44px] rounded-md font-bold text-sm transition-colors shadow-sm"
+                  data-testid="playlist-empty-add-btn"
+                >
+                  <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span>{t('playlistView.emptyAction', 'Adicionar Músicas')}</span>
+                </button>
+              )}
             </div>
           ) : (
             <div className="bg-bg-card rounded-lg border border-border-main shadow-xs overflow-hidden">
