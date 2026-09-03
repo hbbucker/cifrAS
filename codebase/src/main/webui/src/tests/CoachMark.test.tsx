@@ -101,4 +101,30 @@ describe('CoachMark', () => {
 
     expect(screen.getByText('Avançar')).toBeInTheDocument();
   });
+
+  it('advances to nextTourId when next button is clicked', () => {
+    render(
+      <TestWrapper startTourId="step-1">
+        <CoachMark tourId="step-1" nextTourId="step-2" title="Step 1 Title" description="Step 1 Desc">
+          <button>Step 1 Button</button>
+        </CoachMark>
+        <CoachMark tourId="step-2" title="Step 2 Title" description="Step 2 Desc">
+          <button>Step 2 Button</button>
+        </CoachMark>
+      </TestWrapper>
+    );
+
+    expect(screen.getByText('Step 1 Title')).toBeInTheDocument();
+    expect(screen.queryByText('Step 2 Title')).not.toBeInTheDocument();
+
+    const nextBtn = screen.getByRole('button', { name: /Próximo|next/i });
+    expect(nextBtn).toBeInTheDocument();
+    act(() => {
+      nextBtn.click();
+    });
+
+    expect(screen.queryByText('Step 1 Title')).not.toBeInTheDocument();
+    expect(screen.getByText('Step 2 Title')).toBeInTheDocument();
+    expect(localStorage.getItem('tour_seen_step-1')).toBe('true');
+  });
 });

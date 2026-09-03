@@ -5,7 +5,8 @@
     "confirm": "Confirmar",
     "import": "Importar",
     "loading": "Carregando...",
-    "gotIt": "Entendi"
+    "gotIt": "Entendi",
+    "next": "Próximo"
   },
   "sidebar": {
     "home": "Início",
@@ -183,6 +184,10 @@
     "emptyAction": "Adicionar Músicas",
     "tourTitle": "Adicione Músicas à Playlist",
     "tourDesc": "Busque cifras do seu repertório e adicione-as nesta playlist para montar seu setlist.",
+    "tourPresentationTitle": "Gerar Slides (PPTX)",
+    "tourPresentationDesc": "Exporte e apresente slides com as letras das músicas da sua playlist para projeção em cultos, missas ou shows.",
+    "tourTheaterTitle": "Modo Teatro",
+    "tourTheaterDesc": "Toque ao vivo com visualização limpa em tela cheia, rolagem automática suave e transposição instantânea.",
     "loading": "Carregando músicas...",
     "selectSongs": "Selecione músicas para adicionar à sua playlist",
     "startTheater": "Iniciar Modo Teatro",

@@ -10,21 +10,33 @@ interface CoachMarkProps {
   description: string;
   position?: 'top' | 'bottom' | 'left' | 'right';
   confirmText?: string;
+  nextTourId?: string;
 }
 
 export const CoachMark: React.FC<CoachMarkProps> = ({ 
   children, 
   tourId, 
   title, 
-  description,
+  description, 
   position = 'bottom',
-  confirmText
+  confirmText,
+  nextTourId
 }) => {
   const { t } = useTranslation();
-  const { activeTourId, endTour } = useTour();
+  const { activeTourId, endTour, nextTour } = useTour();
   const isActive = activeTourId === tourId;
 
   if (!isActive) return <>{children}</>;
+
+  const handleConfirm = () => {
+    if (nextTourId) {
+      nextTour(nextTourId);
+    } else {
+      endTour();
+    }
+  };
+
+  const defaultButtonText = nextTourId ? t('common.next', 'Próximo') : t('common.gotIt', 'Entendi');
 
   const positionClasses = {
     top: 'bottom-full mb-3 left-1/2 -translate-x-1/2',
@@ -62,10 +74,10 @@ export const CoachMark: React.FC<CoachMarkProps> = ({
           </div>
           <p className="text-sm text-white/90 mb-3">{description}</p>
           <button 
-            onClick={endTour}
+            onClick={handleConfirm}
             className="text-xs font-bold bg-white text-[#aa3bff] hover:bg-white/90 px-4 py-2 rounded-md transition-colors w-full"
           >
-            {confirmText || t('common.gotIt', 'Entendi')}
+            {confirmText || defaultButtonText}
           </button>
         </div>
       </div>

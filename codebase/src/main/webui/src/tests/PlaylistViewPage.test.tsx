@@ -278,7 +278,48 @@ describe('PlaylistViewPage Component', () => {
     expect(await screen.findByPlaceholderText(/searchPlaceholder/i)).toBeInTheDocument();
   });
 
-  it('triggers playlist-add-song coach mark after delay when user is owner', async () => {
+  it('triggers sequential coach mark tour (add song -> slides pptx -> theater mode) for playlist owner', async () => {
+    renderWithProviders();
+
+    await waitFor(() => {
+      expect(screen.getByText('Minha Playlist')).toBeInTheDocument();
+    });
+
+    // Step 1: Add song coach mark
+    await waitFor(() => {
+      expect(screen.getByText(/Adicione Músicas à Playlist|tourTitle/i)).toBeInTheDocument();
+    }, { timeout: 2500 });
+
+    const nextToSlidesBtn = screen.getByRole('button', { name: /Próximo|next/i });
+    act(() => {
+      fireEvent.click(nextToSlidesBtn);
+    });
+
+    expect(screen.queryByText(/Adicione Músicas à Playlist|tourTitle/i)).not.toBeInTheDocument();
+    expect(localStorage.getItem('tour_seen_playlist-add-song')).toBe('true');
+
+    // Step 2: Slides PPTX coach mark
+    expect(screen.getByText(/Gerar Slides \(PPTX\)|tourPresentationTitle/i)).toBeInTheDocument();
+    const nextToTheaterBtn = screen.getByRole('button', { name: /Próximo|next/i });
+    act(() => {
+      fireEvent.click(nextToTheaterBtn);
+    });
+
+    expect(screen.queryByText(/Gerar Slides \(PPTX\)|tourPresentationTitle/i)).not.toBeInTheDocument();
+    expect(localStorage.getItem('tour_seen_playlist-presentation')).toBe('true');
+
+    // Step 3: Theater Mode coach mark
+    expect(screen.getByText(/Modo Teatro|tourTheaterTitle/i)).toBeInTheDocument();
+    const gotItBtn = screen.getByRole('button', { name: /Entendi|gotIt/i });
+    act(() => {
+      fireEvent.click(gotItBtn);
+    });
+
+    expect(screen.queryByText(/Modo Teatro|tourTheaterTitle/i)).not.toBeInTheDocument();
+    expect(localStorage.getItem('tour_seen_playlist-theater')).toBe('true');
+  });
+
+  it('closes active tour immediately when close (X) button is clicked on playlist coach mark', async () => {
     renderWithProviders();
 
     await waitFor(() => {
@@ -289,13 +330,13 @@ describe('PlaylistViewPage Component', () => {
       expect(screen.getByText(/Adicione Músicas à Playlist|tourTitle/i)).toBeInTheDocument();
     }, { timeout: 2500 });
 
-    const gotItBtn = screen.getByRole('button', { name: /Entendi|gotIt/i });
+    const closeBtn = screen.getByLabelText('Close');
     act(() => {
-      fireEvent.click(gotItBtn);
+      fireEvent.click(closeBtn);
     });
 
     expect(screen.queryByText(/Adicione Músicas à Playlist|tourTitle/i)).not.toBeInTheDocument();
-    expect(localStorage.getItem('tour_seen_playlist-add-song')).toBe('true');
+    expect(screen.queryByText(/Gerar Slides|tourPresentationTitle/i)).not.toBeInTheDocument();
   });
 });
 

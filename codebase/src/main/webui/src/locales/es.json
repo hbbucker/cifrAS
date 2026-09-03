@@ -5,7 +5,8 @@
     "confirm": "Confirm",
     "import": "Importar",
     "loading": "Cargando...",
-    "gotIt": "Entendido"
+    "gotIt": "Entendido",
+    "next": "Siguiente"
   },
   "sidebar": {
     "home": "Inicio",
@@ -183,6 +184,10 @@
     "emptyAction": "Añadir Canciones",
     "tourTitle": "Añade Canciones a la Playlist",
     "tourDesc": "Busca acordes de tu biblioteca y añádelos a esta playlist para armar tu setlist.",
+    "tourPresentationTitle": "Generar Diapositivas (PPTX)",
+    "tourPresentationDesc": "Exporta y presenta diapositivas con las letras de las canciones de tu playlist para proyección en cultos, misas o conciertos.",
+    "tourTheaterTitle": "Modo Teatro",
+    "tourTheaterDesc": "Toca en vivo con vista limpia en pantalla completa, desplazamiento automático suave y transposición instantánea.",
     "loading": "Loading songs...",
     "selectSongs": "Select songs to add to your playlist",
     "startTheater": "Start Theater Mode",

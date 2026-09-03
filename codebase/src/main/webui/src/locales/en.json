@@ -5,7 +5,8 @@
     "confirm": "Confirm",
     "import": "Import",
     "loading": "Loading...",
-    "gotIt": "Got it"
+    "gotIt": "Got it",
+    "next": "Next"
   },
   "sidebar": {
     "home": "Home",
@@ -183,6 +184,10 @@
     "emptyAction": "Add Songs",
     "tourTitle": "Add Songs to Playlist",
     "tourDesc": "Search chords from your library and add them to this playlist to build your setlist.",
+    "tourPresentationTitle": "Generate Slides (PPTX)",
+    "tourPresentationDesc": "Export and present slides with the lyrics of your playlist songs for projection in services, masses, or gigs.",
+    "tourTheaterTitle": "Theater Mode",
+    "tourTheaterDesc": "Play live with a clean full-screen view, smooth auto-scroll, and instant chord transposition.",
     "loading": "Loading songs...",
     "selectSongs": "Select songs to add to your playlist",
     "startTheater": "Start Theater Mode",

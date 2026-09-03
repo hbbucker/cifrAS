@@ -208,6 +208,7 @@ export const PlaylistViewPage: React.FC = () => {
             {isOwner && (
               <CoachMark
                 tourId="playlist-add-song"
+                nextTourId="playlist-presentation"
                 title={t('playlistView.tourTitle', 'Adicione Músicas à Playlist')}
                 description={t('playlistView.tourDesc', 'Busque cifras do seu repertório e adicione-as nesta playlist para montar seu setlist.')}
                 position="bottom"
@@ -228,32 +229,47 @@ export const PlaylistViewPage: React.FC = () => {
                 </button>
               </CoachMark>
             )}
-            <button 
-              onClick={() => {
-                if (songs.length === 0) {
-                  toast(t('playlistView.noSongsToExport'), 'error');
-                  return;
-                }
-                setShowPresentationModal(true);
-              }}
-              className="flex items-center justify-center gap-1.5 bg-[#aa3bff] hover:bg-[#9926f0] text-white px-2.5 sm:px-4 py-2 sm:py-2.5 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] rounded-md font-bold text-xs sm:text-sm transition-colors shadow-xs"
-              data-testid="export-presentation-btn"
-              title={t('playlistPresentation.generateSlides')}
-              aria-label={t('playlistPresentation.generateSlides')}
+            <CoachMark
+              tourId="playlist-presentation"
+              nextTourId="playlist-theater"
+              title={t('playlistView.tourPresentationTitle', 'Gerar Slides (PPTX)')}
+              description={t('playlistView.tourPresentationDesc', 'Exporte e apresente slides com as letras das músicas da sua playlist para projeção em cultos, missas ou shows.')}
+              position="bottom"
             >
-              <Presentation className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span className="hidden sm:inline">{t('playlistPresentation.generateSlides')}</span>
-            </button>
-            <button 
-              onClick={() => navigate(`/theater/${id}`)}
-              className="flex items-center justify-center gap-1.5 bg-[#10B981] hover:bg-[#059669] text-white px-3 sm:px-5 py-2 sm:py-2.5 min-h-[36px] sm:min-h-[44px] rounded-md font-bold text-xs sm:text-sm transition-colors shadow-lg shadow-emerald-500/20"
-              data-testid="start-theater-btn"
-              title={t('playlistView.startTheater')}
-              aria-label={t('playlistView.startTheater')}
+              <button 
+                onClick={() => {
+                  if (songs.length === 0) {
+                    toast(t('playlistView.noSongsToExport'), 'error');
+                    return;
+                  }
+                  setShowPresentationModal(true);
+                }}
+                className="flex items-center justify-center gap-1.5 bg-[#aa3bff] hover:bg-[#9926f0] text-white px-2.5 sm:px-4 py-2 sm:py-2.5 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] rounded-md font-bold text-xs sm:text-sm transition-colors shadow-xs"
+                data-testid="export-presentation-btn"
+                title={t('playlistPresentation.generateSlides')}
+                aria-label={t('playlistPresentation.generateSlides')}
+              >
+                <Presentation className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="hidden sm:inline">{t('playlistPresentation.generateSlides')}</span>
+              </button>
+            </CoachMark>
+            <CoachMark
+              tourId="playlist-theater"
+              title={t('playlistView.tourTheaterTitle', 'Modo Teatro')}
+              description={t('playlistView.tourTheaterDesc', 'Toque ao vivo com visualização limpa em tela cheia, rolagem automática suave e transposição instantânea.')}
+              position="bottom"
             >
-              <PlayCircle className="w-4 h-4 sm:w-6 sm:h-6" />
-              <span className="hidden sm:inline">{t('playlistView.startTheater')}</span>
-            </button>
+              <button 
+                onClick={() => navigate(`/theater/${id}`)}
+                className="flex items-center justify-center gap-1.5 bg-[#10B981] hover:bg-[#059669] text-white px-3 sm:px-5 py-2 sm:py-2.5 min-h-[36px] sm:min-h-[44px] rounded-md font-bold text-xs sm:text-sm transition-colors shadow-lg shadow-emerald-500/20"
+                data-testid="start-theater-btn"
+                title={t('playlistView.startTheater')}
+                aria-label={t('playlistView.startTheater')}
+              >
+                <PlayCircle className="w-4 h-4 sm:w-6 sm:h-6" />
+                <span className="hidden sm:inline">{t('playlistView.startTheater')}</span>
+              </button>
+            </CoachMark>
           </div>
         </header>
 

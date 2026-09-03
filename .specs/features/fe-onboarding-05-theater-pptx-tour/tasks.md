@@ -1,0 +1,25 @@
+# Tasks: Onboarding Tour — Modo Teatro e Gerador de Slides PPTX
+
+- [ ] **T1: Atualizar `TourContext.tsx`**
+  - Adicionar método `nextTour(nextTourId: string)`.
+  - Garantir persistência atômica da chave anterior e ativação da próxima etapa não visualizada.
+- [ ] **T2: Atualizar `CoachMark.tsx`**
+  - Adicionar suporte a `nextTourId?: string`.
+  - Configurar fallback de label do botão de confirmação (`t('common.next')` se houver `nextTourId`, senão `t('common.gotIt')`).
+  - Acionar `nextTour(nextTourId)` no clique de confirmação.
+- [ ] **T3: Atualizar arquivos de tradução i18n (`pt-BR.json`, `en.json`, `es.json`)**
+  - Incluir `common.next`.
+  - Incluir chaves `playlistView.tourPresentationTitle`, `playlistView.tourPresentationDesc`.
+  - Incluir chaves `playlistView.tourTheaterTitle`, `playlistView.tourTheaterDesc`.
+- [ ] **T4: Atualizar `PlaylistViewPage.tsx`**
+  - Envolver o botão `export-presentation-btn` no `CoachMark` (`tourId="playlist-presentation"`, `nextTourId="playlist-theater"`).
+  - Envolver o botão `start-theater-btn` no `CoachMark` (`tourId="playlist-theater"`).
+  - Configurar `nextTourId="playlist-presentation"` no `CoachMark` do botão `playlist-add-song`.
+- [ ] **T5: Atualizar e expandir testes unitários e de integração**
+  - Testar `nextTour` e navegação de passos no `CoachMark.test.tsx`.
+  - Testar a sequência completa de tours na `PlaylistViewPage.test.tsx` (`playlist-add-song` -> `playlist-presentation` -> `playlist-theater`).
+- [ ] **T6: Validar build, lint e cobertura**
+  - Executar `npm test` e `npm run coverage`.
+  - Executar `npm run lint`.
+  - Executar `npm run build`.
+- [ ] **T7: Emitir parecer de QA e persistir em `qa/verdict.md`**
