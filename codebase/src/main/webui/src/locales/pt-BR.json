@@ -257,7 +257,13 @@
     "pendingInvitations": "Convites Pendentes",
     "inviteToGroup": "Convidar para o Grupo",
     "groupName": "Nome do Grupo",
-    "memberEmail": "membro@exemplo.com"
+    "memberEmail": "membro@exemplo.com",
+    "tourCreateTitle": "Crie seu Grupo Musical",
+    "tourCreateDesc": "Reúna sua banda, ministério de louvor ou amigos para compartilhar cifras e playlists colaborativas em tempo real.",
+    "educationalEmptyTitle": "Organize e compartilhe seu repertório em equipe",
+    "educationalEmptyStep1": "1. Crie seu grupo musical ou ministério",
+    "educationalEmptyStep2": "2. Convide os integrantes com um link rápido",
+    "educationalEmptyStep3": "3. Compartilhe playlists e cifras com a equipe"
   },
   "group": {
     "sharePlaylist": "Compartilhar Playlist",
@@ -271,6 +277,14 @@
     "removePlaylistSuccess": "Playlist removida do grupo",
     "removePlaylistError": "Falha ao remover playlist",
     "confirmRemovePlaylist": "Tem certeza de que deseja remover esta playlist do grupo?",
+    "tourInviteTitle": "Convide integrantes para o Grupo",
+    "tourInviteDesc": "Gere um link de convite instantâneo para que músicos e vocalistas acessem as músicas do grupo.",
+    "tourSharePlaylistTitle": "Compartilhe Playlists com o Grupo",
+    "tourSharePlaylistDesc": "Vincule suas playlists existentes para que todos os membros do grupo tenham acesso sincronizado ao repertório.",
+    "educationalEmptyPlaylistsTitle": "Nenhuma playlist compartilhada ainda",
+    "educationalEmptyPlaylistsStep1": "1. Crie ou selecione suas playlists de repertório",
+    "educationalEmptyPlaylistsStep2": "2. Compartilhe com os membros do grupo",
+    "educationalEmptyPlaylistsStep3": "3. Toquem juntos no Modo Teatro sincronizado",
     "tabs": {
       "playlists": "Playlists",
       "members": "Membros & Convites"

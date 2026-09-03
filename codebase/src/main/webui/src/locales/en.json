@@ -257,7 +257,13 @@
     "pendingInvitations": "Pending Invitations",
     "inviteToGroup": "Invite to Group",
     "groupName": "Group Name",
-    "memberEmail": "member@example.com"
+    "memberEmail": "member@example.com",
+    "tourCreateTitle": "Create your Music Group",
+    "tourCreateDesc": "Gather your band, worship team, or friends to share chords and collaborative playlists in real time.",
+    "educationalEmptyTitle": "Organize and share your repertoire as a team",
+    "educationalEmptyStep1": "1. Create your music group or ministry",
+    "educationalEmptyStep2": "2. Invite members with a quick link",
+    "educationalEmptyStep3": "3. Share playlists and chord charts with the team"
   },
   "group": {
     "sharePlaylist": "Share Playlist",
@@ -271,6 +277,14 @@
     "removePlaylistSuccess": "Playlist removed from group",
     "removePlaylistError": "Failed to remove playlist",
     "confirmRemovePlaylist": "Are you sure you want to remove this playlist from the group?",
+    "tourInviteTitle": "Invite members to the Group",
+    "tourInviteDesc": "Generate an instant invite link so musicians and singers can access group songs.",
+    "tourSharePlaylistTitle": "Share Playlists with the Group",
+    "tourSharePlaylistDesc": "Link your existing playlists so all group members have synchronized access to the repertoire.",
+    "educationalEmptyPlaylistsTitle": "No shared playlists yet",
+    "educationalEmptyPlaylistsStep1": "1. Create or select your repertoire playlists",
+    "educationalEmptyPlaylistsStep2": "2. Share them with group members",
+    "educationalEmptyPlaylistsStep3": "3. Play together with synchronized Theater Mode",
     "tabs": {
       "playlists": "Playlists",
       "members": "Members & Invites"

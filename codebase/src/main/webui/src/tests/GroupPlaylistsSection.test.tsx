@@ -1,8 +1,10 @@
+import React, { useEffect } from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GroupPlaylistsSection } from '../components/groups/GroupPlaylistsSection';
 import * as groupsApi from '../api/groups';
 import { BrowserRouter } from 'react-router-dom';
+import { TourProvider, useTour } from '../context/TourContext';
 import '@testing-library/jest-dom/vitest';
 
 const mockNavigate = vi.fn();
@@ -27,6 +29,12 @@ const mockT = (key: string) => {
         'groups.create': 'Criar',
         'group.noSharedPlaylists': 'Nenhuma playlist compartilhada',
         'group.noSharedPlaylistsDesc': 'Nenhuma playlist compartilhada com este grupo ainda.',
+        'group.educationalEmptyPlaylistsTitle': 'Nenhuma playlist compartilhada ainda',
+        'group.educationalEmptyPlaylistsStep1': '1. Crie ou selecione suas playlists de repertório',
+        'group.educationalEmptyPlaylistsStep2': '2. Compartilhe com os membros do grupo',
+        'group.educationalEmptyPlaylistsStep3': '3. Toquem juntos no Modo Teatro sincronizado',
+        'group.tourSharePlaylistTitle': 'Compartilhe Playlists com o Grupo',
+        'group.tourSharePlaylistDesc': 'Vincule suas playlists existentes',
         'group.loadPlaylistsError': 'Falha ao carregar playlists compartilhadas',
         'group.removePlaylistSuccess': 'Playlist removida do grupo',
         'group.removePlaylistError': 'Falha ao remover playlist',
@@ -36,6 +44,7 @@ const mockT = (key: string) => {
         'sharedWithMe.playTheater': 'Tocar no Modo Teatro',
         'common.confirm': 'Confirmar',
         'common.cancel': 'Cancelar',
+        'common.gotIt': 'Entendi',
       };
       return dict[key] || key;
     };
@@ -49,20 +58,36 @@ describe('GroupPlaylistsSection Component', () => {
 
   beforeEach(() => {
     vi.restoreAllMocks();
+    localStorage.clear();
   });
 
   const renderComponent = (role: 'Admin' | 'Member' = 'Admin') => {
     return render(
-      <BrowserRouter>
-        <GroupPlaylistsSection groupId="group-1" role={role} onLinkNew={onLinkNewMock} />
-      </BrowserRouter>
+      <TourProvider>
+        <BrowserRouter>
+          <GroupPlaylistsSection groupId="group-1" role={role} onLinkNew={onLinkNewMock} />
+        </BrowserRouter>
+      </TourProvider>
     );
   };
 
-  it('renders loading spinner and then empty state when no playlists', async () => {
+  it('renders loading spinner and then educational empty state when no playlists for Admin', async () => {
     vi.spyOn(groupsApi, 'getGroupPlaylists').mockResolvedValueOnce([]);
 
     renderComponent('Admin');
+
+    expect(await screen.findByText('Nenhuma playlist compartilhada ainda')).toBeInTheDocument();
+    expect(screen.getByText('Crie ou selecione suas playlists de repertório')).toBeInTheDocument();
+
+    const linkBtns = screen.getAllByRole('button', { name: /Compartilhar Playlist/i });
+    fireEvent.click(linkBtns[1]);
+    expect(onLinkNewMock).toHaveBeenCalled();
+  });
+
+  it('renders simple empty state when no playlists for Member', async () => {
+    vi.spyOn(groupsApi, 'getGroupPlaylists').mockResolvedValueOnce([]);
+
+    renderComponent('Member');
 
     expect(await screen.findByText('Nenhuma playlist compartilhada')).toBeInTheDocument();
     expect(screen.getByText('Nenhuma playlist compartilhada com este grupo ainda.')).toBeInTheDocument();
@@ -185,8 +210,39 @@ describe('GroupPlaylistsSection Component', () => {
 
     renderComponent('Admin');
 
-    const addBtn = await screen.findByText('Compartilhar Playlist');
+    const addBtn = await screen.findByTestId('share-playlist-btn');
     fireEvent.click(addBtn);
     expect(onLinkNewMock).toHaveBeenCalled();
+  });
+
+  it('renders CoachMark when group-share-playlist tour is active', async () => {
+    vi.spyOn(groupsApi, 'getGroupPlaylists').mockResolvedValueOnce([
+      { id: 'p1', name: 'Repertório Culto', songCount: 5 },
+    ]);
+
+    const TourStarter: React.FC = () => {
+      const { startTour } = useTour();
+      useEffect(() => {
+        startTour('group-share-playlist');
+      }, [startTour]);
+      return <GroupPlaylistsSection groupId="group-1" role="Admin" onLinkNew={onLinkNewMock} />;
+    };
+
+    render(
+      <TourProvider>
+        <BrowserRouter>
+          <TourStarter />
+        </BrowserRouter>
+      </TourProvider>
+    );
+
+    expect(await screen.findByText('Compartilhe Playlists com o Grupo')).toBeInTheDocument();
+    expect(screen.getByText('Vincule suas playlists existentes')).toBeInTheDocument();
+
+    const gotItBtn = screen.getByRole('button', { name: /Entendi|gotIt/i });
+    fireEvent.click(gotItBtn);
+
+    expect(screen.queryByText('Compartilhe Playlists com o Grupo')).not.toBeInTheDocument();
+    expect(localStorage.getItem('tour_seen_group-share-playlist')).toBe('true');
   });
 });

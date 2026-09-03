@@ -6,6 +6,8 @@ import { Play, Trash2, Plus, ListMusic } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
 import { Button } from '../ui/Button';
 import { EmptyState } from '../ui/EmptyState';
+import { EducationalEmptyState } from '../ui/EducationalEmptyState';
+import { CoachMark } from '../ui/CoachMark';
 import { Spinner } from '../ui/Spinner';
 import { ConfirmModal } from '../modals/ConfirmModal';
 
@@ -87,10 +89,22 @@ export const GroupPlaylistsSection: React.FC<GroupPlaylistsSectionProps> = ({ gr
       <div className="flex justify-between items-center mb-4 sm:mb-6 gap-2">
         <h2 className="text-lg sm:text-xl font-bold text-text-main truncate">{t('group.sharedPlaylists')}</h2>
         {role === 'Admin' && (
-          <Button onClick={onLinkNew} size="sm" className="min-h-[40px] sm:min-h-[44px] px-3 sm:px-4 text-xs sm:text-sm shrink-0">
-            <Plus className="w-4 h-4 mr-1" />
-            <span>{t('group.sharePlaylist')}</span>
-          </Button>
+          <CoachMark
+            tourId="group-share-playlist"
+            title={t('group.tourSharePlaylistTitle', 'Compartilhe Playlists com o Grupo')}
+            description={t('group.tourSharePlaylistDesc', 'Vincule suas playlists existentes para que todos os membros do grupo tenham acesso sincronizado ao repertório.')}
+            position="bottom"
+          >
+            <Button 
+              onClick={onLinkNew} 
+              size="sm" 
+              data-testid="share-playlist-btn"
+              className="min-h-[40px] sm:min-h-[44px] px-3 sm:px-4 text-xs sm:text-sm shrink-0"
+            >
+              <Plus className="w-4 h-4 mr-1" />
+              <span>{t('group.sharePlaylist')}</span>
+            </Button>
+          </CoachMark>
         )}
       </div>
 
@@ -99,11 +113,27 @@ export const GroupPlaylistsSection: React.FC<GroupPlaylistsSectionProps> = ({ gr
           <Spinner />
         </div>
       ) : playlists.length === 0 ? (
-        <EmptyState 
-          icon={ListMusic} 
-          title={t('group.noSharedPlaylists')} 
-          description={t('group.noSharedPlaylistsDesc')} 
-        />
+        role === 'Admin' ? (
+          <EducationalEmptyState
+            icon={ListMusic}
+            title={t('group.educationalEmptyPlaylistsTitle', 'Nenhuma playlist compartilhada ainda')}
+            steps={[
+              t('group.educationalEmptyPlaylistsStep1', '1. Crie ou selecione suas playlists de repertório'),
+              t('group.educationalEmptyPlaylistsStep2', '2. Compartilhe com os membros do grupo'),
+              t('group.educationalEmptyPlaylistsStep3', '3. Toquem juntos no Modo Teatro sincronizado')
+            ]}
+            action={{
+              label: t('group.sharePlaylist', 'Compartilhar Playlist'),
+              onClick: onLinkNew
+            }}
+          />
+        ) : (
+          <EmptyState 
+            icon={ListMusic} 
+            title={t('group.noSharedPlaylists')} 
+            description={t('group.noSharedPlaylistsDesc')} 
+          />
+        )
       ) : (
         <div className="flex flex-col gap-2.5 sm:gap-3">
           {playlists.map(playlist => (
