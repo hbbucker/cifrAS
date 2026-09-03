@@ -9,6 +9,8 @@ import { LinkPlaylistModal } from '../components/modals/LinkPlaylistModal';
 import { linkPlaylist } from '../api/groups';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { CoachMark } from '../components/ui/CoachMark';
+import { useTour } from '../context/TourContext';
 
 interface GroupDetailsData {
   id: string;
@@ -25,6 +27,7 @@ export const GroupDetailsPage: React.FC = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { toast } = useToast();
+  const { startTour } = useTour();
 
   const [group, setGroup] = useState<GroupDetailsData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -68,6 +71,15 @@ export const GroupDetailsPage: React.FC = () => {
       })
       .catch(() => setLoading(false));
   }, [id, user, navigate, logout]);
+
+  useEffect(() => {
+    if (group && group.role === 'Admin') {
+      const timer = setTimeout(() => {
+        startTour('group-invite-members');
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [group, startTour]);
 
   const handleLinkPlaylist = async (playlistId: string) => {
     if (!id) return;
@@ -152,14 +164,22 @@ export const GroupDetailsPage: React.FC = () => {
 
           {group.role === 'Admin' && (
             <div className="shrink-0 ml-auto">
-              <button
-                onClick={() => setShowInviteModal(true)}
-                className="flex items-center gap-1.5 sm:gap-2 bg-[#aa3bff] hover:bg-[#9926f0] text-white px-3 sm:px-4 py-2 min-h-[40px] sm:min-h-[44px] rounded-md font-medium transition-colors text-xs sm:text-sm"
-                data-testid="header-invite-btn"
+              <CoachMark
+                tourId="group-invite-members"
+                title={t('group.tourInviteTitle', 'Convide integrantes para o Grupo')}
+                description={t('group.tourInviteDesc', 'Gere um link de convite instantâneo para que músicos e vocalistas acessem as músicas do grupo.')}
+                position="bottom"
+                nextTourId="group-share-playlist"
               >
-                <UserPlus className="w-4 h-4" />
-                <span className="hidden sm:inline">{t('group.invite')}</span>
-              </button>
+                <button
+                  onClick={() => setShowInviteModal(true)}
+                  className="flex items-center gap-1.5 sm:gap-2 bg-[#aa3bff] hover:bg-[#9926f0] text-white px-3 sm:px-4 py-2 min-h-[40px] sm:min-h-[44px] rounded-md font-medium transition-colors text-xs sm:text-sm"
+                  data-testid="header-invite-btn"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  <span className="hidden sm:inline">{t('group.invite')}</span>
+                </button>
+              </CoachMark>
             </div>
           )}
         </header>

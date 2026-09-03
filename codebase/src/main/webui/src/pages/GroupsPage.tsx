@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { GroupCard } from '../components/cards/GroupCard';
-import { Plus } from 'lucide-react';
+import { Plus, Users } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../context/ToastContext';
 import { BrandLogo } from '../components/ui/BrandLogo';
 import { createShareLink } from '../api/shareLinks';
+import { CoachMark } from '../components/ui/CoachMark';
+import { useTour } from '../context/TourContext';
+import { EducationalEmptyState } from '../components/ui/EducationalEmptyState';
 
 interface GroupData {
   id: string;
@@ -28,6 +31,7 @@ export const GroupsPage: React.FC = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { toast } = useToast();
+  const { startTour } = useTour();
   const [groups, setGroups] = useState<GroupData[]>([]);
   const [invites, setInvites] = useState<InviteData[]>([]);
   const [declinedInvites, setDeclinedInvites] = useState<InviteData[]>([]);
@@ -125,6 +129,13 @@ export const GroupsPage: React.FC = () => {
     fetchInvites();
   }, [fetchGroups, fetchInvites]);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      startTour('group-create');
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [startTour]);
+
   const handleCreateGroup = () => {
     if (!newGroupName.trim()) return;
 
@@ -207,13 +218,21 @@ export const GroupsPage: React.FC = () => {
             <BrandLogo iconOnly size="sm" asLink to="/dashboard" className="sm:hidden shrink-0" />
             <h1 className="text-lg sm:text-xl font-bold text-text-main truncate">{t('groups.groups')}</h1>
           </div>
-          <button 
-            onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-1.5 sm:gap-2 bg-[#aa3bff] hover:bg-[#9926f0] text-white px-3.5 sm:px-4 py-2 min-h-[40px] sm:min-h-[44px] rounded-md font-medium transition-colors text-xs sm:text-sm"
+          <CoachMark
+            tourId="group-create"
+            title={t('groups.tourCreateTitle', 'Crie seu Grupo Musical')}
+            description={t('groups.tourCreateDesc', 'Reúna sua banda, ministério de louvor ou amigos para compartilhar cifras e playlists colaborativas em tempo real.')}
+            position="bottom"
           >
-            <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
-            <span>{t('groups.newGroup')}</span>
-          </button>
+            <button 
+              onClick={() => setShowCreateModal(true)}
+              data-testid="create-group-btn"
+              className="flex items-center gap-1.5 sm:gap-2 bg-[#aa3bff] hover:bg-[#9926f0] text-white px-3.5 sm:px-4 py-2 min-h-[40px] sm:min-h-[44px] rounded-md font-medium transition-colors text-xs sm:text-sm"
+            >
+              <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span>{t('groups.newGroup')}</span>
+            </button>
+          </CoachMark>
         </header>
 
         <div className="flex-1 overflow-y-auto p-3.5 sm:p-6 pb-24 sm:pb-8 min-w-0">
@@ -256,7 +275,19 @@ export const GroupsPage: React.FC = () => {
           {loading ? (
             <div className="text-center py-8 text-text-mute text-sm">{t('groups.loadingGroups')}</div>
           ) : groups.length === 0 ? (
-            <div className="text-center py-12 text-text-mute text-sm">{t('groups.noGroups')}</div>
+            <EducationalEmptyState
+              icon={Users}
+              title={t('groups.educationalEmptyTitle', 'Organize e compartilhe seu repertório em equipe')}
+              steps={[
+                t('groups.educationalEmptyStep1', '1. Crie seu grupo musical ou ministério'),
+                t('groups.educationalEmptyStep2', '2. Convide os integrantes com um link rápido'),
+                t('groups.educationalEmptyStep3', '3. Compartilhe playlists e cifras com a equipe')
+              ]}
+              action={{
+                label: t('groups.newGroup', 'Novo Grupo'),
+                onClick: () => setShowCreateModal(true)
+              }}
+            />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-6">
               {groups.map(group => (
