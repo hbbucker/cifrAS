@@ -70,18 +70,19 @@ describe('LandingPage Component', () => {
     );
 
     // Initial chord G
-    expect(screen.getByText(/\[G\]/)).toBeInTheDocument();
+    expect(screen.getByText('G')).toBeInTheDocument();
+    expect(screen.getByText('Em')).toBeInTheDocument();
 
     const plusBtn = screen.getByTitle('Transpor Tom +');
     const minusBtn = screen.getByTitle('Transpor Tom -');
 
     // Transpose +1 -> G#
     fireEvent.click(plusBtn);
-    expect(screen.getByText(/\[G#\]/)).toBeInTheDocument();
+    expect(screen.getByText('G#')).toBeInTheDocument();
 
     // Transpose -1 -> G
     fireEvent.click(minusBtn);
-    expect(screen.getByText(/\[G\]/)).toBeInTheDocument();
+    expect(screen.getByText('G')).toBeInTheDocument();
 
     // Speed controls
     const speedPlusBtn = screen.getByTitle('Velocidade +');

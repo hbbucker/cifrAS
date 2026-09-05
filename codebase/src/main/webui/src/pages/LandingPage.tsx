@@ -215,18 +215,18 @@ export const LandingPage: React.FC = () => {
                             {/* Simulated Chords & Lyrics */}
                             <div className="space-y-4 font-mono text-sm sm:text-base">
                                 <div className="space-y-1">
-                                    <div className="flex space-x-8 text-[#aa3bff] font-bold text-sm sm:text-base">
-                                        <span>[{chord1}]</span>
-                                        <span>[{chord2}]</span>
+                                    <div className="flex space-x-12 text-[#aa3bff] font-bold text-sm sm:text-base tracking-wide">
+                                        <span>{chord1}</span>
+                                        <span>{chord2}</span>
                                     </div>
                                     <p className="text-gray-300 font-sans text-sm sm:text-base leading-relaxed">
                                         {t('landing.demoLyrics1')}
                                     </p>
                                 </div>
                                 <div className="space-y-1">
-                                    <div className="flex space-x-8 text-[#aa3bff] font-bold text-sm sm:text-base">
-                                        <span>[{chord3}]</span>
-                                        <span>[{chord4}]</span>
+                                    <div className="flex space-x-12 text-[#aa3bff] font-bold text-sm sm:text-base tracking-wide">
+                                        <span>{chord3}</span>
+                                        <span>{chord4}</span>
                                     </div>
                                     <p className="text-gray-300 font-sans text-sm sm:text-base leading-relaxed">
                                         {t('landing.demoLyrics2')}
