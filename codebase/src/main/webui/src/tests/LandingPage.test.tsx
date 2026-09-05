@@ -91,7 +91,7 @@ describe('LandingPage Component', () => {
     fireEvent.click(speedMinusBtn);
 
     // Toggle Auto-scroll
-    const autoScrollBtn = screen.getByRole('button', { name: /auto-scroll/i });
+    const autoScrollBtn = screen.getByRole('button', { name: /alternar rolagem/i });
     expect(autoScrollBtn).toBeInTheDocument();
     fireEvent.click(autoScrollBtn);
   });

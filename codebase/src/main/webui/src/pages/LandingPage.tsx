@@ -200,6 +200,7 @@ export const LandingPage: React.FC = () => {
                                     {/* Auto-scroll toggle */}
                                     <button
                                         onClick={() => setIsAutoScrolling(!isAutoScrolling)}
+                                        aria-label="Alternar rolagem automática"
                                         className={`flex items-center space-x-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
                                             isAutoScrolling
                                                 ? 'bg-[#aa3bff]/20 border-[#aa3bff]/40 text-[#d980ff]'
