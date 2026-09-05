@@ -145,7 +145,7 @@ export const LandingPage: React.FC = () => {
                         <div className="bg-gray-800/80 backdrop-blur-md rounded-2xl border border-gray-700/80 p-5 sm:p-6 text-left shadow-2xl relative overflow-hidden">
                             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-700/70 pb-4 mb-4">
                                 <div>
-                                    <div className="text-xs font-semibold text-[#aa3bff] uppercase tracking-wider">Demo Interativa</div>
+                                    <div className="text-xs font-semibold text-[#d980ff] uppercase tracking-wider">Demo Interativa</div>
                                     <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
                                         {t('landing.demoSongTitle')} <span className="text-xs text-gray-400 font-normal">({t('landing.demoArtist')})</span>
                                     </h2>
@@ -161,7 +161,7 @@ export const LandingPage: React.FC = () => {
                                         >
                                             <Minus className="w-3.5 h-3.5" />
                                         </button>
-                                        <span className="px-2 text-xs font-semibold text-[#aa3bff]">
+                                        <span className="px-2 text-xs font-semibold text-[#d980ff]">
                                             {t('landing.demoKey')}: {chord1}
                                         </span>
                                         <button
@@ -216,7 +216,7 @@ export const LandingPage: React.FC = () => {
                             {/* Simulated Chords & Lyrics */}
                             <div className="space-y-4 font-mono text-sm sm:text-base">
                                 <div className="space-y-1">
-                                    <div className="flex space-x-12 text-[#aa3bff] font-bold text-sm sm:text-base tracking-wide">
+                                    <div className="flex space-x-12 text-[#d980ff] font-bold text-sm sm:text-base tracking-wide">
                                         <span>{chord1}</span>
                                         <span>{chord2}</span>
                                     </div>
@@ -225,7 +225,7 @@ export const LandingPage: React.FC = () => {
                                     </p>
                                 </div>
                                 <div className="space-y-1">
-                                    <div className="flex space-x-12 text-[#aa3bff] font-bold text-sm sm:text-base tracking-wide">
+                                    <div className="flex space-x-12 text-[#d980ff] font-bold text-sm sm:text-base tracking-wide">
                                         <span>{chord3}</span>
                                         <span>{chord4}</span>
                                     </div>
@@ -339,7 +339,7 @@ export const LandingPage: React.FC = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
                         <div className="bg-gray-800/30 border border-gray-800 p-6 sm:p-8 rounded-2xl relative text-left">
-                            <div className="w-10 h-10 bg-[#aa3bff]/20 text-[#aa3bff] rounded-full flex items-center justify-center font-bold text-lg mb-6">
+                            <div className="w-10 h-10 bg-[#aa3bff]/20 text-[#d980ff] rounded-full flex items-center justify-center font-bold text-lg mb-6">
                                 1
                             </div>
                             <h3 className="text-lg sm:text-xl font-bold mb-2 text-white">{t('landing.step1Title')}</h3>
@@ -347,7 +347,7 @@ export const LandingPage: React.FC = () => {
                         </div>
 
                         <div className="bg-gray-800/30 border border-gray-800 p-6 sm:p-8 rounded-2xl relative text-left">
-                            <div className="w-10 h-10 bg-[#aa3bff]/20 text-[#aa3bff] rounded-full flex items-center justify-center font-bold text-lg mb-6">
+                            <div className="w-10 h-10 bg-[#aa3bff]/20 text-[#d980ff] rounded-full flex items-center justify-center font-bold text-lg mb-6">
                                 2
                             </div>
                             <h3 className="text-lg sm:text-xl font-bold mb-2 text-white">{t('landing.step2Title')}</h3>
@@ -355,7 +355,7 @@ export const LandingPage: React.FC = () => {
                         </div>
 
                         <div className="bg-gray-800/30 border border-gray-800 p-6 sm:p-8 rounded-2xl relative text-left">
-                            <div className="w-10 h-10 bg-[#aa3bff]/20 text-[#aa3bff] rounded-full flex items-center justify-center font-bold text-lg mb-6">
+                            <div className="w-10 h-10 bg-[#aa3bff]/20 text-[#d980ff] rounded-full flex items-center justify-center font-bold text-lg mb-6">
                                 3
                             </div>
                             <h3 className="text-lg sm:text-xl font-bold mb-2 text-white">{t('landing.step3Title')}</h3>
