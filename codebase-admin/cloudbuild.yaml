@@ -1,0 +1,50 @@
+steps:
+  # 1. Build Docker image with GraalVM Native & Quinoa (BuildKit enabled)
+  - name: 'gcr.io/cloud-builders/docker'
+    dir: 'codebase-admin'
+    args:
+      - 'build'
+      - '-f'
+      - 'Dockerfile'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO_NAME}/cifras-adm:$COMMIT_SHA'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO_NAME}/cifras-adm:latest'
+      - '.'
+    env:
+      - 'DOCKER_BUILDKIT=1'
+
+  # 2. Push Docker image to Google Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '--all-tags'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO_NAME}/cifras-adm'
+
+  # 3. Deploy to Google Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'cifras-adm'
+      - '--image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO_NAME}/cifras-adm:$COMMIT_SHA'
+      - '--region=${_REGION}'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--port=8081'
+      - '--memory=512Mi'
+      - '--cpu=1'
+      - '--min-instances=0'
+
+images:
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO_NAME}/cifras-adm:$COMMIT_SHA'
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO_NAME}/cifras-adm:latest'
+
+substitutions:
+  _REGION: 'europe-west1'
+  _REPO_NAME: 'cifras-repo'
+
+options:
+  machineType: 'E2_HIGHMEM_8'
+  logging: CLOUD_LOGGING_ONLY

@@ -46,3 +46,5 @@ codebase/src/main/webui/playwright-report/index.html
 .serena/
 fix_*.js
 slack_bridge/thread_mapping.json
+.worktrees/
+deploy-*.sh
