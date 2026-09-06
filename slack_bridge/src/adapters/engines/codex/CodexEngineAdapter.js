@@ -204,9 +204,9 @@ class CodexEngineAdapter extends ILLMEnginePort {
     if (event.type === 'item.started' && event.item) {
       const convId = executionContext.boundSessionId;
       if (event.item.type === 'command_execution') {
-        queue.push(EngineEvent.statusUpdated(convId, 'Executando comando: ' + (event.item.command || '')));
+        queue.push(EngineEvent.statusUpdated(convId, 'Executando: ' + (event.item.command || '')));
       } else if (event.item.type === 'tool_use') {
-        queue.push(EngineEvent.statusUpdated(convId, 'Usando ferramenta: ' + (event.item.tool_name || '')));
+        queue.push(EngineEvent.statusUpdated(convId, 'Tools: ' + (event.item.tool_name || '')));
       }
     }
   }

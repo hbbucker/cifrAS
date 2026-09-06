@@ -1,3 +1,4 @@
+const fs = require('node:fs');
 const path = require('node:path');
 
 const SLACK_MARKDOWN_LIMIT = 2900;
@@ -22,16 +23,59 @@ class SlackMrkdwnFormatter {
       .replace(/(?:^|[\s(])(?:\/[A-Za-z0-9._-]+){2,}/g, (match) => `${match[0]}[caminho local removido]`);
   }
 
-  extractLocalFiles(markdown) {
+  extractLocalFiles(markdown, options = {}) {
+    const workspaceDir = options.workspaceDir || process.cwd();
     const filePaths = [];
-    const markdownWithoutLocalFiles = String(markdown || '').replace(/!?\[([^\]]*)\]\((file:\/\/\/[^)]+|\/(?:[^)\s]+))\)/g, (match, label, location) => {
-      const filePath = location.startsWith('file:///') ? decodeURIComponent(location.slice('file://'.length)) : location;
-      if (path.isAbsolute(filePath)) filePaths.push(filePath);
-      return '';
+
+    const transformedMarkdown = String(markdown || '').replace(/!?\[([^\]]*)\]\(([^)\s]+)\)/g, (match, label, rawLocation) => {
+      // Ignora links web HTTP / HTTPS / mailto
+      if (/^(https?:\/\/|mailto:)/i.test(rawLocation)) {
+        return match;
+      }
+
+      let location = rawLocation;
+      if (location.startsWith('file:///')) {
+        location = decodeURIComponent(location.slice('file://'.length));
+      } else if (location.startsWith('file://')) {
+        location = decodeURIComponent(location.slice('file://'.length));
+      }
+
+      // Descarta fragmento de linha (#L...) e query (?...)
+      const cleanedLocation = location.split('#')[0].split('?')[0];
+
+      let resolvedPath = cleanedLocation;
+      if (!path.isAbsolute(resolvedPath) && workspaceDir) {
+        const candidate = path.resolve(workspaceDir, resolvedPath);
+        if (fs.existsSync(candidate) || /^(\.|\.\.|\.specs|\/)/.test(resolvedPath) || path.extname(resolvedPath)) {
+          resolvedPath = candidate;
+        }
+      }
+
+      // Checa se é diretório no disco para ignorar
+      let isDirectory = false;
+      try {
+        if (fs.existsSync(resolvedPath)) {
+          const stat = fs.statSync(resolvedPath);
+          isDirectory = stat.isDirectory();
+        }
+      } catch {
+        isDirectory = false;
+      }
+
+      if (path.isAbsolute(resolvedPath) && !isDirectory) {
+        filePaths.push(resolvedPath);
+      }
+
+      let displayLabel = label || path.basename(resolvedPath) || 'arquivo';
+      if (path.isAbsolute(displayLabel)) {
+        displayLabel = path.basename(displayLabel);
+      }
+      return match.startsWith('!') ? `*🖼️ ${displayLabel}*` : `*${displayLabel}*`;
     });
+
     return {
       filePaths: [...new Set(filePaths)],
-      markdown: this.redactLocalPaths(markdownWithoutLocalFiles).trim(),
+      markdown: this.redactLocalPaths(transformedMarkdown).trim(),
     };
   }
 

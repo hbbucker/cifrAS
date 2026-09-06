@@ -187,7 +187,7 @@ test('Antigravity quota Slack flow: invalid duration uses the safe fallback', as
   );
 });
 
-test('Antigravity quota Slack flow: generic engine failure keeps the existing recovery behavior', async () => {
+test('Antigravity quota Slack flow: generic engine failure preserves session safely', async () => {
   const publicPayloads = [];
   const statuses = [];
   const session = new ThreadSession({
@@ -219,11 +219,11 @@ test('Antigravity quota Slack flow: generic engine failure keeps the existing re
   });
 
   assert.equal(result.success, false);
-  assert.equal(result.sessionId, null);
-  assert.equal(repository.session.sessionId, null);
-  assert.deepEqual(repository.session.participantRoles, ['CEO']);
+  assert.equal(result.sessionId, 'session-to-reset');
+  assert.equal(repository.session.sessionId, 'session-to-reset');
+  assert.deepEqual(repository.session.participantRoles, ['CEO', 'CTO']);
   assert.equal(publicPayloads.length, 1);
-  assert.match(publicPayloads[0].text, /contexto foi reinicializado/);
-  assert.doesNotMatch(publicPayloads[0].text, /limite individual|sessão foi preservada/);
+  assert.match(publicPayloads[0].text, /sessão foi preservada/);
+  assert.doesNotMatch(publicPayloads[0].text, /limite individual|reinicializado/);
   assert.equal(statuses.filter((payload) => payload.status === '').length, 1);
 });

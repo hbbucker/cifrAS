@@ -65,11 +65,30 @@ class ProcessMessageUseCase {
       uniqueId,
     });
 
+    let heartbeatInterval = null;
+    let lastActivityTime = Date.now();
+
     try {
       let finalResult = null;
 
+      heartbeatInterval = setInterval(async () => {
+        const elapsed = Date.now() - lastActivityTime;
+        if (elapsed >= 35_000) {
+          try {
+            await this.notificationGateway.sendStatus(
+              threadId,
+              channelId,
+              '⏳ CEO e especialistas continuam trabalhando na sua solicitação...',
+              { bypassInterval: true }
+            );
+          } catch {}
+        }
+      }, 35_000);
+      if (heartbeatInterval.unref) heartbeatInterval.unref();
+
       // 2. Itera de forma sequencial e atômica sobre o fluxo de eventos tipados
       for await (const event of this.llmEngine.executeStream(instruction)) {
+        lastActivityTime = Date.now();
         if (global.logDebug && event.type !== 'TEXT_DELTA_EMITTED') global.logDebug('USECASE PROCESSING EVENT:', event.type);
         switch (event.type) {
           case 'SESSION_BOUND': {
@@ -90,7 +109,7 @@ class ProcessMessageUseCase {
             break;
           }
 
-                    case 'TEXT_DELTA_EMITTED': {
+          case 'TEXT_DELTA_EMITTED': {
             const { conversationId, textChunk } = event.payload;
             const role = session.getRoleForConversation(conversationId) || AgentRole.from('Especialista');
             await this.notificationGateway.streamNarrative(threadId, channelId, role, textChunk);
@@ -184,23 +203,27 @@ class ProcessMessageUseCase {
         });
       }
 
-      // 4. Tratamento de Recuperação (Auto-Recovery)
-      if (session.sessionId) {
-        session.resetSession();
-        await this.sessionRepository.save(session);
-      }
+      // 4. Tratamento de Recuperação Não-Destrutivo (Preservação de Sessão)
       session.markActive(false);
+      await this.sessionRepository.save(session);
+
+      const errorMessage = (error && error.message && error.message.includes('timed out'))
+        ? '⚠️ O tempo limite de inatividade (5 minutos sem resposta) foi atingido. Sua sessão foi preservada. Você pode enviar uma nova instrução para continuar.'
+        : '⚠️ Ocorreu uma interrupção durante a execução. Sua sessão foi preservada. Por favor, tente enviar sua mensagem novamente.';
 
       await this.notificationGateway.sendErrorMessage(
         threadId,
         channelId,
-        '⚠️ Houve uma interrupção na sessão anterior. O contexto foi reinicializado. Por favor, envie sua mensagem novamente.'
+        errorMessage
       );
 
       return new ExecutionResultDTO({
         success: false,
+        sessionId: session.sessionId,
         error,
       });
+    } finally {
+      if (heartbeatInterval) clearInterval(heartbeatInterval);
     }
   }
 }

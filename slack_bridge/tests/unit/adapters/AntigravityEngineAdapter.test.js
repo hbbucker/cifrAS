@@ -193,6 +193,42 @@ test('AntigravityEngineAdapter: readTranscriptResponse asynchronously reads and 
   }
 });
 
+test('AntigravityEngineAdapter: readTranscriptFiles extracts filePaths from tool_calls', async () => {
+  const tempBrainDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agy_brain_data_'));
+  const tempWorkDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agy_work_data_'));
+  const sessionId = 'test-session-data-999';
+  const transcriptDir = path.join(tempBrainDir, sessionId, '.system_generated', 'logs');
+  fs.mkdirSync(transcriptDir, { recursive: true });
+
+  const generatedFile = path.join(tempWorkDir, 'generated_spec.md');
+  fs.writeFileSync(generatedFile, '# Spec content');
+
+  const transcriptContent = [
+    JSON.stringify({
+      type: 'PLANNER_RESPONSE',
+      content: 'Arquivo criado com sucesso.',
+      tool_calls: [
+        { toolAction: 'Writing file', args: { TargetFile: generatedFile } },
+        { toolAction: 'Writing file', args: { TargetFile: '/tmp/non_existing_file_9999.xyz' } },
+      ],
+    }),
+  ].join('\n');
+  fs.writeFileSync(path.join(transcriptDir, 'transcript.jsonl'), transcriptContent);
+
+  const adapter = new AntigravityEngineAdapter({ brainDir: tempBrainDir });
+
+  try {
+    const text = await adapter.readTranscriptResponse(sessionId);
+    const files = await adapter.readTranscriptFiles(sessionId);
+    assert.equal(text, 'Arquivo criado com sucesso.');
+    assert.deepEqual(files, [generatedFile]);
+  } finally {
+    fs.rmSync(tempBrainDir, { recursive: true, force: true });
+    fs.rmSync(tempWorkDir, { recursive: true, force: true });
+  }
+});
+
+
 test('AntigravityEngineAdapter: executeStream yields typed EngineEvent flow throughout subprocess lifecycle', async () => {
   const tempBrainDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agy_test_brain_'));
   const testSessionId = 'test-session-uuid-123';
@@ -438,4 +474,90 @@ test('AntigravityEngineAdapter: near match keeps generic failure behavior', asyn
   assert.equal(transcriptReads, 1);
   assert.equal(events.at(-1).type, 'EXECUTION_FAILED');
   assert.notEqual(events.at(-1).payload.error.code, 'ENGINE_QUOTA_EXHAUSTED');
+});
+
+test('AntigravityEngineAdapter: result stream event terminates execution immediately without waiting for child close', async () => {
+  let killed = false;
+  const adapter = new AntigravityEngineAdapter({
+    spawnFn: () => {
+      const child = new EventEmitter();
+      child.stdout = new EventEmitter();
+      child.stderr = new EventEmitter();
+      child.kill = (sig) => { killed = true; };
+      setImmediate(() => {
+        child.stdout.emit('data', Buffer.from(JSON.stringify({ event: 'init', conversation_id: 'conv-123' }) + '\n'));
+        child.stdout.emit('data', Buffer.from(JSON.stringify({ event: 'result', status: 'success' }) + '\n'));
+        // Note: child 'close' is intentionally NOT emitted to simulate open background fds
+      });
+      return child;
+    },
+  });
+  adapter.readTranscriptResponse = async () => 'Resposta final gerada com sucesso';
+
+  const events = await collectExecutionEvents(adapter, 'conv-123');
+  assert.equal(events.length, 2);
+  assert.equal(events[0].type, 'SESSION_BOUND');
+  assert.equal(events[1].type, 'EXECUTION_COMPLETED');
+  assert.equal(events[1].payload.result.responseText, 'Resposta final gerada com sucesso');
+  assert.ok(killed, 'Child process should receive termination signal');
+});
+
+test('AntigravityEngineAdapter: turn watchdog kills hung process and fails with timeout error after inactivity', async () => {
+  const killSignals = [];
+  const adapter = new AntigravityEngineAdapter({
+    inactivityTimeoutMs: 50,
+    spawnFn: () => {
+      const child = new EventEmitter();
+      child.stdout = new EventEmitter();
+      child.stderr = new EventEmitter();
+      child.kill = (sig) => {
+        killSignals.push(sig);
+        child.killed = true;
+      };
+      return child;
+    },
+  });
+
+  const events = await collectExecutionEvents(adapter);
+  assert.equal(events.length, 1);
+  assert.equal(events[0].type, 'EXECUTION_FAILED');
+  assert.ok(events[0].payload.error.message.includes('Turn execution timed out after 50ms of inactivity'));
+  assert.ok(killSignals.includes('SIGKILL'));
+});
+
+test('AntigravityEngineAdapter: sliding inactivity watchdog resets on continuous data stream allowing long sessions', async () => {
+  let killCount = 0;
+  const adapter = new AntigravityEngineAdapter({
+    inactivityTimeoutMs: 60, // Janela curta de inatividade
+    spawnFn: () => {
+      const child = new EventEmitter();
+      child.stdout = new EventEmitter();
+      child.stderr = new EventEmitter();
+      child.kill = () => { killCount += 1; };
+
+      // Emite chunks a cada 30ms (menor que a janela de 60ms), totalizando 120ms (o dobro da janela original)
+      setTimeout(() => {
+        child.stdout.emit('data', Buffer.from(JSON.stringify({ event: 'init', conversation_id: 'conv-long-1' }) + '\n'));
+      }, 25);
+
+      setTimeout(() => {
+        child.stdout.emit('data', Buffer.from(JSON.stringify({ event: 'step_update', step_update: { status_text: 'Executando testes...' } }) + '\n'));
+      }, 55);
+
+      setTimeout(() => {
+        child.stdout.emit('data', Buffer.from(JSON.stringify({ event: 'result', status: 'success' }) + '\n'));
+      }, 85);
+
+      return child;
+    },
+  });
+  adapter.readTranscriptResponse = async () => 'Sessão longa finalizada com sucesso!';
+
+  const events = await collectExecutionEvents(adapter, 'conv-long-1');
+  assert.equal(events.length, 3);
+  assert.equal(events[0].type, 'SESSION_BOUND');
+  assert.equal(events[1].type, 'STATUS_UPDATED');
+  assert.equal(events[2].type, 'EXECUTION_COMPLETED');
+  assert.equal(events[2].payload.result.responseText, 'Sessão longa finalizada com sucesso!');
+  assert.equal(killCount > 0, true); // Clean termination on complete
 });

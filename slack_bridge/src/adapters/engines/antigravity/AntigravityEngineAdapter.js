@@ -120,11 +120,21 @@ class AsyncEventQueue {
 }
 
 class AntigravityEngineAdapter extends ILLMEnginePort {
-  constructor({ brainDir = DEFAULT_BRAIN_DIR, agyBin = 'agy', spawnFn = spawn } = {}) {
+  constructor({
+    brainDir = DEFAULT_BRAIN_DIR,
+    agyBin = 'agy',
+    spawnFn = spawn,
+    inactivityTimeoutMs = 300_000,
+    maxTurnTimeoutMs = 7_200_000,
+    turnTimeoutMs,
+  } = {}) {
     super();
     this.brainDir = brainDir;
     this.agyBin = agyBin;
     this.spawn = spawnFn;
+    this.inactivityTimeoutMs = Number(process.env.LLM_INACTIVITY_TIMEOUT_MS)
+      || (turnTimeoutMs !== undefined ? turnTimeoutMs : inactivityTimeoutMs);
+    this.maxTurnTimeoutMs = Number(process.env.LLM_MAX_TURN_TIMEOUT_MS) || maxTurnTimeoutMs;
   }
 
   /**
@@ -157,8 +167,42 @@ class AntigravityEngineAdapter extends ILLMEnginePort {
       env,
     });
 
+    let inactivityTimer = null;
+    let maxTurnTimer = null;
+
+    const resetInactivityTimer = () => {
+      if (terminalClaimed) return;
+      if (inactivityTimer) clearTimeout(inactivityTimer);
+      if (this.inactivityTimeoutMs > 0) {
+        inactivityTimer = setTimeout(() => {
+          if (terminalClaimed) return;
+          if (global.logDebug) global.logDebug(`[AGY] Turn inactivity timed out after ${this.inactivityTimeoutMs}ms of silence`);
+          try {
+            if (!child.killed) child.kill('SIGKILL');
+          } catch {}
+          finish(1, new Error(`Turn execution timed out after ${this.inactivityTimeoutMs}ms of inactivity`));
+        }, this.inactivityTimeoutMs);
+        if (inactivityTimer.unref) inactivityTimer.unref();
+      }
+    };
+
+    resetInactivityTimer();
+
+    if (this.maxTurnTimeoutMs > 0) {
+      maxTurnTimer = setTimeout(() => {
+        if (terminalClaimed) return;
+        if (global.logDebug) global.logDebug(`[AGY] Max turn timeout reached after ${this.maxTurnTimeoutMs}ms`);
+        try {
+          if (!child.killed) child.kill('SIGKILL');
+        } catch {}
+        finish(1, new Error(`Max turn execution time exceeded ${this.maxTurnTimeoutMs}ms`));
+      }, this.maxTurnTimeoutMs);
+      if (maxTurnTimer.unref) maxTurnTimer.unref();
+    }
+
     if (child.stderr) {
       child.stderr.on('data', (chunk) => {
+        resetInactivityTimer();
         this.handleStderr(chunk);
         const chunkText = chunk.toString('utf8');
         const signatureSearchText = executionContext.quotaSignatureOverlap + chunkText;
@@ -180,17 +224,37 @@ class AntigravityEngineAdapter extends ILLMEnginePort {
     }
 
     const streamParser = AntigravityStreamParser.create((event) => {
+      resetInactivityTimer();
       if (executionContext.quotaDetected) return;
       if (global.logDebug) global.logDebug('[AGY] Stream Event:', event.event, event.step_update ? (event.step_update.step_type || event.step_update.state) : '');
-      this.translateStreamEvent(event, queue, executionContext);
+      this.translateStreamEvent(event, queue, executionContext, () => {
+        finish(0);
+      });
     });
 
-    child.stdout.on('data', streamParser);
+    child.stdout.on('data', (chunk) => {
+      resetInactivityTimer();
+      streamParser(chunk);
+    });
 
     const finish = async (exitCode, error = null) => {
       if (terminalClaimed) return;
       terminalClaimed = true;
+      if (inactivityTimer) clearTimeout(inactivityTimer);
+      if (maxTurnTimer) clearTimeout(maxTurnTimer);
       streamParser.flush();
+
+      // Encerra graciosamente processos filhos residuais que prendam descritores
+      try {
+        if (!child.killed) {
+          child.kill('SIGTERM');
+          setTimeout(() => {
+            try {
+              if (!child.killed) child.kill('SIGKILL');
+            } catch {}
+          }, 2000).unref?.();
+        }
+      } catch {}
 
       if (executionContext.quotaDetected) {
         const retryAfterSeconds = executionContext.retryAfterSeconds
@@ -206,15 +270,16 @@ class AntigravityEngineAdapter extends ILLMEnginePort {
       }
 
       const responseText = await this.readTranscriptResponse(executionContext.boundSessionId);
+      const filePaths = await this.readTranscriptFiles(executionContext.boundSessionId);
       const normalizedExitCode = typeof exitCode === 'number' ? exitCode : 0;
-      const isSuccess = normalizedExitCode === 0 || Boolean(responseText);
+      const isSuccess = (normalizedExitCode === 0 || Boolean(responseText)) && !error;
 
       if (isSuccess) {
         queue.push(EngineEvent.executionCompleted(new TurnResultDTO({
           exitCode: normalizedExitCode,
           responseText,
-          filePaths: [],
-          error,
+          filePaths,
+          error: null,
         })));
       } else {
         queue.push(EngineEvent.executionFailed(
@@ -248,13 +313,21 @@ class AntigravityEngineAdapter extends ILLMEnginePort {
   /**
    * Traduz eventos NDJSON do protocolo Antigravity e enfileira instâncias tipadas de EngineEvent.
    */
-  translateStreamEvent(event, queue, executionContext = {}) {
+  translateStreamEvent(event, queue, executionContext = {}, onResult = null) {
     if (!event || !queue) return;
 
     // 1. Vincula Session ID da sessão raiz
     if (event.event === 'init' && event.conversation_id) {
       executionContext.boundSessionId = event.conversation_id;
       queue.push(EngineEvent.sessionBound(executionContext.boundSessionId));
+    }
+
+    // 2. Evento terminal 'result' emitido pelo AGY ao concluir o turno
+    if (event.event === 'result') {
+      if (typeof onResult === 'function') {
+        onResult(event);
+      }
+      return;
     }
 
     // 2. Notificação de Subagente descoberto
@@ -307,7 +380,7 @@ class AntigravityEngineAdapter extends ILLMEnginePort {
     // 4. Mudança de status da execução
     if (event.event === 'step_update' && event.step_update && event.step_update.step_type === 'tool' && event.step_update.state === 'ACTIVE') {
       const convId = event.step_update.conversation_id || executionContext.boundSessionId;
-      queue.push(EngineEvent.statusUpdated(convId, 'Usando ferramenta: ' + event.step_update.tool_name));
+      queue.push(EngineEvent.statusUpdated(convId, 'Tool: ' + event.step_update.tool_name));
     }
     
     if (event.event === 'step_update' && event.step_update && event.step_update.status_text) {
@@ -336,6 +409,49 @@ class AntigravityEngineAdapter extends ILLMEnginePort {
       // Retorna vazio caso o arquivo ainda não exista ou não tenha sido criado
     }
     return '';
+  }
+
+  /**
+   * Lê assincronamente o transcript em disco e extrai caminhos de arquivos criados/modificados no turno.
+   */
+  async readTranscriptFiles(sessionId) {
+    if (!sessionId) return [];
+
+    const transcriptPath = path.join(this.brainDir, sessionId, TRANSCRIPT_RELATIVE_PATH);
+    const filePaths = new Set();
+
+    try {
+      const content = await fs.readFile(transcriptPath, 'utf8');
+      const lines = content.split('\n').filter(Boolean);
+      for (let i = lines.length - 1; i >= 0; i--) {
+        const parsed = JSON.parse(lines[i]);
+        if (Array.isArray(parsed.tool_calls)) {
+          for (const call of parsed.tool_calls) {
+            const args = call.args || call;
+            if (args.TargetFile && typeof args.TargetFile === 'string') {
+              filePaths.add(args.TargetFile);
+            }
+            if (Array.isArray(args.ImagePaths)) {
+              for (const img of args.ImagePaths) {
+                if (typeof img === 'string') filePaths.add(img);
+              }
+            }
+          }
+        }
+      }
+    } catch {
+      // Retorna vazio caso o arquivo ainda não exista ou não tenha sido criado
+    }
+
+    const validFilePaths = [];
+    for (const fp of filePaths) {
+      try {
+        const stat = await fs.stat(fp);
+        if (stat.isFile()) validFilePaths.push(fp);
+      } catch {}
+    }
+
+    return validFilePaths;
   }
 
   /**

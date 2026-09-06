@@ -155,11 +155,11 @@ test('ProcessMessageUseCase: successfully orchestrates end-to-end turn with mock
 
 
 
-test('ProcessMessageUseCase: handles engine failure and triggers session recovery', async () => {
+test('ProcessMessageUseCase: handles engine failure non-destructively and preserves session', async () => {
   const repository = new InMemoryThreadRepository();
   const notifier = new InMemoryNotificationService();
 
-  const existingSession = new ThreadSession({ threadId: '1000.2000', channelId: 'C_TEST', sessionId: 'broken-session-999' });
+  const existingSession = new ThreadSession({ threadId: '1000.2000', channelId: 'C_TEST', sessionId: 'existing-session-999' });
   await repository.save(existingSession);
 
   const failingEngine = new MockEngineAdapter({
@@ -182,15 +182,57 @@ test('ProcessMessageUseCase: handles engine failure and triggers session recover
   });
 
   assert.equal(result.success, false);
+  assert.equal(result.sessionId, 'existing-session-999');
 
-  // Verifica que a sessão quebrada foi resetada no repositório
-  const recoveredSession = await repository.getByThreadId('1000.2000');
-  assert.equal(recoveredSession.sessionId, null);
+  // Verifica que a sessão NÃO foi resetada no repositório
+  const preservedSession = await repository.getByThreadId('1000.2000');
+  assert.equal(preservedSession.sessionId, 'existing-session-999');
+  assert.equal(preservedSession.isActive, false);
 
-  // Verifica mensagem de aviso ao usuário
+  // Verifica mensagem de aviso ao usuário informando que a sessão foi preservada
   const errorEvent = notifier.events.find(e => e.type === 'error');
   assert.ok(errorEvent);
-  assert.ok(errorEvent.errorText.includes('reinicializado'));
+  assert.ok(errorEvent.errorText.includes('preservada'));
+  assert.equal(errorEvent.errorText.includes('reinicializado'), false);
+});
+
+test('ProcessMessageUseCase: handles turn timeout non-destructively and informs user of preserved session', async () => {
+  const repository = new InMemoryThreadRepository();
+  const notifier = new InMemoryNotificationService();
+
+  const existingSession = new ThreadSession({ threadId: 'timeout-thread', channelId: 'C_TEST', sessionId: 'timeout-session-123' });
+  await repository.save(existingSession);
+
+  const timeoutEngine = new MockEngineAdapter({
+    events: async function* () {
+      yield EngineEvent.executionFailed(new Error('Turn execution timed out after 300000ms'), 1);
+    },
+  });
+
+  const useCase = new ProcessMessageUseCase({
+    llmEngine: timeoutEngine,
+    notificationGateway: notifier,
+    sessionRepository: repository,
+    workspaceDir: '/test/workspace',
+  });
+
+  const result = await useCase.execute({
+    threadId: 'timeout-thread',
+    channelId: 'C_TEST',
+    userText: 'comando demorado',
+  });
+
+  assert.equal(result.success, false);
+  assert.equal(result.sessionId, 'timeout-session-123');
+
+  const preservedSession = await repository.getByThreadId('timeout-thread');
+  assert.equal(preservedSession.sessionId, 'timeout-session-123');
+  assert.equal(preservedSession.isActive, false);
+
+  const errorEvent = notifier.events.find(e => e.type === 'error');
+  assert.ok(errorEvent);
+  assert.ok(errorEvent.errorText.includes('tempo limite'));
+  assert.ok(errorEvent.errorText.includes('preservada'));
 });
 
 test('ProcessMessageUseCase: preserves the complete session and reuses it after quota exhaustion', async () => {
@@ -309,4 +351,59 @@ test('ProcessMessageUseCase: quota fallback message contains no provider output'
     '⚠️ O limite individual do Antigravity foi atingido. Tente novamente mais tarde. Sua sessão foi preservada.'
   );
   assert.doesNotMatch(JSON.stringify(notifier.events), /Error ID|Individual quota reached|\/home\//);
+});
+
+test('ProcessMessageUseCase: reuses preserved sessionId after turn timeout on subsequent message', async () => {
+  const repository = new InMemoryThreadRepository();
+  const notifier = new InMemoryNotificationService();
+  await repository.save(new ThreadSession({
+    threadId: 'timeout-flow-thread',
+    channelId: 'C_TEST',
+    sessionId: 'session-to-continue',
+    participantRoles: ['CEO', 'CTO'],
+  }));
+
+  const receivedInstructions = [];
+  let attempt = 0;
+  const engine = {
+    async *executeStream(instruction) {
+      receivedInstructions.push(instruction);
+      attempt += 1;
+      if (attempt === 1) {
+        yield EngineEvent.executionFailed(new Error('Turn execution timed out after 300000ms'), 1);
+        return;
+      }
+      yield EngineEvent.executionCompleted(new TurnResultDTO({
+        exitCode: 0,
+        responseText: 'Sucesso na continuidade',
+        filePaths: [],
+      }));
+    },
+  };
+
+  const useCase = new ProcessMessageUseCase({
+    llmEngine: engine,
+    notificationGateway: notifier,
+    sessionRepository: repository,
+    workspaceDir: '/test/workspace',
+  });
+
+  // Primeira tentativa: timeout
+  const firstResult = await useCase.execute({
+    threadId: 'timeout-flow-thread',
+    channelId: 'C_TEST',
+    userText: 'comando que deu timeout',
+  });
+  assert.equal(firstResult.success, false);
+  assert.equal(firstResult.sessionId, 'session-to-continue');
+
+  // Segunda tentativa na mesma thread: deve reutilizar session-to-continue
+  const secondResult = await useCase.execute({
+    threadId: 'timeout-flow-thread',
+    channelId: 'C_TEST',
+    userText: 'comando seguinte após timeout',
+  });
+  assert.equal(secondResult.success, true);
+  assert.equal(secondResult.sessionId, 'session-to-continue');
+  assert.equal(receivedInstructions[1].sessionId, 'session-to-continue');
 });

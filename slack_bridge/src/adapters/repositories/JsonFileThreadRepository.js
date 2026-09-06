@@ -22,7 +22,9 @@ class JsonFileThreadRepository extends IThreadSessionRepository {
   _writeAll(data) {
     const dir = path.dirname(this.filePath);
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(this.filePath, JSON.stringify(data, null, 2), 'utf8');
+    const tempFilePath = `${this.filePath}.tmp.${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+    fs.writeFileSync(tempFilePath, JSON.stringify(data, null, 2), 'utf8');
+    fs.renameSync(tempFilePath, this.filePath);
   }
 
   async getByThreadId(threadId) {

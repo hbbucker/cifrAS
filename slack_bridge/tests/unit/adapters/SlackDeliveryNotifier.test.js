@@ -86,3 +86,28 @@ test('SlackDeliveryNotifier: assistant mode uses assistant.threads.setStatus and
   assert.equal(postedMessages.length, 2);
   assert.ok(postedMessages[1].text.includes('Resultado final pronto') || (postedMessages[1].blocks && postedMessages[1].blocks[0].text.text.includes('Resultado final')));
 });
+
+test('SlackDeliveryNotifier: _uploadFiles uploads existing files and deduplicates paths', async () => {
+  const uploadedFiles = [];
+  const mockSlackClient = {
+    files: {
+      uploadV2: async (payload) => {
+        uploadedFiles.push(payload);
+        return { ok: true };
+      },
+    },
+  };
+
+  const notifier = new SlackDeliveryNotifier({ slackClient: mockSlackClient });
+  const realFile = __filename; // Este arquivo de teste existe e é arquivo regular
+  const nonExistent = '/tmp/definitely_not_existing_file_9999.xyz';
+  const directory = __dirname; // É diretório, deve ser ignorado
+
+  await notifier._uploadFiles('C_CHAN', '100.200', [realFile, realFile, nonExistent, directory]);
+
+  assert.equal(uploadedFiles.length, 1, 'Only the existing real file should be uploaded once');
+  assert.equal(uploadedFiles[0].channel_id, 'C_CHAN');
+  assert.equal(uploadedFiles[0].thread_ts, '100.200');
+  assert.ok(uploadedFiles[0].filename.includes('SlackDeliveryNotifier.test.js'));
+});
+

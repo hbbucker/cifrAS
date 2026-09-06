@@ -38,10 +38,54 @@ async function bootstrap() {
     socketMode: true,
   });
 
+  app.error(async (error) => {
+    console.error('[Slack Bolt App Error]', error);
+    if (global.logDebug) global.logDebug('bolt_app_error', error.message || error);
+  });
+
+  if (app.receiver && app.receiver.client) {
+    const socketClient = app.receiver.client;
+
+    socketClient.on('connected', () => {
+      console.log('⚡ [Slack SocketMode] Conexão WebSocket estabelecida com sucesso.');
+      if (global.logDebug) global.logDebug('socket_connected');
+    });
+
+    socketClient.on('reconnecting', () => {
+      console.warn('⚠️ [Slack SocketMode] Reconectando WebSocket...');
+      if (global.logDebug) global.logDebug('socket_reconnecting');
+    });
+
+    socketClient.on('disconnected', () => {
+      console.warn('⚠️ [Slack SocketMode] WebSocket desconectado. Tentando reconexão ativa...');
+      if (global.logDebug) global.logDebug('socket_disconnected');
+      setTimeout(() => {
+        try {
+          if (typeof socketClient.reconnect === 'function') {
+            socketClient.reconnect();
+          }
+        } catch (err) {
+          if (global.logDebug) global.logDebug('socket_reconnect_error', err.message);
+        }
+      }, 1000).unref?.();
+    });
+
+    socketClient.on('unable_to_socket_mode_start', (err) => {
+      console.error('❌ [Slack SocketMode] Falha ao iniciar Socket Mode:', err);
+      if (global.logDebug) global.logDebug('unable_to_socket_mode_start', err.message);
+    });
+
+    socketClient.on('error', (err) => {
+      console.error('❌ [Slack SocketMode Client Error]:', err);
+      if (global.logDebug) global.logDebug('socket_client_error', err.message);
+    });
+  }
+
   const formatter = new SlackMrkdwnFormatter();
   const notifier = new SlackDeliveryNotifier({
     slackClient: app.client,
     formatter,
+    workspaceDir: config.workspaceDir,
   });
   const repository = new JsonFileThreadRepository();
   const engine = createEngine(config.llmEngine);

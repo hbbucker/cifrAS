@@ -8,10 +8,11 @@ const STATUS_INTERVAL_MS = 15_000;
 const ACKNOWLEDGEMENT_STATUS = 'CEO entendeu a solicitação e está avaliando o encaminhamento.';
 
 class SlackDeliveryNotifier extends INotificationPort {
-  constructor({ slackClient, formatter = new SlackMrkdwnFormatter() }) {
+  constructor({ slackClient, formatter = new SlackMrkdwnFormatter(), workspaceDir = process.cwd() } = {}) {
     super();
     this.client = slackClient;
     this.formatter = formatter;
+    this.workspaceDir = workspaceDir;
     this.queues = new Map();
     this.lastStatusByThread = new Map();
     this.streamBuffers = new Map();
@@ -179,10 +180,36 @@ class SlackDeliveryNotifier extends INotificationPort {
      });
   }
 
+  async sendMilestoneNotification(threadId, channelId, agentRole, markdownText) {
+    const queue = this._getQueue(threadId);
+    const { filePaths: extractedFiles, markdown: cleanMarkdown } = this.formatter.extractLocalFiles(markdownText || '', { workspaceDir: this.workspaceDir });
+    const header = `*${agentRole.formattedName}*`;
+    const formattedBody = this.formatter.format(cleanMarkdown);
+    const fullMessage = `${header}\n\n${formattedBody}`;
+
+    return queue.add(async () => {
+      await this._postMessageBlock(channelId, threadId, fullMessage);
+      await this._uploadFiles(channelId, threadId, extractedFiles);
+    });
+  }
+
+  async sendIntermediateNarrative(threadId, channelId, agentRole, markdownText) {
+    const queue = this._getQueue(threadId);
+    const { filePaths: extractedFiles, markdown: cleanMarkdown } = this.formatter.extractLocalFiles(markdownText || '', { workspaceDir: this.workspaceDir });
+    const header = `*${agentRole.formattedName}*`;
+    const formattedBody = this.formatter.format(cleanMarkdown);
+    const fullMessage = `${header}\n\n${formattedBody}`;
+
+    return queue.add(async () => {
+      await this._postMessageBlock(channelId, threadId, fullMessage);
+      await this._uploadFiles(channelId, threadId, extractedFiles);
+    });
+  }
+
   async sendPrimaryResponse(threadId, channelId, agentRole, markdownText) {
     const queue = this._getQueue(threadId);
     
-    const { filePaths: extractedFiles, markdown: cleanMarkdown } = this.formatter.extractLocalFiles(markdownText);
+    const { filePaths: extractedFiles, markdown: cleanMarkdown } = this.formatter.extractLocalFiles(markdownText, { workspaceDir: this.workspaceDir });
     
     const header = `*${agentRole.formattedName}*`;
     const formattedBody = this.formatter.format(cleanMarkdown);
@@ -229,7 +256,7 @@ class SlackDeliveryNotifier extends INotificationPort {
   async sendFinalConsolidation(threadId, channelId, agentRole, markdownText, filePaths = []) {
     const queue = this._getQueue(threadId);
     
-    const { filePaths: extractedFiles, markdown: cleanMarkdown } = this.formatter.extractLocalFiles(markdownText || '');
+    const { filePaths: extractedFiles, markdown: cleanMarkdown } = this.formatter.extractLocalFiles(markdownText || '', { workspaceDir: this.workspaceDir });
     const allFiles = [...new Set([...(filePaths || []), ...extractedFiles])];
     
     const formattedBody = this.formatter.format(cleanMarkdown);
@@ -252,17 +279,23 @@ class SlackDeliveryNotifier extends INotificationPort {
 
   async _uploadFiles(channelId, threadId, filePaths) {
     if (!filePaths || filePaths.length === 0) return;
-    for (const filePath of filePaths) {
-      if (!fs.existsSync(filePath)) continue;
+    const uniqueFiles = [...new Set(filePaths)];
+    for (const filePath of uniqueFiles) {
       try {
-        await this.client.files.uploadV2({
-          channel_id: channelId,
-          thread_ts: threadId,
-          file: fs.createReadStream(filePath),
-          filename: path.basename(filePath),
-        });
+        if (!fs.existsSync(filePath)) continue;
+        const stat = fs.statSync(filePath);
+        if (!stat.isFile()) continue;
+
+        if (this.client?.files?.uploadV2 && typeof this.client.files.uploadV2 === 'function') {
+          await this.client.files.uploadV2({
+            channel_id: channelId,
+            thread_ts: threadId,
+            file: fs.createReadStream(filePath),
+            filename: path.basename(filePath),
+          });
+        }
       } catch (err) {
-        if (global.logDebug) global.logDebug('file_upload_failed');
+        if (global.logDebug) global.logDebug('file_upload_failed', err?.message || err);
       }
     }
   }
