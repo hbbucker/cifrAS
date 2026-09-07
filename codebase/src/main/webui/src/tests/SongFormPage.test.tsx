@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { SongFormPage } from '../pages/SongFormPage';
 import { BrowserRouter } from 'react-router-dom';
@@ -60,4 +60,32 @@ describe('SongFormPage Component', () => {
    expect(screen.getByText(/37/)).toBeInTheDocument();
    expect(screen.getByText(/40/)).toBeInTheDocument();
  });
+
+  it('inserts [coluna] marker into editor when [Coluna] button is clicked', async () => {
+    render(
+      <AuthProvider>
+        <ThemeProvider>
+          <ToastProvider>
+            <BrowserRouter>
+              <SongFormPage />
+            </BrowserRouter>
+          </ToastProvider>
+        </ThemeProvider>
+      </AuthProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('btn-insert-coluna')).toBeInTheDocument();
+      expect(screen.getByTestId('song-title-input')).toHaveValue('Wonderwall');
+    });
+
+    const insertColunaBtn = screen.getByTestId('btn-insert-coluna');
+    const contentInput = screen.getByTestId('song-content-input') as HTMLTextAreaElement;
+
+    fireEvent.click(insertColunaBtn);
+
+    await waitFor(() => {
+      expect(contentInput.value).toContain('[coluna]');
+    });
+  });
 });

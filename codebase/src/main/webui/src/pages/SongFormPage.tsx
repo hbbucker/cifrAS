@@ -188,10 +188,11 @@ export const SongFormPage: React.FC = () => {
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-4 overflow-hidden">
                   <span className="text-xs sm:text-sm font-semibold text-text-main shrink-0">{t('songForm.chordsLyrics')}</span>
                   <div className="flex items-center gap-1.5 sm:gap-2 bg-bg-main p-1 sm:p-1.5 rounded-md border border-border-main overflow-x-auto no-scrollbar py-1">
-                    <button onClick={() => insertText('[Refrão]\n')} className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-lg hover:bg-bg-elevated transition-colors shrink-0">{t('songForm.refrao')}</button>
-                    <button onClick={() => insertText('\n\n')} className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-lg hover:bg-bg-elevated transition-colors shrink-0">{t('songForm.quebra')}</button>
-                    <button onClick={() => insertText('\n---\n')} className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-lg hover:bg-bg-elevated transition-colors shrink-0">{t('songForm.separador')}</button>
-                    <button onClick={() => insertText('\ne|---\nB|---\nG|---\nD|---\nA|---\nE|---\n')} className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-lg hover:bg-bg-elevated transition-colors shrink-0">{t('songForm.tablatura')}</button>
+                    <button type="button" onClick={() => insertText('[Refrão]\n')} className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-lg hover:bg-bg-elevated transition-colors shrink-0">{t('songForm.refrao')}</button>
+                    <button type="button" onClick={() => insertText('\n[coluna]\n\n')} className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-lg hover:bg-bg-elevated transition-colors shrink-0" data-testid="btn-insert-coluna" title={t('songForm.colunaTooltip')}>{t('songForm.coluna')}</button>
+                    <button type="button" onClick={() => insertText('\n\n')} className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-lg hover:bg-bg-elevated transition-colors shrink-0">{t('songForm.quebra')}</button>
+                    <button type="button" onClick={() => insertText('\n---\n')} className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-lg hover:bg-bg-elevated transition-colors shrink-0">{t('songForm.separador')}</button>
+                    <button type="button" onClick={() => insertText('\ne|---\nB|---\nG|---\nD|---\nA|---\nE|---\n')} className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-lg hover:bg-bg-elevated transition-colors shrink-0">{t('songForm.tablatura')}</button>
                   </div>
                 </div>
                 <Button 
