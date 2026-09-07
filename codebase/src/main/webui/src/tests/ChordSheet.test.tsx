@@ -96,4 +96,26 @@ E|-----------3---|`;
     expect(screen.getByTestId('instrumental-singer-notice')).toBeInTheDocument();
     expect(screen.getByText('(Música Instrumental / Sem Letra)')).toBeInTheDocument();
   });
+
+  it('correctly handles parenthesized sequences and diminished/extended chords in normal and singerMode', () => {
+    const contentWithParensAndDim = `[Intro]
+(C F G) (2x)
+
+[Verso]
+Cº C9 C11
+Canto uma canção`;
+
+    const { rerender } = render(<ChordSheet content={contentWithParensAndDim} singerMode={false} />);
+
+    // In normal mode: rendered and identified as chord lines
+    expect(screen.getByText('(C F G) (2x)')).toBeInTheDocument();
+    expect(screen.getByText('Cº C9 C11')).toBeInTheDocument();
+    expect(screen.getByText('Canto uma canção')).toBeInTheDocument();
+
+    // In singer mode: chord lines with parens and dim symbols are completely hidden
+    rerender(<ChordSheet content={contentWithParensAndDim} singerMode={true} />);
+    expect(screen.queryByText('(C F G) (2x)')).not.toBeInTheDocument();
+    expect(screen.queryByText('Cº C9 C11')).not.toBeInTheDocument();
+    expect(screen.getByText('Canto uma canção')).toBeInTheDocument();
+  });
 });

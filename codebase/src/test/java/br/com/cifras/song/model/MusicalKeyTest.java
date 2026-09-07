@@ -85,4 +85,28 @@ class MusicalKeyTest {
         MusicalKey simple = new MusicalKey("C", "");
         assertEquals("C", simple.toString());
     }
+
+    /**
+     * Test 7: Chords with diminished symbols, 9/11 extensions, and parentheses.
+     */
+    @ParameterizedTest
+    @CsvSource({
+        "Cº,C,º",
+        "C°,C,°",
+        "Cø,C,ø",
+        "C9,C,9",
+        "C11,C,11",
+        "C13,C,13",
+        "C7(9),C,7(9)",
+        "C7M(9),C,7M(9)",
+        "C#m7(b5),C#,m7(b5)",
+        "(C,C,''",
+        "(C9,C,9",
+        "(Cº,C,º"
+    })
+    void givenSpecialAndParenthesizedChords_whenParse_thenParsedCorrectly(String input, String expectedRoot, String expectedSuffix) {
+        MusicalKey key = MusicalKey.parse(input);
+        assertEquals(expectedRoot, key.root());
+        assertEquals(expectedSuffix, key.suffix());
+    }
 }

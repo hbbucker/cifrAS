@@ -58,4 +58,34 @@ class CifraClubParserTest {
         assertEquals("Em7", line2.chords().get(1).chord());
         assertEquals(31, line2.chords().get(1).position());
     }
+
+    @Test
+    void testParseParenthesizedAndDiminishedChords() {
+        String text = """
+                [Intro]
+                (C F G) (2x)
+
+                [Verso]
+                Cº         C11
+                Letra aqui
+                """;
+
+        LyricsStructure lyrics = CifraClubParser.parse(text);
+        assertEquals(2, lyrics.sections().size());
+
+        Section intro = lyrics.sections().get(0);
+        Line introLine = intro.lines().get(0);
+        assertEquals(4, introLine.chords().size());
+        assertEquals("(C", introLine.chords().get(0).chord());
+        assertEquals("F", introLine.chords().get(1).chord());
+        assertEquals("G)", introLine.chords().get(2).chord());
+        assertEquals("(2x)", introLine.chords().get(3).chord());
+
+        Section verso = lyrics.sections().get(1);
+        Line versoLine = verso.lines().get(0);
+        assertEquals("Letra aqui", versoLine.text());
+        assertEquals(2, versoLine.chords().size());
+        assertEquals("Cº", versoLine.chords().get(0).chord());
+        assertEquals("C11", versoLine.chords().get(1).chord());
+    }
 }

@@ -5,8 +5,44 @@ const FLAT_TO_SHARP: Record<string, string> = {
 
 const normalizeRoot = (root: string) => FLAT_TO_SHARP[root] || root;
 
-export const transposeChord = (chord: string, steps: number, useBb: boolean = false, useEb: boolean = false): string => {
-  // Match the root note, optional accidental, and the rest
+export const CORE_CHORD_REGEX = /^[A-G][#b]?(?:m|M|maj|min|dim|aug|sus|add|alt|º|°|ø|Ø|\+|-|b|#|[0-9])*(?:\([^)]+\))*(?:\/(?:[A-G][#b]?(?:m|M|maj|min|dim|aug|sus|add|alt|º|°|ø|Ø|\+|-|b|#|[0-9])*(?:\([^)]+\))*|\d+))?$/;
+export const MARKER_REGEX = /^(\|:|:\||\||%|-|~|\(\d+x\)|\d+x|intro:?|solo:?|riff:?|base:?|interlúdio:?|interlude:?|fim:?|final:?)$/i;
+
+export const stripOuterPunctuation = (token: string): string => {
+  if (!token) return '';
+  let str = token.trim();
+
+  // Strip leading punctuation/brackets/parentheses: '(', '[', '{', '|', ':'
+  while (str.length > 0 && /^[[({|:~]/.test(str)) {
+    str = str.slice(1);
+  }
+
+  // Strip trailing punctuation/brackets/parentheses: ')', ']', '}', '|', ',', '.', ';', '!'
+  // For ')' specifically: only strip if unbalanced
+  while (str.length > 0) {
+    const lastChar = str[str.length - 1];
+    if (/[)\]}|:.,;~*!]/.test(lastChar)) {
+      if (lastChar === ')') {
+        const openCount = (str.match(/\(/g) || []).length;
+        const closeCount = (str.match(/\)/g) || []).length;
+        if (closeCount > openCount) {
+          str = str.slice(0, -1);
+          continue;
+        } else {
+          break;
+        }
+      } else {
+        str = str.slice(0, -1);
+        continue;
+      }
+    }
+    break;
+  }
+
+  return str;
+};
+
+function transposeSingleChord(chord: string, steps: number, useBb: boolean = false, useEb: boolean = false): string {
   const match = chord.match(/^([A-G][b#]?)(.*)$/);
   if (!match) return chord;
 
@@ -17,73 +53,112 @@ export const transposeChord = (chord: string, steps: number, useBb: boolean = fa
   const currentIndex = CHORD_SCALE.indexOf(root);
   if (currentIndex === -1) return chord;
 
-  // Calculate new index with wrap-around
   let newIndex = (currentIndex + steps) % 12;
   if (newIndex < 0) newIndex += 12;
 
   let newRoot = steps === 0 ? originalRoot : CHORD_SCALE[newIndex];
   if (useBb && normalizeRoot(newRoot) === 'A#') newRoot = 'Bb';
   if (useEb && normalizeRoot(newRoot) === 'D#') newRoot = 'Eb';
-  
-  // Also transpose bass notes if present (e.g., /F#)
-  let newRest = rest;
-  const bassMatch = rest.match(/^(\/)([A-G][b#]?)(.*)$/);
-  if (bassMatch) {
-    const bassOriginal = bassMatch[2];
-    const bassRoot = normalizeRoot(bassOriginal);
-    const bassIndex = CHORD_SCALE.indexOf(bassRoot);
-    if (bassIndex !== -1) {
-      let newBassIndex = (bassIndex + steps) % 12;
-      if (newBassIndex < 0) newBassIndex += 12;
-      let newBassRoot = steps === 0 ? bassOriginal : CHORD_SCALE[newBassIndex];
-      if (useBb && normalizeRoot(newBassRoot) === 'A#') newBassRoot = 'Bb';
-      if (useEb && normalizeRoot(newBassRoot) === 'D#') newBassRoot = 'Eb';
-      newRest = `${bassMatch[1]}${newBassRoot}${bassMatch[3]}`;
+
+  return `${newRoot}${rest}`;
+}
+
+export const transposeChord = (chord: string, steps: number, useBb: boolean = false, useEb: boolean = false): string => {
+  if (!chord) return chord;
+
+  // Extract leading outer punctuation (e.g. '(', '[', '|')
+  let start = 0;
+  while (start < chord.length && /[[({|]/.test(chord[start])) {
+    start++;
+  }
+
+  // Extract trailing outer punctuation (e.g. ')', ']', '|', ',', '.', ';', '!')
+  let end = chord.length;
+  while (end > start) {
+    const char = chord[end - 1];
+    if (/[)\]}|,.:;*!]/.test(char)) {
+      if (char === ')') {
+        const sub = chord.substring(start, end);
+        const openCount = (sub.match(/\(/g) || []).length;
+        const closeCount = (sub.match(/\)/g) || []).length;
+        if (closeCount > openCount) {
+          end--;
+          continue;
+        } else {
+          break;
+        }
+      } else {
+        end--;
+        continue;
+      }
+    }
+    break;
+  }
+
+  const leadPunct = chord.substring(0, start);
+  const inner = chord.substring(start, end);
+  const trailPunct = chord.substring(end);
+
+  if (!inner) return chord;
+
+  // Check for slash bass (e.g. C/E, Cº/Eb, Am7/G, G/B, but not C6/9 or C7/9 where denominator is a number)
+  if (inner.includes('/')) {
+    const slashIdx = inner.lastIndexOf('/');
+    const numerator = inner.substring(0, slashIdx);
+    const denominator = inner.substring(slashIdx + 1);
+
+    const bassMatch = denominator.match(/^([A-G][b#]?)(.*)$/);
+    if (bassMatch) {
+      const transposedNumerator = transposeSingleChord(numerator, steps, useBb, useEb);
+      const bassOriginal = bassMatch[1];
+      const bassRest = bassMatch[2];
+      const bassRoot = normalizeRoot(bassOriginal);
+      const bassIndex = CHORD_SCALE.indexOf(bassRoot);
+      let newBass = bassOriginal;
+      if (bassIndex !== -1) {
+        let newBassIndex = (bassIndex + steps) % 12;
+        if (newBassIndex < 0) newBassIndex += 12;
+        newBass = steps === 0 ? bassOriginal : CHORD_SCALE[newBassIndex];
+        if (useBb && normalizeRoot(newBass) === 'A#') newBass = 'Bb';
+        if (useEb && normalizeRoot(newBass) === 'D#') newBass = 'Eb';
+      }
+      return `${leadPunct}${transposedNumerator}/${newBass}${bassRest}${trailPunct}`;
     }
   }
 
-  return `${newRoot}${newRest}`;
+  return `${leadPunct}${transposeSingleChord(inner, steps, useBb, useEb)}${trailPunct}`;
 };
 
 export const transposeLine = (line: string, steps: number, useBb: boolean = false, useEb: boolean = false): string => {
- // A simple regex to find chords in a line. 
- // It assumes words starting with A-G and optional #/b are chords if they match the chord structure.
- // The ChordSheet component uses a similar regex to colorize.
- // We'll replace chords in the line while preserving spaces.
- 
- const chordRegex = /\b[A-G][#b]?(?:m|maj|dim|aug|sus|add|M)?\d*(?:b\d+|#\d+)?(?:\([^)]+\))?(?:\/[A-G][#b]?)?\b/g;
- 
- // We need to be careful not to transpose normal text that looks like a chord (e.g. "A" or "I" or "Am").
- // So we only transpose if the line is predominantly chords, or we do it word by word if the line is a chord line.
- 
- // For now, let's just transpose everything that matches the regex, since this function 
- // should ideally only be called on lines that are known to be chord lines.
- return line.replace(chordRegex, (match) => transposeChord(match, steps, useBb, useEb));
+  const chordRegex = /\b[A-G][#b]?(?:m|M|maj|min|dim|aug|sus|add|alt|º|°|ø|Ø|\+|-|b|#|[0-9])*(?:\([^)]+\))*(?:\/(?:[A-G][#b]?|\d+))?\b/g;
+  return line.replace(chordRegex, (match) => transposeChord(match, steps, useBb, useEb));
 };
 
-export const isChordLineHelper = (line: string) => {
- const cleanLine = line.replace(/^\[.*?\]\s*/, '').trim();
- if (cleanLine.length === 0) return false;
- 
- const words = cleanLine.split(/\s+/);
- if (words.length === 0) return false;
- 
- const chordRegex = /^[A-G][#b]?(m|M|maj|dim|aug|sus|add)?\d*(m|M|maj|dim|aug|sus|add)?(b\d+|#\d+)?(\([^)]+\))?(\/([A-G][#b]?|\d+))?$/;
- // Ignore structural words and punctuation when calculating the chord ratio
- const ignoreRegex = /^(intro|introdução|tab|solo|riff|base|parte|refrão|chorus|verse|ponte|bridge|final|end)?:?(,|:|\.|\||%|-|~|\(\dx\)|\d+x)?$/i;
+export const isChordLineHelper = (line: string): boolean => {
+  const cleanLine = line.replace(/^\[.*?\]\s*/, '').trim();
+  if (cleanLine.length === 0) return false;
+  
+  const words = cleanLine.split(/\s+/).filter(Boolean);
+  if (words.length === 0) return false;
+  
+  let chordCount = 0;
+  let wordCount = 0;
 
- let chordCount = 0;
- let wordCount = 0;
+  for (const word of words) {
+    if (MARKER_REGEX.test(word)) continue;
+    
+    const cleanWord = stripOuterPunctuation(word);
+    if (cleanWord.length === 0) continue;
 
- for (const word of words) {
- if (ignoreRegex.test(word)) continue;
- wordCount++;
- if (chordRegex.test(word)) {
- chordCount++;
- }
- }
+    if (MARKER_REGEX.test(cleanWord)) continue;
 
- return wordCount > 0 && (chordCount / wordCount) >= 0.7;
+    wordCount++;
+    if (CORE_CHORD_REGEX.test(cleanWord)) {
+      chordCount++;
+    }
+  }
+
+  return wordCount > 0 && (chordCount / wordCount) >= 0.5;
 };
 
 export const isTabLineHelper = (line: string) => {
@@ -143,28 +218,23 @@ export const transposeTabLine = (line: string, steps: number): string => {
 
 export const transposeContent = (content: string, steps: number, useBb: boolean = false, useEb: boolean = false): string => {
  if (steps === 0 && !useBb && !useEb) return content;
- 
- return content.split('\n').map(line => {
- if (isChordLineHelper(line)) {
- // Split the line by spaces but preserve them to keep alignment
- // Because chord lines rely heavily on precise spacing, we use a regex that matches chords or spaces
- 
- const parts = line.split(/(\s+)/);
- return parts.map(part => {
- if (part.trim() === '') return part; // Space
- 
- // Let's use a more strict chord regex for exact match on the part
- const strictChordRegex = /^[A-G][#b]?(m|M|maj|dim|aug|sus|add)?\d*(m|M|maj|dim|aug|sus|add)?(b\d+|#\d+)?(\([^)]+\))?(\/([A-G][#b]?|\d+))?$/;
- if (strictChordRegex.test(part)) {
- return transposeChord(part, steps, useBb, useEb);
- }
- return part;
- }).join('');
- } else if (isTabLineHelper(line)) {
- return transposeTabLine(line, steps);
- }
- return line;
- }).join('\n');
+  return content.split('\n').map(line => {
+    if (isChordLineHelper(line)) {
+      const parts = line.split(/(\s+)/);
+      return parts.map(part => {
+        if (part.trim() === '') return part; // Space
+
+        const cleanPart = part.replace(/^[([{|:~\s]+|[)\]}|:.,;~*!]+$/g, '');
+        if (cleanPart && CORE_CHORD_REGEX.test(cleanPart)) {
+          return transposeChord(part, steps, useBb, useEb);
+        }
+        return part;
+      }).join('');
+    } else if (isTabLineHelper(line)) {
+      return transposeTabLine(line, steps);
+    }
+    return line;
+  }).join('\n');
 };
 
 export const getNextKey = (currentKey: string, up: boolean, useBb: boolean = false, useEb: boolean = false): string => {
