@@ -228,11 +228,43 @@ Para economizar tokens de contexto nas interações com o terminal e o git, todo
   npx playwright test
   ```
 
-### Deploy
-**Executar o deploy na raiz do projeto
-```bash
-fly deploy --local-only --verbose
-```
+### Deploy e Procedimento Padrão para Encerramento de Release ("fechar release")
+Quando o usuário instruir "fechar release" (com autorização explícita), execute OBRIGATORIAMENTE o seguinte ciclo padronizado completo na ordem:
+
+1. **Merge do Pull Request:**
+   Realizar squash merge do PR e deletar a branch da feature/fix:
+   ```bash
+   gh pr merge <PR_NUM> --squash --delete-branch
+   ```
+2. **Registro do Parecer de Release:**
+   Criar/atualizar `.specs/features/<feature>/release/verdict.md` documentando escopo, evidências de validação e veredicto.
+3. **Atualização do Estado do Projeto:**
+   Registrar o item concluído em `.specs/project/STATE.md` (e `ROADMAP.md` se aplicável).
+4. **Commit e Sincronização da Documentação:**
+   Comitar os registros de release e sincronizar na branch `main`:
+   ```bash
+   git add .specs/ && git commit -m "docs(release): atualizar estado do projeto e encerrar release vX.Y.Z" && git push origin main
+   ```
+5. **Versionamento e Git Tag:**
+   Incrementar versão semântica e criar/enviar a tag anotada:
+   ```bash
+   git tag -a vX.Y.Z -m "vX.Y.Z - <Título da Release>" && git push origin vX.Y.Z
+   ```
+6. **Publicação da Release no GitHub:**
+   Criar a release oficial no GitHub:
+   ```bash
+   gh release create vX.Y.Z --title "vX.Y.Z - <Título da Release>" --notes "<Notas da Release>"
+   ```
+7. **Deploy em Produção:**
+   Executar o deploy na raiz do projeto:
+   ```bash
+   fly deploy --local-only --verbose
+   ```
+8. **Limpeza de Worktrees:**
+   Remover a worktree local utilizada para o desenvolvimento:
+   ```bash
+   git worktree remove <caminho_worktree>
+   ```
 
 <!-- startupos-governance:start -->
 # Startup OS Governance
@@ -307,7 +339,7 @@ Qualquer ponte, integração (como `slack_bridge`) ou wrapper que invoque a CLI 
 4. **Validate** — QA Lead avalia contra o nível consolidado, gates e evidências. O parecer de integração é `PRONTA PARA INTEGRAÇÃO` ou `REJEITADA`; ele não autoriza release. O QA produz o texto do parecer read-only e o CEO/Orquestrador o persiste verbatim em `.specs/features/<feature>/qa/`.
 5. **Adversarial Mode** — Se o QA Lead rejeitar 3 vezes a mesma entrega, ele congela a feature e força a Autoridade de Domínio (CTO ou CPO) a assumir a responsabilidade técnica/funcional.
 6. **Gerenciamento de Alterações** - Sempre que uma alteração de código for iniciada, abra uma worktree com uma nova branch, e ao encerrar a release e o deploy remova a worktree local.
-7. **Deploy e Release** - Nunca feche uma release e um deploy em produção sem autorização explicita do humano.
+7. **Deploy e Release** - Nunca feche uma release e um deploy em produção sem autorização explícita do humano. Ao receber o comando "fechar release", execute obrigatoriamente o ciclo padronizado completo: merge do PR via squash, registro do parecer de release, atualização de `.specs/project/STATE.md`, commit/push na `main`, criação e envio de git tag anotada (`vX.Y.Z`), publicação da release no GitHub (`gh release create`), deploy com `fly deploy --local-only --verbose` e remoção da worktree local.
 
 ### 4.2 Fast-Track com Gate de Qualidade
 1. Registrar uma microespecificação com objetivo, escopo, critérios de aceite e riscos conhecidos.
