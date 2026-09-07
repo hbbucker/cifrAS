@@ -156,6 +156,9 @@ export const ChordSheet: React.FC<ChordSheetProps> = ({
   };
 
   const renderLine = (line: string, index: number) => {
+    if (isColumnBreakLineHelper(line)) {
+      return null;
+    }
     const trimmed = line.trim();
     const isEmptyLine = trimmed.length === 0;
     const isChordLine = !singerMode && isChordLineHelper(line);

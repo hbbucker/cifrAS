@@ -233,5 +233,28 @@ Parte B`;
     expect(screen.getByTestId('chord-column-2')).toHaveTextContent('Parte B');
     expect(screen.queryByText('---coluna---')).not.toBeInTheDocument();
   });
+
+  it('guarantees that column break markers are completely hidden in 1-col, 2-cols and singerMode', () => {
+    const mixed = `[Intro]
+C G
+Começo
+
+[ coluna ]
+
+[Refrão]
+Am F
+Fim`;
+
+    const { rerender } = render(<ChordSheet content={mixed} columns={1} singerMode={false} />);
+    expect(screen.queryByText(/coluna/i)).not.toBeInTheDocument();
+
+    rerender(<ChordSheet content={mixed} columns={2} singerMode={false} />);
+    expect(screen.queryByText(/coluna/i)).not.toBeInTheDocument();
+
+    rerender(<ChordSheet content={mixed} columns={2} singerMode={true} />);
+    expect(screen.queryByText(/coluna/i)).not.toBeInTheDocument();
+    expect(screen.getByText('Começo')).toBeInTheDocument();
+    expect(screen.getByText('Fim')).toBeInTheDocument();
+  });
 });
 
