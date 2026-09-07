@@ -9,14 +9,16 @@ import { useToast } from '../context/ToastContext';
 import { apiClient } from '../services/authService';
 import { usePerformanceSession } from '../hooks/usePerformanceSession';
 import { useTranslation } from 'react-i18next';
+import { useTour } from '../context/TourContext';
 
 interface SongData {
- id: string;
- [key: string]: unknown;
+  id: string;
+  [key: string]: unknown;
 }
 
 export const TheaterModePage: React.FC = () => {
- const { t } = useTranslation();
+  const { t } = useTranslation();
+  const { startTour } = useTour();
  const navigate = useNavigate();
  const { playlistId, songId } = useParams();
  const location = useLocation();
@@ -96,6 +98,13 @@ export const TheaterModePage: React.FC = () => {
       // Screen orientation unlock is not supported or not allowed in this environment
     }
   }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      startTour('theater-columns-toggle');
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [startTour]);
   const hasExplicitTarget = Boolean(
     querySongId ||
     stateSongId ||

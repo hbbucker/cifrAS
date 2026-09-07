@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { Save, ArrowLeft } from 'lucide-react';
+import { Save, ArrowLeft, CloudDownload } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import { ConfirmModal } from '../components/modals/ConfirmModal';
 import { parseContentToLyrics, stringifyLyrics } from '../utils/lyricsParser';
@@ -9,10 +9,13 @@ import { DriveFilePicker } from '../components/DriveFilePicker';
 import { Button } from '../components/ui/Button';
 import { TagInput } from '../components/ui/TagInput';
 import { getUserTags } from '../api/songs';
-import { CloudDownload } from 'lucide-react';
+import { CoachMark } from '../components/ui/CoachMark';
+import { useTour } from '../context/TourContext';
+
 export const SongFormPage: React.FC = () => {
   const { t } = useTranslation();
- const { id } = useParams();
+  const { startTour } = useTour();
+  const { id } = useParams();
  const navigate = useNavigate();
  const location = useLocation();
  const { toast } = useToast();
@@ -47,13 +50,17 @@ export const SongFormPage: React.FC = () => {
  }, 0);
  };
 
- useEffect(() => {
-   getUserTags()
-     .then((tagCounts) => {
-       setAvailableTags(tagCounts.map((tc) => tc.name));
-     })
-     .catch(() => {});
- }, []);
+  useEffect(() => {
+    getUserTags()
+      .then((tagCounts) => {
+        setAvailableTags(tagCounts.map((tc) => tc.name));
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    startTour('song-editor-column-marker');
+  }, [startTour]);
 
  useEffect(() => {
  if (id) {
@@ -189,7 +196,14 @@ export const SongFormPage: React.FC = () => {
                   <span className="text-xs sm:text-sm font-semibold text-text-main shrink-0">{t('songForm.chordsLyrics')}</span>
                   <div className="flex items-center gap-1.5 sm:gap-2 bg-bg-main p-1 sm:p-1.5 rounded-md border border-border-main overflow-x-auto no-scrollbar py-1">
                     <button type="button" onClick={() => insertText('[Refrão]\n')} className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-lg hover:bg-bg-elevated transition-colors shrink-0">{t('songForm.refrao')}</button>
-                    <button type="button" onClick={() => insertText('\n[coluna]\n\n')} className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-lg hover:bg-bg-elevated transition-colors shrink-0" data-testid="btn-insert-coluna" title={t('songForm.colunaTooltip')}>{t('songForm.coluna')}</button>
+                    <CoachMark
+                      tourId="song-editor-column-marker"
+                      title={t('songForm.tourColumnTitle', 'Quebra de Coluna ([coluna])')}
+                      description={t('songForm.tourColumnDesc', 'Insira [coluna] onde desejar que a cifra quebre para a 2ª coluna no Modo Teatro ou telas em modo paisagem.')}
+                      position="bottom"
+                    >
+                      <button type="button" onClick={() => insertText('\n[coluna]\n\n')} className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-lg hover:bg-bg-elevated transition-colors shrink-0" data-testid="btn-insert-coluna" title={t('songForm.colunaTooltip')}>{t('songForm.coluna')}</button>
+                    </CoachMark>
                     <button type="button" onClick={() => insertText('\n\n')} className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-lg hover:bg-bg-elevated transition-colors shrink-0">{t('songForm.quebra')}</button>
                     <button type="button" onClick={() => insertText('\n---\n')} className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-lg hover:bg-bg-elevated transition-colors shrink-0">{t('songForm.separador')}</button>
                     <button type="button" onClick={() => insertText('\ne|---\nB|---\nG|---\nD|---\nA|---\nE|---\n')} className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-lg hover:bg-bg-elevated transition-colors shrink-0">{t('songForm.tablatura')}</button>

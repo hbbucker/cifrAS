@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Play, Pause, ChevronLeft, ChevronRight, Maximize, X, Lock, Unlock, Mic, Columns, Maximize2, Minimize2 } from 'lucide-react';
 import { TransposePad } from '../music/TransposePad';
+import { CoachMark } from '../ui/CoachMark';
 
 interface TheaterControlsProps {
   isScrolling: boolean;
@@ -135,15 +136,22 @@ export const TheaterControls: React.FC<TheaterControlsProps> = ({
           <div className="w-4 h-px bg-border-main my-0.5" />
 
           {onToggleColumns && (
-            <button 
-              onClick={onToggleColumns}
-              className={`p-2 min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center hover:bg-bg-elevated rounded-md transition-colors ${columns === 2 ? 'bg-[#aa3bff]/15 text-[#aa3bff] ring-1 ring-[#aa3bff]/30' : 'text-text-mute hover:text-text-main'}`}
-              title={columns === 2 ? t('theater.columns1') : t('theater.columns2')} 
-              aria-label={t('theater.toggleColumns')}
-              data-testid="toggle-columns-btn"
+            <CoachMark
+              tourId="theater-columns-toggle"
+              title={t('theater.tourColumnsTitle', 'Visualização em 2 Colunas')}
+              description={t('theater.tourColumnsDesc', 'Alterne para 2 colunas para aproveitar melhor telas em paisagem ou tablets. A cifra respeita a quebra manual [coluna] ou balanceia automaticamente.')}
+              position="left"
             >
-              <Columns className="w-4 h-4 sm:w-5 sm:h-5" />
-            </button>
+              <button 
+                onClick={onToggleColumns}
+                className={`p-2 min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center hover:bg-bg-elevated rounded-md transition-colors ${columns === 2 ? 'bg-[#aa3bff]/15 text-[#aa3bff] ring-1 ring-[#aa3bff]/30' : 'text-text-mute hover:text-text-main'}`}
+                title={columns === 2 ? t('theater.columns1') : t('theater.columns2')} 
+                aria-label={t('theater.toggleColumns')}
+                data-testid="toggle-columns-btn"
+              >
+                <Columns className="w-4 h-4 sm:w-5 sm:h-5" />
+              </button>
+            </CoachMark>
           )}
 
           {onToggleFullWidth && (
