@@ -19,7 +19,7 @@ describe('SongViewPage Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
-    global.fetch = vi.fn().mockImplementation((url: string) => {
+    globalThis.fetch = vi.fn().mockImplementation((url: string) => {
       if (url.includes('/api/songs/1')) {
         return Promise.resolve({
           ok: true,
