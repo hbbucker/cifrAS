@@ -37,3 +37,6 @@ Based on board approval, we are pausing new feature development (including Epic 
 
 - **FIX-CHORDSHEET-SPACING-01:** (DONE) Espaçamento Compacto de Linhas em Branco no ChordSheet (`fix-chordsheet-blank-line-height`). Altura das linhas vazias compactada para 12px fixos, eliminando espaço excessivo entre estrofes e preservando a herança tipográfica e controle de fonte do usuário. 274 testes de frontend e 226 de backend passando 100%. PR #38 aprovado, integrado na `main` e publicado com sucesso em produção no Fly.io.
 
+- **THEATER-LANDSCAPE-COLUMNS-01:** (DONE) Divisão em Múltiplas Colunas, Expansão de Largura e Sincronização de Tipografia no Modo Teatro (`landscape-columns-and-fullwidth`). Suporte a 2 colunas balanceadas com prevenção de quebra em versos (`break-inside-avoid`), alternância de largura total (Full Width) com ativação automática ao acionar 2 colunas, controles dedicados no dock lateral do Modo Teatro (`TheaterControls`), sincronização e recuperação de `fontSize` no `localStorage` entre visualização/edição e playlists, 100% i18n (pt, en, es). 226 testes de backend e 280 de frontend passando 100%, 0 erros no ESLint. Homologado como Release Candidate v1.3.0 e publicado no Fly.io.
+
+
