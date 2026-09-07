@@ -415,13 +415,14 @@ describe('TheaterModePage Component — Gesture & Interaction Navigation', () =>
 
     // Song 1 has transposeSteps = 2 (C -> D)
     expect(await screen.findByText('Song 1')).toBeInTheDocument();
-    expect(screen.getByText('D')).toBeInTheDocument();
+    expect(screen.getByTestId('theater-current-key')).toHaveTextContent('D');
+    expect(screen.getByTestId('theater-orig-key')).toHaveTextContent('theater.originalKeyLabel C');
 
     // Navigate to Song 2
     fireEvent.click(screen.getByTestId('next-song-btn'));
     expect(await screen.findByText('Song 2')).toBeInTheDocument();
 
     // Song 2 has transposeSteps = 0 (G remains G, not transposed to A)
-    expect(await screen.findByText('G')).toBeInTheDocument();
+    expect(screen.getByTestId('theater-current-key')).toHaveTextContent('G');
   });
 });

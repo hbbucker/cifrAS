@@ -494,12 +494,13 @@ export const TheaterModePage: React.FC = () => {
       )}
 
       <TheaterControls 
-        className={!showControls ? 'opacity-0 pointer-events-none' : 'opacity-100'}
+        showControls={showControls}
         title={song.title}
         artist={song.artist}
         isScrolling={isScrolling}
         speed={speed}
         currentKey={currentKey}
+        originalKey={song.originalKey}
         onPlayPause={() => isScrolling ? pause() : play()}
         onSpeedChange={setSpeed}
         onTransposeUp={() => setTransposeSteps(s => s + 1)}

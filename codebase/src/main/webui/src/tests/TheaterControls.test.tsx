@@ -25,6 +25,8 @@ vi.mock('react-i18next', () => ({
         'theater.scrollSpeed': 'Velocidade da Rolagem',
         'theater.pauseScroll': 'Pausar Rolagem',
         'theater.startScroll': 'Iniciar Rolagem',
+        'theater.keyLabel': 'Tom',
+        'theater.originalKeyLabel': 'Orig.',
       };
       return dict[key] || key;
     }
@@ -36,6 +38,8 @@ describe('TheaterControls Component', () => {
     isScrolling: false,
     speed: 3,
     currentKey: 'C',
+    originalKey: 'C',
+    showControls: true,
     onPlayPause: vi.fn(),
     onSpeedChange: vi.fn(),
     onTransposeUp: vi.fn(),
@@ -65,6 +69,42 @@ describe('TheaterControls Component', () => {
     expect(screen.getByTestId('lock-mode-btn')).toBeInTheDocument();
     expect(screen.getByTestId('fullscreen-btn')).toBeInTheDocument();
     expect(screen.getByTestId('exit-theater-btn')).toBeInTheDocument();
+  });
+
+  it('renders persistent song title, artist, and key badge even when controls are hidden', () => {
+    render(
+      <TheaterControls 
+        {...defaultProps} 
+        showControls={false} 
+        title="Tempo Perdido" 
+        artist="Legião Urbana" 
+        currentKey="D" 
+        originalKey="C"
+      />
+    );
+
+    // Title and artist remain visible in the document
+    expect(screen.getByTestId('theater-song-title')).toHaveTextContent('Tempo Perdido');
+    expect(screen.getByTestId('theater-song-artist')).toHaveTextContent('Legião Urbana');
+    
+    // Key badge displays current key and original key reference
+    expect(screen.getByTestId('theater-current-key')).toHaveTextContent('D');
+    expect(screen.getByTestId('theater-orig-key')).toHaveTextContent('Orig. C');
+  });
+
+  it('shows only current key when song is in its original key', () => {
+    render(
+      <TheaterControls 
+        {...defaultProps} 
+        title="Tempo Perdido" 
+        artist="Legião Urbana" 
+        currentKey="C" 
+        originalKey="C"
+      />
+    );
+
+    expect(screen.getByTestId('theater-current-key')).toHaveTextContent('C');
+    expect(screen.queryByTestId('theater-orig-key')).not.toBeInTheDocument();
   });
 
   it('toggles singer mode when singer-mode-btn is clicked', () => {

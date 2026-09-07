@@ -381,7 +381,9 @@
     "scrollSpeed": "Scroll Speed",
     "pauseScroll": "Pause Scroll",
     "startScroll": "Start Scroll",
-    "failedLoadSongDetails": "Failed to load song details"
+    "failedLoadSongDetails": "Failed to load song details",
+    "keyLabel": "Key",
+    "originalKeyLabel": "Orig."
   },
   "linkPlaylist": {
     "shareTitle": "Share a Playlist",
