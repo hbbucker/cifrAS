@@ -254,3 +254,14 @@ export const getNextKey = (currentKey: string, up: boolean, useBb: boolean = fal
 
  return currentKey.replace(/^[A-G][b#]?/, newRoot);
 };
+
+export const isColumnBreakLineHelper = (line: string): boolean => {
+  const trimmed = line.trim().toLowerCase();
+  if (/^\[(coluna|quebra[-_ ]?coluna|coluna[-_ ]?2|column|col|break[-_ ]?column)\]$/.test(trimmed)) {
+    return true;
+  }
+  if (/^[-=]{2,}\s*(coluna|column|quebra[-_ ]?coluna)\s*[-=]{2,}$/.test(trimmed)) {
+    return true;
+  }
+  return false;
+};

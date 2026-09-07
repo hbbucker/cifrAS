@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { transposeChord, transposeContent, isChordLineHelper } from '../utils/chordTransposer';
+import { transposeChord, transposeContent, isChordLineHelper, isColumnBreakLineHelper } from '../utils/chordTransposer';
 
 describe('chordTransposer', () => {
   describe('transposeChord with diminished, extensions and parentheses', () => {
@@ -82,6 +82,37 @@ Sem olhar para trás`;
       expect(transposed).toContain('(Bm7  E7  A7M)');
       expect(transposed).toContain('Caminhando pela rua');
       expect(transposed).toContain('Sem olhar para trás');
+    });
+  });
+
+  describe('isColumnBreakLineHelper', () => {
+    it('identifies bracketed column markers in various languages and casing', () => {
+      expect(isColumnBreakLineHelper('[coluna]')).toBe(true);
+      expect(isColumnBreakLineHelper('[COLUNA]')).toBe(true);
+      expect(isColumnBreakLineHelper('[coluna 2]')).toBe(true);
+      expect(isColumnBreakLineHelper('[coluna-2]')).toBe(true);
+      expect(isColumnBreakLineHelper('[quebra-coluna]')).toBe(true);
+      expect(isColumnBreakLineHelper('[quebra_coluna]')).toBe(true);
+      expect(isColumnBreakLineHelper('[column]')).toBe(true);
+      expect(isColumnBreakLineHelper('[COLUMN]')).toBe(true);
+      expect(isColumnBreakLineHelper('[col]')).toBe(true);
+      expect(isColumnBreakLineHelper('[break-column]')).toBe(true);
+    });
+
+    it('identifies dashed and equals column divider lines', () => {
+      expect(isColumnBreakLineHelper('---coluna---')).toBe(true);
+      expect(isColumnBreakLineHelper('--- coluna ---')).toBe(true);
+      expect(isColumnBreakLineHelper('===coluna===')).toBe(true);
+      expect(isColumnBreakLineHelper('---column---')).toBe(true);
+      expect(isColumnBreakLineHelper('---quebra-coluna---')).toBe(true);
+    });
+
+    it('rejects regular lyrics or chord lines', () => {
+      expect(isColumnBreakLineHelper('[Intro]')).toBe(false);
+      expect(isColumnBreakLineHelper('[Verso 1]')).toBe(false);
+      expect(isColumnBreakLineHelper('[Refrão]')).toBe(false);
+      expect(isColumnBreakLineHelper('C G Am F')).toBe(false);
+      expect(isColumnBreakLineHelper('Minha canção de teste')).toBe(false);
     });
   });
 });
