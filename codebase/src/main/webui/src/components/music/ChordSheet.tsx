@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
-// Removed react-window as it is unnecessary for standard chord sheets and was causing import issues.
+import { isChordLineHelper } from '../../utils/chordTransposer';
+
 interface ChordSheetProps {
   content: string;
   fontSize?: number;
@@ -23,31 +24,6 @@ export const ChordSheet: React.FC<ChordSheetProps> = ({
   // Calculate line height based on font size (approx 1.5x)
   const itemSize = Math.max(24, Math.round(fontSize * 1.5));
 
-  const isChordLineHelper = (line: string) => {
-    const cleanLine = line.replace(/^\[.*?\]\s*/, '').trim();
-    if (cleanLine.length === 0) return false;
-    
-    const words = cleanLine.split(/\s+/);
-    if (words.length === 0) return false;
-    
-    // Strict chord regex covering extended chords, slashes, and parentheses
-    const chordRegex = /^[A-G][#b]?(m|M|maj|dim|aug|sus|add)?\d*(m|M|maj|dim|aug|sus|add)?(b\d+|#\d+)?(\([^)]+\))?(\/([A-G][#b]?|\d+))?$/;
-    // Ignore structural words and punctuation when calculating the chord ratio
-    const ignoreRegex = /^(intro|introdução|tab|solo|riff|base|parte|refrão|chorus|verse|ponte|bridge|final|end)?:?(,|:|\.|\||%|-|~|\(\dx\)|\d+x)?$/i;
-
-    let chordCount = 0;
-    let wordCount = 0;
-
-    for (const word of words) {
-      if (ignoreRegex.test(word)) continue;
-      wordCount++;
-      if (chordRegex.test(word)) {
-        chordCount++;
-      }
-    }
-
-    return wordCount > 0 && (chordCount / wordCount) >= 0.6;
-  };
 
   const lines = useMemo(() => {
     if (!singerMode) return rawLines;

@@ -142,15 +142,14 @@ export function isStrummingOrRhythmLine(line: string): boolean {
   return false;
 }
 
+import { stripOuterPunctuation, CORE_CHORD_REGEX, MARKER_REGEX } from './chordTransposer';
+
 /**
  * Detects if a line is composed purely or predominantly of chord notations.
  */
 export function isChordOnlyLine(line: string): boolean {
   const trimmed = line.trim();
   if (!trimmed) return false;
-
-  const chordRegex = /^([A-G][#b]?)([mM0-9]|maj|min|dim|aug|sus|add|\+|-|º|°|ø|b|#)*(\([^)]+\))*(\/([A-G][#b]?|[0-9]+))?$/;
-  const markerRegex = /^(\|:|:\||\||%|-|~|\(\d+x\)|\d+x|intro:?|solo:?|riff:?|base:?|interlúdio:?|interlude:?|fim:?|final:?)$/i;
 
   const tokens = trimmed.split(/\s+/).filter(Boolean);
   if (tokens.length === 0) return false;
@@ -159,14 +158,17 @@ export function isChordOnlyLine(line: string): boolean {
   let evaluatedTokens = 0;
 
   for (const token of tokens) {
-    const cleanToken = token.replace(/^[([]+|[)\].,;]+$/g, '');
+    if (MARKER_REGEX.test(token)) {
+      continue;
+    }
 
-    if (markerRegex.test(token) || markerRegex.test(cleanToken)) {
+    const cleanToken = stripOuterPunctuation(token);
+    if (!cleanToken || MARKER_REGEX.test(cleanToken)) {
       continue;
     }
 
     evaluatedTokens++;
-    if (chordRegex.test(token) || (cleanToken.length > 0 && chordRegex.test(cleanToken))) {
+    if (CORE_CHORD_REGEX.test(cleanToken)) {
       chordCount++;
     }
   }

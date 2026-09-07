@@ -19,7 +19,10 @@ public class CifraClubParser {
     // Intervals: numbers or parentheses with numbers/accidentals
     // Bass: / followed by A-G, optionally # or b
     private static final Pattern CHORD_TOKEN_PATTERN = Pattern.compile(
-            "^[A-G][#b]?(m|M|dim|aug|sus|add|maj|[0-9]|\\+|\\-)*(?:\\([^)]+\\))?(?:/[A-G][#b]?)?$"
+            "^[A-G][#b]?(?:m|M|maj|min|dim|aug|sus|add|alt|º|°|ø|Ø|\\+|\\-|b|#|[0-9])*(?:\\([^)]+\\))*(?:/(?:[A-G][#b]?(?:m|M|maj|min|dim|aug|sus|add|alt|º|°|ø|Ø|\\+|\\-|b|#|[0-9])*(?:\\([^)]+\\))*|\\d+))?$"
+    );
+    private static final Pattern MARKER_PATTERN = Pattern.compile(
+            "^(\\|:|:\\||\\||%|-|~|\\(\\d+x\\)|\\d+x)$", Pattern.CASE_INSENSITIVE
     );
 
     public static LyricsStructure parse(String text) {
@@ -94,12 +97,23 @@ public class CifraClubParser {
         String[] tokens = trimmedLine.split("\\s+");
         if (tokens.length == 0) return false;
         
+        int chordCount = 0;
+        int evaluatedTokens = 0;
+
         for (String token : tokens) {
-            if (!CHORD_TOKEN_PATTERN.matcher(token).matches()) {
-                return false;
+            if (token.isBlank() || MARKER_PATTERN.matcher(token).matches()) {
+                continue;
+            }
+            String clean = token.replaceAll("^[(\\[{|:~\\s]+|[)\\]}|:.,;~*!]+$", "");
+            if (clean.isEmpty() || MARKER_PATTERN.matcher(clean).matches()) {
+                continue;
+            }
+            evaluatedTokens++;
+            if (CHORD_TOKEN_PATTERN.matcher(clean).matches()) {
+                chordCount++;
             }
         }
-        return true;
+        return evaluatedTokens > 0 && ((double) chordCount / evaluatedTokens) >= 0.5;
     }
 
     private static List<ChordPosition> parseChords(String line) {
