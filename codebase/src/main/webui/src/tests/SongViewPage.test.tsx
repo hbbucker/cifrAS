@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SongViewPage } from '../pages/SongViewPage';
 import { BrowserRouter } from 'react-router-dom';
@@ -57,39 +57,6 @@ describe('SongViewPage Component', () => {
   
     expect(await screen.findByText('Wonderwall')).toBeInTheDocument();
   });
-
-  it('allows toggling columns and full-width mode with persistence in localStorage', async () => {
-    render(
-      <AuthProvider>
-        <ThemeProvider>
-          <ToastProvider>
-            <BrowserRouter>
-              <SongViewPage />
-            </BrowserRouter>
-          </ToastProvider>
-        </ThemeProvider>
-      </AuthProvider>
-    );
-
-    expect(await screen.findByText('Wonderwall')).toBeInTheDocument();
-
-    const toggleColsBtn = screen.getByTestId('toggle-columns-btn');
-    const toggleFullWidthBtn = screen.getByTestId('toggle-fullwidth-btn');
-
-    // Toggle columns to 2
-    fireEvent.click(toggleColsBtn);
-    expect(localStorage.getItem('cifras_songview_columns')).toBe('2');
-
-    // Toggle full-width to true
-    fireEvent.click(toggleFullWidthBtn);
-    expect(localStorage.getItem('cifras_songview_fullwidth')).toBe('true');
-
-    // Toggle back
-    fireEvent.click(toggleColsBtn);
-    expect(localStorage.getItem('cifras_songview_columns')).toBe('1');
-
-    fireEvent.click(toggleFullWidthBtn);
-    expect(localStorage.getItem('cifras_songview_fullwidth')).toBe('false');
-  });
 });
+
 

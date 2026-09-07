@@ -426,27 +426,30 @@ describe('TheaterModePage Component — Gesture & Interaction Navigation', () =>
     expect(screen.getByTestId('theater-current-key')).toHaveTextContent('G');
   });
 
-  it('allows toggling columns and full-width layout with persistence in localStorage', async () => {
+  it('allows toggling columns and full-width layout, auto-activating full-width on 2 columns', async () => {
+    localStorage.clear();
     renderComponent();
     expect(await screen.findByText('Song 1')).toBeInTheDocument();
 
     const toggleColsBtn = screen.getByTestId('toggle-columns-btn');
     const toggleFullWidthBtn = screen.getByTestId('toggle-fullwidth-btn');
 
-    // Toggle columns to 2
+    // Initially 1 column, standard width
+    expect(localStorage.getItem('cifras_theater_columns')).toBeNull();
+
+    // Toggle columns to 2 -> should auto-activate full-width
     fireEvent.click(toggleColsBtn);
     expect(localStorage.getItem('cifras_theater_columns')).toBe('2');
-
-    // Toggle full-width to true
-    fireEvent.click(toggleFullWidthBtn);
     expect(localStorage.getItem('cifras_theater_fullwidth')).toBe('true');
 
-    // Toggle back
-    fireEvent.click(toggleColsBtn);
-    expect(localStorage.getItem('cifras_theater_columns')).toBe('1');
-
+    // Can manually toggle full-width off if desired
     fireEvent.click(toggleFullWidthBtn);
     expect(localStorage.getItem('cifras_theater_fullwidth')).toBe('false');
+
+    // Toggle back to 1 column
+    fireEvent.click(toggleColsBtn);
+    expect(localStorage.getItem('cifras_theater_columns')).toBe('1');
   });
 });
+
 

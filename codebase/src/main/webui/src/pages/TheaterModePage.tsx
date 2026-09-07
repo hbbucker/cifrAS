@@ -114,6 +114,10 @@ export const TheaterModePage: React.FC = () => {
     setColumns(prev => {
       const next = prev === 1 ? 2 : 1;
       localStorage.setItem('cifras_theater_columns', String(next));
+      if (next === 2) {
+        setIsFullWidth(true);
+        localStorage.setItem('cifras_theater_fullwidth', 'true');
+      }
       return next;
     });
   };

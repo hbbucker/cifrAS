@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TransposePad } from '../components/music/TransposePad';
 import { ChordSheet } from '../components/music/ChordSheet';
-import { ArrowLeft, PlayCircle, Settings2, Edit, Share2, Columns, Maximize2, Minimize2 } from 'lucide-react';
+import { ArrowLeft, PlayCircle, Settings2, Edit, Share2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { stringifyLyrics } from '../utils/lyricsParser';
 import { transposeContent } from '../utils/chordTransposer';
@@ -11,60 +11,35 @@ import { ShareSongModal } from '../components/modals/ShareSongModal';
 
 export const SongViewPage: React.FC = () => {
   const { t } = useTranslation();
- const navigate = useNavigate();
- const { id } = useParams();
- const { toast } = useToast();
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const { toast } = useToast();
  
- const [song, setSong] = useState({
- title: 'Carregando...',
- artist: '...',
- originalKey: 'C',
- content: ''
- });
+  const [song, setSong] = useState({
+    title: 'Carregando...',
+    artist: '...',
+    originalKey: 'C',
+    content: ''
+  });
  
- const [transposeSteps, setTransposeSteps] = useState(0);
+  const [transposeSteps, setTransposeSteps] = useState(0);
  
- // Preferences State
- const [showSettings, setShowSettings] = useState(false);
- const [useBb, setUseBb] = useState(false);
- const [useEb, setUseEb] = useState(false);
+  // Preferences State
+  const [showSettings, setShowSettings] = useState(false);
+  const [useBb, setUseBb] = useState(false);
+  const [useEb, setUseEb] = useState(false);
   const [autoScrollSpeed, setAutoScrollSpeed] = useState(1);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  const [columns, setColumns] = useState<1 | 2>(() => {
-    const saved = localStorage.getItem('cifras_songview_columns');
-    return saved === '2' ? 2 : 1;
-  });
-
-  const [isFullWidth, setIsFullWidth] = useState<boolean>(() => {
-    return localStorage.getItem('cifras_songview_fullwidth') === 'true';
-  });
-
-  const handleToggleColumns = () => {
-    setColumns(prev => {
-      const next = prev === 1 ? 2 : 1;
-      localStorage.setItem('cifras_songview_columns', String(next));
-      return next;
-    });
-  };
-
-  const handleToggleFullWidth = () => {
-    setIsFullWidth(prev => {
-      const next = !prev;
-      localStorage.setItem('cifras_songview_fullwidth', String(next));
-      return next;
-    });
-  };
-
- useEffect(() => {
- if (id) {
- fetch(`/api/songs/${id}`, {
- headers: { 
-   'Authorization': `Bearer ${localStorage.getItem('token')}`,
-   'Cache-Control': 'no-cache, no-store'
- },
- cache: 'no-store'
- })
+  useEffect(() => {
+    if (id) {
+      fetch(`/api/songs/${id}`, {
+        headers: { 
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Cache-Control': 'no-cache, no-store'
+        },
+        cache: 'no-store'
+      })
  .then(res => {
  if (!res.ok) throw new Error('Fetch failed');
  return res.json();
@@ -179,26 +154,6 @@ export const SongViewPage: React.FC = () => {
             />
             
             <div className="flex items-center gap-1 sm:gap-2">
-              <button 
-                onClick={handleToggleColumns}
-                className={`w-9 h-9 sm:w-10 sm:h-10 min-w-[36px] min-h-[36px] sm:min-w-[40px] sm:min-h-[40px] flex items-center justify-center hover:bg-bg-elevated rounded-md transition-colors ${columns === 2 ? 'bg-[#aa3bff]/15 text-[#aa3bff]' : 'text-text-mute'}`}
-                title={columns === 2 ? t('songView.columns1') : t('songView.columns2')}
-                aria-label={t('songView.toggleColumns')}
-                data-testid="toggle-columns-btn"
-              >
-                <Columns className="w-4 h-4 sm:w-5 sm:h-5" />
-              </button>
-
-              <button 
-                onClick={handleToggleFullWidth}
-                className={`w-9 h-9 sm:w-10 sm:h-10 min-w-[36px] min-h-[36px] sm:min-w-[40px] sm:min-h-[40px] flex items-center justify-center hover:bg-bg-elevated rounded-md transition-colors ${isFullWidth ? 'bg-[#aa3bff]/15 text-[#aa3bff]' : 'text-text-mute'}`}
-                title={isFullWidth ? t('songView.fitWidth') : t('songView.expandWidth')}
-                aria-label={t('songView.toggleWidth')}
-                data-testid="toggle-fullwidth-btn"
-              >
-                {isFullWidth ? <Minimize2 className="w-4 h-4 sm:w-5 sm:h-5" /> : <Maximize2 className="w-4 h-4 sm:w-5 sm:h-5" />}
-              </button>
-
               <div className="relative">
                 <button 
                   onClick={() => setShowSettings(!showSettings)}
@@ -281,8 +236,8 @@ export const SongViewPage: React.FC = () => {
         </header>
 
         <div className="flex-1 overflow-y-auto p-3.5 sm:p-6 pb-24 sm:pb-8 bg-bg-main/50 min-w-0" ref={scrollContainerRef}>
-          <div className={`${isFullWidth ? 'max-w-none w-full px-2' : 'max-w-4xl mx-auto'} h-full flex flex-col transition-all duration-200`}>
-            <ChordSheet content={transposedContent} fontSize={20} columns={columns} />
+          <div className="max-w-4xl mx-auto h-full flex flex-col">
+            <ChordSheet content={transposedContent} fontSize={20} />
           </div>
         </div>
       </div>
