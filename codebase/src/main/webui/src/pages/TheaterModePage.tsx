@@ -96,18 +96,42 @@ export const TheaterModePage: React.FC = () => {
   const { activeSession, saveProgress, clearSession } = usePerformanceSession();
   const [showResumePrompt, setShowResumePrompt] = useState(false);
   const hasPromptedRef = React.useRef(hasExplicitTarget);
- 
- const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
- const [showControls, setShowControls] = useState(!isMobile);
- const [fontSize, setFontSize] = useState<number>(isMobile ? 24 : 32);
- const [lastInteraction, setLastInteraction] = useState<number>(0);
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const [showControls, setShowControls] = useState(!isMobile);
+  const [fontSize, setFontSize] = useState<number>(isMobile ? 24 : 32);
+  const [lastInteraction, setLastInteraction] = useState<number>(0);
 
- useEffect(() => {
-   if (showControls) {
-     const timer = setTimeout(() => setShowControls(false), 4000);
-     return () => clearTimeout(timer);
-   }
- }, [showControls, lastInteraction]);
+  const [columns, setColumns] = useState<1 | 2>(() => {
+    const saved = localStorage.getItem('cifras_theater_columns');
+    return saved === '2' ? 2 : 1;
+  });
+
+  const [isFullWidth, setIsFullWidth] = useState<boolean>(() => {
+    return localStorage.getItem('cifras_theater_fullwidth') === 'true';
+  });
+
+  const handleToggleColumns = () => {
+    setColumns(prev => {
+      const next = prev === 1 ? 2 : 1;
+      localStorage.setItem('cifras_theater_columns', String(next));
+      return next;
+    });
+  };
+
+  const handleToggleFullWidth = () => {
+    setIsFullWidth(prev => {
+      const next = !prev;
+      localStorage.setItem('cifras_theater_fullwidth', String(next));
+      return next;
+    });
+  };
+
+  useEffect(() => {
+    if (showControls) {
+      const timer = setTimeout(() => setShowControls(false), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [showControls, lastInteraction]);
 
  // Fetch playlist queue if playlistId is provided
  useEffect(() => {
@@ -476,8 +500,8 @@ export const TheaterModePage: React.FC = () => {
         }}
         data-testid="theater-scroll-container"
       >
-        <div className="max-w-4xl mx-auto text-text-main">
-          <ChordSheet content={transposedContent} fontSize={fontSize} transparent={true} singerMode={isSingerMode} />
+        <div className={`${isFullWidth ? 'max-w-none w-full' : 'max-w-4xl mx-auto'} text-text-main transition-all duration-200`}>
+          <ChordSheet content={transposedContent} fontSize={fontSize} transparent={true} singerMode={isSingerMode} columns={columns} />
         </div>
       </div>
 
@@ -545,6 +569,10 @@ export const TheaterModePage: React.FC = () => {
         onLockToggle={() => setIsLocked(!isLocked)}
         isSingerMode={isSingerMode}
         onToggleSingerMode={() => setIsSingerMode(prev => !prev)}
+        columns={columns}
+        onToggleColumns={handleToggleColumns}
+        isFullWidth={isFullWidth}
+        onToggleFullWidth={handleToggleFullWidth}
       />
     </div>
   );

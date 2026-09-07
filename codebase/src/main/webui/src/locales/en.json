@@ -204,7 +204,13 @@
     "autoScroll": "Auto-scroll Speed",
     "useEb": "Use Eb",
     "useBb": "Use Bb",
-    "editSong": "Edit Song"
+    "editSong": "Edit Song",
+    "columns1": "1 Column",
+    "columns2": "2 Columns",
+    "toggleColumns": "Toggle Columns (1 or 2)",
+    "expandWidth": "Expand Full Width",
+    "fitWidth": "Standard Width",
+    "toggleWidth": "Toggle Width"
   },
   "playlistView": {
     "addSongs": "Add Songs",
@@ -386,7 +392,13 @@
     "startScroll": "Start Scroll",
     "failedLoadSongDetails": "Failed to load song details",
     "keyLabel": "Key",
-    "originalKeyLabel": "Orig."
+    "originalKeyLabel": "Orig.",
+    "columns1": "1 Column",
+    "columns2": "2 Columns",
+    "toggleColumns": "Toggle Columns (1 or 2)",
+    "expandWidth": "Expand Full Width",
+    "fitWidth": "Standard Width",
+    "toggleWidth": "Toggle Screen Width"
   },
   "linkPlaylist": {
     "shareTitle": "Share a Playlist",

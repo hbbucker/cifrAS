@@ -425,4 +425,28 @@ describe('TheaterModePage Component — Gesture & Interaction Navigation', () =>
     // Song 2 has transposeSteps = 0 (G remains G, not transposed to A)
     expect(screen.getByTestId('theater-current-key')).toHaveTextContent('G');
   });
+
+  it('allows toggling columns and full-width layout with persistence in localStorage', async () => {
+    renderComponent();
+    expect(await screen.findByText('Song 1')).toBeInTheDocument();
+
+    const toggleColsBtn = screen.getByTestId('toggle-columns-btn');
+    const toggleFullWidthBtn = screen.getByTestId('toggle-fullwidth-btn');
+
+    // Toggle columns to 2
+    fireEvent.click(toggleColsBtn);
+    expect(localStorage.getItem('cifras_theater_columns')).toBe('2');
+
+    // Toggle full-width to true
+    fireEvent.click(toggleFullWidthBtn);
+    expect(localStorage.getItem('cifras_theater_fullwidth')).toBe('true');
+
+    // Toggle back
+    fireEvent.click(toggleColsBtn);
+    expect(localStorage.getItem('cifras_theater_columns')).toBe('1');
+
+    fireEvent.click(toggleFullWidthBtn);
+    expect(localStorage.getItem('cifras_theater_fullwidth')).toBe('false');
+  });
 });
+
