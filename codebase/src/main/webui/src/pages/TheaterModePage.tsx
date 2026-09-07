@@ -86,6 +86,16 @@ export const TheaterModePage: React.FC = () => {
  }
  };
  }, [isLocked]);
+
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined' && 'screen' in window && window.screen?.orientation && typeof (window.screen.orientation as unknown as { unlock?: () => void }).unlock === 'function') {
+        (window.screen.orientation as unknown as { unlock: () => void }).unlock();
+      }
+    } catch {
+      // Screen orientation unlock is not supported or not allowed in this environment
+    }
+  }, []);
   const hasExplicitTarget = Boolean(
     querySongId ||
     stateSongId ||

@@ -164,7 +164,7 @@ export const ChordSheet: React.FC<ChordSheetProps> = ({
       data-testid="chord-sheet-container"
     >
       <div 
-        className={`h-full w-full ${isMultiColumn ? 'columns-1 md:columns-2 gap-8 [column-fill:balance]' : ''}`} 
+        className={`h-full w-full ${isMultiColumn ? 'columns-1 landscape:columns-2 md:columns-2 gap-6 md:gap-8 [column-fill:balance]' : ''}`} 
         style={{ lineHeight: `${itemSize}px` }}
         data-testid="chord-sheet-columns"
       >

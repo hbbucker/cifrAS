@@ -464,6 +464,19 @@ describe('TheaterModePage Component — Gesture & Interaction Navigation', () =>
     const savedFontSize = Number(localStorage.getItem('cifras_theater_fontsize'));
     expect(savedFontSize).toBeGreaterThan(0);
   });
+
+  it('attempts to unlock screen orientation on mount to support landscape mode', async () => {
+    const unlockMock = vi.fn().mockReturnValue(Promise.resolve());
+    Object.defineProperty(window.screen, 'orientation', {
+      value: { unlock: unlockMock },
+      configurable: true,
+      writable: true
+    });
+
+    renderComponent();
+    expect(await screen.findByText('Song 1')).toBeInTheDocument();
+    expect(unlockMock).toHaveBeenCalled();
+  });
 });
 
 

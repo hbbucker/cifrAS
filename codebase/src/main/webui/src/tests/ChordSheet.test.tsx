@@ -169,8 +169,9 @@ Refrão linha 2`;
     expect(columnContainer.className).not.toContain('columns-2');
 
     rerender(<ChordSheet content={multiVerseContent} columns={2} />);
+    expect(columnContainer.className).toContain('landscape:columns-2');
     expect(columnContainer.className).toContain('md:columns-2');
-    expect(columnContainer.className).toContain('gap-8');
+    expect(columnContainer.className).toContain('gap-6');
   });
 });
 
