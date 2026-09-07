@@ -186,7 +186,10 @@
     "newTitle": "New Song",
     "editingOriginalKeyWarning": "You are editing the song in its original key ({{key}}). Your transpose preferences will be kept when viewing.",
     "tags": "Tags",
-    "tagsPlaceholder": "Add tags such as Rock, Gospel, Acoustic..."
+    "tagsPlaceholder": "Add tags such as Rock, Gospel, Acoustic...",
+    "lineGuideTooltip": "Recommended line-break guide (37 chars on mobile / 40 on desktop)",
+    "lineGuideMobile": "37 chars",
+    "lineGuideDesktop": "40 chars"
   },
   "tags": {
     "title": "Tags",

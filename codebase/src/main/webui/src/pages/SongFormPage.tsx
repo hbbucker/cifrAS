@@ -205,20 +205,34 @@ export const SongFormPage: React.FC = () => {
                   {t('songForm.importDrive')}
                 </Button>
               </div>
-              <textarea 
-                ref={textareaRef}
-                value={content} 
-                onChange={handleChange(setContent)} 
-                onKeyDown={(e) => {
-                  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-                    e.preventDefault();
-                    handleSave();
-                  }
-                }}
-                className="w-full flex-1 min-h-[40vh] sm:min-h-[50vh] bg-transparent text-text-main font-mono text-sm sm:text-base focus:outline-none resize-none leading-relaxed"
-                placeholder={t('songForm.contentPlaceholder')}
-                data-testid="song-content-input"
-              />
+              <div className="relative flex-1 flex flex-col min-h-[40vh] sm:min-h-[50vh] font-mono text-sm sm:text-base">
+                {/* Linha guia vertical para parâmetro de quebra de linha */}
+                <div 
+                  data-testid="song-editor-line-guide"
+                  title={t('songForm.lineGuideTooltip')}
+                  aria-hidden="true"
+                  className="absolute top-0 bottom-0 left-[37ch] sm:left-[40ch] border-r border-dashed border-border-main pointer-events-none z-10 flex flex-col justify-start"
+                >
+                  <span className="text-[10px] text-text-mute/70 tracking-tight font-sans select-none -translate-x-1/2 bg-bg-card px-1 py-0.5 rounded border border-border-main/60 mt-1 whitespace-nowrap shadow-none">
+                    <span className="sm:hidden">{t('songForm.lineGuideMobile', '37 carac.')}</span>
+                    <span className="hidden sm:inline">{t('songForm.lineGuideDesktop', '40 carac.')}</span>
+                  </span>
+                </div>
+                <textarea 
+                  ref={textareaRef}
+                  value={content} 
+                  onChange={handleChange(setContent)} 
+                  onKeyDown={(e) => {
+                    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                      e.preventDefault();
+                      handleSave();
+                    }
+                  }}
+                  className="w-full flex-1 min-h-full bg-transparent text-text-main font-mono text-sm sm:text-base focus:outline-none resize-none leading-relaxed"
+                  placeholder={t('songForm.contentPlaceholder')}
+                  data-testid="song-content-input"
+                />
+              </div>
             </div>
           </div>
         </div>

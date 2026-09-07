@@ -35,4 +35,29 @@ describe('SongFormPage Component', () => {
     expect(titleInput.value).toBe('Wonderwall');
   });
  });
+
+ it('renders the vertical line guide with 37ch mobile and 40ch desktop classes and non-blocking events', async () => {
+   render(
+     <AuthProvider>
+       <ThemeProvider>
+         <ToastProvider>
+           <BrowserRouter>
+             <SongFormPage />
+           </BrowserRouter>
+         </ToastProvider>
+       </ThemeProvider>
+     </AuthProvider>
+   );
+
+   const lineGuide = screen.getByTestId('song-editor-line-guide');
+   expect(lineGuide).toBeInTheDocument();
+   expect(lineGuide.className).toContain('left-[37ch]');
+   expect(lineGuide.className).toContain('sm:left-[40ch]');
+   expect(lineGuide.className).toContain('pointer-events-none');
+   expect(lineGuide.className).toContain('border-dashed');
+
+   // Check that responsive guide labels are rendered
+   expect(screen.getByText(/37/)).toBeInTheDocument();
+   expect(screen.getByText(/40/)).toBeInTheDocument();
+ });
 });

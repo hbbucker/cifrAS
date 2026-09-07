@@ -186,7 +186,10 @@
     "newTitle": "Nova Música",
     "editingOriginalKeyWarning": "Você está editando a cifra no tom original ({{key}}). Suas preferências de transposição serão mantidas ao visualizar.",
     "tags": "Tags",
-    "tagsPlaceholder": "Adicione tags como Rock, Gospel, Missa..."
+    "tagsPlaceholder": "Adicione tags como Rock, Gospel, Missa...",
+    "lineGuideTooltip": "Linha guia recomendada para quebra de linha (37 carac. no celular / 40 no computador)",
+    "lineGuideMobile": "37 carac.",
+    "lineGuideDesktop": "40 carac."
   },
   "tags": {
     "title": "Tags",

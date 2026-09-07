@@ -186,7 +186,10 @@
     "newTitle": "Nueva Canción",
     "editingOriginalKeyWarning": "Estás editando la canción en su tono original ({{key}}). Tus preferencias de transposición se mantendrán al visualizar.",
     "tags": "Etiquetas",
-    "tagsPlaceholder": "Añade etiquetas como Rock, Gospel, Acústico..."
+    "tagsPlaceholder": "Añade etiquetas como Rock, Gospel, Acústico...",
+    "lineGuideTooltip": "Guía recomendada para salto de línea (37 caract. en móvil / 40 en escritorio)",
+    "lineGuideMobile": "37 carac.",
+    "lineGuideDesktop": "40 carac."
   },
   "tags": {
     "title": "Etiquetas",
