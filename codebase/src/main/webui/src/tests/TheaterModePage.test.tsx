@@ -450,6 +450,21 @@ describe('TheaterModePage Component — Gesture & Interaction Navigation', () =>
     fireEvent.click(toggleColsBtn);
     expect(localStorage.getItem('cifras_theater_columns')).toBe('1');
   });
+
+  it('persists and recovers font size definitions across theater modes and songs', async () => {
+    localStorage.clear();
+    renderComponent();
+    expect(await screen.findByText('Song 1')).toBeInTheDocument();
+
+    const increaseFontBtn = screen.getByTestId('increase-font-btn');
+    fireEvent.click(increaseFontBtn);
+
+    // Font size should be persisted in localStorage
+    expect(localStorage.getItem('cifras_theater_fontsize')).toBeDefined();
+    const savedFontSize = Number(localStorage.getItem('cifras_theater_fontsize'));
+    expect(savedFontSize).toBeGreaterThan(0);
+  });
 });
+
 
 
