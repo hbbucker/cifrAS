@@ -173,8 +173,12 @@
     "title": "Title",
     "artist": "Artist",
     "tom": "Tom",
-    "refrao": "Refrão",
-    "separador": "Separador",
+    "refrao": "Chorus",
+    "coluna": "Column",
+    "colunaTooltip": "Insert column break in Theater Mode ([coluna])",
+    "tourColumnTitle": "Column Break ([coluna])",
+    "tourColumnDesc": "Insert [coluna] wherever you want the song chart to break into the 2nd column in Theater Mode or landscape screens.",
+    "separador": "Separator",
     "tablatura": "Tablatura",
     "titlePlaceholder": "Song Title",
     "artistPlaceholder": "Artist Name",
@@ -398,7 +402,9 @@
     "toggleColumns": "Toggle Columns (1 or 2)",
     "expandWidth": "Expand Full Width",
     "fitWidth": "Standard Width",
-    "toggleWidth": "Toggle Screen Width"
+    "toggleWidth": "Toggle Screen Width",
+    "tourColumnsTitle": "2 Columns View",
+    "tourColumnsDesc": "Switch to 2 columns to take full advantage of landscape screens or tablets. It respects manual [coluna] breaks or balances automatically."
   },
   "linkPlaylist": {
     "shareTitle": "Share a Playlist",

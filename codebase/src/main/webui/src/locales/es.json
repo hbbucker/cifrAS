@@ -173,7 +173,11 @@
     "title": "Title",
     "artist": "Artist",
     "tom": "Tom",
-    "refrao": "Refrão",
+    "refrao": "Estribillo",
+    "coluna": "Columna",
+    "colunaTooltip": "Insertar salto de columna en Modo Teatro ([coluna])",
+    "tourColumnTitle": "Salto de Columna ([coluna])",
+    "tourColumnDesc": "Inserta [coluna] donde quieras que la cifra se divida en la 2ª columna en el Modo Teatro o pantallas en modo horizontal.",
     "separador": "Separador",
     "tablatura": "Tablatura",
     "titlePlaceholder": "Song Title",
@@ -398,7 +402,9 @@
     "toggleColumns": "Alternar Columnas (1 o 2)",
     "expandWidth": "Expandir Ancho Completo",
     "fitWidth": "Ancho Estándar",
-    "toggleWidth": "Alternar Ancho de Pantalla"
+    "toggleWidth": "Alternar Ancho de Pantalla",
+    "tourColumnsTitle": "Vista en 2 Columnas",
+    "tourColumnsDesc": "Cambia a 2 columnas para aprovechar pantallas horizontales o tablets. Respeta el salto manual [coluna] o se balancea automáticamente."
   },
   "linkPlaylist": {
     "shareTitle": "Compartir una Playlist",

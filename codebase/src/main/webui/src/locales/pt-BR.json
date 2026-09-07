@@ -174,6 +174,10 @@
     "artist": "Artista",
     "tom": "Tom",
     "refrao": "Refrão",
+    "coluna": "Coluna",
+    "colunaTooltip": "Inserir quebra de coluna no Modo Teatro ([coluna])",
+    "tourColumnTitle": "Quebra de Coluna ([coluna])",
+    "tourColumnDesc": "Insira [coluna] onde desejar que a cifra quebre para a 2ª coluna no Modo Teatro ou telas em modo paisagem.",
     "separador": "Separador",
     "tablatura": "Tablatura",
     "titlePlaceholder": "Título da Música",
@@ -398,7 +402,9 @@
     "toggleColumns": "Alternar Colunas (1 ou 2)",
     "expandWidth": "Expandir Largura Total",
     "fitWidth": "Largura Padrão",
-    "toggleWidth": "Alternar Largura da Tela"
+    "toggleWidth": "Alternar Largura da Tela",
+    "tourColumnsTitle": "Visualização em 2 Colunas",
+    "tourColumnsDesc": "Alterne para 2 colunas para aproveitar melhor telas em paisagem ou tablets. A cifra respeita a quebra manual [coluna] ou balanceia automaticamente."
   },
   "linkPlaylist": {
     "shareTitle": "Compartilhar uma Playlist",

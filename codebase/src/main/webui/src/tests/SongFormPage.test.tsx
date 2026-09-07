@@ -1,10 +1,11 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { SongFormPage } from '../pages/SongFormPage';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '../context/AuthContext';
 import { ToastProvider } from '../context/ToastContext';
 import { ThemeProvider } from '../context/ThemeContext';
+import { TourProvider } from '../context/TourContext';
 import '@testing-library/jest-dom/vitest';
 
 vi.mock('react-router-dom', async () => {
@@ -21,9 +22,11 @@ describe('SongFormPage Component', () => {
   <AuthProvider>
   <ThemeProvider>
   <ToastProvider>
+  <TourProvider>
   <BrowserRouter>
   <SongFormPage />
   </BrowserRouter>
+  </TourProvider>
   </ToastProvider>
   </ThemeProvider>
   </AuthProvider>
@@ -41,9 +44,11 @@ describe('SongFormPage Component', () => {
      <AuthProvider>
        <ThemeProvider>
          <ToastProvider>
-           <BrowserRouter>
-             <SongFormPage />
-           </BrowserRouter>
+           <TourProvider>
+             <BrowserRouter>
+               <SongFormPage />
+             </BrowserRouter>
+           </TourProvider>
          </ToastProvider>
        </ThemeProvider>
      </AuthProvider>
@@ -60,4 +65,62 @@ describe('SongFormPage Component', () => {
    expect(screen.getByText(/37/)).toBeInTheDocument();
    expect(screen.getByText(/40/)).toBeInTheDocument();
  });
+
+  it('inserts [coluna] marker into editor when [Coluna] button is clicked', async () => {
+    render(
+      <AuthProvider>
+        <ThemeProvider>
+          <ToastProvider>
+            <TourProvider>
+              <BrowserRouter>
+                <SongFormPage />
+              </BrowserRouter>
+            </TourProvider>
+          </ToastProvider>
+        </ThemeProvider>
+      </AuthProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('btn-insert-coluna')).toBeInTheDocument();
+      expect(screen.getByTestId('song-title-input')).toHaveValue('Wonderwall');
+    });
+
+    const insertColunaBtn = screen.getByTestId('btn-insert-coluna');
+    const contentInput = screen.getByTestId('song-content-input') as HTMLTextAreaElement;
+
+    fireEvent.click(insertColunaBtn);
+
+    await waitFor(() => {
+      expect(contentInput.value).toContain('[coluna]');
+    });
+  });
+
+  it('displays CoachMark onboarding tooltip for column marker and closes on dismiss', async () => {
+    localStorage.clear();
+    render(
+      <AuthProvider>
+        <ThemeProvider>
+          <ToastProvider>
+            <TourProvider>
+              <BrowserRouter>
+                <SongFormPage />
+              </BrowserRouter>
+            </TourProvider>
+          </ToastProvider>
+        </ThemeProvider>
+      </AuthProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/Quebra de Coluna/i)).toBeInTheDocument();
+    });
+
+    const closeBtn = screen.getByRole('button', { name: /close/i });
+    fireEvent.click(closeBtn);
+
+    await waitFor(() => {
+      expect(screen.queryByText(/Quebra de Coluna/i)).not.toBeInTheDocument();
+    });
+  });
 });

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { isChordLineHelper } from '../../utils/chordTransposer';
+import { isChordLineHelper, isColumnBreakLineHelper } from '../../utils/chordTransposer';
 
 interface ChordSheetProps {
   content: string;
@@ -34,11 +34,12 @@ export const ChordSheet: React.FC<ChordSheetProps> = ({
 
     for (const line of rawLines) {
       const trimmed = line.trim();
+      const isColBreak = isColumnBreakLineHelper(line);
       const isChordLine = isChordLineHelper(line);
       const isTabLine = /^[eBGDAEa-g][#b]?\|/.test(trimmed);
       const isStrumLine = /^[\s]*[↓↑v^]+[\s↓↑v^]*$/.test(line) && trimmed.length > 0;
 
-      if (isChordLine || isTabLine || isStrumLine) {
+      if (!isColBreak && (isChordLine || isTabLine || isStrumLine)) {
         continue;
       }
 
@@ -59,25 +60,51 @@ export const ChordSheet: React.FC<ChordSheetProps> = ({
   const hasLyrics = useMemo(() => {
     return lines.some(l => {
       const trimmed = l.trim();
-      return trimmed.length > 0 && !(trimmed.startsWith('[') && trimmed.endsWith(']'));
+      return trimmed.length > 0 && !isColumnBreakLineHelper(l) && !(trimmed.startsWith('[') && trimmed.endsWith(']'));
     });
   }, [lines]);
 
-  const stanzas = useMemo(() => {
-    const result: { startIndex: number; lines: string[] }[] = [];
+  const { column1Stanzas, column2Stanzas, hasExplicitColumnBreak, allStanzas } = useMemo(() => {
+    const col1: { startIndex: number; lines: string[] }[] = [];
+    const col2: { startIndex: number; lines: string[] }[] = [];
     let currentStanza: string[] = [];
     let currentStartIndex = 0;
+    let explicitBreakFound = false;
 
     lines.forEach((line, index) => {
       const trimmed = line.trim();
       const isEmpty = trimmed.length === 0;
+      const isBreak = isColumnBreakLineHelper(line);
+
+      if (isBreak) {
+        if (currentStanza.length > 0) {
+          if (!explicitBreakFound) {
+            col1.push({ startIndex: currentStartIndex, lines: currentStanza });
+          } else {
+            col2.push({ startIndex: currentStartIndex, lines: currentStanza });
+          }
+          currentStanza = [];
+        }
+        explicitBreakFound = true;
+        currentStartIndex = index + 1;
+        return;
+      }
 
       if (isEmpty) {
         if (currentStanza.length > 0) {
-          result.push({ startIndex: currentStartIndex, lines: currentStanza });
+          if (!explicitBreakFound) {
+            col1.push({ startIndex: currentStartIndex, lines: currentStanza });
+          } else {
+            col2.push({ startIndex: currentStartIndex, lines: currentStanza });
+          }
           currentStanza = [];
         }
-        result.push({ startIndex: index, lines: [line] });
+        const blank = { startIndex: index, lines: [line] };
+        if (!explicitBreakFound) {
+          col1.push(blank);
+        } else {
+          col2.push(blank);
+        }
         currentStartIndex = index + 1;
       } else {
         if (currentStanza.length === 0) {
@@ -88,10 +115,20 @@ export const ChordSheet: React.FC<ChordSheetProps> = ({
     });
 
     if (currentStanza.length > 0) {
-      result.push({ startIndex: currentStartIndex, lines: currentStanza });
+      if (!explicitBreakFound) {
+        col1.push({ startIndex: currentStartIndex, lines: currentStanza });
+      } else {
+        col2.push({ startIndex: currentStartIndex, lines: currentStanza });
+      }
     }
 
-    return result;
+    const all = [...col1, ...col2];
+    return {
+      column1Stanzas: col1,
+      column2Stanzas: col2,
+      hasExplicitColumnBreak: explicitBreakFound && col1.length > 0 && col2.length > 0,
+      allStanzas: all
+    };
   }, [lines]);
 
   const renderTabLine = (line: string) => {
@@ -119,6 +156,9 @@ export const ChordSheet: React.FC<ChordSheetProps> = ({
   };
 
   const renderLine = (line: string, index: number) => {
+    if (isColumnBreakLineHelper(line)) {
+      return null;
+    }
     const trimmed = line.trim();
     const isEmptyLine = trimmed.length === 0;
     const isChordLine = !singerMode && isChordLineHelper(line);
@@ -140,7 +180,7 @@ export const ChordSheet: React.FC<ChordSheetProps> = ({
 
     return (
       <div 
-        key={index}
+        key={index} 
         style={{ 
           display: 'flex', 
           alignItems: 'center', 
@@ -155,6 +195,18 @@ export const ChordSheet: React.FC<ChordSheetProps> = ({
     );
   };
 
+  const renderStanza = (stanza: { startIndex: number; lines: string[] }, sIdx: number, avoidBreak = true) => {
+    const isBlankStanza = stanza.lines.length === 1 && stanza.lines[0].trim().length === 0;
+    return (
+      <div 
+        key={sIdx} 
+        className={avoidBreak ? (isBlankStanza ? '' : 'break-inside-avoid inline-block w-full mb-1') : (isBlankStanza ? '' : 'w-full mb-1')}
+      >
+        {stanza.lines.map((line, lIdx) => renderLine(line, stanza.startIndex + lIdx))}
+      </div>
+    );
+  };
+
   const isMultiColumn = columns === 2;
 
   return (
@@ -163,29 +215,34 @@ export const ChordSheet: React.FC<ChordSheetProps> = ({
       style={transparent ? { fontSize: `${fontSize}px` } : { fontSize: `${fontSize}px`, width, height }}
       data-testid="chord-sheet-container"
     >
-      <div 
-        className={`h-full w-full ${isMultiColumn ? 'columns-1 md:columns-2 gap-8 [column-fill:balance]' : ''}`} 
-        style={{ lineHeight: `${itemSize}px` }}
-        data-testid="chord-sheet-columns"
-      >
-        {singerMode && !hasLyrics && content.trim().length > 0 ? (
-          <div className="text-center py-12 text-text-mute italic text-lg" data-testid="instrumental-singer-notice">
-            (Música Instrumental / Sem Letra)
+      {singerMode && !hasLyrics && content.trim().length > 0 ? (
+        <div className="text-center py-12 text-text-mute italic text-lg" data-testid="instrumental-singer-notice">
+          (Música Instrumental / Sem Letra)
+        </div>
+      ) : isMultiColumn && hasExplicitColumnBreak ? (
+        /* Manual explicit 2-column grid layout */
+        <div 
+          className="grid grid-cols-1 landscape:grid-cols-2 md:grid-cols-2 gap-6 md:gap-8 items-start w-full"
+          style={{ lineHeight: `${itemSize}px` }}
+          data-testid="chord-sheet-columns"
+        >
+          <div className="min-w-0 w-full" data-testid="chord-column-1">
+            {column1Stanzas.map((stanza, sIdx) => renderStanza(stanza, sIdx, false))}
           </div>
-        ) : (
-          stanzas.map((stanza, sIdx) => {
-            const isBlankStanza = stanza.lines.length === 1 && stanza.lines[0].trim().length === 0;
-            return (
-              <div 
-                key={sIdx} 
-                className={`${isMultiColumn ? (isBlankStanza ? '' : 'break-inside-avoid inline-block w-full mb-1') : ''}`}
-              >
-                {stanza.lines.map((line, lIdx) => renderLine(line, stanza.startIndex + lIdx))}
-              </div>
-            );
-          })
-        )}
-      </div>
+          <div className="min-w-0 w-full" data-testid="chord-column-2">
+            {column2Stanzas.map((stanza, sIdx) => renderStanza(stanza, sIdx, false))}
+          </div>
+        </div>
+      ) : (
+        /* Automatic column balanced layout or single column */
+        <div 
+          className={`h-full w-full ${isMultiColumn ? 'columns-1 landscape:columns-2 md:columns-2 gap-6 md:gap-8 [column-fill:balance]' : ''}`} 
+          style={{ lineHeight: `${itemSize}px` }}
+          data-testid="chord-sheet-columns"
+        >
+          {allStanzas.map((stanza, sIdx) => renderStanza(stanza, sIdx, isMultiColumn))}
+        </div>
+      )}
     </div>
   );
 };

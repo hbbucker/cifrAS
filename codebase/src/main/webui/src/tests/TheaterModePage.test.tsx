@@ -1,10 +1,11 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { TheaterModePage } from '../pages/TheaterModePage';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '../context/AuthContext';
 import { ToastProvider } from '../context/ToastContext';
 import { ThemeProvider } from '../context/ThemeContext';
+import { TourProvider } from '../context/TourContext';
 import { apiClient } from '../services/authService';
 import '@testing-library/jest-dom/vitest';
 
@@ -100,9 +101,11 @@ describe('TheaterModePage Component — Gesture & Interaction Navigation', () =>
       <AuthProvider>
         <ThemeProvider>
           <ToastProvider>
-            <BrowserRouter>
-              <TheaterModePage />
-            </BrowserRouter>
+            <TourProvider>
+              <BrowserRouter>
+                <TheaterModePage />
+              </BrowserRouter>
+            </TourProvider>
           </ToastProvider>
         </ThemeProvider>
       </AuthProvider>
@@ -463,6 +466,36 @@ describe('TheaterModePage Component — Gesture & Interaction Navigation', () =>
     expect(localStorage.getItem('cifras_theater_fontsize')).toBeDefined();
     const savedFontSize = Number(localStorage.getItem('cifras_theater_fontsize'));
     expect(savedFontSize).toBeGreaterThan(0);
+  });
+
+  it('attempts to unlock screen orientation on mount to support landscape mode', async () => {
+    const unlockMock = vi.fn().mockReturnValue(Promise.resolve());
+    Object.defineProperty(window.screen, 'orientation', {
+      value: { unlock: unlockMock },
+      configurable: true,
+      writable: true
+    });
+
+    renderComponent();
+    expect(await screen.findByText('Song 1')).toBeInTheDocument();
+    expect(unlockMock).toHaveBeenCalled();
+  });
+
+  it('displays CoachMark tooltip for 2 columns toggle in theater mode and dismisses properly', async () => {
+    localStorage.clear();
+    renderComponent();
+    expect(await screen.findByText('Song 1')).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.getByText(/Visualização em 2 Colunas/i)).toBeInTheDocument();
+    });
+
+    const closeBtn = screen.getByRole('button', { name: /close/i });
+    fireEvent.click(closeBtn);
+
+    await waitFor(() => {
+      expect(screen.queryByText(/Visualização em 2 Colunas/i)).not.toBeInTheDocument();
+    });
   });
 });
 
