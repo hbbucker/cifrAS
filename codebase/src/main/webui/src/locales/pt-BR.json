@@ -381,7 +381,9 @@
     "scrollSpeed": "Velocidade da Rolagem",
     "pauseScroll": "Pausar Rolagem",
     "startScroll": "Iniciar Rolagem",
-    "failedLoadSongDetails": "Falha ao carregar detalhes da música"
+    "failedLoadSongDetails": "Falha ao carregar detalhes da música",
+    "keyLabel": "Tom",
+    "originalKeyLabel": "Orig."
   },
   "linkPlaylist": {
     "shareTitle": "Compartilhar uma Playlist",

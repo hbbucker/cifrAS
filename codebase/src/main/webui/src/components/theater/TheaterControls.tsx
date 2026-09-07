@@ -4,11 +4,10 @@ import { Play, Pause, ChevronLeft, ChevronRight, Maximize, X, Lock, Unlock, Mic 
 import { TransposePad } from '../music/TransposePad';
 
 interface TheaterControlsProps {
-  title?: string;
-  artist?: string;
   isScrolling: boolean;
   speed: number;
   currentKey: string;
+  showControls?: boolean;
   onPlayPause: () => void;
   onSpeedChange: (speed: number) => void;
   onTransposeUp: () => void;
@@ -27,11 +26,10 @@ interface TheaterControlsProps {
 }
 
 export const TheaterControls: React.FC<TheaterControlsProps> = ({
-  title,
-  artist,
   isScrolling,
   speed,
   currentKey,
+  showControls = true,
   onPlayPause,
   onSpeedChange,
   onTransposeUp,
@@ -50,37 +48,33 @@ export const TheaterControls: React.FC<TheaterControlsProps> = ({
 }) => {
   const { t } = useTranslation();
 
+  const isVisible = showControls && !className.includes('opacity-0');
+  const opacityClass = isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none';
+
   return (
     <div 
-      className={`fixed inset-0 pointer-events-none z-40 transition-all duration-300 ${className}`} 
+      className={`fixed inset-0 pointer-events-none z-40 transition-opacity duration-300 ${opacityClass} ${className}`} 
       data-testid="theater-controls"
     >
       {/* ========================================================================= */}
-      {/* 1. TOP HEADER (Session & Utilities)                                       */}
+      {/* 1. TOP HEADER (Action Buttons)                                            */}
       {/* ========================================================================= */}
-      <header className="fixed top-0 left-0 right-0 px-3.5 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between bg-gradient-to-b from-bg-main via-bg-main/85 to-transparent backdrop-blur-sm border-b border-border-main/30 pointer-events-auto transition-all">
-        {/* Left: Exit button + Song Title & Artist */}
+      <header className="fixed top-0 left-0 right-0 px-3.5 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between pointer-events-none z-40 transition-all">
+        {/* Left: Exit button */}
         <div className="flex items-center gap-2 sm:gap-3.5 min-w-0 pr-2">
           <button 
             onClick={onExit} 
-            className="p-2 min-h-[38px] min-w-[38px] sm:min-h-[42px] sm:min-w-[42px] flex items-center justify-center rounded-full bg-bg-card/90 hover:bg-red-500/20 text-text-mute hover:text-red-500 transition-colors border border-border-main/50 shadow-sm shrink-0" 
+            className="p-2 min-h-[38px] min-w-[38px] sm:min-h-[42px] sm:min-w-[42px] flex items-center justify-center rounded-full bg-bg-card/90 hover:bg-red-500/20 text-text-mute hover:text-red-500 transition-colors border border-border-main/50 shadow-sm shrink-0 pointer-events-auto" 
             title={t('theater.exit')} 
             aria-label={t('theater.exit')}
             data-testid="exit-theater-btn"
           >
             <X className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
-          
-          {(title || artist) && (
-            <div className="min-w-0">
-              {title && <h1 className="text-sm sm:text-base md:text-lg font-bold truncate text-text-main">{title}</h1>}
-              {artist && <p className="text-xs sm:text-sm text-text-mute truncate">{artist}</p>}
-            </div>
-          )}
         </div>
 
         {/* Right: Lock & Fullscreen buttons */}
-        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 pointer-events-auto">
           <button 
             onClick={onLockToggle}
             className={`p-2 min-h-[38px] min-w-[38px] sm:min-h-[42px] sm:min-w-[42px] flex items-center justify-center rounded-full bg-bg-card/90 hover:bg-bg-elevated transition-colors border border-border-main/50 shadow-sm ${isLocked ? 'text-[#aa3bff] ring-1 ring-[#aa3bff]/40' : 'text-text-mute hover:text-text-main'}`}

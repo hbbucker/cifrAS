@@ -25,6 +25,8 @@ vi.mock('react-i18next', () => ({
         'theater.scrollSpeed': 'Velocidade da Rolagem',
         'theater.pauseScroll': 'Pausar Rolagem',
         'theater.startScroll': 'Iniciar Rolagem',
+        'theater.keyLabel': 'Tom',
+        'theater.originalKeyLabel': 'Orig.',
       };
       return dict[key] || key;
     }
@@ -36,6 +38,8 @@ describe('TheaterControls Component', () => {
     isScrolling: false,
     speed: 3,
     currentKey: 'C',
+    originalKey: 'C',
+    showControls: true,
     onPlayPause: vi.fn(),
     onSpeedChange: vi.fn(),
     onTransposeUp: vi.fn(),
@@ -65,6 +69,14 @@ describe('TheaterControls Component', () => {
     expect(screen.getByTestId('lock-mode-btn')).toBeInTheDocument();
     expect(screen.getByTestId('fullscreen-btn')).toBeInTheDocument();
     expect(screen.getByTestId('exit-theater-btn')).toBeInTheDocument();
+  });
+
+  it('applies opacity-100 when showControls is true and opacity-0 when false', () => {
+    const { rerender } = render(<TheaterControls {...defaultProps} showControls={true} />);
+    expect(screen.getByTestId('theater-controls')).toHaveClass('opacity-100');
+
+    rerender(<TheaterControls {...defaultProps} showControls={false} />);
+    expect(screen.getByTestId('theater-controls')).toHaveClass('opacity-0');
   });
 
   it('toggles singer mode when singer-mode-btn is clicked', () => {
@@ -158,13 +170,6 @@ describe('TheaterControls Component', () => {
 
     fireEvent.click(screen.getByTestId('prev-song-btn'));
     expect(onPrevSong).toHaveBeenCalledTimes(1);
-  });
-
-  it('renders song title and artist in the top header when provided', () => {
-    render(<TheaterControls {...defaultProps} title="Tempo Perdido" artist="Legião Urbana" />);
-
-    expect(screen.getByText('Tempo Perdido')).toBeInTheDocument();
-    expect(screen.getByText('Legião Urbana')).toBeInTheDocument();
   });
 
   it('renders Pause icon and proper aria-label when isScrolling is true', () => {

@@ -381,7 +381,9 @@
     "scrollSpeed": "Velocidad de Desplazamiento",
     "pauseScroll": "Pausar Desplazamiento",
     "startScroll": "Iniciar Desplazamiento",
-    "failedLoadSongDetails": "Error al cargar los detalles de la canción"
+    "failedLoadSongDetails": "Error al cargar los detalles de la canción",
+    "keyLabel": "Tono",
+    "originalKeyLabel": "Orig."
   },
   "linkPlaylist": {
     "shareTitle": "Compartir una Playlist",
