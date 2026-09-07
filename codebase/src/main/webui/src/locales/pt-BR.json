@@ -204,7 +204,13 @@
     "autoScroll": "Velocidade da Rolagem",
     "useEb": "Usar Eb",
     "useBb": "Usar Bb",
-    "editSong": "Editar Música"
+    "editSong": "Editar Música",
+    "columns1": "1 Coluna",
+    "columns2": "2 Colunas",
+    "toggleColumns": "Alternar Colunas (1 ou 2)",
+    "expandWidth": "Expandir Largura Total",
+    "fitWidth": "Largura Padrão",
+    "toggleWidth": "Alternar Largura"
   },
   "playlistView": {
     "addSongs": "Adicionar Músicas",
@@ -386,7 +392,13 @@
     "startScroll": "Iniciar Rolagem",
     "failedLoadSongDetails": "Falha ao carregar detalhes da música",
     "keyLabel": "Tom",
-    "originalKeyLabel": "Orig."
+    "originalKeyLabel": "Orig.",
+    "columns1": "1 Coluna",
+    "columns2": "2 Colunas",
+    "toggleColumns": "Alternar Colunas (1 ou 2)",
+    "expandWidth": "Expandir Largura Total",
+    "fitWidth": "Largura Padrão",
+    "toggleWidth": "Alternar Largura da Tela"
   },
   "linkPlaylist": {
     "shareTitle": "Compartilhar uma Playlist",

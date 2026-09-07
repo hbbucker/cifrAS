@@ -202,9 +202,15 @@
     "preferences": "Preferences",
     "perform": "Perform",
     "autoScroll": "Auto-scroll Speed",
-    "useEb": "Use Eb",
-    "useBb": "Use Bb",
-    "editSong": "Edit Song"
+    "useEb": "Usar Eb",
+    "useBb": "Usar Bb",
+    "editSong": "Editar Canción",
+    "columns1": "1 Columna",
+    "columns2": "2 Columnas",
+    "toggleColumns": "Alternar Columnas (1 o 2)",
+    "expandWidth": "Expandir Ancho Completo",
+    "fitWidth": "Ancho Estándar",
+    "toggleWidth": "Alternar Ancho"
   },
   "playlistView": {
     "addSongs": "Add Songs",
@@ -386,7 +392,13 @@
     "startScroll": "Iniciar Desplazamiento",
     "failedLoadSongDetails": "Error al cargar los detalles de la canción",
     "keyLabel": "Tono",
-    "originalKeyLabel": "Orig."
+    "originalKeyLabel": "Orig.",
+    "columns1": "1 Columna",
+    "columns2": "2 Columnas",
+    "toggleColumns": "Alternar Columnas (1 o 2)",
+    "expandWidth": "Expandir Ancho Completo",
+    "fitWidth": "Ancho Estándar",
+    "toggleWidth": "Alternar Ancho de Pantalla"
   },
   "linkPlaylist": {
     "shareTitle": "Compartir una Playlist",

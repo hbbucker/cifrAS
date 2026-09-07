@@ -425,4 +425,46 @@ describe('TheaterModePage Component — Gesture & Interaction Navigation', () =>
     // Song 2 has transposeSteps = 0 (G remains G, not transposed to A)
     expect(screen.getByTestId('theater-current-key')).toHaveTextContent('G');
   });
+
+  it('allows toggling columns and full-width layout, auto-activating full-width on 2 columns', async () => {
+    localStorage.clear();
+    renderComponent();
+    expect(await screen.findByText('Song 1')).toBeInTheDocument();
+
+    const toggleColsBtn = screen.getByTestId('toggle-columns-btn');
+    const toggleFullWidthBtn = screen.getByTestId('toggle-fullwidth-btn');
+
+    // Initially 1 column, standard width
+    expect(localStorage.getItem('cifras_theater_columns')).toBeNull();
+
+    // Toggle columns to 2 -> should auto-activate full-width
+    fireEvent.click(toggleColsBtn);
+    expect(localStorage.getItem('cifras_theater_columns')).toBe('2');
+    expect(localStorage.getItem('cifras_theater_fullwidth')).toBe('true');
+
+    // Can manually toggle full-width off if desired
+    fireEvent.click(toggleFullWidthBtn);
+    expect(localStorage.getItem('cifras_theater_fullwidth')).toBe('false');
+
+    // Toggle back to 1 column
+    fireEvent.click(toggleColsBtn);
+    expect(localStorage.getItem('cifras_theater_columns')).toBe('1');
+  });
+
+  it('persists and recovers font size definitions across theater modes and songs', async () => {
+    localStorage.clear();
+    renderComponent();
+    expect(await screen.findByText('Song 1')).toBeInTheDocument();
+
+    const increaseFontBtn = screen.getByTestId('increase-font-btn');
+    fireEvent.click(increaseFontBtn);
+
+    // Font size should be persisted in localStorage
+    expect(localStorage.getItem('cifras_theater_fontsize')).toBeDefined();
+    const savedFontSize = Number(localStorage.getItem('cifras_theater_fontsize'));
+    expect(savedFontSize).toBeGreaterThan(0);
+  });
 });
+
+
+

@@ -147,4 +147,30 @@ C G
     expect(blankLine.style.minHeight).toBe('12px');
     expect(blankLine.style.height).toBe('12px');
   });
+
+  it('supports 2 columns layout with proper CSS classes and break-inside avoidance', () => {
+    const multiVerseContent = `[Intro]
+C G Am F
+
+[Verse 1]
+C G
+Linha de teste 1
+Am F
+Linha de teste 2
+
+[Chorus]
+C G
+Refrão linha 1
+Am F
+Refrão linha 2`;
+
+    const { rerender } = render(<ChordSheet content={multiVerseContent} columns={1} />);
+    const columnContainer = screen.getByTestId('chord-sheet-columns');
+    expect(columnContainer.className).not.toContain('columns-2');
+
+    rerender(<ChordSheet content={multiVerseContent} columns={2} />);
+    expect(columnContainer.className).toContain('md:columns-2');
+    expect(columnContainer.className).toContain('gap-8');
+  });
 });
+

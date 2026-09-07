@@ -27,6 +27,12 @@ vi.mock('react-i18next', () => ({
         'theater.startScroll': 'Iniciar Rolagem',
         'theater.keyLabel': 'Tom',
         'theater.originalKeyLabel': 'Orig.',
+        'theater.columns1': '1 Coluna',
+        'theater.columns2': '2 Colunas',
+        'theater.toggleColumns': 'Alternar Colunas (1 ou 2)',
+        'theater.expandWidth': 'Expandir Largura Total',
+        'theater.fitWidth': 'Largura Padrão',
+        'theater.toggleWidth': 'Alternar Largura da Tela',
       };
       return dict[key] || key;
     }
@@ -178,4 +184,59 @@ describe('TheaterControls Component', () => {
     const playBtn = screen.getByTestId('play-pause-btn');
     expect(playBtn).toHaveAttribute('aria-label', 'Pausar Rolagem');
   });
+
+  it('triggers onToggleColumns and shows appropriate titles when columns change', () => {
+    const onToggleColumns = vi.fn();
+    const { rerender } = render(
+      <TheaterControls 
+        {...defaultProps} 
+        columns={1} 
+        onToggleColumns={onToggleColumns} 
+      />
+    );
+
+    const columnsBtn = screen.getByTestId('toggle-columns-btn');
+    expect(columnsBtn).toHaveAttribute('title', '2 Colunas');
+
+    fireEvent.click(columnsBtn);
+    expect(onToggleColumns).toHaveBeenCalledTimes(1);
+
+    rerender(
+      <TheaterControls 
+        {...defaultProps} 
+        columns={2} 
+        onToggleColumns={onToggleColumns} 
+      />
+    );
+    expect(columnsBtn).toHaveAttribute('title', '1 Coluna');
+    expect(columnsBtn.className).toContain('text-[#aa3bff]');
+  });
+
+  it('triggers onToggleFullWidth and shows appropriate titles when fullWidth changes', () => {
+    const onToggleFullWidth = vi.fn();
+    const { rerender } = render(
+      <TheaterControls 
+        {...defaultProps} 
+        isFullWidth={false} 
+        onToggleFullWidth={onToggleFullWidth} 
+      />
+    );
+
+    const fullWidthBtn = screen.getByTestId('toggle-fullwidth-btn');
+    expect(fullWidthBtn).toHaveAttribute('title', 'Expandir Largura Total');
+
+    fireEvent.click(fullWidthBtn);
+    expect(onToggleFullWidth).toHaveBeenCalledTimes(1);
+
+    rerender(
+      <TheaterControls 
+        {...defaultProps} 
+        isFullWidth={true} 
+        onToggleFullWidth={onToggleFullWidth} 
+      />
+    );
+    expect(fullWidthBtn).toHaveAttribute('title', 'Largura Padrão');
+    expect(fullWidthBtn.className).toContain('text-[#aa3bff]');
+  });
 });
+

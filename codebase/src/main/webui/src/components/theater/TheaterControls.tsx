@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Play, Pause, ChevronLeft, ChevronRight, Maximize, X, Lock, Unlock, Mic } from 'lucide-react';
+import { Play, Pause, ChevronLeft, ChevronRight, Maximize, X, Lock, Unlock, Mic, Columns, Maximize2, Minimize2 } from 'lucide-react';
 import { TransposePad } from '../music/TransposePad';
 
 interface TheaterControlsProps {
@@ -23,6 +23,10 @@ interface TheaterControlsProps {
   onLockToggle?: () => void;
   isSingerMode?: boolean;
   onToggleSingerMode?: () => void;
+  columns?: 1 | 2;
+  onToggleColumns?: () => void;
+  isFullWidth?: boolean;
+  onToggleFullWidth?: () => void;
 }
 
 export const TheaterControls: React.FC<TheaterControlsProps> = ({
@@ -44,7 +48,11 @@ export const TheaterControls: React.FC<TheaterControlsProps> = ({
   isLocked = false,
   onLockToggle,
   isSingerMode = false,
-  onToggleSingerMode
+  onToggleSingerMode,
+  columns = 1,
+  onToggleColumns,
+  isFullWidth = false,
+  onToggleFullWidth
 }) => {
   const { t } = useTranslation();
 
@@ -123,6 +131,32 @@ export const TheaterControls: React.FC<TheaterControlsProps> = ({
           >
             {t('theater.aMinus')}
           </button>
+
+          <div className="w-4 h-px bg-border-main my-0.5" />
+
+          {onToggleColumns && (
+            <button 
+              onClick={onToggleColumns}
+              className={`p-2 min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center hover:bg-bg-elevated rounded-md transition-colors ${columns === 2 ? 'bg-[#aa3bff]/15 text-[#aa3bff] ring-1 ring-[#aa3bff]/30' : 'text-text-mute hover:text-text-main'}`}
+              title={columns === 2 ? t('theater.columns1') : t('theater.columns2')} 
+              aria-label={t('theater.toggleColumns')}
+              data-testid="toggle-columns-btn"
+            >
+              <Columns className="w-4 h-4 sm:w-5 sm:h-5" />
+            </button>
+          )}
+
+          {onToggleFullWidth && (
+            <button 
+              onClick={onToggleFullWidth}
+              className={`p-2 min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center hover:bg-bg-elevated rounded-md transition-colors ${isFullWidth ? 'bg-[#aa3bff]/15 text-[#aa3bff] ring-1 ring-[#aa3bff]/30' : 'text-text-mute hover:text-text-main'}`}
+              title={isFullWidth ? t('theater.fitWidth') : t('theater.expandWidth')} 
+              aria-label={t('theater.toggleWidth')}
+              data-testid="toggle-fullwidth-btn"
+            >
+              {isFullWidth ? <Minimize2 className="w-4 h-4 sm:w-5 sm:h-5" /> : <Maximize2 className="w-4 h-4 sm:w-5 sm:h-5" />}
+            </button>
+          )}
 
           <div className="w-4 h-px bg-border-main my-0.5" />
 

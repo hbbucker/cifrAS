@@ -11,35 +11,35 @@ import { ShareSongModal } from '../components/modals/ShareSongModal';
 
 export const SongViewPage: React.FC = () => {
   const { t } = useTranslation();
- const navigate = useNavigate();
- const { id } = useParams();
- const { toast } = useToast();
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const { toast } = useToast();
  
- const [song, setSong] = useState({
- title: 'Carregando...',
- artist: '...',
- originalKey: 'C',
- content: ''
- });
+  const [song, setSong] = useState({
+    title: 'Carregando...',
+    artist: '...',
+    originalKey: 'C',
+    content: ''
+  });
  
- const [transposeSteps, setTransposeSteps] = useState(0);
+  const [transposeSteps, setTransposeSteps] = useState(0);
  
- // Preferences State
- const [showSettings, setShowSettings] = useState(false);
- const [useBb, setUseBb] = useState(false);
- const [useEb, setUseEb] = useState(false);
+  // Preferences State
+  const [showSettings, setShowSettings] = useState(false);
+  const [useBb, setUseBb] = useState(false);
+  const [useEb, setUseEb] = useState(false);
   const [autoScrollSpeed, setAutoScrollSpeed] = useState(1);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
- useEffect(() => {
- if (id) {
- fetch(`/api/songs/${id}`, {
- headers: { 
-   'Authorization': `Bearer ${localStorage.getItem('token')}`,
-   'Cache-Control': 'no-cache, no-store'
- },
- cache: 'no-store'
- })
+  useEffect(() => {
+    if (id) {
+      fetch(`/api/songs/${id}`, {
+        headers: { 
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Cache-Control': 'no-cache, no-store'
+        },
+        cache: 'no-store'
+      })
  .then(res => {
  if (!res.ok) throw new Error('Fetch failed');
  return res.json();
