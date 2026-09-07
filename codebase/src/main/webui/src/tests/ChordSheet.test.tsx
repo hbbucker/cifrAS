@@ -118,4 +118,33 @@ Canto uma canção`;
     expect(screen.queryByText('Cº C9 C11')).not.toBeInTheDocument();
     expect(screen.getByText('Canto uma canção')).toBeInTheDocument();
   });
+
+  it('renders section headers like [REFRAO] in bold with user font size inheritance', () => {
+    const content = `[REFRAO]
+C G
+Glória a Deus`;
+
+    render(<ChordSheet content={content} />);
+    const sectionLine = screen.getByTestId('line-0');
+    expect(sectionLine).toHaveTextContent('[REFRAO]');
+    expect(sectionLine.className).toContain('font-bold');
+    expect(sectionLine.className).not.toContain('bg-bg-elevated');
+    expect(sectionLine.className).not.toContain('border');
+    expect(sectionLine.className).not.toContain('text-sm');
+  });
+
+  it('renders blank lines with compact 12px height', () => {
+    const content = `[Intro]
+C G
+
+[Verso]`;
+
+    render(<ChordSheet content={content} fontSize={18} />);
+    const regularLine = screen.getByTestId('line-0');
+    const blankLine = screen.getByTestId('line-2');
+
+    expect(regularLine.style.minHeight).toBe('27px');
+    expect(blankLine.style.minHeight).toBe('12px');
+    expect(blankLine.style.height).toBe('12px');
+  });
 });
