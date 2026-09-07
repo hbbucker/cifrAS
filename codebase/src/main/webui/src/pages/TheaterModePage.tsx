@@ -432,6 +432,39 @@ export const TheaterModePage: React.FC = () => {
         setShowControls(prev => !prev);
       }}
     >
+      {/* Persistent Theater Top Header (Always visible: Song Title, Artist, Key Reference) */}
+      <header className="fixed top-0 left-0 right-0 px-3.5 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between bg-gradient-to-b from-bg-main via-bg-main/85 to-transparent backdrop-blur-sm border-b border-border-main/30 pointer-events-none z-30 transition-all" data-testid="theater-persistent-header">
+        <div className="flex items-center gap-2 sm:gap-3.5 min-w-0 pr-2">
+          {/* Reserved slot for the exit button */}
+          <div className="w-[38px] sm:w-[42px] shrink-0" />
+          
+          {(song.title || song.artist) && (
+            <div className="min-w-0 flex items-center gap-2 sm:gap-3 select-none" data-testid="theater-title-block">
+              <div className="min-w-0">
+                {song.title && <h1 className="text-sm sm:text-base md:text-lg font-bold truncate text-text-main leading-tight" data-testid="theater-song-title">{song.title}</h1>}
+                {song.artist && <p className="text-xs sm:text-sm text-text-mute truncate leading-tight" data-testid="theater-song-artist">{song.artist}</p>}
+              </div>
+
+              {/* Persistent Key Badge */}
+              {currentKey && (
+                <div 
+                  className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[11px] sm:text-xs bg-bg-card/90 border border-border-main shadow-sm shrink-0"
+                  data-testid="theater-key-badge"
+                >
+                  <span className="text-text-mute font-medium">{t('theater.keyLabel')}:</span>
+                  <span className="font-bold text-[#aa3bff]" data-testid="theater-current-key">{currentKey}</span>
+                  {song.originalKey && song.originalKey !== currentKey && (
+                    <span className="text-text-mute text-[10px] sm:text-[11px] font-normal pl-1 border-l border-border-main/60 flex items-center gap-0.5" data-testid="theater-orig-key">
+                      {t('theater.originalKeyLabel')} <strong className="font-medium text-text-main">{song.originalKey}</strong>
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </header>
+
       {/* Main scrolling container */}
       <div 
         key={activeSongId}
@@ -495,12 +528,9 @@ export const TheaterModePage: React.FC = () => {
 
       <TheaterControls 
         showControls={showControls}
-        title={song.title}
-        artist={song.artist}
         isScrolling={isScrolling}
         speed={speed}
         currentKey={currentKey}
-        originalKey={song.originalKey}
         onPlayPause={() => isScrolling ? pause() : play()}
         onSpeedChange={setSpeed}
         onTransposeUp={() => setTransposeSteps(s => s + 1)}

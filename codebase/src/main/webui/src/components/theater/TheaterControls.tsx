@@ -4,12 +4,9 @@ import { Play, Pause, ChevronLeft, ChevronRight, Maximize, X, Lock, Unlock, Mic 
 import { TransposePad } from '../music/TransposePad';
 
 interface TheaterControlsProps {
-  title?: string;
-  artist?: string;
   isScrolling: boolean;
   speed: number;
   currentKey: string;
-  originalKey?: string;
   showControls?: boolean;
   onPlayPause: () => void;
   onSpeedChange: (speed: number) => void;
@@ -29,12 +26,9 @@ interface TheaterControlsProps {
 }
 
 export const TheaterControls: React.FC<TheaterControlsProps> = ({
-  title,
-  artist,
   isScrolling,
   speed,
   currentKey,
-  originalKey,
   showControls = true,
   onPlayPause,
   onSpeedChange,
@@ -54,60 +48,33 @@ export const TheaterControls: React.FC<TheaterControlsProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  // Determine if action controls should be visible
-  const areControlsVisible = showControls && !className.includes('opacity-0');
+  const isVisible = showControls && !className.includes('opacity-0');
+  const opacityClass = isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none';
 
   return (
     <div 
-      className="fixed inset-0 pointer-events-none z-40" 
+      className={`fixed inset-0 pointer-events-none z-40 transition-opacity duration-300 ${opacityClass} ${className}`} 
       data-testid="theater-controls"
     >
       {/* ========================================================================= */}
-      {/* 1. TOP HEADER (Session, Title & Utilities)                                */}
+      {/* 1. TOP HEADER (Action Buttons)                                            */}
       {/* ========================================================================= */}
-      <header className="fixed top-0 left-0 right-0 px-3.5 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between bg-gradient-to-b from-bg-main via-bg-main/85 to-transparent backdrop-blur-sm border-b border-border-main/30 pointer-events-none z-40 transition-all">
-        {/* Left: Exit button (ephemeral) + Song Title, Artist & Key badge (persistent) */}
+      <header className="fixed top-0 left-0 right-0 px-3.5 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between pointer-events-none z-40 transition-all">
+        {/* Left: Exit button */}
         <div className="flex items-center gap-2 sm:gap-3.5 min-w-0 pr-2">
-          <div className={`transition-opacity duration-300 pointer-events-auto ${areControlsVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-            <button 
-              onClick={onExit} 
-              className="p-2 min-h-[38px] min-w-[38px] sm:min-h-[42px] sm:min-w-[42px] flex items-center justify-center rounded-full bg-bg-card/90 hover:bg-red-500/20 text-text-mute hover:text-red-500 transition-colors border border-border-main/50 shadow-sm shrink-0" 
-              title={t('theater.exit')} 
-              aria-label={t('theater.exit')}
-              data-testid="exit-theater-btn"
-            >
-              <X className="w-4 h-4 sm:w-5 sm:h-5" />
-            </button>
-          </div>
-          
-          {(title || artist) && (
-            <div className="min-w-0 flex items-center gap-2 sm:gap-3 pointer-events-auto select-none" data-testid="theater-title-block">
-              <div className="min-w-0">
-                {title && <h1 className="text-sm sm:text-base md:text-lg font-bold truncate text-text-main leading-tight" data-testid="theater-song-title">{title}</h1>}
-                {artist && <p className="text-xs sm:text-sm text-text-mute truncate leading-tight" data-testid="theater-song-artist">{artist}</p>}
-              </div>
-
-              {/* Key Badge (Persistent) */}
-              {currentKey && (
-                <div 
-                  className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[11px] sm:text-xs bg-bg-card/90 border border-border-main shadow-sm shrink-0"
-                  data-testid="theater-key-badge"
-                >
-                  <span className="text-text-mute font-medium">{t('theater.keyLabel')}:</span>
-                  <span className="font-bold text-[#aa3bff]" data-testid="theater-current-key">{currentKey}</span>
-                  {originalKey && originalKey !== currentKey && (
-                    <span className="text-text-mute text-[10px] sm:text-[11px] font-normal pl-1 border-l border-border-main/60 flex items-center gap-0.5" data-testid="theater-orig-key">
-                      {t('theater.originalKeyLabel')} <strong className="font-medium text-text-main">{originalKey}</strong>
-                    </span>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
+          <button 
+            onClick={onExit} 
+            className="p-2 min-h-[38px] min-w-[38px] sm:min-h-[42px] sm:min-w-[42px] flex items-center justify-center rounded-full bg-bg-card/90 hover:bg-red-500/20 text-text-mute hover:text-red-500 transition-colors border border-border-main/50 shadow-sm shrink-0 pointer-events-auto" 
+            title={t('theater.exit')} 
+            aria-label={t('theater.exit')}
+            data-testid="exit-theater-btn"
+          >
+            <X className="w-4 h-4 sm:w-5 sm:h-5" />
+          </button>
         </div>
 
-        {/* Right: Lock & Fullscreen buttons (ephemeral) */}
-        <div className={`flex items-center gap-1.5 sm:gap-2 shrink-0 transition-opacity duration-300 pointer-events-auto ${areControlsVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        {/* Right: Lock & Fullscreen buttons */}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 pointer-events-auto">
           <button 
             onClick={onLockToggle}
             className={`p-2 min-h-[38px] min-w-[38px] sm:min-h-[42px] sm:min-w-[42px] flex items-center justify-center rounded-full bg-bg-card/90 hover:bg-bg-elevated transition-colors border border-border-main/50 shadow-sm ${isLocked ? 'text-[#aa3bff] ring-1 ring-[#aa3bff]/40' : 'text-text-mute hover:text-text-main'}`}
@@ -136,7 +103,7 @@ export const TheaterControls: React.FC<TheaterControlsProps> = ({
       {/* 2. SIDE DOCK (Typography & View Mode)                                     */}
       {/* ========================================================================= */}
       {!isLocked && (
-        <aside className={`fixed right-3 sm:right-6 top-1/3 -translate-y-1/2 flex flex-col items-center gap-1 sm:gap-1.5 p-1.5 bg-bg-card/90 backdrop-blur-xl border border-border-main rounded-lg shadow-xl pointer-events-auto transition-opacity duration-300 z-40 ${areControlsVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <aside className="fixed right-3 sm:right-6 top-1/3 -translate-y-1/2 flex flex-col items-center gap-1 sm:gap-1.5 p-1.5 bg-bg-card/90 backdrop-blur-xl border border-border-main rounded-lg shadow-xl pointer-events-auto transition-all">
           <button 
             onClick={onFontSizeIncrease} 
             className="p-2 min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center hover:bg-bg-elevated rounded-md transition-colors text-text-mute hover:text-text-main font-bold text-sm sm:text-base" 
@@ -175,7 +142,7 @@ export const TheaterControls: React.FC<TheaterControlsProps> = ({
       {/* 3. BOTTOM DOCK (Performance & Playback)                                   */}
       {/* ========================================================================= */}
       <nav 
-        className={`fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 bg-bg-card/95 backdrop-blur-xl text-text-main px-3.5 sm:px-6 py-2.5 sm:py-3.5 rounded-full shadow-2xl border border-border-main flex items-center gap-2 sm:gap-4 md:gap-5 pointer-events-auto transition-opacity duration-300 max-w-[95%] w-auto z-40 ${areControlsVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 bg-bg-card/95 backdrop-blur-xl text-text-main px-3.5 sm:px-6 py-2.5 sm:py-3.5 rounded-full shadow-2xl border border-border-main flex items-center gap-2 sm:gap-4 md:gap-5 pointer-events-auto transition-all max-w-[95%] w-auto"
         aria-label={t('theater.performanceControls')}
       >
         {/* Playlist Navigation */}

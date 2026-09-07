@@ -71,40 +71,12 @@ describe('TheaterControls Component', () => {
     expect(screen.getByTestId('exit-theater-btn')).toBeInTheDocument();
   });
 
-  it('renders persistent song title, artist, and key badge even when controls are hidden', () => {
-    render(
-      <TheaterControls 
-        {...defaultProps} 
-        showControls={false} 
-        title="Tempo Perdido" 
-        artist="Legião Urbana" 
-        currentKey="D" 
-        originalKey="C"
-      />
-    );
+  it('applies opacity-100 when showControls is true and opacity-0 when false', () => {
+    const { rerender } = render(<TheaterControls {...defaultProps} showControls={true} />);
+    expect(screen.getByTestId('theater-controls')).toHaveClass('opacity-100');
 
-    // Title and artist remain visible in the document
-    expect(screen.getByTestId('theater-song-title')).toHaveTextContent('Tempo Perdido');
-    expect(screen.getByTestId('theater-song-artist')).toHaveTextContent('Legião Urbana');
-    
-    // Key badge displays current key and original key reference
-    expect(screen.getByTestId('theater-current-key')).toHaveTextContent('D');
-    expect(screen.getByTestId('theater-orig-key')).toHaveTextContent('Orig. C');
-  });
-
-  it('shows only current key when song is in its original key', () => {
-    render(
-      <TheaterControls 
-        {...defaultProps} 
-        title="Tempo Perdido" 
-        artist="Legião Urbana" 
-        currentKey="C" 
-        originalKey="C"
-      />
-    );
-
-    expect(screen.getByTestId('theater-current-key')).toHaveTextContent('C');
-    expect(screen.queryByTestId('theater-orig-key')).not.toBeInTheDocument();
+    rerender(<TheaterControls {...defaultProps} showControls={false} />);
+    expect(screen.getByTestId('theater-controls')).toHaveClass('opacity-0');
   });
 
   it('toggles singer mode when singer-mode-btn is clicked', () => {
@@ -198,13 +170,6 @@ describe('TheaterControls Component', () => {
 
     fireEvent.click(screen.getByTestId('prev-song-btn'));
     expect(onPrevSong).toHaveBeenCalledTimes(1);
-  });
-
-  it('renders song title and artist in the top header when provided', () => {
-    render(<TheaterControls {...defaultProps} title="Tempo Perdido" artist="Legião Urbana" />);
-
-    expect(screen.getByText('Tempo Perdido')).toBeInTheDocument();
-    expect(screen.getByText('Legião Urbana')).toBeInTheDocument();
   });
 
   it('renders Pause icon and proper aria-label when isScrolling is true', () => {
