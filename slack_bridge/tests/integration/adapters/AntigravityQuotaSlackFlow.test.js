@@ -81,7 +81,13 @@ test('Antigravity quota Slack flow: publishes one safe terminal message and pres
         child.emit('close', 0);
       });
     }
-    return createChild((child) => child.emit('close', 0));
+    return createChild((child) => {
+      child.stdout.emit('data', Buffer.from(`${JSON.stringify({
+        event: 'result',
+        result: { status: 'SUCCESS', response: 'manual retry completed' },
+      })}\n`));
+      child.emit('close', 0);
+    });
   };
 
   const initialSession = new ThreadSession({
@@ -203,7 +209,6 @@ test('Antigravity quota Slack flow: generic engine failure preserves session saf
       child.emit('close', 2);
     }),
   });
-  adapter.readTranscriptResponse = async () => '';
   const useCase = new ProcessMessageUseCase({
     llmEngine: adapter,
     notificationGateway: new SlackDeliveryNotifier({

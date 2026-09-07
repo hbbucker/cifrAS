@@ -3,7 +3,7 @@
  * Contrato abstrato para envio de notificações, streaming e arquivos para o canal (Slack).
  */
 class INotificationPort {
-  async sendAcknowledgement(threadId, channelId) {
+  async sendAcknowledgement(threadId, channelId, options = {}) {
     throw new Error('INotificationPort.sendAcknowledgement() must be implemented');
   }
 

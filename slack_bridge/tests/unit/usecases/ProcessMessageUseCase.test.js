@@ -26,8 +26,8 @@ class InMemoryNotificationService {
   constructor() {
     this.events = [];
   }
-  async sendAcknowledgement(threadId, channelId) {
-    this.events.push({ type: 'ack', threadId, channelId });
+  async sendAcknowledgement(threadId, channelId, options) {
+    this.events.push({ type: 'ack', threadId, channelId, options });
   }
   async sendStatus(threadId, channelId, text, options) {
     this.events.push({ type: 'status', threadId, channelId, text, options });
@@ -143,6 +143,7 @@ test('ProcessMessageUseCase: successfully orchestrates end-to-end turn with mock
   // Verifica despachos para a notificação
   const ackEvent = notifier.events.find(e => e.type === 'ack');
   assert.ok(ackEvent);
+  assert.equal(ackEvent.options.protectedText, 'Por favor, crie os índices do banco');
 
   const statusEvents = notifier.events.filter(e => e.type === 'status');
   assert.ok(statusEvents.length >= 1);
@@ -150,6 +151,85 @@ test('ProcessMessageUseCase: successfully orchestrates end-to-end turn with mock
   const finalEvent = notifier.events.find(e => e.type === 'final');
   assert.ok(finalEvent);
   assert.ok(finalEvent.markdown.includes('Entrega final concluída'));
+});
+
+test('ProcessMessageUseCase: labels engine and canonical subagent status sources without bypass', async () => {
+  const repository = new InMemoryThreadRepository();
+  const notifier = new InMemoryNotificationService();
+  const engine = new MockEngineAdapter({
+    events: async function* () {
+      yield EngineEvent.subagentDiscovered('sub-cto', 'CTO');
+      yield EngineEvent.statusUpdated('Analisando a arquitetura da solução…');
+      yield EngineEvent.executionCompleted(new TurnResultDTO({
+        exitCode: 0,
+        responseText: 'Entrega concluída.',
+        filePaths: [],
+      }));
+    },
+  });
+  const useCase = new ProcessMessageUseCase({
+    llmEngine: engine,
+    notificationGateway: notifier,
+    sessionRepository: repository,
+  });
+
+  const result = await useCase.execute({
+    threadId: 'status-source-thread',
+    channelId: 'C_TEST',
+    userText: 'implemente a solução',
+  });
+  const statusEvents = notifier.events.filter((event) => event.type === 'status');
+
+  assert.equal(result.success, true);
+  assert.deepEqual(statusEvents.map((event) => event.options), [
+    { source: 'subagent' },
+    { source: 'engine' },
+  ]);
+  assert.equal(statusEvents.some((event) => event.options.bypassInterval), false);
+});
+
+test('ProcessMessageUseCase: labels inactivity heartbeat without bypassing status policy', async () => {
+  const repository = new InMemoryThreadRepository();
+  const notifier = new InMemoryNotificationService();
+  const originalNow = Date.now;
+  const originalSetInterval = global.setInterval;
+  const originalClearInterval = global.clearInterval;
+  let currentTime = 0;
+  let heartbeatCallback;
+  Date.now = () => currentTime;
+  global.setInterval = (callback) => {
+    heartbeatCallback = callback;
+    return { unref() {} };
+  };
+  global.clearInterval = () => {};
+
+  try {
+    const engine = {
+      async *executeStream() {
+        currentTime = 35_000;
+        await heartbeatCallback();
+        yield EngineEvent.executionCompleted(new TurnResultDTO({
+          exitCode: 0,
+          responseText: 'Finalizado.',
+          filePaths: [],
+        }));
+      },
+    };
+    const useCase = new ProcessMessageUseCase({
+      llmEngine: engine,
+      notificationGateway: notifier,
+      sessionRepository: repository,
+    });
+    await useCase.execute({ threadId: 'heartbeat-thread', channelId: 'C_TEST', userText: 'continue' });
+
+    const heartbeat = notifier.events.find((event) => event.options?.source === 'heartbeat');
+    assert.ok(heartbeat);
+    assert.equal(heartbeat.options.bypassInterval, undefined);
+  } finally {
+    Date.now = originalNow;
+    global.setInterval = originalSetInterval;
+    global.clearInterval = originalClearInterval;
+  }
 });
 
 

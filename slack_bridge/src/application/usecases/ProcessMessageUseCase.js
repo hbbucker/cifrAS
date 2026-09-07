@@ -2,6 +2,7 @@ const { ThreadSession } = require('../../domain/entities/ThreadSession');
 const { AgentRole } = require('../../domain/value-objects/AgentRole');
 const { GovernanceContract } = require('../../domain/value-objects/GovernanceContract');
 const { NarrativeSanitizerService } = require('../../domain/services/NarrativeSanitizerService');
+const { HEARTBEAT_STATUS } = require('../../domain/services/LiveStatusPolicy');
 const { EngineInstructionDTO } = require('../../domain/dtos/EngineInstructionDTO');
 const { EngineQuotaExhaustedError } = require('../../domain/errors/EngineQuotaExhaustedError');
 const { ExecutionResultDTO } = require('../dtos/IncomingMessageDTO');
@@ -54,7 +55,12 @@ class ProcessMessageUseCase {
     await this.sessionRepository.save(session);
 
     // 1. Envia Reconhecimento Imediato
-    await this.notificationGateway.sendAcknowledgement(threadId, channelId);
+    const acknowledgementOptions = {};
+    Object.defineProperty(acknowledgementOptions, 'protectedText', {
+      value: userText,
+      enumerable: false,
+    });
+    await this.notificationGateway.sendAcknowledgement(threadId, channelId, acknowledgementOptions);
 
     const uniqueId = session.sessionId ? '' : `init_${Date.now()}`;
     const prompt = this.governanceContract.formatPrompt(userText, uniqueId);
@@ -78,8 +84,8 @@ class ProcessMessageUseCase {
             await this.notificationGateway.sendStatus(
               threadId,
               channelId,
-              '⏳ CEO e especialistas continuam trabalhando na sua solicitação...',
-              { bypassInterval: true }
+              HEARTBEAT_STATUS,
+              { source: 'heartbeat' }
             );
           } catch {}
         }
@@ -104,7 +110,7 @@ class ProcessMessageUseCase {
 
             const progressMsg = role.getProgressMessage('delegated');
             if (progressMsg) {
-              await this.notificationGateway.sendStatus(threadId, channelId, progressMsg, { bypassInterval: true });
+              await this.notificationGateway.sendStatus(threadId, channelId, progressMsg, { source: 'subagent' });
             }
             break;
           }
@@ -140,7 +146,7 @@ class ProcessMessageUseCase {
           }
 
           case 'STATUS_UPDATED': {
-            await this.notificationGateway.sendStatus(threadId, channelId, event.payload.statusText);
+            await this.notificationGateway.sendStatus(threadId, channelId, event.payload.statusText, { source: 'engine' });
             break;
           }
 
