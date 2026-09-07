@@ -100,17 +100,20 @@ export const ChordSheet: React.FC<ChordSheetProps> = ({
         ) : (
           lines.map((line, index) => {
             const trimmed = line.trim();
+            const isEmptyLine = trimmed.length === 0;
             const isChordLine = !singerMode && isChordLineHelper(line);
             const isSectionHeader = trimmed.startsWith('[') && trimmed.endsWith(']');
             const isTabLine = !singerMode && /^[eBGDAEa-g][#b]?\|/.test(trimmed);
             const isStrumLine = !singerMode && /^[\s]*[↓↑v^]+[\s↓↑v^]*$/.test(line) && trimmed.length > 0;
             
+            const lineMinHeight = isEmptyLine ? 12 : itemSize;
+
             // All lines use whitespace-pre to preserve chord/lyric column alignment.
             let lineClasses = transparent ? 'text-inherit' : 'text-text-main';
             if (isChordLine) {
               lineClasses = 'text-[#aa3bff] font-bold';
             } else if (isSectionHeader) {
-              lineClasses = 'text-text-main font-bold bg-bg-elevated inline-block px-3 py-1 rounded-md mt-6 mb-2 text-sm tracking-wider uppercase shadow-sm border border-border-main';
+              lineClasses = 'text-text-main font-bold';
             } else if (isStrumLine) {
               lineClasses = 'text-orange-500 font-black tracking-widest';
             }
@@ -118,7 +121,12 @@ export const ChordSheet: React.FC<ChordSheetProps> = ({
             return (
               <div 
                 key={index}
-                style={{ display: 'flex', alignItems: 'center', minHeight: `${itemSize}px` }} 
+                style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  minHeight: `${lineMinHeight}px`,
+                  ...(isEmptyLine ? { height: `${lineMinHeight}px`, lineHeight: `${lineMinHeight}px` } : {})
+                }} 
                 className={`whitespace-pre font-mono ${lineClasses}`}
                 data-testid={`line-${index}`}
               >
