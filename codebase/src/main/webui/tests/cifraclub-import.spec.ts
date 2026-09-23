@@ -72,11 +72,12 @@ test.describe('CifraClub Import', () => {
     await expect(modalHeading).toBeVisible();
 
     // Fill the URL input
-    const urlInput = page.getByRole('textbox');
+    const modal = page.getByRole('dialog');
+    const urlInput = modal.locator('#url-input');
     await urlInput.fill('https://www.cifraclub.com.br/band/song');
 
     // Click Import inside the modal
-    const modalImportBtn = page.getByRole('dialog').getByRole('button', { name: /importar/i });
+    const modalImportBtn = modal.getByRole('button', { name: /importar/i });
     await modalImportBtn.click();
 
     // Wait for the modal to close and redirection to happen
