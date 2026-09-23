@@ -62,13 +62,13 @@ public class CifraClubScraper implements SongScraperProvider {
         String artist = "Unknown Artist";
         Matcher titleMatcher = TITLE_PATTERN.matcher(html);
         if (titleMatcher.find()) {
-            String fullTitle = titleMatcher.group(1); // "Ah, Jesus / Coração Igual Ao Teu - Julliany Souza - Cifra Club"
+            String fullTitle = titleMatcher.group(1).replaceAll("(?i)\\s*-\\s*Cifra Club.*", "").trim();
             String[] parts = fullTitle.split(" - ");
             if (parts.length >= 2) {
                 title = parts[0].trim();
                 artist = parts[1].trim();
             } else {
-                title = fullTitle.replace("- Cifra Club", "").trim();
+                title = fullTitle.trim();
             }
         }
 

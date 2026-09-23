@@ -46,6 +46,24 @@ class LaCuerdaSongScraperTest {
                     CORO:
                     C          G
                     Yo te quiero con limón y sal
+                    
+                    ESTRIBILLO:
+                    C          G
+                    La la la
+                    
+                    PUENTE:
+                    F          G
+                    Puente musical
+                    
+                    SOLO:
+                    C  G  Am  F
+                    
+                    FINAL:
+                    C
+                    Fin
+                    
+                    OUTRO:
+                    C
                     </pre>
                 </body>
                 </html>
@@ -57,10 +75,15 @@ class LaCuerdaSongScraperTest {
         assertEquals("Julieta Venegas", request.artist());
         assertTrue(request.tags().contains("lacuerda"));
         assertTrue(request.tags().contains("imported"));
-        assertEquals(3, request.lyrics().sections().size());
+        assertEquals(8, request.lyrics().sections().size());
         assertEquals("INTRO", request.lyrics().sections().get(0).label());
         assertEquals("VERSO 1", request.lyrics().sections().get(1).label());
         assertEquals("CORO", request.lyrics().sections().get(2).label());
+        assertEquals("ESTRIBILLO", request.lyrics().sections().get(3).label());
+        assertEquals("PUENTE", request.lyrics().sections().get(4).label());
+        assertEquals("SOLO", request.lyrics().sections().get(5).label());
+        assertEquals("FINAL", request.lyrics().sections().get(6).label());
+        assertEquals("OUTRO", request.lyrics().sections().get(7).label());
     }
 
     @Test
@@ -69,12 +92,12 @@ class LaCuerdaSongScraperTest {
                 <!DOCTYPE html>
                 <html>
                 <head>
-                    <title>Maná, Rayando el Sol: Acordes</title>
+                    <title>Rayando el Sol - Maná - LaCuerda.net</title>
                 </head>
                 <body>
                     <pre>
                     [Intro]
-                    Sol  Re  Mim  Do
+                    Sol  Re  Mim  Do  Fa#  Si7  Lam
                     
                     [Verso 1]
                     Sol               Re
@@ -89,10 +112,38 @@ class LaCuerdaSongScraperTest {
         assertEquals("Rayando el Sol", request.title());
         assertEquals("Maná", request.artist());
         assertEquals(2, request.lyrics().sections().size());
-        // Verify Sol / Re / Mim / Do converted to G / D / Em / C
+        // Verify Latin notation converted to standard
         assertEquals("G", request.lyrics().sections().get(0).lines().get(0).chords().get(0).chord());
         assertEquals("D", request.lyrics().sections().get(0).lines().get(0).chords().get(1).chord());
         assertEquals("Em", request.lyrics().sections().get(0).lines().get(0).chords().get(2).chord());
         assertEquals("C", request.lyrics().sections().get(0).lines().get(0).chords().get(3).chord());
+        assertEquals("F#", request.lyrics().sections().get(0).lines().get(0).chords().get(4).chord());
+        assertEquals("B7", request.lyrics().sections().get(0).lines().get(0).chords().get(5).chord());
+        assertEquals("Am", request.lyrics().sections().get(0).lines().get(0).chords().get(6).chord());
+    }
+
+    @Test
+    void testParseHtmlPlainTitleAndNoPre() {
+        String html = """
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>CancionSinAutor</title>
+                </head>
+                <body>
+                    <div>Sin acordes</div>
+                </body>
+                </html>
+                """;
+
+        CreateSongRequest request = scraper.parseHtml(html);
+        assertEquals("CancionSinAutor", request.title());
+        assertEquals("Unknown Artist", request.artist());
+        assertTrue(request.lyrics().sections().isEmpty());
+    }
+
+    @Test
+    void testScrapeAndParseInvalidUrlThrows() {
+        assertThrows(RuntimeException.class, () -> scraper.scrapeAndParse("http://invalid-url-that-does-not-exist.local"));
     }
 }

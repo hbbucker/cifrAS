@@ -8,7 +8,6 @@ import jakarta.ws.rs.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Iterator;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,17 +25,19 @@ class SongScraperRegistryTest {
         provider1 = mock(SongScraperProvider.class);
         provider2 = mock(SongScraperProvider.class);
 
+        when(provider1.getProviderName()).thenReturn("provider1");
         when(provider1.supports("https://site1.com/song")).thenReturn(true);
         when(provider1.scrapeAndParse("https://site1.com/song"))
                 .thenReturn(new CreateSongRequest("Song 1", "Artist 1", "C", LyricsStructure.empty(), List.of("site1")));
 
+        when(provider2.getProviderName()).thenReturn("provider2");
         when(provider2.supports("https://site2.com/song")).thenReturn(true);
         when(provider2.scrapeAndParse("https://site2.com/song"))
                 .thenReturn(new CreateSongRequest("Song 2", "Artist 2", "G", LyricsStructure.empty(), List.of("site2")));
 
         @SuppressWarnings("unchecked")
         Instance<SongScraperProvider> instance = mock(Instance.class);
-        when(instance.iterator()).thenReturn(List.of(provider1, provider2).iterator());
+        when(instance.iterator()).thenAnswer(inv -> List.of(provider1, provider2).iterator());
 
         registry.providers = instance;
     }
@@ -59,5 +60,13 @@ class SongScraperRegistryTest {
     void testScrapeThrowsOnNullOrBlank() {
         assertThrows(BadRequestException.class, () -> registry.scrape(null));
         assertThrows(BadRequestException.class, () -> registry.scrape("   "));
+    }
+
+    @Test
+    void testSupports() {
+        assertTrue(registry.supports("https://site1.com/song"));
+        assertFalse(registry.supports("https://unknown.com/song"));
+        assertFalse(registry.supports(null));
+        assertFalse(registry.supports("  "));
     }
 }

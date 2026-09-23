@@ -51,10 +51,59 @@ class ChordProParserTest {
     }
 
     @Test
+    void testParseShortDirectivesAndBridgeAndVerseTags() {
+        String chordPro = """
+                {t: Hotel California}
+                {subtitle: Eagles}
+                {k: Bm}
+                
+                {start_of_verse}
+                [Bm]On a dark desert highway
+                {end_of_verse}
+                
+                {start_of_bridge}
+                [G]Some dance to remember
+                {end_of_bridge}
+                
+                {sob}
+                [D]Some dance to forget
+                {eob}
+                
+                {sov: Verse 2}
+                [F#]Her mind is Tiffany-twisted
+                {eov}
+                
+                {ci: Outro}
+                [Bm]Guitar Solo
+                
+                [Chorus]
+                [G]Welcome to the Hotel California
+                
+                [Puente]
+                [A]Línea en español
+                
+                [Instrumental]
+                [Bm] [A] [G]
+                """;
+
+        ChordProParser.ParseResult result = ChordProParser.parse(chordPro);
+
+        assertEquals("Hotel California", result.getTitle());
+        assertEquals("Eagles", result.getArtist());
+        assertEquals("Bm", result.getKey());
+
+        LyricsStructure lyrics = result.getLyrics();
+        assertTrue(lyrics.sections().size() >= 7);
+    }
+
+    @Test
     void testParseEmptyAndEdgeCases() {
         ChordProParser.ParseResult empty = ChordProParser.parse("");
         assertTrue(empty.getLyrics().sections().isEmpty());
         assertNull(empty.getTitle());
+
+        ChordProParser.ParseResult whitespace = ChordProParser.parse("   \n\n  ");
+        assertTrue(whitespace.getLyrics().sections().isEmpty());
 
         ChordProParser.ParseResult nullResult = ChordProParser.parse(null);
         assertTrue(nullResult.getLyrics().sections().isEmpty());

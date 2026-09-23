@@ -54,4 +54,34 @@ class CifraClubScraperTest {
         assertTrue(req.tags().contains("imported"));
         assertEquals(2, req.lyrics().sections().size());
     }
+
+    @Test
+    void testParseHtmlFallbackKeyAndSingleTitle() {
+        String html = """
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Sozinho - Cifra Club</title>
+                </head>
+                <body>
+                    <span>Tom: <b>F#m</b></span>
+                    <pre>
+                    [Intro]
+                    F#m  Bm
+                    </pre>
+                </body>
+                </html>
+                """;
+
+        CreateSongRequest req = scraper.parseHtml(html);
+        assertEquals("Sozinho", req.title());
+        assertEquals("Unknown Artist", req.artist());
+        assertEquals("F#m", req.originalKey());
+        assertEquals(1, req.lyrics().sections().size());
+    }
+
+    @Test
+    void testScrapeAndParseInvalidUrlThrows() {
+        assertThrows(RuntimeException.class, () -> scraper.scrapeAndParse("http://invalid-url-that-does-not-exist.local"));
+    }
 }

@@ -53,7 +53,47 @@ class UltimateGuitarSongScraperTest {
     }
 
     @Test
-    void testParseHtmlFallback() {
+    void testParseHtmlWithWindowUgAppAndMetaTonality() {
+        String html = """
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Yellow Chords by Coldplay @ Ultimate-Guitar.Com</title>
+                </head>
+                <body>
+                    <script>
+                    window.UGAPP.store.page = {
+                        "page": {
+                            "data": {
+                                "tab": {
+                                    "song_name": "Yellow",
+                                    "artist_name": "Coldplay"
+                                },
+                                "tab_view": {
+                                    "wiki_tab": {
+                                        "content": "[Intro]\\n[tab]B  Badd11  F#  E[/tab]"
+                                    },
+                                    "meta": {
+                                        "tonality": "B"
+                                    }
+                                }
+                            }
+                        }
+                    };</script>
+                </body>
+                </html>
+                """;
+
+        CreateSongRequest request = scraper.parseHtml(html);
+
+        assertEquals("Yellow", request.title());
+        assertEquals("Coldplay", request.artist());
+        assertEquals("B", request.originalKey());
+        assertEquals(1, request.lyrics().sections().size());
+    }
+
+    @Test
+    void testParseHtmlFallbackPreAndTitleRegex() {
         String html = """
                 <!DOCTYPE html>
                 <html>
@@ -79,5 +119,30 @@ class UltimateGuitarSongScraperTest {
         assertEquals("Eagles", request.artist());
         assertEquals("C", request.originalKey());
         assertEquals(2, request.lyrics().sections().size());
+    }
+
+    @Test
+    void testParseHtmlFallbackSingleTitle() {
+        String html = """
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>SimpleSong</title>
+                </head>
+                <body>
+                    <div>No pre tag here</div>
+                </body>
+                </html>
+                """;
+
+        CreateSongRequest request = scraper.parseHtml(html);
+        assertEquals("SimpleSong", request.title());
+        assertEquals("Unknown Artist", request.artist());
+        assertTrue(request.lyrics().sections().isEmpty());
+    }
+
+    @Test
+    void testScrapeAndParseInvalidUrlThrows() {
+        assertThrows(RuntimeException.class, () -> scraper.scrapeAndParse("http://invalid-url-that-does-not-exist.local"));
     }
 }
