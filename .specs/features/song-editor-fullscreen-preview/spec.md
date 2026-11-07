@@ -3,7 +3,7 @@
 - **ID da Feature**: `song-editor-fullscreen-preview`
 - **Linear Issue**: [FHP-34](https://linear.app/fabioandhugo-projetos/issue/FHP-34/feateditor-modo-tela-cheia-e-live-preview-dividido-fullscreen-and)
 - **Classificação de Impacto**: `I1` (Fast-Track - Frontend puro, sem alteração em schemas de banco ou contratos REST de backend)
-- **Status**: Planejado / Em Especificação
+- **Status**: Concluído (Done) — Release v1.5.0, PR #41
 
 ---
 
