@@ -82,7 +82,7 @@ O sistema processa a estrutura de letras (`LyricsStructure`) de todas as música
 - [ ] **AC-02:** Clicar no botão abre o modal `ExportPlaylistPresentationModal` exibindo a lista de músicas, opções de tema e botões de ação.
 - [ ] **AC-03:** Clicar em "Baixar PowerPoint (.pptx)" dispara o download de um arquivo `.pptx` válido na proporção 16:9.
 - [ ] **AC-04:** Os slides gerados NÃO contêm cifras, acordes musicais, linhas de tablatura (`e|---`, `B|---`, etc.) ou diagramas de ritmo/dedilhado (`↓ ↑ ↓ ↑`, `P I M A`), exibindo apenas o texto das letras limpas.
-- [ ] **AC-05:** Os slides respeitam a paginação com no máximo 6 linhas por slide e tamanho de fonte adequado para projeção ($\ge 36\text{pt}$).
+- [ ] **AC-05:** Os slides respeitam a paginação com no máximo 6 linhas por slide e fonte Arial 40pt fixa nas letras (todos os temas) e sem rodapé nos slides de letra (FHP-35).
 - [ ] **AC-06:** Se o usuário desmarcar uma música na lista do modal, essa música não é incluída no `.pptx` gerado.
 - [ ] **AC-07:** A ação "Copiar Todas as Letras" copia o texto puro de todas as músicas selecionadas para o Clipboard sem cifras, tablaturas ou diagramas de ritmo.
 - [ ] **AC-08:** O layout e temas (Dark, Light, Litúrgico) aplicam corretamente as cores de fundo e texto configuradas.
