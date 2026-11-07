@@ -27,8 +27,7 @@ describe('LoginPage Component', () => {
 
   it('does not render dev mock button when import.meta.env.DEV is false', () => {
     const originalDev = import.meta.env.DEV;
-    // @ts-expect-error - overriding DEV for test isolation
-    import.meta.env.DEV = false;
+    (import.meta.env as unknown as { DEV: boolean }).DEV = false;
 
     render(
       <AuthProvider>
@@ -44,7 +43,6 @@ describe('LoginPage Component', () => {
 
     expect(screen.queryByTestId('dev-mock-login-btn')).not.toBeInTheDocument();
 
-    // @ts-expect-error - restoring DEV
-    import.meta.env.DEV = originalDev;
+    (import.meta.env as unknown as { DEV: boolean }).DEV = originalDev;
   });
 });
