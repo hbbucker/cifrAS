@@ -52,7 +52,13 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useTour = () => {
   const context = useContext(TourContext);
   if (context === undefined) {
-    throw new Error('useTour must be used within a TourProvider');
+    return {
+      activeTourId: null,
+      startTour: () => {},
+      endTour: () => {},
+      nextTour: () => {},
+      hasSeenTour: () => false,
+    };
   }
   return context;
 };
