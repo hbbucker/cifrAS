@@ -12,7 +12,10 @@ import java.util.regex.Pattern;
 
 public class CifraClubParser {
 
-    private static final Pattern SECTION_PATTERN = Pattern.compile("^\\s*\\[(.*)\\]\\s*$");
+    private static final Pattern SECTION_BRACKET_PATTERN = Pattern.compile("^\\s*\\[(.*)\\]\\s*$");
+    private static final Pattern SECTION_PAREN_PATTERN = Pattern.compile("^\\s*\\(((?:Intro|Verse|Chorus|Bridge|Outro|Solo|Refrão|Verso|Coro|Estribillo|Puente|Final|Primeira Parte|Segunda Parte)[^)]*)\\)\\s*$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern SECTION_COLON_PATTERN = Pattern.compile("^\\s*((?:Intro|Verse|Chorus|Bridge|Outro|Solo|Refrão|Verso|Coro|Estribillo|Puente|Final|Primeira Parte|Segunda Parte)[^:]*):\\s*$", Pattern.CASE_INSENSITIVE);
+
     // A strict regex to identify if a token is a valid chord
     // Base: A-G, optionally # or b
     // Modifier: m, M, dim, aug, sus, add
@@ -47,18 +50,17 @@ public class CifraClubParser {
                     pendingChords.clear();
                 }
                 // Skip consecutive empty lines or add as empty text if needed.
-                // We'll add an empty line to preserve some spacing, but skip if previous was empty.
                 if (!currentSectionLines.isEmpty() && !currentSectionLines.getLast().text().isEmpty()) {
                     currentSectionLines.add(new Line(new ArrayList<>(), ""));
                 }
                 continue;
             }
 
-            Matcher sectionMatcher = SECTION_PATTERN.matcher(trimmed);
-            if (sectionMatcher.matches()) {
+            String sectionHeader = extractSectionHeader(trimmed);
+            if (sectionHeader != null) {
                 // Flush previous section
                 flushSection(sections, currentSectionLabel, currentSectionLines, pendingChords);
-                currentSectionLabel = sectionMatcher.group(1).trim();
+                currentSectionLabel = sectionHeader;
                 continue;
             }
 
@@ -80,6 +82,26 @@ public class CifraClubParser {
         flushSection(sections, currentSectionLabel, currentSectionLines, pendingChords);
 
         return new LyricsStructure(sections);
+    }
+
+    private static String extractSectionHeader(String trimmed) {
+        Matcher bracket = SECTION_BRACKET_PATTERN.matcher(trimmed);
+        if (bracket.matches()) {
+            String val = bracket.group(1).trim();
+            if (val.endsWith(":")) val = val.substring(0, val.length() - 1).trim();
+            return val;
+        }
+        Matcher paren = SECTION_PAREN_PATTERN.matcher(trimmed);
+        if (paren.matches()) {
+            String val = paren.group(1).trim();
+            if (val.endsWith(":")) val = val.substring(0, val.length() - 1).trim();
+            return val;
+        }
+        Matcher colon = SECTION_COLON_PATTERN.matcher(trimmed);
+        if (colon.matches()) {
+            return colon.group(1).trim();
+        }
+        return null;
     }
 
     private static void flushSection(List<Section> sections, String label, List<Line> lines, List<ChordPosition> pendingChords) {

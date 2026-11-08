@@ -16,7 +16,7 @@ test('create group, verify tabs, member list and invite button', async ({ page }
   await expect(page.locator('h1')).toHaveText('Groups');
 
   const groupName = `E2E Band ${Date.now()}`;
-  await page.getByText('New Group').click();
+  await page.getByTestId('create-group-btn').click();
   await page.getByPlaceholder('Group Name').fill(groupName);
   await page.getByRole('button', { name: 'Create', exact: true }).click();
   await expect(page.getByText('Group created successfully')).toBeVisible();

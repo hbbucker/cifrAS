@@ -7,6 +7,7 @@ import br.com.cifras.song.model.ChordPosition;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CifraClubParserTest {
 
@@ -87,5 +88,34 @@ class CifraClubParserTest {
         assertEquals(2, versoLine.chords().size());
         assertEquals("Cº", versoLine.chords().get(0).chord());
         assertEquals("C11", versoLine.chords().get(1).chord());
+    }
+
+    @Test
+    void testParseVariousSectionFormatsAndMarkers() {
+        String text = """
+                (Intro):
+                |: C  G  Am  F :| (4x)
+                
+                Verso 1:
+                C          G
+                Linha 1 do verso
+                
+                (Refrão)
+                Am         F
+                Linha do refrão
+                
+                Coro:
+                G
+                Linha do coro
+                """;
+
+        LyricsStructure lyrics = CifraClubParser.parse(text);
+        assertEquals(4, lyrics.sections().size());
+    }
+
+    @Test
+    void testParseNullOrEmpty() {
+        assertTrue(CifraClubParser.parse(null).sections().isEmpty());
+        assertTrue(CifraClubParser.parse("   ").sections().isEmpty());
     }
 }
