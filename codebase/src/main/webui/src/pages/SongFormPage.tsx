@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { Save, ArrowLeft, CloudDownload } from 'lucide-react';
+import { Save, ArrowLeft, CloudDownload, Maximize2 } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import { ConfirmModal } from '../components/modals/ConfirmModal';
 import { parseContentToLyrics, stringifyLyrics } from '../utils/lyricsParser';
@@ -11,10 +11,11 @@ import { TagInput } from '../components/ui/TagInput';
 import { getUserTags } from '../api/songs';
 import { CoachMark } from '../components/ui/CoachMark';
 import { useTour } from '../context/TourContext';
+import { SongEditorFullscreen } from '../components/music/SongEditorFullscreen';
 
 export const SongFormPage: React.FC = () => {
   const { t } = useTranslation();
-  const { startTour } = useTour();
+  const { startTour, hasSeenTour } = useTour();
   const { id } = useParams();
  const navigate = useNavigate();
  const location = useLocation();
@@ -30,6 +31,7 @@ export const SongFormPage: React.FC = () => {
  const [availableTags, setAvailableTags] = useState<string[]>([]);
  const [showCancelModal, setShowCancelModal] = useState(false);
  const [showDrivePicker, setShowDrivePicker] = useState(false);
+ const [isFullscreen, setIsFullscreen] = useState(false);
  const [isDirty, setIsDirty] = useState(false);
  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -59,8 +61,12 @@ export const SongFormPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    startTour('song-editor-column-marker');
-  }, [startTour]);
+    if (!hasSeenTour('song-editor-column-marker')) {
+      startTour('song-editor-column-marker');
+    } else if (!hasSeenTour('song-editor-fullscreen')) {
+      startTour('song-editor-fullscreen');
+    }
+  }, [startTour, hasSeenTour]);
 
  useEffect(() => {
  if (id) {
@@ -198,6 +204,7 @@ export const SongFormPage: React.FC = () => {
                     <button type="button" onClick={() => insertText('[Refrão]\n')} className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-lg hover:bg-bg-elevated transition-colors shrink-0">{t('songForm.refrao')}</button>
                     <CoachMark
                       tourId="song-editor-column-marker"
+                      nextTourId="song-editor-fullscreen"
                       title={t('songForm.tourColumnTitle', 'Quebra de Coluna ([coluna])')}
                       description={t('songForm.tourColumnDesc', 'Insira [coluna] onde desejar que a cifra quebre para a 2ª coluna no Modo Teatro ou telas em modo paisagem.')}
                       position="bottom"
@@ -208,16 +215,37 @@ export const SongFormPage: React.FC = () => {
                     <button type="button" onClick={() => insertText('\ne|---\nB|---\nG|---\nD|---\nA|---\nE|---\n')} className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-lg hover:bg-bg-elevated transition-colors shrink-0">{t('songForm.tablatura')}</button>
                   </div>
                 </div>
-                <Button 
-                  onClick={() => setShowDrivePicker(true)}
-                  variant="ghost"
-                  size="sm"
-                  className="text-primary hover:bg-primary/10 shrink-0 self-start sm:self-auto min-h-[36px]"
-                  data-testid="btn-open-drive-picker"
-                >
-                  <CloudDownload className="w-4 h-4 mr-2" />
-                  {t('songForm.importDrive')}
-                </Button>
+                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 self-start sm:self-auto">
+                  <Button 
+                    onClick={() => setShowDrivePicker(true)}
+                    variant="ghost"
+                    size="sm"
+                    className="text-primary hover:bg-primary/10 shrink-0 min-h-[36px]"
+                    data-testid="btn-open-drive-picker"
+                  >
+                    <CloudDownload className="w-4 h-4 mr-2" />
+                    {t('songForm.importDrive')}
+                  </Button>
+                  <CoachMark
+                    tourId="song-editor-fullscreen"
+                    title={t('songForm.tourFullscreenTitle', 'Modo Tela Cheia & Live Preview')}
+                    description={t('songForm.tourFullscreenDesc', 'Expanda o editor para tela cheia e acompanhe a cifra renderizada ao vivo com acordes em tempo real.')}
+                    position="bottom"
+                  >
+                    <Button
+                      type="button"
+                      onClick={() => setIsFullscreen(true)}
+                      variant="ghost"
+                      size="sm"
+                      className="text-text-mute hover:text-text-main hover:bg-bg-elevated shrink-0 min-h-[36px] min-w-[36px] p-2 flex items-center justify-center rounded-md"
+                      data-testid="btn-toggle-fullscreen"
+                      title={t('songForm.fullscreenBtn')}
+                      aria-label={t('songForm.fullscreenBtn')}
+                    >
+                      <Maximize2 className="w-4 h-4" />
+                    </Button>
+                  </CoachMark>
+                </div>
               </div>
               <div className="relative flex-1 flex flex-col min-h-[40vh] sm:min-h-[50vh] font-mono text-sm sm:text-base">
                 {/* Linha guia vertical para parâmetro de quebra de linha */}
@@ -225,9 +253,9 @@ export const SongFormPage: React.FC = () => {
                   data-testid="song-editor-line-guide"
                   title={t('songForm.lineGuideTooltip')}
                   aria-hidden="true"
-                  className="absolute top-0 bottom-0 left-[37ch] sm:left-[40ch] border-r border-dashed border-border-main pointer-events-none z-10 flex flex-col justify-start"
+                  className="absolute top-0 bottom-0 left-[37ch] sm:left-[40ch] border-r border-dashed border-border-main pointer-events-none z-0 flex flex-col justify-start"
                 >
-                  <span className="text-[10px] text-text-mute/70 tracking-tight font-sans select-none -translate-x-1/2 bg-bg-card px-1 py-0.5 rounded border border-border-main/60 mt-1 whitespace-nowrap shadow-none">
+                  <span className="text-[10px] text-text-mute/70 tracking-tight font-sans select-none -translate-x-1/2 bg-bg-card/80 px-1 py-0.5 rounded border border-border-main/60 mt-1 whitespace-nowrap shadow-none opacity-70">
                     <span className="sm:hidden">{t('songForm.lineGuideMobile', '37 carac.')}</span>
                     <span className="hidden sm:inline">{t('songForm.lineGuideDesktop', '40 carac.')}</span>
                   </span>
@@ -242,7 +270,7 @@ export const SongFormPage: React.FC = () => {
                       handleSave();
                     }
                   }}
-                  className="w-full flex-1 min-h-full bg-transparent text-text-main font-mono text-sm sm:text-base focus:outline-none resize-none leading-relaxed"
+                  className="relative z-10 w-full flex-1 min-h-full bg-transparent text-text-main font-mono text-sm sm:text-base focus:outline-none resize-none leading-relaxed"
                   placeholder={t('songForm.contentPlaceholder')}
                   data-testid="song-content-input"
                 />
@@ -278,6 +306,21 @@ export const SongFormPage: React.FC = () => {
  }}
  />
  )}
+
+ <SongEditorFullscreen
+   isOpen={isFullscreen}
+   content={content}
+   onChange={(newContent) => {
+     setContent(newContent);
+     setIsDirty(true);
+   }}
+   onClose={() => setIsFullscreen(false)}
+   onSave={handleSave}
+   title={title}
+   artist={artist}
+   songKey={key}
+   insertText={insertText}
+ />
  </>
  );
 };

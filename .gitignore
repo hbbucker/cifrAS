@@ -48,3 +48,8 @@ fix_*.js
 slack_bridge/thread_mapping.json
 .worktrees/
 deploy-*.sh
+
+.tlc/
+.tlc/harness/state/
+.cursor/hooks.json
+.claude/settings.json

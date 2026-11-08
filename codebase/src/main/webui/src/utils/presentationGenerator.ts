@@ -63,9 +63,12 @@ const THEME_STYLES: Record<
     textColor: 'F9FAFB',
     accentColor: 'E60023',
     subtextColor: 'D1D5DB',
-    fontFace: 'Georgia',
+    fontFace: 'Arial',
   },
 };
+
+// why: FHP-35 fixa Arial 40 nos slides de letra para legibilidade uniforme em projeção.
+const LYRICS_FONT_SIZE = 40;
 
 /**
  * Detects if a line is a guitar/bass tablature line.
@@ -426,14 +429,13 @@ export function buildPresentation(
 
         // Lyrics Text Block
         const lyricsText = chunk.join('\n');
-        const calculatedFontSize = chunk.length > 4 ? 32 : 36;
 
         slide.addText(lyricsText, {
           x: '6%',
           y: section.label ? '18%' : '12%',
           w: '88%',
           h: '70%',
-          fontSize: calculatedFontSize,
+          fontSize: LYRICS_FONT_SIZE,
           fontFace: style.fontFace,
           bold: true,
           color: style.textColor,
@@ -441,19 +443,6 @@ export function buildPresentation(
           valign: 'middle',
           isTextBox: true,
           lineSpacingMultiple: 1.25,
-        });
-
-        // Small Footer
-        slide.addText(song.title, {
-          x: '6%',
-          y: '90%',
-          w: '88%',
-          h: '6%',
-          fontSize: 12,
-          fontFace: style.fontFace,
-          color: style.subtextColor,
-          align: 'right',
-          valign: 'middle',
         });
       });
     }

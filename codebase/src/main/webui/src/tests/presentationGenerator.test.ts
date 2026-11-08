@@ -518,6 +518,41 @@ Linha 6`,
       // Should only have lyric slides, no cover slide
       expect(pptx.slides.length).toBe(2); // 2 sections
     });
+
+    it.each(['dark', 'light', 'liturgic'] as const)(
+      'FHP-35: lyric slides use Arial 40 without footer (%s theme)',
+      (theme) => {
+        const longSong: SongForPresentation = {
+          id: 'long',
+          title: 'Música Longa',
+          content: 'L1\nL2\nL3\nL4\nL5\nL6',
+        };
+        const pptx = buildPresentation('Set', [sampleSong1, longSong], {
+          theme,
+          includePlaylistTitleSlide: false,
+          includeSongTitleSlides: false,
+          maxLinesPerSlide: 5,
+        }) as unknown as MockPresentation;
+
+        // 2 sections of sampleSong1 + 2 chunks of longSong
+        expect(pptx.slides).toHaveLength(4);
+        for (const slide of pptx.slides) {
+          const lyricBlocks = slide.texts.filter((t) => t.options.isTextBox === true);
+          expect(lyricBlocks).toHaveLength(1);
+          expect(lyricBlocks[0].options.fontFace).toBe('Arial');
+          expect(lyricBlocks[0].options.fontSize).toBe(40);
+
+          for (const t of slide.texts) {
+            expect(t.options.y).not.toBe('90%');
+            expect(t.text).not.toBe('Eis-me Aqui Senhor');
+            expect(t.text).not.toBe('Música Longa');
+          }
+        }
+        // Unlabelled chunks carry only the lyrics block
+        expect(pptx.slides[2].texts).toHaveLength(1);
+        expect(pptx.slides[3].texts).toHaveLength(1);
+      }
+    );
   });
 
   describe('exportCleanLyricsText', () => {
