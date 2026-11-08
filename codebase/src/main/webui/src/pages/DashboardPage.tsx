@@ -17,6 +17,7 @@ import { BrandLogo } from '../components/ui/BrandLogo';
 import { ImportSongModal } from '../components/modals/ImportSongModal';
 import { CoachMark } from '../components/ui/CoachMark';
 import { useTour } from '../context/TourContext';
+import { PedalFeatureBanner } from '../components/cards/PedalFeatureBanner';
 
 interface SongData {
  id: string;
@@ -184,6 +185,9 @@ export const DashboardPage: React.FC = () => {
           </h2>
           <p className="text-xs sm:text-sm text-text-mute">{t('dashboard.subtitle')}</p>
         </div>
+
+        {/* Feature Announcement Banner for Bluetooth Pedals */}
+        <PedalFeatureBanner />
 
         <div className="mb-4 sm:mb-6 flex justify-between items-center">
           <h3 className="text-base sm:text-lg font-bold text-text-main">

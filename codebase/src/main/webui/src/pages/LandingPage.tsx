@@ -14,7 +14,8 @@ import {
     Plus,
     Minus,
     ArrowRight,
-    Sparkles
+    Sparkles,
+    Radio
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { BrandLogo } from '../components/ui/BrandLogo';
@@ -321,6 +322,20 @@ export const LandingPage: React.FC = () => {
                                 </div>
                                 <h3 className="text-xl font-bold mb-3 text-white">{t('landing.featMobileTitle')}</h3>
                                 <p className="text-gray-400 text-sm sm:text-base leading-relaxed">{t('landing.featMobileDesc')}</p>
+                            </div>
+                        </div>
+
+                        {/* 7. Pedais Bluetooth (Mãos Livres) */}
+                        <div className="bg-gray-800/50 hover:bg-gray-800/80 p-6 sm:p-8 rounded-2xl border border-gray-700/70 hover:border-[#aa3bff]/50 transition-all flex flex-col justify-between">
+                            <div>
+                                <div className="w-12 h-12 bg-[#aa3bff]/20 rounded-xl flex items-center justify-center mb-6 relative">
+                                    <Radio className="w-6 h-6 text-[#aa3bff]" />
+                                    <span className="absolute -top-2 -right-2 px-1.5 py-0.5 text-[9px] font-extrabold uppercase bg-[#aa3bff] text-white rounded-full">
+                                        {t('pedal.badgeNew', 'NOVO')}
+                                    </span>
+                                </div>
+                                <h3 className="text-xl font-bold mb-3 text-white">{t('landing.featPedalsTitle', 'Pedais Bluetooth')}</h3>
+                                <p className="text-gray-400 text-sm sm:text-base leading-relaxed">{t('landing.featPedalsDesc', 'Controle o Modo Teatro e passe páginas com os pés. Suporte universal plug-and-play para AirTurn, PageFlip, Donner e pedais genéricos.')}</p>
                             </div>
                         </div>
                     </div>
