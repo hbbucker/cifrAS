@@ -14,14 +14,14 @@ USER quarkus
 
 WORKDIR /app
 
-COPY --chown=quarkus:quarkus codebase-admin/pom.xml .
-COPY --chown=quarkus:quarkus codebase-admin/mvnw .
-COPY --chown=quarkus:quarkus codebase-admin/.mvn .mvn
+COPY --chown=quarkus:quarkus pom.xml .
+COPY --chown=quarkus:quarkus mvnw .
+COPY --chown=quarkus:quarkus .mvn .mvn
 
 RUN --mount=type=cache,target=/home/quarkus/.m2,uid=1001,gid=1001 \
     ./mvnw dependency:go-offline -q
 
-COPY --chown=quarkus:quarkus codebase-admin/src src
+COPY --chown=quarkus:quarkus src src
 
 RUN --mount=type=cache,target=/home/quarkus/.m2,uid=1001,gid=1001 \
     --mount=type=cache,target=/home/quarkus/.npm,uid=1001,gid=1001 \

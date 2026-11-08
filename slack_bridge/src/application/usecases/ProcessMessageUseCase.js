@@ -2,8 +2,29 @@ const { ThreadSession } = require('../../domain/entities/ThreadSession');
 const { AgentRole } = require('../../domain/value-objects/AgentRole');
 const { GovernanceContract } = require('../../domain/value-objects/GovernanceContract');
 const { NarrativeSanitizerService } = require('../../domain/services/NarrativeSanitizerService');
+const { HEARTBEAT_STATUS } = require('../../domain/services/LiveStatusPolicy');
 const { EngineInstructionDTO } = require('../../domain/dtos/EngineInstructionDTO');
+const { EngineQuotaExhaustedError } = require('../../domain/errors/EngineQuotaExhaustedError');
 const { ExecutionResultDTO } = require('../dtos/IncomingMessageDTO');
+
+function formatRetryDuration(retryAfterSeconds) {
+  const hours = Math.floor(retryAfterSeconds / 3600);
+  const minutes = Math.floor((retryAfterSeconds % 3600) / 60);
+  const seconds = retryAfterSeconds % 60;
+  const components = [];
+  if (hours > 0) components.push(`${hours} h`);
+  if (minutes > 0) components.push(`${minutes} min`);
+  if (seconds > 0) components.push(`${seconds} s`);
+  return components.join(' ');
+}
+
+function buildQuotaMessage(retryAfterSeconds) {
+  if (Number.isInteger(retryAfterSeconds) && retryAfterSeconds > 0) {
+    const duration = formatRetryDuration(retryAfterSeconds);
+    return `⚠️ O limite individual do Antigravity foi atingido. A plataforma informou nova tentativa em aproximadamente ${duration}. Sua sessão foi preservada.`;
+  }
+  return '⚠️ O limite individual do Antigravity foi atingido. Tente novamente mais tarde. Sua sessão foi preservada.';
+}
 
 class ProcessMessageUseCase {
   constructor({
@@ -34,7 +55,12 @@ class ProcessMessageUseCase {
     await this.sessionRepository.save(session);
 
     // 1. Envia Reconhecimento Imediato
-    await this.notificationGateway.sendAcknowledgement(threadId, channelId);
+    const acknowledgementOptions = {};
+    Object.defineProperty(acknowledgementOptions, 'protectedText', {
+      value: userText,
+      enumerable: false,
+    });
+    await this.notificationGateway.sendAcknowledgement(threadId, channelId, acknowledgementOptions);
 
     const uniqueId = session.sessionId ? '' : `init_${Date.now()}`;
     const prompt = this.governanceContract.formatPrompt(userText, uniqueId);
@@ -45,11 +71,31 @@ class ProcessMessageUseCase {
       uniqueId,
     });
 
+    let heartbeatInterval = null;
+    let lastActivityTime = Date.now();
+
     try {
       let finalResult = null;
 
+      heartbeatInterval = setInterval(async () => {
+        const elapsed = Date.now() - lastActivityTime;
+        if (elapsed >= 35_000) {
+          try {
+            await this.notificationGateway.sendStatus(
+              threadId,
+              channelId,
+              HEARTBEAT_STATUS,
+              { source: 'heartbeat' }
+            );
+          } catch {}
+        }
+      }, 35_000);
+      if (heartbeatInterval.unref) heartbeatInterval.unref();
+
       // 2. Itera de forma sequencial e atômica sobre o fluxo de eventos tipados
       for await (const event of this.llmEngine.executeStream(instruction)) {
+        lastActivityTime = Date.now();
+        if (global.logDebug && event.type !== 'TEXT_DELTA_EMITTED') global.logDebug('USECASE PROCESSING EVENT:', event.type);
         switch (event.type) {
           case 'SESSION_BOUND': {
             session.bindSessionId(event.payload.sessionId);
@@ -64,13 +110,15 @@ class ProcessMessageUseCase {
 
             const progressMsg = role.getProgressMessage('delegated');
             if (progressMsg) {
-              await this.notificationGateway.sendStatus(threadId, channelId, progressMsg, { bypassInterval: true });
+              await this.notificationGateway.sendStatus(threadId, channelId, progressMsg, { source: 'subagent' });
             }
             break;
           }
 
           case 'TEXT_DELTA_EMITTED': {
-            // Streaming de texto puro: não envia fragmentos cortados para a thread
+            const { conversationId, textChunk } = event.payload;
+            const role = session.getRoleForConversation(conversationId) || AgentRole.from('Especialista');
+            await this.notificationGateway.streamNarrative(threadId, channelId, role, textChunk);
             break;
           }
 
@@ -86,12 +134,19 @@ class ProcessMessageUseCase {
             session.addPublishedNarrative(`${role.name}:${sanitized}`);
             await this.sessionRepository.save(session);
 
-            await this.notificationGateway.sendMilestoneNotification(threadId, channelId, role, sanitized);
+            if (conversationId === session.sessionId) {
+              // Primary response from CEO (non-blocking)
+              this.notificationGateway.sendPrimaryResponse(threadId, channelId, role, sanitized).catch(err => {
+                if (global.logDebug) global.logDebug('Error sending primary response: ' + err.message);
+              });
+            } else {
+              await this.notificationGateway.sendMilestoneNotification(threadId, channelId, role, sanitized);
+            }
             break;
           }
 
           case 'STATUS_UPDATED': {
-            await this.notificationGateway.sendStatus(threadId, channelId, event.payload.statusText);
+            await this.notificationGateway.sendStatus(threadId, channelId, event.payload.statusText, { source: 'engine' });
             break;
           }
 
@@ -120,7 +175,7 @@ class ProcessMessageUseCase {
           threadId,
           channelId,
           ceoRole,
-          finalResult.responseText,
+          isAlreadyPublished ? '' : finalResult.responseText,
           finalResult.filePaths || []
         );
       } else {
@@ -137,23 +192,44 @@ class ProcessMessageUseCase {
         filePaths: finalResult.filePaths || [],
       });
     } catch (error) {
-      // 4. Tratamento de Recuperação (Auto-Recovery)
-      if (session.sessionId) {
-        session.resetSession();
+      if (error instanceof EngineQuotaExhaustedError) {
+        session.markActive(false);
         await this.sessionRepository.save(session);
+
+        await this.notificationGateway.sendErrorMessage(
+          threadId,
+          channelId,
+          buildQuotaMessage(error.retryAfterSeconds)
+        );
+
+        return new ExecutionResultDTO({
+          success: false,
+          sessionId: session.sessionId,
+          error,
+        });
       }
+
+      // 4. Tratamento de Recuperação Não-Destrutivo (Preservação de Sessão)
       session.markActive(false);
+      await this.sessionRepository.save(session);
+
+      const errorMessage = (error && error.message && error.message.includes('timed out'))
+        ? '⚠️ O tempo limite de inatividade (5 minutos sem resposta) foi atingido. Sua sessão foi preservada. Você pode enviar uma nova instrução para continuar.'
+        : '⚠️ Ocorreu uma interrupção durante a execução. Sua sessão foi preservada. Por favor, tente enviar sua mensagem novamente.';
 
       await this.notificationGateway.sendErrorMessage(
         threadId,
         channelId,
-        '⚠️ Houve uma interrupção na sessão anterior. O contexto foi reinicializado. Por favor, envie sua mensagem novamente.'
+        errorMessage
       );
 
       return new ExecutionResultDTO({
         success: false,
+        sessionId: session.sessionId,
         error,
       });
+    } finally {
+      if (heartbeatInterval) clearInterval(heartbeatInterval);
     }
   }
 }

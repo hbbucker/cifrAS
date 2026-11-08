@@ -2,11 +2,11 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ShareSongModal } from '../components/modals/ShareSongModal';
 import { ToastProvider } from '../context/ToastContext';
-import * as songSharesApi from '../api/songShares';
+import * as shareLinksApi from '../api/shareLinks';
 import '@testing-library/jest-dom/vitest';
 
-vi.mock('../api/songShares', () => ({
-  shareSong: vi.fn(),
+vi.mock('../api/shareLinks', () => ({
+  createShareLink: vi.fn(),
 }));
 
 describe('ShareSongModal Component', () => {
@@ -34,8 +34,7 @@ describe('ShareSongModal Component', () => {
     renderModal();
 
     expect(screen.getByText('Test Song')).toBeInTheDocument();
-    expect(screen.getByRole('textbox')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /sendInvite/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /generateLink|Gerar Link/i })).toBeInTheDocument();
   });
 
   it('does not render when isOpen is false', () => {
@@ -44,111 +43,47 @@ describe('ShareSongModal Component', () => {
     expect(screen.queryByText('Test Song')).not.toBeInTheDocument();
   });
 
-  it('submits form successfully and calls onSuccess and closes', async () => {
-    vi.mocked(songSharesApi.shareSong).mockResolvedValueOnce({
-      id: 'share-1',
-      songId: 'song-123',
-      inviterId: 'user-1',
-      inviteeEmail: 'friend@test.com',
-      status: 'PENDING',
-      createdAt: new Date().toISOString(),
+  it('generates link successfully and displays it', async () => {
+    vi.mocked(shareLinksApi.createShareLink).mockResolvedValueOnce({
+      token: 'token123',
+      type: 'SONG',
+      resourceId: 'song-123',
+      resourceName: 'Test Song',
+      authorName: 'Author',
+      expiresAt: new Date().toISOString(),
+      url: 'http://localhost/invite/token123',
     });
 
     renderModal();
 
-    const input = screen.getByRole('textbox');
-    fireEvent.change(input, { target: { value: 'friend@test.com' } });
-
-    const submitBtn = screen.getByRole('button', { name: /sendInvite/i });
-    fireEvent.click(submitBtn);
+    const generateBtn = screen.getByRole('button', { name: /generateLink|Gerar Link/i });
+    fireEvent.click(generateBtn);
 
     await waitFor(() => {
-      expect(songSharesApi.shareSong).toHaveBeenCalledWith('song-123', 'friend@test.com');
-      expect(defaultProps.onSuccess).toHaveBeenCalled();
-      expect(defaultProps.onClose).toHaveBeenCalled();
+      expect(shareLinksApi.createShareLink).toHaveBeenCalledWith({ type: 'SONG', resourceId: 'song-123' });
     });
+
+    const urlInput = await screen.findByRole('textbox');
+    expect((urlInput as HTMLInputElement).value).toContain("/invite/token123");
   });
 
-  it('displays user not found error when API returns 404', async () => {
-    vi.mocked(songSharesApi.shareSong).mockRejectedValueOnce({
-      response: { status: 404 },
-    });
+  it('displays general error when API fails', async () => {
+    vi.mocked(shareLinksApi.createShareLink).mockRejectedValueOnce(new Error('Network error'));
 
     renderModal();
 
-    const input = screen.getByRole('textbox');
-    fireEvent.change(input, { target: { value: 'unknown@test.com' } });
-
-    const submitBtn = screen.getByRole('button', { name: /sendInvite/i });
-    fireEvent.click(submitBtn);
+    const generateBtn = screen.getByRole('button', { name: /generateLink|Gerar Link/i });
+    fireEvent.click(generateBtn);
 
     await waitFor(() => {
-      expect(screen.getByText(/userNotFound/i)).toBeInTheDocument();
-    });
-
-    // Clear error message on typing
-    fireEvent.change(input, { target: { value: 'unknown2@test.com' } });
-    expect(screen.queryByText(/userNotFound/i)).not.toBeInTheDocument();
-  });
-
-  it('displays self share error when API returns 400', async () => {
-    vi.mocked(songSharesApi.shareSong).mockRejectedValueOnce({
-      response: { status: 400 },
-    });
-
-    renderModal();
-
-    const input = screen.getByRole('textbox');
-    fireEvent.change(input, { target: { value: 'self@test.com' } });
-
-    const submitBtn = screen.getByRole('button', { name: /sendInvite/i });
-    fireEvent.click(submitBtn);
-
-    await waitFor(() => {
-      expect(screen.getByText(/selfShareError/i)).toBeInTheDocument();
-    });
-  });
-
-  it('displays conflict error when API returns 409', async () => {
-    vi.mocked(songSharesApi.shareSong).mockRejectedValueOnce({
-      response: { status: 409 },
-    });
-
-    renderModal();
-
-    const input = screen.getByRole('textbox');
-    fireEvent.change(input, { target: { value: 'friend@test.com' } });
-
-    const submitBtn = screen.getByRole('button', { name: /sendInvite/i });
-    fireEvent.click(submitBtn);
-
-    await waitFor(() => {
-      expect(screen.getByText(/conflictError/i)).toBeInTheDocument();
-    });
-  });
-
-  it('displays general error when API returns 500', async () => {
-    vi.mocked(songSharesApi.shareSong).mockRejectedValueOnce({
-      response: { status: 500 },
-    });
-
-    renderModal();
-
-    const input = screen.getByRole('textbox');
-    fireEvent.change(input, { target: { value: 'friend@test.com' } });
-
-    const submitBtn = screen.getByRole('button', { name: /sendInvite/i });
-    fireEvent.click(submitBtn);
-
-    await waitFor(() => {
-      expect(screen.getByText(/generalError/i)).toBeInTheDocument();
+      expect(screen.getByText(/generalError|Ocorreu um erro/i)).toBeInTheDocument();
     });
   });
 
   it('calls onClose when cancel button or close icon is clicked', () => {
     renderModal();
 
-    const cancelBtn = screen.getByRole('button', { name: /common.cancel/i });
+    const cancelBtn = screen.getByRole('button', { name: /common.cancel|Cancelar/i });
     fireEvent.click(cancelBtn);
 
     expect(defaultProps.onClose).toHaveBeenCalled();

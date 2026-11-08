@@ -29,8 +29,8 @@ export const OnboardingTooltip: React.FC<OnboardingTooltipProps> = ({ children, 
       {children}
       {isVisible && (
         <div className="absolute right-0 top-full mt-3 w-64 z-50 animate-in fade-in slide-in-from-top-2 duration-300">
-          <div className="relative bg-[#8629cc] text-white p-4 rounded-lg shadow-xl shadow-[#8629cc]/20">
-            <div className="absolute -top-2 right-4 w-4 h-4 bg-[#8629cc] rotate-45" />
+          <div className="relative bg-[#aa3bff] text-white p-4 rounded-lg shadow-xl shadow-[#aa3bff]/20">
+            <div className="absolute -top-2 right-4 w-4 h-4 bg-[#aa3bff] rotate-45" />
             
             <div className="relative flex justify-between items-start mb-2">
               <h4 className="font-bold text-sm">{t('onboarding.tooltipTitle')}</h4>

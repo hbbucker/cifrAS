@@ -19,6 +19,7 @@ import { SettingsPage } from './pages/SettingsPage';
 import { GoogleCallbackPage } from './pages/settings/GoogleCallbackPage';
 import { PrivacyPage } from './pages/PrivacyPage';
 import { LandingPage } from './pages/LandingPage';
+import { InvitePage } from './pages/InvitePage';
 import { usePwaAutoUpdate } from './hooks/usePwaAutoUpdate';
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
  return (
   <Routes>
   <Route path="/" element={<LandingPage />} />
+  <Route path="/invite/:token" element={<InvitePage />} />
   <Route path="/login" element={<LoginPage />} />
   <Route path="/register" element={<Navigate to="/login" replace />} />
   <Route path="/auth/callback" element={<AuthCallbackPage />} />

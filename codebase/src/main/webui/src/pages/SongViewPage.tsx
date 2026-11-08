@@ -7,56 +7,39 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { stringifyLyrics } from '../utils/lyricsParser';
 import { transposeContent } from '../utils/chordTransposer';
 import { useToast } from '../context/ToastContext';
-import { FeatureDiscoveryModal } from '../components/FeatureDiscoveryModal';
 import { ShareSongModal } from '../components/modals/ShareSongModal';
 
 export const SongViewPage: React.FC = () => {
   const { t } = useTranslation();
- const navigate = useNavigate();
- const { id } = useParams();
- const { toast } = useToast();
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const { toast } = useToast();
  
- const [song, setSong] = useState({
- title: 'Carregando...',
- artist: '...',
- originalKey: 'C',
- content: ''
- });
+  const [song, setSong] = useState({
+    title: 'Carregando...',
+    artist: '...',
+    originalKey: 'C',
+    content: ''
+  });
  
- const [transposeSteps, setTransposeSteps] = useState(0);
+  const [transposeSteps, setTransposeSteps] = useState(0);
  
- // Preferences State
- const [showSettings, setShowSettings] = useState(false);
- const [useBb, setUseBb] = useState(false);
- const [useEb, setUseEb] = useState(false);
+  // Preferences State
+  const [showSettings, setShowSettings] = useState(false);
+  const [useBb, setUseBb] = useState(false);
+  const [useEb, setUseEb] = useState(false);
   const [autoScrollSpeed, setAutoScrollSpeed] = useState(1);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [showFeatureModal, setShowFeatureModal] = useState(false);
 
   useEffect(() => {
-    const seen = localStorage.getItem('feature_discovery_03_seen');
-    if (!seen || seen === 'false') {
-      const timer = setTimeout(() => {
-        setShowFeatureModal(true);
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, []);
-
-  const handleCloseFeatureModal = () => {
-    localStorage.setItem('feature_discovery_03_seen', 'true');
-    setShowFeatureModal(false);
-  };
-
- useEffect(() => {
- if (id) {
- fetch(`/api/songs/${id}`, {
- headers: { 
-   'Authorization': `Bearer ${localStorage.getItem('token')}`,
-   'Cache-Control': 'no-cache, no-store'
- },
- cache: 'no-store'
- })
+    if (id) {
+      fetch(`/api/songs/${id}`, {
+        headers: { 
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Cache-Control': 'no-cache, no-store'
+        },
+        cache: 'no-store'
+      })
  .then(res => {
  if (!res.ok) throw new Error('Fetch failed');
  return res.json();
@@ -174,15 +157,15 @@ export const SongViewPage: React.FC = () => {
               <div className="relative">
                 <button 
                   onClick={() => setShowSettings(!showSettings)}
-                  className="w-9 h-9 sm:w-10 sm:h-10 min-w-[36px] min-h-[36px] sm:min-w-[40px] sm:min-h-[40px] flex items-center justify-center text-text-mute hover:bg-bg-elevated rounded-xl transition-colors"
+                  className="w-9 h-9 sm:w-10 sm:h-10 min-w-[36px] min-h-[36px] sm:min-w-[40px] sm:min-h-[40px] flex items-center justify-center text-text-mute hover:bg-bg-elevated rounded-md transition-colors"
                   title="Preferences"
                   aria-label="Preferences"
                 >
-                  <Settings2 className={`w-4 h-4 sm:w-5 sm:h-5 ${showSettings ? 'text-[#8629cc]' : ''}`} />
+                  <Settings2 className={`w-4 h-4 sm:w-5 sm:h-5 ${showSettings ? 'text-[#aa3bff]' : ''}`} />
                 </button>
                 
                 {showSettings && (
-                  <div className="absolute top-full right-0 mt-2 w-64 bg-bg-card border border-border-main rounded-2xl shadow-xl p-4 z-50 animate-in slide-in-from-top-2">
+                  <div className="absolute top-full right-0 mt-2 w-64 bg-bg-card border border-border-main rounded-lg shadow-xl p-4 z-50 animate-in slide-in-from-top-2">
                     <h3 className="font-semibold text-text-main mb-4">{t('songView.preferences')}</h3>
                     
                     <div className="space-y-4">
@@ -197,7 +180,7 @@ export const SongViewPage: React.FC = () => {
                           max="10" 
                           value={autoScrollSpeed}
                           onChange={(e) => setAutoScrollSpeed(Number(e.target.value))}
-                          className="w-full accent-[#8629cc]"
+                          className="w-full accent-[#aa3bff]"
                         />
                       </div>
                       
@@ -205,7 +188,7 @@ export const SongViewPage: React.FC = () => {
                         <span className="text-sm text-text-main font-medium">{t('songView.useBb')}</span>
                         <label className="relative inline-flex items-center cursor-pointer">
                           <input type="checkbox" className="sr-only peer" checked={useBb} onChange={(e) => setUseBb(e.target.checked)} />
-                          <div className="w-11 h-6 bg-bg-elevated peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-text-main after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#8629cc]"></div>
+                          <div className="w-11 h-6 bg-bg-elevated peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-text-main after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#aa3bff]"></div>
                         </label>
                       </div>
                       
@@ -213,7 +196,7 @@ export const SongViewPage: React.FC = () => {
                         <span className="text-sm text-text-main font-medium">{t('songView.useEb')}</span>
                         <label className="relative inline-flex items-center cursor-pointer">
                           <input type="checkbox" className="sr-only peer" checked={useEb} onChange={(e) => setUseEb(e.target.checked)} />
-                          <div className="w-11 h-6 bg-bg-elevated peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-text-main after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#8629cc]"></div>
+                          <div className="w-11 h-6 bg-bg-elevated peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-text-main after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#aa3bff]"></div>
                         </label>
                       </div>
                     </div>
@@ -223,7 +206,7 @@ export const SongViewPage: React.FC = () => {
 
               <button 
                 onClick={() => setShowShareModal(true)}
-                className="w-9 h-9 sm:w-10 sm:h-10 min-w-[36px] min-h-[36px] sm:min-w-[40px] sm:min-h-[40px] flex items-center justify-center text-text-mute hover:bg-bg-elevated rounded-xl transition-colors"
+                className="w-9 h-9 sm:w-10 sm:h-10 min-w-[36px] min-h-[36px] sm:min-w-[40px] sm:min-h-[40px] flex items-center justify-center text-text-mute hover:bg-bg-elevated rounded-md transition-colors"
                 title={t('songSharing.shareSong')}
                 data-testid="share-song-btn"
                 aria-label={t('songSharing.shareSong')}
@@ -233,7 +216,7 @@ export const SongViewPage: React.FC = () => {
               
               <button 
                 onClick={() => navigate(`/songs/edit/${id}`, { state: { wasTransposed: transposeSteps !== 0, originalKey: song.originalKey } })}
-                className="w-9 h-9 sm:w-10 sm:h-10 min-w-[36px] min-h-[36px] sm:min-w-[40px] sm:min-h-[40px] flex items-center justify-center text-text-mute hover:bg-bg-elevated rounded-xl transition-colors"
+                className="w-9 h-9 sm:w-10 sm:h-10 min-w-[36px] min-h-[36px] sm:min-w-[40px] sm:min-h-[40px] flex items-center justify-center text-text-mute hover:bg-bg-elevated rounded-md transition-colors"
                 title={t('songView.editSong')}
                 aria-label={t('songView.editSong')}
               >
@@ -242,7 +225,7 @@ export const SongViewPage: React.FC = () => {
               
               <button 
                 onClick={() => navigate(`/theater/song/${id}`, { state: { autoScrollSpeed, useBb, useEb, transposeSteps } })}
-                className="flex items-center gap-1.5 sm:gap-2 bg-[#8629cc] hover:bg-[#721eb8] text-white px-3 sm:px-4 py-2 min-h-[36px] sm:min-h-[44px] rounded-xl font-medium transition-colors shadow-sm text-xs sm:text-sm shrink-0"
+                className="flex items-center gap-1.5 sm:gap-2 bg-[#aa3bff] hover:bg-[#992df2] text-white px-3 sm:px-4 py-2 min-h-[36px] sm:min-h-[44px] rounded-md font-medium transition-colors shadow-sm text-xs sm:text-sm shrink-0"
                 data-testid="theater-mode-btn"
               >
                 <PlayCircle className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -258,7 +241,6 @@ export const SongViewPage: React.FC = () => {
           </div>
         </div>
       </div>
-      {showFeatureModal && <FeatureDiscoveryModal onClose={handleCloseFeatureModal} />}
       {id && (
         <ShareSongModal
           isOpen={showShareModal}

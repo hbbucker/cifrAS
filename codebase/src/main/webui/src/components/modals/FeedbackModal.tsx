@@ -52,7 +52,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose })
           <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            className="w-full h-32 p-3 bg-bg-main border border-border-main rounded-xl focus:ring-2 focus:ring-brand-primary focus:border-brand-primary outline-none resize-none text-text-main mb-4"
+            className="w-full h-32 p-3 bg-bg-main border border-border-main rounded-md focus:ring-2 focus:ring-brand-primary focus:border-brand-primary outline-none resize-none text-text-main mb-4"
             placeholder="Digite sua mensagem aqui..."
             required
             disabled={isSubmitting}

@@ -1,8 +1,10 @@
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { GroupDetailsPage } from '../pages/GroupDetailsPage';
 import * as groupsApi from '../api/groups';
+import * as shareLinksApi from '../api/shareLinks';
 import { BrowserRouter } from 'react-router-dom';
+import { TourProvider } from '../context/TourContext';
 import '@testing-library/jest-dom/vitest';
 
 const mockNavigate = vi.fn();
@@ -36,6 +38,10 @@ vi.mock('../context/ToastContext', () => ({
   })
 }));
 
+vi.mock('../api/shareLinks', () => ({
+  createShareLink: vi.fn(),
+}));
+
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => {
@@ -45,13 +51,24 @@ vi.mock('react-i18next', () => ({
       if (key === 'group.members.roles.member') return 'Membro';
       if (key === 'group.invite') return 'Convidar Membro';
       if (key === 'groups.inviteToGroup') return 'Convidar para o Grupo';
-      if (key === 'groups.sendInvite') return 'Enviar Convite';
+      if (key === 'songSharing.generateLink') return 'Gerar Link';
+      if (key === 'songSharing.generalError') return 'Ocorreu um erro';
       if (key === 'common.cancel') return 'Cancelar';
+      if (key === 'common.next') return 'Próximo';
+      if (key === 'common.gotIt') return 'Entendi';
       if (key === 'group.sharePlaylist') return 'Compartilhar Playlist';
       if (key === 'group.sharedPlaylists') return 'Playlists Compartilhadas';
       if (key === 'group.noSharedPlaylists') return 'Nenhuma playlist compartilhada';
       if (key === 'linkPlaylist.shareTitle') return 'Compartilhar Playlist';
       if (key === 'musicCard.share') return 'Compartilhar';
+      if (key === 'group.tourInviteTitle') return 'Convide integrantes para o Grupo';
+      if (key === 'group.tourInviteDesc') return 'Gere um link de convite instantâneo';
+      if (key === 'group.tourSharePlaylistTitle') return 'Compartilhe Playlists com o Grupo';
+      if (key === 'group.tourSharePlaylistDesc') return 'Vincule suas playlists existentes';
+      if (key === 'group.educationalEmptyPlaylistsTitle') return 'Nenhuma playlist compartilhada ainda';
+      if (key === 'group.educationalEmptyPlaylistsStep1') return '1. Crie ou selecione suas playlists de repertório';
+      if (key === 'group.educationalEmptyPlaylistsStep2') return '2. Compartilhe com os membros do grupo';
+      if (key === 'group.educationalEmptyPlaylistsStep3') return '3. Toquem juntos no Modo Teatro sincronizado';
       return key;
     }
   })
@@ -93,11 +110,19 @@ describe('GroupDetailsPage Component', () => {
     vi.spyOn(groupsApi, 'linkPlaylist').mockResolvedValue();
   });
 
+  afterEach(() => {
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
+    localStorage.clear();
+  });
+
   it('renders group header and allows switching tabs between Playlists and Members', async () => {
     render(
-      <BrowserRouter>
-        <GroupDetailsPage />
-      </BrowserRouter>
+      <TourProvider>
+        <BrowserRouter>
+          <GroupDetailsPage />
+        </BrowserRouter>
+      </TourProvider>
     );
 
     await waitFor(() => {
@@ -107,14 +132,11 @@ describe('GroupDetailsPage Component', () => {
     expect(screen.getByTestId('tab-playlists')).toBeInTheDocument();
     expect(screen.getByTestId('tab-members')).toBeInTheDocument();
 
-    // Default tab is Playlists
     expect(screen.getByText('Playlists Compartilhadas')).toBeInTheDocument();
 
-    // Back to groups button
     fireEvent.click(screen.getByTestId('back-to-groups-btn'));
     expect(mockNavigate).toHaveBeenCalledWith('/groups');
 
-    // Switch to Members tab
     fireEvent.click(screen.getByTestId('tab-members'));
 
     await waitFor(() => {
@@ -122,11 +144,23 @@ describe('GroupDetailsPage Component', () => {
     });
   });
 
-  it('opens invite modal and submits invite', async () => {
+  it('opens invite modal and generates link', async () => {
+    vi.mocked(shareLinksApi.createShareLink).mockResolvedValueOnce({
+      token: 'group-token',
+      type: 'GROUP',
+      resourceId: 'group-1',
+      resourceName: 'The Awesome Band',
+      authorName: 'Owner',
+      expiresAt: new Date().toISOString(),
+      url: 'http://localhost/invite/group-token',
+    });
+
     render(
-      <BrowserRouter>
-        <GroupDetailsPage />
-      </BrowserRouter>
+      <TourProvider>
+        <BrowserRouter>
+          <GroupDetailsPage />
+        </BrowserRouter>
+      </TourProvider>
     );
 
     await waitFor(() => {
@@ -137,26 +171,26 @@ describe('GroupDetailsPage Component', () => {
 
     expect(screen.getByText('Convidar para o Grupo')).toBeInTheDocument();
 
-    const emailInput = screen.getByTestId('invite-email-input');
-    fireEvent.change(emailInput, { target: { value: 'newmember@band.com' } });
-
-    const sendBtn = screen.getByTestId('send-invite-btn');
-    fireEvent.click(sendBtn);
+    const generateBtn = screen.getByRole('button', { name: /Gerar Link/i });
+    fireEvent.click(generateBtn);
 
     await waitFor(() => {
-      expect(groupsApi.inviteGroupMember).toHaveBeenCalledWith('group-1', 'newmember@band.com');
+      expect(shareLinksApi.createShareLink).toHaveBeenCalledWith({ type: 'GROUP', resourceId: 'group-1' });
     });
+
+    const urlInput = await screen.findByRole('textbox');
+    expect((urlInput as HTMLInputElement).value).toContain("/invite/group-token");
   });
 
-  it('handles invite error response gracefully', async () => {
-    vi.spyOn(groupsApi, 'inviteGroupMember').mockRejectedValueOnce({
-      response: { data: { error: 'User is already a member' } }
-    });
+  it('handles invite error response gracefully when API fails', async () => {
+    vi.mocked(shareLinksApi.createShareLink).mockRejectedValueOnce(new Error('API error'));
 
     render(
-      <BrowserRouter>
-        <GroupDetailsPage />
-      </BrowserRouter>
+      <TourProvider>
+        <BrowserRouter>
+          <GroupDetailsPage />
+        </BrowserRouter>
+      </TourProvider>
     );
 
     await waitFor(() => {
@@ -165,29 +199,28 @@ describe('GroupDetailsPage Component', () => {
 
     fireEvent.click(screen.getByTestId('header-invite-btn'));
 
-    const emailInput = screen.getByTestId('invite-email-input');
-    fireEvent.change(emailInput, { target: { value: 'existing@band.com' } });
-
-    const sendBtn = screen.getByTestId('send-invite-btn');
-    fireEvent.click(sendBtn);
+    const generateBtn = screen.getByRole('button', { name: /Gerar Link/i });
+    fireEvent.click(generateBtn);
 
     await waitFor(() => {
-      expect(screen.getByText('User is already a member')).toBeInTheDocument();
+      expect(screen.getByText(/Ocorreu um erro/i)).toBeInTheDocument();
     });
   });
 
   it('opens LinkPlaylistModal and links playlist', async () => {
     render(
-      <BrowserRouter>
-        <GroupDetailsPage />
-      </BrowserRouter>
+      <TourProvider>
+        <BrowserRouter>
+          <GroupDetailsPage />
+        </BrowserRouter>
+      </TourProvider>
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Compartilhar Playlist')).toBeInTheDocument();
+      expect(screen.getByTestId('share-playlist-btn')).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByText('Compartilhar Playlist'));
+    fireEvent.click(screen.getByTestId('share-playlist-btn'));
 
     await waitFor(() => {
       expect(screen.getByText('Setlist 1')).toBeInTheDocument();
@@ -211,14 +244,50 @@ describe('GroupDetailsPage Component', () => {
     );
 
     render(
-      <BrowserRouter>
-        <GroupDetailsPage />
-      </BrowserRouter>
+      <TourProvider>
+        <BrowserRouter>
+          <GroupDetailsPage />
+        </BrowserRouter>
+      </TourProvider>
     );
 
     await waitFor(() => {
       expect(logoutMock).toHaveBeenCalled();
       expect(mockNavigate).toHaveBeenCalledWith('/login');
     });
+  });
+
+  it('triggers group-invite-members tour on mount for Admin and advances to group-share-playlist', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+
+    render(
+      <TourProvider>
+        <BrowserRouter>
+          <GroupDetailsPage />
+        </BrowserRouter>
+      </TourProvider>
+    );
+
+    // Wait for initial fetch to resolve
+    await vi.waitFor(() => {
+      expect(screen.getByText('The Awesome Band')).toBeInTheDocument();
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+
+    expect(screen.getByText('Convide integrantes para o Grupo')).toBeInTheDocument();
+    expect(screen.getByText('Gere um link de convite instantâneo')).toBeInTheDocument();
+
+    const nextBtn = screen.getByRole('button', { name: /Próximo|next/i });
+    act(() => {
+      fireEvent.click(nextBtn);
+    });
+
+    expect(screen.queryByText('Convide integrantes para o Grupo')).not.toBeInTheDocument();
+    expect(localStorage.getItem('tour_seen_group-invite-members')).toBe('true');
+
+    vi.useRealTimers();
   });
 });

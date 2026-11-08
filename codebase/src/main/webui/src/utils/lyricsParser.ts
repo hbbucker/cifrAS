@@ -17,22 +17,18 @@ export interface LyricsStructure {
  sections: Section[];
 }
 
-const CHORD_REGEX = /^([A-G][#b]?)([mM0-9]|maj|min|dim|aug|sus|add|\+|-|º|°)*(\([^)]+\))*(\/[A-G][#b]?([mM0-9]|maj|min|dim|aug|sus|add|\+|-|º|°)*(\([^)]+\))*)?$/;
+import { isChordLineHelper, stripOuterPunctuation, CORE_CHORD_REGEX, MARKER_REGEX } from './chordTransposer';
 
-function isChordToken(token: string): boolean {
- return CHORD_REGEX.test(token) || token === '|' || /^\(\d+x\)$/i.test(token);
+export function isChordToken(token: string): boolean {
+  if (!token) return false;
+  if (MARKER_REGEX.test(token)) return true;
+  const clean = stripOuterPunctuation(token);
+  if (!clean) return false;
+  return CORE_CHORD_REGEX.test(clean) || MARKER_REGEX.test(clean);
 }
 
-function checkIsChordLine(trimmedLine: string): boolean {
- if (!trimmedLine) return false;
- const tokens = trimmedLine.split(/\s+/).filter(Boolean);
- if (tokens.length === 0) return false;
- 
- let validCount = 0;
- for (const token of tokens) {
- if (isChordToken(token)) validCount++;
- }
- return (validCount / tokens.length) > 0.6;
+export function checkIsChordLine(trimmedLine: string): boolean {
+  return isChordLineHelper(trimmedLine);
 }
 
 export function parseContentToLyrics(content: string): LyricsStructure {

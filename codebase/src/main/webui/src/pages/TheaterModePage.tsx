@@ -9,14 +9,16 @@ import { useToast } from '../context/ToastContext';
 import { apiClient } from '../services/authService';
 import { usePerformanceSession } from '../hooks/usePerformanceSession';
 import { useTranslation } from 'react-i18next';
+import { useTour } from '../context/TourContext';
 
 interface SongData {
- id: string;
- [key: string]: unknown;
+  id: string;
+  [key: string]: unknown;
 }
 
 export const TheaterModePage: React.FC = () => {
- const { t } = useTranslation();
+  const { t } = useTranslation();
+  const { startTour } = useTour();
  const navigate = useNavigate();
  const { playlistId, songId } = useParams();
  const location = useLocation();
@@ -86,6 +88,23 @@ export const TheaterModePage: React.FC = () => {
  }
  };
  }, [isLocked]);
+
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined' && 'screen' in window && window.screen?.orientation && typeof (window.screen.orientation as unknown as { unlock?: () => void }).unlock === 'function') {
+        (window.screen.orientation as unknown as { unlock: () => void }).unlock();
+      }
+    } catch {
+      // Screen orientation unlock is not supported or not allowed in this environment
+    }
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      startTour('theater-columns-toggle');
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [startTour]);
   const hasExplicitTarget = Boolean(
     querySongId ||
     stateSongId ||
@@ -96,18 +115,55 @@ export const TheaterModePage: React.FC = () => {
   const { activeSession, saveProgress, clearSession } = usePerformanceSession();
   const [showResumePrompt, setShowResumePrompt] = useState(false);
   const hasPromptedRef = React.useRef(hasExplicitTarget);
- 
- const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
- const [showControls, setShowControls] = useState(!isMobile);
- const [fontSize, setFontSize] = useState<number>(isMobile ? 24 : 32);
- const [lastInteraction, setLastInteraction] = useState<number>(0);
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const [showControls, setShowControls] = useState(!isMobile);
+  const [fontSize, setFontSize] = useState<number>(() => {
+    const saved = localStorage.getItem('cifras_theater_fontsize');
+    if (saved) {
+      const parsed = Number(saved);
+      if (!isNaN(parsed) && parsed >= 10 && parsed <= 60) {
+        return parsed;
+      }
+    }
+    return isMobile ? 24 : 32;
+  });
+  const [lastInteraction, setLastInteraction] = useState<number>(0);
 
- useEffect(() => {
-   if (showControls) {
-     const timer = setTimeout(() => setShowControls(false), 4000);
-     return () => clearTimeout(timer);
-   }
- }, [showControls, lastInteraction]);
+  const [columns, setColumns] = useState<1 | 2>(() => {
+    const saved = localStorage.getItem('cifras_theater_columns');
+    return saved === '2' ? 2 : 1;
+  });
+
+  const [isFullWidth, setIsFullWidth] = useState<boolean>(() => {
+    return localStorage.getItem('cifras_theater_fullwidth') === 'true';
+  });
+
+  const handleToggleColumns = () => {
+    setColumns(prev => {
+      const next = prev === 1 ? 2 : 1;
+      localStorage.setItem('cifras_theater_columns', String(next));
+      if (next === 2) {
+        setIsFullWidth(true);
+        localStorage.setItem('cifras_theater_fullwidth', 'true');
+      }
+      return next;
+    });
+  };
+
+  const handleToggleFullWidth = () => {
+    setIsFullWidth(prev => {
+      const next = !prev;
+      localStorage.setItem('cifras_theater_fullwidth', String(next));
+      return next;
+    });
+  };
+
+  useEffect(() => {
+    if (showControls) {
+      const timer = setTimeout(() => setShowControls(false), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [showControls, lastInteraction]);
 
  // Fetch playlist queue if playlistId is provided
  useEffect(() => {
@@ -178,6 +234,21 @@ export const TheaterModePage: React.FC = () => {
 
         const theaterPref = (prefRes && prefRes.status === 200 && prefRes.data) ? prefRes.data : null;
 
+        const savedLocalFontSize = localStorage.getItem('cifras_theater_fontsize');
+        const parsedLocalFontSize = (savedLocalFontSize && !isNaN(Number(savedLocalFontSize))) ? Number(savedLocalFontSize) : null;
+
+        if (theaterPref && theaterPref.fontSize != null) {
+          setFontSize(theaterPref.fontSize);
+          hasCustomFontSizeRef.current = true;
+          localStorage.setItem('cifras_theater_fontsize', String(theaterPref.fontSize));
+        } else if (parsedLocalFontSize != null) {
+          setFontSize(parsedLocalFontSize);
+          hasCustomFontSizeRef.current = true;
+        } else {
+          hasCustomFontSizeRef.current = false;
+          setFontSize(isMobile ? 24 : 32);
+        }
+
         if (isFirstMountRef.current && passedState && passedState.transposeSteps !== undefined) {
           setTransposeSteps(passedState.transposeSteps);
           if (passedState.autoScrollSpeed !== undefined) setSpeed(passedState.autoScrollSpeed);
@@ -185,18 +256,9 @@ export const TheaterModePage: React.FC = () => {
         } else if (theaterPref) {
           setTransposeSteps(theaterPref.transposeSteps ?? 0);
           setSpeed(theaterPref.autoScrollSpeed ?? 1);
-          if (theaterPref.fontSize != null) {
-            setFontSize(theaterPref.fontSize);
-            hasCustomFontSizeRef.current = true;
-          } else {
-            hasCustomFontSizeRef.current = false;
-            setFontSize(isMobile ? 24 : 32);
-          }
         } else {
           setTransposeSteps(songData.prefTransposeSteps ?? 0);
           setSpeed(songData.prefAutoScrollSpeed ?? 1);
-          hasCustomFontSizeRef.current = false;
-          setFontSize(isMobile ? 24 : 32);
         }
 
         loadedSongIdRef.current = activeSongId;
@@ -273,7 +335,11 @@ export const TheaterModePage: React.FC = () => {
 
   const handleFontSizeChange = (delta: number) => {
     hasCustomFontSizeRef.current = true;
-    setFontSize(prev => Math.max(10, Math.min(60, prev + delta)));
+    setFontSize(prev => {
+      const next = Math.max(10, Math.min(60, prev + delta));
+      localStorage.setItem('cifras_theater_fontsize', String(next));
+      return next;
+    });
   };
 
   // Auto-fit: flag resets whenever the active song changes so each song gets a fresh fit.
@@ -314,8 +380,10 @@ export const TheaterModePage: React.FC = () => {
       const maxFit = Math.floor(availableWidth / (maxLineLength * 0.601));
       const fitted = Math.max(10, maxFit);
 
+      const savedLocalFontSize = localStorage.getItem('cifras_theater_fontsize');
+
       // Apply only once per song load, and only when there are no custom/saved preferences.
-      if (!autoFitAppliedRef.current && !hasCustomFontSizeRef.current) {
+      if (!autoFitAppliedRef.current && !hasCustomFontSizeRef.current && !savedLocalFontSize) {
         autoFitAppliedRef.current = true;
         setFontSize(prev => {
           const defaultSize = isMobile ? 24 : 32;
@@ -432,6 +500,39 @@ export const TheaterModePage: React.FC = () => {
         setShowControls(prev => !prev);
       }}
     >
+      {/* Persistent Theater Top Header (Always visible: Song Title, Artist, Key Reference) */}
+      <header className="fixed top-0 left-0 right-0 px-3.5 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between bg-gradient-to-b from-bg-main via-bg-main/85 to-transparent backdrop-blur-sm border-b border-border-main/30 pointer-events-none z-30 transition-all" data-testid="theater-persistent-header">
+        <div className="flex items-center gap-2 sm:gap-3.5 min-w-0 pr-2">
+          {/* Reserved slot for the exit button */}
+          <div className="w-[38px] sm:w-[42px] shrink-0" />
+          
+          {(song.title || song.artist) && (
+            <div className="min-w-0 flex items-center gap-2 sm:gap-3 select-none" data-testid="theater-title-block">
+              <div className="min-w-0">
+                {song.title && <h1 className="text-sm sm:text-base md:text-lg font-bold truncate text-text-main leading-tight" data-testid="theater-song-title">{song.title}</h1>}
+                {song.artist && <p className="text-xs sm:text-sm text-text-mute truncate leading-tight" data-testid="theater-song-artist">{song.artist}</p>}
+              </div>
+
+              {/* Persistent Key Badge */}
+              {currentKey && (
+                <div 
+                  className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[11px] sm:text-xs bg-bg-card/90 border border-border-main shadow-sm shrink-0"
+                  data-testid="theater-key-badge"
+                >
+                  <span className="text-text-mute font-medium">{t('theater.keyLabel')}:</span>
+                  <span className="font-bold text-[#aa3bff]" data-testid="theater-current-key">{currentKey}</span>
+                  {song.originalKey && song.originalKey !== currentKey && (
+                    <span className="text-text-mute text-[10px] sm:text-[11px] font-normal pl-1 border-l border-border-main/60 flex items-center gap-0.5" data-testid="theater-orig-key">
+                      {t('theater.originalKeyLabel')} <strong className="font-medium text-text-main">{song.originalKey}</strong>
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </header>
+
       {/* Main scrolling container */}
       <div 
         key={activeSongId}
@@ -443,8 +544,8 @@ export const TheaterModePage: React.FC = () => {
         }}
         data-testid="theater-scroll-container"
       >
-        <div className="max-w-4xl mx-auto text-text-main">
-          <ChordSheet content={transposedContent} fontSize={fontSize} transparent={true} singerMode={isSingerMode} />
+        <div className={`${isFullWidth ? 'max-w-none w-full' : 'max-w-4xl mx-auto'} text-text-main transition-all duration-200`}>
+          <ChordSheet content={transposedContent} fontSize={fontSize} transparent={true} singerMode={isSingerMode} columns={columns} />
         </div>
       </div>
 
@@ -461,7 +562,7 @@ export const TheaterModePage: React.FC = () => {
 
       {showResumePrompt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" data-testid="resume-prompt">
-          <div className="bg-bg-card p-6 rounded-2xl shadow-xl border border-border-main max-w-sm w-full mx-4">
+          <div className="bg-bg-card p-6 rounded-lg shadow-xl border border-border-main max-w-sm w-full mx-4">
             <h3 className="text-xl font-bold mb-2">{t('theater.resumeSessionPromptTitle')}</h3>
             <p className="text-text-mute mb-6">{t('theater.resumeSessionPromptDesc')}</p>
             <div className="flex justify-end gap-3">
@@ -483,7 +584,7 @@ export const TheaterModePage: React.FC = () => {
                     containerRef.current.scrollTop = activeSession?.scrollPosition || 0;
                   }
                 }}
-                className="px-4 py-2 rounded-lg font-medium bg-[#8629cc] text-white hover:bg-[#721eb8] transition-colors shadow-lg shadow-[#8629cc]/20"
+                className="px-4 py-2 rounded-lg font-medium bg-[#aa3bff] text-white hover:bg-[#9926f0] transition-colors shadow-lg shadow-[#aa3bff]/20"
                 data-testid="resume-yes-btn"
               >
                 {t('theater.resume')}
@@ -494,9 +595,7 @@ export const TheaterModePage: React.FC = () => {
       )}
 
       <TheaterControls 
-        className={!showControls ? 'opacity-0 pointer-events-none' : 'opacity-100'}
-        title={song.title}
-        artist={song.artist}
+        showControls={showControls}
         isScrolling={isScrolling}
         speed={speed}
         currentKey={currentKey}
@@ -514,6 +613,10 @@ export const TheaterModePage: React.FC = () => {
         onLockToggle={() => setIsLocked(!isLocked)}
         isSingerMode={isSingerMode}
         onToggleSingerMode={() => setIsSingerMode(prev => !prev)}
+        columns={columns}
+        onToggleColumns={handleToggleColumns}
+        isFullWidth={isFullWidth}
+        onToggleFullWidth={handleToggleFullWidth}
       />
     </div>
   );

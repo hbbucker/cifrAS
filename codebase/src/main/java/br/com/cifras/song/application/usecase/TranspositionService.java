@@ -61,25 +61,48 @@ public class TranspositionService {
     /**
      * Transposes a single chord string.
      *
-     * @param chord      chord string (e.g. "Am", "F#m7", "G/B")
+     * @param chord      chord string (e.g. "Am", "F#m7", "G/B", "(C", "G)", "(C F G)", "Cº", "C9")
      * @param semitones  semitones to shift
      * @param convention output enharmonic convention
      * @return transposed chord string, or original if unrecognized
      */
-    public String transposeChord(String chord, int semitones, EnharmonicConvention convention) {
+     public String transposeChord(String chord, int semitones, EnharmonicConvention convention) {
         if (chord == null || chord.isBlank()) return chord == null ? null : chord;
 
-        // Handle compound chord (slash notation)
-        if (chord.contains("/")) {
-            int slashIdx = chord.indexOf('/');
-            String numerator = chord.substring(0, slashIdx);
-            String denominator = chord.substring(slashIdx + 1);
-            return transposeSimpleChord(numerator, semitones, convention)
-                + "/"
-                + transposeSimpleChord(denominator, semitones, convention);
+        int start = 0;
+        while (start < chord.length() && (chord.charAt(start) == '(' || chord.charAt(start) == '[' || chord.charAt(start) == '{' || chord.charAt(start) == '|')) {
+            start++;
+        }
+        int end = chord.length();
+        while (end > start && (chord.charAt(end - 1) == ')' || chord.charAt(end - 1) == ']' || chord.charAt(end - 1) == '}' || chord.charAt(end - 1) == '|' || chord.charAt(end - 1) == ',' || chord.charAt(end - 1) == '.' || chord.charAt(end - 1) == ';' || chord.charAt(end - 1) == ':')) {
+            end--;
         }
 
-        return transposeSimpleChord(chord, semitones, convention);
+        String prefix = chord.substring(0, start);
+        String inner = chord.substring(start, end);
+        String suffix = chord.substring(end);
+
+        if (inner.isEmpty()) {
+            return chord;
+        }
+
+        // Handle compound chord (slash notation)
+        if (inner.contains("/")) {
+            int slashIdx = inner.indexOf('/');
+            String numerator = inner.substring(0, slashIdx);
+            String denominator = inner.substring(slashIdx + 1);
+
+            String transposedNumerator = transposeSimpleChord(numerator, semitones, convention);
+            String transposedDenominator;
+            if (!denominator.isEmpty() && NOTE_LETTERS.contains(denominator.charAt(0))) {
+                transposedDenominator = transposeSimpleChord(denominator, semitones, convention);
+            } else {
+                transposedDenominator = denominator;
+            }
+            return prefix + transposedNumerator + "/" + transposedDenominator + suffix;
+        }
+
+        return prefix + transposeSimpleChord(inner, semitones, convention) + suffix;
     }
 
     /**

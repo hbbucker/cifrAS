@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MusicCard } from '../components/cards/MusicCard';
-import { Filter, Plus, Music, X } from 'lucide-react';
+import { Filter, Plus, Music, X, Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -15,6 +15,9 @@ import { useRef } from 'react';
 import { getSongs, getUserTags } from '../api/songs';
 import type { SongData, TagCount } from '../api/songs';
 import { ShareSongModal } from '../components/modals/ShareSongModal';
+import { ImportSongModal } from '../components/modals/ImportSongModal';
+import { CoachMark } from '../components/ui/CoachMark';
+import { useTour } from '../context/TourContext';
 import { BrandLogo } from '../components/ui/BrandLogo';
 import { TagFilterBar } from '../components/ui/TagFilterBar';
 
@@ -32,7 +35,19 @@ export const SongsListPage: React.FC = () => {
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+
+
+  const { startTour } = useTour();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      startTour('import-cifraclub');
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [startTour]);
 
   useEffect(() => {
     getUserTags()
@@ -140,16 +155,33 @@ export const SongsListPage: React.FC = () => {
               <BrandLogo iconOnly size="sm" asLink to="/dashboard" className="sm:hidden shrink-0" />
               <h1 className="text-lg sm:text-xl font-bold text-text-main truncate">{t('songsList.title')}</h1>
             </div>
-            <OnboardingTooltip tooltipId="add_song_btn">
-              <Button
-                onClick={() => navigate('/songs/new')}
-                data-testid="add-song-btn"
-                className="min-h-[40px] sm:min-h-[44px] px-3.5 sm:px-4 text-xs sm:text-sm"
+            <div className="flex gap-2">
+              <CoachMark
+                tourId="import-cifraclub"
+                title={t('songsList.importTitle', 'Importar do CifraClub')}
+                description={t('songsList.importDesc', 'Cole o link de uma música do CifraClub para importá-la diretamente para o seu repertório.')}
+                position="bottom"
               >
-                <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-1" />
-                <span>{t('songsList.addSong')}</span>
-              </Button>
-            </OnboardingTooltip>
+                <Button
+                  variant="secondary"
+                  onClick={() => setIsImportModalOpen(true)}
+                  size="sm"
+                >
+                  <Download className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-1" />
+                  <span className="hidden sm:inline">{t('common.import', 'Importar')}</span>
+                </Button>
+              </CoachMark>
+              <OnboardingTooltip tooltipId="add_song_btn">
+                <Button
+                  onClick={() => navigate('/songs/new')}
+                  data-testid="add-song-btn"
+                  size="sm"
+                >
+                  <Plus className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-1" />
+                  <span className="hidden sm:inline">{t('songsList.addSong')}</span>
+                </Button>
+              </OnboardingTooltip>
+            </div>
           </div>
 
           <div className="px-3.5 sm:px-6 pb-3 pt-0 flex flex-col gap-2.5 sm:gap-3">
@@ -163,7 +195,7 @@ export const SongsListPage: React.FC = () => {
                     setSearchQuery(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full pl-4 pr-10 py-2.5 sm:py-2 bg-bg-card border border-border-main rounded-xl focus:ring-2 focus:ring-[#8629cc] outline-none text-sm"
+                  className="w-full pl-4 pr-10 py-2.5 sm:py-2 bg-bg-card border border-border-main rounded-md focus:ring-2 focus:ring-[#aa3bff] outline-none text-sm"
                 />
                 {searchQuery ? (
                   <button
@@ -221,6 +253,7 @@ export const SongsListPage: React.FC = () => {
                   t('dashboard.educationalEmptyStep2'),
                   t('dashboard.educationalEmptyStep3')
                 ]}
+                secondaryAction={{ label: t("common.import", "Importar"), onClick: () => setIsImportModalOpen(true) }}
                 action={{ label: t('songsList.addFirstSong'), onClick: () => navigate('/songs/new') }}
               />
             ) : (
@@ -228,6 +261,7 @@ export const SongsListPage: React.FC = () => {
                 icon={Music}
                 title={t('dashboard.emptyTitle')}
                 description={t('songsList.emptyDesc')}
+                secondaryAction={{ label: t("common.import", "Importar"), onClick: () => setIsImportModalOpen(true) }}
                 action={{ label: t('songsList.addSong'), onClick: () => navigate('/songs/new') }}
               />
             )
@@ -256,6 +290,10 @@ export const SongsListPage: React.FC = () => {
           onClose={() => setSharingSong(null)}
         />
       )}
+      <ImportSongModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+      />
     </>
   );
 };

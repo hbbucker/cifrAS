@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SongsListPage } from '../pages/SongsListPage';
+import { TourProvider } from '../context/TourContext';
 import { MemoryRouter } from 'react-router-dom';
 import { AuthProvider } from '../context/AuthContext';
 import { ToastProvider } from '../context/ToastContext';
@@ -32,7 +33,7 @@ describe('SongsListPage Component', () => {
         <ThemeProvider>
           <ToastProvider>
             <MemoryRouter>
-              <SongsListPage />
+              <TourProvider><SongsListPage /></TourProvider>
             </MemoryRouter>
           </ToastProvider>
         </ThemeProvider>

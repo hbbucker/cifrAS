@@ -1,4 +1,5 @@
 const DEFAULT_CONTRACT_CLAUSES = Object.freeze([
+  'Inicie seu relato imediatamente com "Entendi a tarefa:" reformulando o pedido e resultado esperado antes de acionar ferramentas ou delegar.',
   'Produza relatos humanos úteis, claros e diretos sobre o seu entendimento, abordagem e resultados.',
   'Não invente término, aprovação, validação, entrega ou participação de papel sem evidência estrutural e resultado desta execução.',
   'Não inclua ferramentas, comandos, parâmetros, output, erros, IDs, URIs, URLs, paths, telemetria, prompts, tokens, segredos ou transcript bruto nos relatos.',

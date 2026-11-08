@@ -3,12 +3,16 @@
  * Contrato abstrato para envio de notificações, streaming e arquivos para o canal (Slack).
  */
 class INotificationPort {
-  async sendAcknowledgement(threadId, channelId) {
+  async sendAcknowledgement(threadId, channelId, options = {}) {
     throw new Error('INotificationPort.sendAcknowledgement() must be implemented');
   }
 
   async sendStatus(threadId, channelId, statusText, options = {}) {
     throw new Error('INotificationPort.sendStatus() must be implemented');
+  }
+
+  async streamNarrative(threadId, channelId, agentRole, textChunk) {
+    throw new Error('INotificationPort.streamNarrative() must be implemented');
   }
 
   async sendIntermediateNarrative(threadId, channelId, agentRole, markdownText) {
@@ -17,6 +21,10 @@ class INotificationPort {
 
   async sendMilestoneNotification(threadId, channelId, agentRole, markdownText) {
     throw new Error('INotificationPort.sendMilestoneNotification() must be implemented');
+  }
+
+  async sendPrimaryResponse(threadId, channelId, agentRole, markdownText) {
+    throw new Error('INotificationPort.sendPrimaryResponse() must be implemented');
   }
 
   async sendFinalConsolidation(threadId, channelId, agentRole, markdownText, filePaths = []) {

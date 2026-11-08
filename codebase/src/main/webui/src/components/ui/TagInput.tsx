@@ -97,14 +97,14 @@ export const TagInput: React.FC<TagInputProps> = ({
     <div className="w-full flex flex-col gap-1.5" ref={containerRef}>
       {label && (
         <label className="text-sm font-medium text-text-main flex items-center gap-1.5">
-          <TagIcon className="w-4 h-4 text-[#8629cc]" />
+          <TagIcon className="w-4 h-4 text-[#aa3bff]" />
           {label}
         </label>
       )}
 
       <div
         onClick={() => inputRef.current?.focus()}
-        className={`relative min-h-[44px] w-full bg-bg-card border border-border-main rounded-xl px-3 py-1.5 flex flex-wrap items-center gap-1.5 focus-within:border-[#8629cc] focus-within:ring-2 focus-within:ring-[#8629cc]/20 transition-all ${
+        className={`relative min-h-[44px] w-full bg-bg-card border border-border-main rounded-md px-3 py-1.5 flex flex-wrap items-center gap-1.5 focus-within:border-[#aa3bff] focus-within:ring-2 focus-within:ring-[#aa3bff]/20 transition-all ${
           disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-text'
         }`}
         data-testid="tag-input-container"
@@ -112,7 +112,7 @@ export const TagInput: React.FC<TagInputProps> = ({
         {tags.map((tag) => (
           <span
             key={tag}
-            className="inline-flex items-center gap-1 bg-[#8629cc]/10 dark:bg-[#8629cc]/20 text-[#8629cc] dark:text-[#c084fc] px-2.5 py-0.5 rounded-full text-xs font-semibold animate-fadeIn"
+            className="inline-flex items-center gap-1 bg-[#aa3bff]/10 dark:bg-[#aa3bff]/20 text-[#aa3bff] dark:text-[#c084fc] px-2.5 py-0.5 rounded-full text-xs font-semibold animate-fadeIn"
             data-testid={`tag-chip-${tag}`}
           >
             {tag}
@@ -123,7 +123,7 @@ export const TagInput: React.FC<TagInputProps> = ({
                   e.stopPropagation();
                   removeTag(tag);
                 }}
-                className="hover:bg-[#8629cc]/20 rounded-full p-0.5 transition-colors focus:outline-none"
+                className="hover:bg-[#aa3bff]/20 rounded-full p-0.5 transition-colors focus:outline-none"
                 aria-label={t('tags.remove', { tag, defaultValue: `Remover tag ${tag}` })}
                 data-testid={`remove-tag-${tag}`}
               >
@@ -152,7 +152,7 @@ export const TagInput: React.FC<TagInputProps> = ({
 
         {isOpen && filteredSuggestions.length > 0 && !disabled && (
           <ul
-            className="absolute left-0 top-full mt-1.5 w-full bg-bg-card border border-border-main rounded-xl shadow-xl z-50 py-1 max-h-48 overflow-y-auto"
+            className="absolute left-0 top-full mt-1.5 w-full bg-bg-card border border-border-main rounded-md shadow-xl z-50 py-1 max-h-48 overflow-y-auto"
             role="listbox"
             data-testid="tag-suggestions-list"
           >
@@ -165,7 +165,7 @@ export const TagInput: React.FC<TagInputProps> = ({
                 onMouseEnter={() => setHighlightedIndex(index)}
                 className={`px-3 py-2 text-sm cursor-pointer flex items-center justify-between transition-colors ${
                   index === highlightedIndex
-                    ? 'bg-[#8629cc]/15 text-[#8629cc] font-medium'
+                    ? 'bg-[#aa3bff]/15 text-[#aa3bff] font-medium'
                     : 'text-text-main hover:bg-bg-elevated'
                 }`}
                 data-testid={`tag-suggestion-${suggestion}`}

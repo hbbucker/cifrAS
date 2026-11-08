@@ -37,7 +37,7 @@ export const PrivacyPage: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-gray-900 text-gray-300 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-3xl mx-auto bg-gray-800 rounded-xl shadow-2xl overflow-hidden border border-gray-700">
+            <div className="max-w-3xl mx-auto bg-gray-800 rounded-md shadow-2xl overflow-hidden border border-gray-700">
                 <div className="bg-gray-850 px-6 py-4 border-b border-gray-700 flex justify-between items-center sticky top-0 bg-gray-800 z-10">
                     <div className="flex items-center space-x-3">
                         <button 
@@ -48,30 +48,30 @@ export const PrivacyPage: React.FC = () => {
                             <ArrowLeft className="w-5 h-5" />
                         </button>
                         <div className="flex items-center space-x-2">
-                            <Shield className="w-6 h-6 text-[#8629cc]" />
+                            <Shield className="w-6 h-6 text-[#aa3bff]" />
                             <h1 className="text-xl font-bold text-white">{t('landing.privacy')}</h1>
                         </div>
                     </div>
                     <div className="flex space-x-2">
                         <button 
                             onClick={() => handleLanguageChange('pt')}
-                            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${lang === 'pt' ? 'bg-[#8629cc] text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
+                            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${lang === 'pt' ? 'bg-[#aa3bff] text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
                         >
                             PT
                         </button>
                         <button 
                             onClick={() => handleLanguageChange('en')}
-                            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${lang === 'en' ? 'bg-[#8629cc] text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
+                            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${lang === 'en' ? 'bg-[#aa3bff] text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
                         >
                             EN
                         </button>
                     </div>
                 </div>
                 
-                <div className="p-8 prose prose-invert prose-p:text-gray-300 prose-headings:text-white prose-a:text-[#8629cc] max-w-none">
+                <div className="p-8 prose prose-invert prose-p:text-gray-300 prose-headings:text-white prose-a:text-[#aa3bff] max-w-none">
                     {isLoading ? (
                         <div className="flex justify-center items-center h-64">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#8629cc]"></div>
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#aa3bff]"></div>
                         </div>
                     ) : (
                         <ReactMarkdown>{content}</ReactMarkdown>

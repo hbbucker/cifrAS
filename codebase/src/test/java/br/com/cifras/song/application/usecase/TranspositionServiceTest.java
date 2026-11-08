@@ -193,4 +193,56 @@ class TranspositionServiceTest {
     void givenNullChord_whenTranspose_thenNoExceptionThrown() {
         assertDoesNotThrow(() -> service.transposeChord(null, 3, EnharmonicConvention.SHARPS));
     }
+
+    /**
+     * Test 18: Diminished chords transposition (º, °, ø, dim)
+     */
+    @ParameterizedTest
+    @CsvSource({
+        "Cº,2,Dº",
+        "C°,2,D°",
+        "Cø,2,Dø",
+        "Cdim,2,Ddim",
+        "Cdim7,2,Ddim7",
+        "C#º,1,Dº",
+        "Bbº,2,Cº"
+    })
+    void givenDiminishedChords_whenTranspose_thenCorrectlyTransposed(String input, int semitones, String expected) {
+        assertEquals(expected, service.transposeChord(input, semitones, EnharmonicConvention.SHARPS));
+    }
+
+    /**
+     * Test 19: Extended chords transposition (9, 11, 13, 6/9, 7/9, 7(9))
+     */
+    @ParameterizedTest
+    @CsvSource({
+        "C9,2,D9",
+        "C11,2,D11",
+        "C13,2,D13",
+        "C6/9,2,D6/9",
+        "C7/9,2,D7/9",
+        "C7(9),2,D7(9)",
+        "C7M(9),2,D7M(9)",
+        "C#m7(b5),2,D#m7(b5)"
+    })
+    void givenExtendedChords_whenTranspose_thenCorrectlyTransposed(String input, int semitones, String expected) {
+        assertEquals(expected, service.transposeChord(input, semitones, EnharmonicConvention.SHARPS));
+    }
+
+    /**
+     * Test 20: Parenthesized chords and compound chord transposition
+     */
+    @ParameterizedTest
+    @CsvSource({
+        "(C,2,(D",
+        "G),2,A)",
+        "(C),2,(D)",
+        "(C9),2,(D9)",
+        "(Cº),2,(Dº)",
+        "(C/E),2,(D/F#)",
+        "[C],2,[D]"
+    })
+    void givenParenthesizedChords_whenTranspose_thenCorrectlyTransposedPreservingPunctuation(String input, int semitones, String expected) {
+        assertEquals(expected, service.transposeChord(input, semitones, EnharmonicConvention.SHARPS));
+    }
 }

@@ -17,11 +17,6 @@ class NarrativeSanitizerService {
     const isRawToolLeak = /^(?:```(?:bash|sh|json)\n)?\s*(?:npm|node|git|curl|wget|cat|grep|sed|awk|ls|view_file|replace_file_content|write_to_file)\b/im.test(narrative);
     if (isRawToolLeak && narrative.length < 200) return null;
 
-    // Truncamento gracioso para limite do Slack
-    if (narrative.length > this.charLimit) {
-      narrative = narrative.substring(0, this.charLimit) + '...\n_(texto truncado pelo limite do Slack)_';
-    }
-
     return narrative;
   }
 

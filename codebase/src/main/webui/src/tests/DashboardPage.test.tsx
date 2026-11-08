@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '../context/AuthContext';
 import { ToastProvider } from '../context/ToastContext';
 import { ThemeProvider } from '../context/ThemeContext';
+import { TourProvider } from '../context/TourContext';
 import '@testing-library/jest-dom/vitest';
 
 const mockNavigate = vi.fn();
@@ -34,9 +35,11 @@ describe('DashboardPage Component', () => {
       <AuthProvider>
         <ThemeProvider>
           <ToastProvider>
-            <BrowserRouter>
-              <DashboardPage />
-            </BrowserRouter>
+            <TourProvider>
+              <BrowserRouter>
+                <DashboardPage />
+              </BrowserRouter>
+            </TourProvider>
           </ToastProvider>
         </ThemeProvider>
       </AuthProvider>
@@ -57,9 +60,11 @@ describe('DashboardPage Component', () => {
       <AuthProvider>
         <ThemeProvider>
           <ToastProvider>
-            <BrowserRouter>
-              <DashboardPage />
-            </BrowserRouter>
+            <TourProvider>
+              <BrowserRouter>
+                <DashboardPage />
+              </BrowserRouter>
+            </TourProvider>
           </ToastProvider>
         </ThemeProvider>
       </AuthProvider>
@@ -75,9 +80,11 @@ describe('DashboardPage Component', () => {
       <AuthProvider>
         <ThemeProvider>
           <ToastProvider>
-            <BrowserRouter>
-              <DashboardPage />
-            </BrowserRouter>
+            <TourProvider>
+              <BrowserRouter>
+                <DashboardPage />
+              </BrowserRouter>
+            </TourProvider>
           </ToastProvider>
         </ThemeProvider>
       </AuthProvider>

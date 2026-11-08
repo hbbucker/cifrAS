@@ -4,6 +4,10 @@ import { useToast } from '../../context/ToastContext';
 import authClient from '../../services/authService';
 import { BrandLogo } from '../../components/ui/BrandLogo';
 
+const DEV_MOCK_JWT = import.meta.env.DEV
+  ? 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL3Rlc3QuY2lmcmFzLmNvbSIsInN1YiI6ImUyZS11c2VyLTEyMzQiLCJ1cG4iOiJlMmUtdXNlci0xMjM0Iiwicm9sZSI6WyJ1c2VyIiwiYXV0aGVudGljYXRlZCJdLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoyMTAyMTU2NTQxLCJpYXQiOjE3ODY3OTY1NDF9.ays3isbuaqCirzrSTZpZC6J9pq1GLElKRYrcnovrRxXKTb3vR8UOxkUKJJlhOsi8iAk-7yGexVq1NglMxPFqyf3pvVHgaELvFYi0w99LZWM7qO6zKTkABjqHM2iXU9LD5Q05uHyR1M0EeATuBbfzEGCj8Nd3hPSo0j2OoaafCOVB2ugcOVJ5fz0UXgHM9Xuc8uTy3ZKFxjVlk91soU3Y6dMq49_vkPrKnZVBAAvl4HNT2Zvabg8iKPUhFDOTTBazWUthaN4UU6U2HuFEeBknEGSDpYO2Uv9VJ8Zx0ttzDJhy56lWgXM-T9EoGMe3qPCg29mzhhtwxmnTVDZMfWiTPQ'
+  : '';
+
 export const LoginPage: React.FC = () => {
   const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
@@ -27,7 +31,7 @@ export const LoginPage: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4">
-      <div className="max-w-md w-full bg-gray-800 rounded-xl shadow-2xl p-8 border border-gray-700">
+      <div className="max-w-md w-full bg-gray-800 rounded-md shadow-2xl p-8 border border-gray-700">
         <div className="flex flex-col items-center mb-8">
           <div className="mb-4">
             <BrandLogo iconOnly size="lg" />
@@ -63,12 +67,25 @@ export const LoginPage: React.FC = () => {
             </svg>
             <span>{isLoading ? 'Redirecting...' : 'Sign in with Google'}</span>
           </button>
+
+          {import.meta.env.DEV && (
+            <button
+              type="button"
+              onClick={() => {
+                window.location.href = `/auth/callback#access_token=${DEV_MOCK_JWT}&refresh_token=dummy`;
+              }}
+              data-testid="dev-mock-login-btn"
+              className="w-full bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 font-medium py-2.5 px-4 rounded-lg transition-colors text-sm flex items-center justify-center space-x-2"
+            >
+              <span>⚡ Entrar como Dev (Mock Local)</span>
+            </button>
+          )}
         </div>
 
         <div className="mt-8 flex justify-center space-x-4 text-xs text-gray-500">
-          <a href="/privacy?lang=pt" className="hover:text-[#8629cc] transition-colors">{t('landing.privacy')}</a>
+          <a href="/privacy?lang=pt" className="hover:text-[#aa3bff] transition-colors">{t('landing.privacy')}</a>
           <span>•</span>
-          <a href="/privacy?lang=en" className="hover:text-[#8629cc] transition-colors">{t('landing.privacy')}</a>
+          <a href="/privacy?lang=en" className="hover:text-[#aa3bff] transition-colors">{t('landing.privacy')}</a>
         </div>
       </div>
     </div>

@@ -96,4 +96,165 @@ E|-----------3---|`;
     expect(screen.getByTestId('instrumental-singer-notice')).toBeInTheDocument();
     expect(screen.getByText('(Música Instrumental / Sem Letra)')).toBeInTheDocument();
   });
+
+  it('correctly handles parenthesized sequences and diminished/extended chords in normal and singerMode', () => {
+    const contentWithParensAndDim = `[Intro]
+(C F G) (2x)
+
+[Verso]
+Cº C9 C11
+Canto uma canção`;
+
+    const { rerender } = render(<ChordSheet content={contentWithParensAndDim} singerMode={false} />);
+
+    // In normal mode: rendered and identified as chord lines
+    expect(screen.getByText('(C F G) (2x)')).toBeInTheDocument();
+    expect(screen.getByText('Cº C9 C11')).toBeInTheDocument();
+    expect(screen.getByText('Canto uma canção')).toBeInTheDocument();
+
+    // In singer mode: chord lines with parens and dim symbols are completely hidden
+    rerender(<ChordSheet content={contentWithParensAndDim} singerMode={true} />);
+    expect(screen.queryByText('(C F G) (2x)')).not.toBeInTheDocument();
+    expect(screen.queryByText('Cº C9 C11')).not.toBeInTheDocument();
+    expect(screen.getByText('Canto uma canção')).toBeInTheDocument();
+  });
+
+  it('renders section headers like [REFRAO] in bold with user font size inheritance', () => {
+    const content = `[REFRAO]
+C G
+Glória a Deus`;
+
+    render(<ChordSheet content={content} />);
+    const sectionLine = screen.getByTestId('line-0');
+    expect(sectionLine).toHaveTextContent('[REFRAO]');
+    expect(sectionLine.className).toContain('font-bold');
+    expect(sectionLine.className).not.toContain('bg-bg-elevated');
+    expect(sectionLine.className).not.toContain('border');
+    expect(sectionLine.className).not.toContain('text-sm');
+  });
+
+  it('renders blank lines with compact 12px height', () => {
+    const content = `[Intro]
+C G
+
+[Verso]`;
+
+    render(<ChordSheet content={content} fontSize={18} />);
+    const regularLine = screen.getByTestId('line-0');
+    const blankLine = screen.getByTestId('line-2');
+
+    expect(regularLine.style.minHeight).toBe('27px');
+    expect(blankLine.style.minHeight).toBe('12px');
+    expect(blankLine.style.height).toBe('12px');
+  });
+
+  it('supports 2 columns layout with proper CSS classes and break-inside avoidance', () => {
+    const multiVerseContent = `[Intro]
+C G Am F
+
+[Verse 1]
+C G
+Linha de teste 1
+Am F
+Linha de teste 2
+
+[Chorus]
+C G
+Refrão linha 1
+Am F
+Refrão linha 2`;
+
+    const { rerender } = render(<ChordSheet content={multiVerseContent} columns={1} />);
+    const columnContainer = screen.getByTestId('chord-sheet-columns');
+    expect(columnContainer.className).not.toContain('columns-2');
+
+    rerender(<ChordSheet content={multiVerseContent} columns={2} />);
+    expect(columnContainer.className).toContain('landscape:columns-2');
+    expect(columnContainer.className).toContain('md:columns-2');
+    expect(columnContainer.className).toContain('gap-6');
+  });
+
+  it('splits into explicit columns when [coluna] marker is present in 2-columns mode', () => {
+    const explicitContent = `[Intro]
+C G Am F
+
+[Verso 1]
+C G
+Linha 1
+Am F
+Linha 2
+
+[coluna]
+
+[Refrão]
+C G
+Refrão linha 1
+Am F
+Refrão linha 2`;
+
+    const { rerender } = render(<ChordSheet content={explicitContent} columns={2} />);
+    
+    // In 2 columns mode with explicit break:
+    expect(screen.getByTestId('chord-column-1')).toBeInTheDocument();
+    expect(screen.getByTestId('chord-column-2')).toBeInTheDocument();
+
+    // Column 1 has Intro and Verso 1
+    expect(screen.getByTestId('chord-column-1')).toHaveTextContent('Linha 1');
+    expect(screen.getByTestId('chord-column-1')).not.toHaveTextContent('Refrão linha 1');
+
+    // Column 2 has Refrão
+    expect(screen.getByTestId('chord-column-2')).toHaveTextContent('Refrão linha 1');
+    expect(screen.getByTestId('chord-column-2')).not.toHaveTextContent('Linha 1');
+
+    // The [coluna] marker line is not rendered in the view
+    expect(screen.queryByText('[coluna]')).not.toBeInTheDocument();
+
+    // In 1 column mode, all content renders sequentially without [coluna] marker
+    rerender(<ChordSheet content={explicitContent} columns={1} />);
+    expect(screen.queryByTestId('chord-column-1')).not.toBeInTheDocument();
+    expect(screen.getByText('Linha 1')).toBeInTheDocument();
+    expect(screen.getByText('Refrão linha 1')).toBeInTheDocument();
+    expect(screen.queryByText('[coluna]')).not.toBeInTheDocument();
+  });
+
+  it('supports alternative column break markers such as [quebra-coluna] and ---coluna---', () => {
+    const dashedContent = `[Verso 1]
+C G
+Parte A
+
+---coluna---
+
+[Verso 2]
+Am F
+Parte B`;
+
+    render(<ChordSheet content={dashedContent} columns={2} />);
+    expect(screen.getByTestId('chord-column-1')).toHaveTextContent('Parte A');
+    expect(screen.getByTestId('chord-column-2')).toHaveTextContent('Parte B');
+    expect(screen.queryByText('---coluna---')).not.toBeInTheDocument();
+  });
+
+  it('guarantees that column break markers are completely hidden in 1-col, 2-cols and singerMode', () => {
+    const mixed = `[Intro]
+C G
+Começo
+
+[ coluna ]
+
+[Refrão]
+Am F
+Fim`;
+
+    const { rerender } = render(<ChordSheet content={mixed} columns={1} singerMode={false} />);
+    expect(screen.queryByText(/coluna/i)).not.toBeInTheDocument();
+
+    rerender(<ChordSheet content={mixed} columns={2} singerMode={false} />);
+    expect(screen.queryByText(/coluna/i)).not.toBeInTheDocument();
+
+    rerender(<ChordSheet content={mixed} columns={2} singerMode={true} />);
+    expect(screen.queryByText(/coluna/i)).not.toBeInTheDocument();
+    expect(screen.getByText('Começo')).toBeInTheDocument();
+    expect(screen.getByText('Fim')).toBeInTheDocument();
+  });
 });
+

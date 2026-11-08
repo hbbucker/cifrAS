@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { Save, ArrowLeft } from 'lucide-react';
+import { Save, ArrowLeft, CloudDownload, Maximize2 } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import { ConfirmModal } from '../components/modals/ConfirmModal';
 import { parseContentToLyrics, stringifyLyrics } from '../utils/lyricsParser';
@@ -9,10 +9,14 @@ import { DriveFilePicker } from '../components/DriveFilePicker';
 import { Button } from '../components/ui/Button';
 import { TagInput } from '../components/ui/TagInput';
 import { getUserTags } from '../api/songs';
-import { CloudDownload } from 'lucide-react';
+import { CoachMark } from '../components/ui/CoachMark';
+import { useTour } from '../context/TourContext';
+import { SongEditorFullscreen } from '../components/music/SongEditorFullscreen';
+
 export const SongFormPage: React.FC = () => {
   const { t } = useTranslation();
- const { id } = useParams();
+  const { startTour, hasSeenTour } = useTour();
+  const { id } = useParams();
  const navigate = useNavigate();
  const location = useLocation();
  const { toast } = useToast();
@@ -27,6 +31,7 @@ export const SongFormPage: React.FC = () => {
  const [availableTags, setAvailableTags] = useState<string[]>([]);
  const [showCancelModal, setShowCancelModal] = useState(false);
  const [showDrivePicker, setShowDrivePicker] = useState(false);
+ const [isFullscreen, setIsFullscreen] = useState(false);
  const [isDirty, setIsDirty] = useState(false);
  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -47,13 +52,21 @@ export const SongFormPage: React.FC = () => {
  }, 0);
  };
 
- useEffect(() => {
-   getUserTags()
-     .then((tagCounts) => {
-       setAvailableTags(tagCounts.map((tc) => tc.name));
-     })
-     .catch(() => {});
- }, []);
+  useEffect(() => {
+    getUserTags()
+      .then((tagCounts) => {
+        setAvailableTags(tagCounts.map((tc) => tc.name));
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (!hasSeenTour('song-editor-column-marker')) {
+      startTour('song-editor-column-marker');
+    } else if (!hasSeenTour('song-editor-fullscreen')) {
+      startTour('song-editor-fullscreen');
+    }
+  }, [startTour, hasSeenTour]);
 
  useEffect(() => {
  if (id) {
@@ -150,12 +163,12 @@ export const SongFormPage: React.FC = () => {
         <div className="flex-1 overflow-y-auto p-3.5 sm:p-6 pb-24 sm:pb-8 flex flex-col bg-bg-main min-w-0">
           <div className="max-w-5xl mx-auto w-full flex-1 flex flex-col space-y-4 sm:space-y-6">
             {wasTransposed && (
-              <div className="bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-xs sm:text-sm p-3 rounded-xl flex items-center gap-2">
+              <div className="bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-xs sm:text-sm p-3 rounded-md flex items-center gap-2">
                 {t('songForm.editingOriginalKeyWarning', { key: originalKey || key })}
               </div>
             )}
             
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 bg-bg-card p-3.5 sm:p-4.5 rounded-2xl border border-border-main">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 bg-bg-card p-3.5 sm:p-4.5 rounded-lg border border-border-main">
               <div className="flex-1 min-w-0">
                 <label className="block text-xs font-semibold text-text-mute mb-1 uppercase tracking-wider">{t('songForm.title')}</label>
                 <input type="text" value={title} onChange={handleChange(setTitle)} className="w-full px-3 py-2 bg-transparent border-b border-border-main focus:border-primary text-text-main font-bold text-base sm:text-lg focus:outline-none transition-colors" data-testid="song-title-input" placeholder={t('songForm.titlePlaceholder')} />
@@ -170,7 +183,7 @@ export const SongFormPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-bg-card p-3.5 sm:p-4.5 rounded-2xl border border-border-main">
+            <div className="bg-bg-card p-3.5 sm:p-4.5 rounded-lg border border-border-main">
               <TagInput
                 tags={tags}
                 onChange={(newTags) => {
@@ -183,42 +196,85 @@ export const SongFormPage: React.FC = () => {
               />
             </div>
             
-            <div className="flex-1 flex flex-col bg-bg-card p-3.5 sm:p-4.5 rounded-2xl border border-border-main min-h-0">
+            <div className="flex-1 flex flex-col bg-bg-card p-3.5 sm:p-4.5 rounded-lg border border-border-main min-h-0">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3 sm:mb-4 border-b border-border-main pb-3 sm:pb-4">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-4 overflow-hidden">
                   <span className="text-xs sm:text-sm font-semibold text-text-main shrink-0">{t('songForm.chordsLyrics')}</span>
-                  <div className="flex items-center gap-1.5 sm:gap-2 bg-bg-main p-1 sm:p-1.5 rounded-xl border border-border-main overflow-x-auto no-scrollbar py-1">
-                    <button onClick={() => insertText('[Refrão]\n')} className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-lg hover:bg-bg-elevated transition-colors shrink-0">{t('songForm.refrao')}</button>
-                    <button onClick={() => insertText('\n\n')} className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-lg hover:bg-bg-elevated transition-colors shrink-0">{t('songForm.quebra')}</button>
-                    <button onClick={() => insertText('\n---\n')} className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-lg hover:bg-bg-elevated transition-colors shrink-0">{t('songForm.separador')}</button>
-                    <button onClick={() => insertText('\ne|---\nB|---\nG|---\nD|---\nA|---\nE|---\n')} className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-lg hover:bg-bg-elevated transition-colors shrink-0">{t('songForm.tablatura')}</button>
+                  <div className="flex items-center gap-1.5 sm:gap-2 bg-bg-main p-1 sm:p-1.5 rounded-md border border-border-main overflow-x-auto no-scrollbar py-1">
+                    <button type="button" onClick={() => insertText('[Refrão]\n')} className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-lg hover:bg-bg-elevated transition-colors shrink-0">{t('songForm.refrao')}</button>
+                    <CoachMark
+                      tourId="song-editor-column-marker"
+                      nextTourId="song-editor-fullscreen"
+                      title={t('songForm.tourColumnTitle', 'Quebra de Coluna ([coluna])')}
+                      description={t('songForm.tourColumnDesc', 'Insira [coluna] onde desejar que a cifra quebre para a 2ª coluna no Modo Teatro ou telas em modo paisagem.')}
+                      position="bottom"
+                    >
+                      <button type="button" onClick={() => insertText('\n[coluna]\n\n')} className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-lg hover:bg-bg-elevated transition-colors shrink-0" data-testid="btn-insert-coluna" title={t('songForm.colunaTooltip')}>{t('songForm.coluna')}</button>
+                    </CoachMark>
+                    <button type="button" onClick={() => insertText('\n---\n')} className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-lg hover:bg-bg-elevated transition-colors shrink-0">{t('songForm.separador')}</button>
+                    <button type="button" onClick={() => insertText('\ne|---\nB|---\nG|---\nD|---\nA|---\nE|---\n')} className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-text-main bg-bg-card border border-border-main rounded-lg hover:bg-bg-elevated transition-colors shrink-0">{t('songForm.tablatura')}</button>
                   </div>
                 </div>
-                <Button 
-                  onClick={() => setShowDrivePicker(true)}
-                  variant="ghost"
-                  size="sm"
-                  className="text-primary hover:bg-primary/10 shrink-0 self-start sm:self-auto min-h-[36px]"
-                  data-testid="btn-open-drive-picker"
-                >
-                  <CloudDownload className="w-4 h-4 mr-2" />
-                  {t('songForm.importDrive')}
-                </Button>
+                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 self-start sm:self-auto">
+                  <Button 
+                    onClick={() => setShowDrivePicker(true)}
+                    variant="ghost"
+                    size="sm"
+                    className="text-primary hover:bg-primary/10 shrink-0 min-h-[36px]"
+                    data-testid="btn-open-drive-picker"
+                  >
+                    <CloudDownload className="w-4 h-4 mr-2" />
+                    {t('songForm.importDrive')}
+                  </Button>
+                  <CoachMark
+                    tourId="song-editor-fullscreen"
+                    title={t('songForm.tourFullscreenTitle', 'Modo Tela Cheia & Live Preview')}
+                    description={t('songForm.tourFullscreenDesc', 'Expanda o editor para tela cheia e acompanhe a cifra renderizada ao vivo com acordes em tempo real.')}
+                    position="bottom"
+                  >
+                    <Button
+                      type="button"
+                      onClick={() => setIsFullscreen(true)}
+                      variant="ghost"
+                      size="sm"
+                      className="text-text-mute hover:text-text-main hover:bg-bg-elevated shrink-0 min-h-[36px] min-w-[36px] p-2 flex items-center justify-center rounded-md"
+                      data-testid="btn-toggle-fullscreen"
+                      title={t('songForm.fullscreenBtn')}
+                      aria-label={t('songForm.fullscreenBtn')}
+                    >
+                      <Maximize2 className="w-4 h-4" />
+                    </Button>
+                  </CoachMark>
+                </div>
               </div>
-              <textarea 
-                ref={textareaRef}
-                value={content} 
-                onChange={handleChange(setContent)} 
-                onKeyDown={(e) => {
-                  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-                    e.preventDefault();
-                    handleSave();
-                  }
-                }}
-                className="w-full flex-1 min-h-[40vh] sm:min-h-[50vh] bg-transparent text-text-main font-mono text-sm sm:text-base focus:outline-none resize-none leading-relaxed"
-                placeholder={t('songForm.contentPlaceholder')}
-                data-testid="song-content-input"
-              />
+              <div className="relative flex-1 flex flex-col min-h-[40vh] sm:min-h-[50vh] font-mono text-sm sm:text-base">
+                {/* Linha guia vertical para parâmetro de quebra de linha */}
+                <div 
+                  data-testid="song-editor-line-guide"
+                  title={t('songForm.lineGuideTooltip')}
+                  aria-hidden="true"
+                  className="absolute top-0 bottom-0 left-[37ch] sm:left-[40ch] border-r border-dashed border-border-main pointer-events-none z-0 flex flex-col justify-start"
+                >
+                  <span className="text-[10px] text-text-mute/70 tracking-tight font-sans select-none -translate-x-1/2 bg-bg-card/80 px-1 py-0.5 rounded border border-border-main/60 mt-1 whitespace-nowrap shadow-none opacity-70">
+                    <span className="sm:hidden">{t('songForm.lineGuideMobile', '37 carac.')}</span>
+                    <span className="hidden sm:inline">{t('songForm.lineGuideDesktop', '40 carac.')}</span>
+                  </span>
+                </div>
+                <textarea 
+                  ref={textareaRef}
+                  value={content} 
+                  onChange={handleChange(setContent)} 
+                  onKeyDown={(e) => {
+                    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                      e.preventDefault();
+                      handleSave();
+                    }
+                  }}
+                  className="relative z-10 w-full flex-1 min-h-full bg-transparent text-text-main font-mono text-sm sm:text-base focus:outline-none resize-none leading-relaxed"
+                  placeholder={t('songForm.contentPlaceholder')}
+                  data-testid="song-content-input"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -250,6 +306,21 @@ export const SongFormPage: React.FC = () => {
  }}
  />
  )}
+
+ <SongEditorFullscreen
+   isOpen={isFullscreen}
+   content={content}
+   onChange={(newContent) => {
+     setContent(newContent);
+     setIsDirty(true);
+   }}
+   onClose={() => setIsFullscreen(false)}
+   onSave={handleSave}
+   title={title}
+   artist={artist}
+   songKey={key}
+   insertText={insertText}
+ />
  </>
  );
 };

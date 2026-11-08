@@ -1,10 +1,11 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { TheaterModePage } from '../pages/TheaterModePage';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '../context/AuthContext';
 import { ToastProvider } from '../context/ToastContext';
 import { ThemeProvider } from '../context/ThemeContext';
+import { TourProvider } from '../context/TourContext';
 import { apiClient } from '../services/authService';
 import '@testing-library/jest-dom/vitest';
 
@@ -100,9 +101,11 @@ describe('TheaterModePage Component — Gesture & Interaction Navigation', () =>
       <AuthProvider>
         <ThemeProvider>
           <ToastProvider>
-            <BrowserRouter>
-              <TheaterModePage />
-            </BrowserRouter>
+            <TourProvider>
+              <BrowserRouter>
+                <TheaterModePage />
+              </BrowserRouter>
+            </TourProvider>
           </ToastProvider>
         </ThemeProvider>
       </AuthProvider>
@@ -415,13 +418,86 @@ describe('TheaterModePage Component — Gesture & Interaction Navigation', () =>
 
     // Song 1 has transposeSteps = 2 (C -> D)
     expect(await screen.findByText('Song 1')).toBeInTheDocument();
-    expect(screen.getByText('D')).toBeInTheDocument();
+    expect(screen.getByTestId('theater-current-key')).toHaveTextContent('D');
+    expect(screen.getByTestId('theater-orig-key')).toHaveTextContent('theater.originalKeyLabel C');
 
     // Navigate to Song 2
     fireEvent.click(screen.getByTestId('next-song-btn'));
     expect(await screen.findByText('Song 2')).toBeInTheDocument();
 
     // Song 2 has transposeSteps = 0 (G remains G, not transposed to A)
-    expect(await screen.findByText('G')).toBeInTheDocument();
+    expect(screen.getByTestId('theater-current-key')).toHaveTextContent('G');
+  });
+
+  it('allows toggling columns and full-width layout, auto-activating full-width on 2 columns', async () => {
+    localStorage.clear();
+    renderComponent();
+    expect(await screen.findByText('Song 1')).toBeInTheDocument();
+
+    const toggleColsBtn = screen.getByTestId('toggle-columns-btn');
+    const toggleFullWidthBtn = screen.getByTestId('toggle-fullwidth-btn');
+
+    // Initially 1 column, standard width
+    expect(localStorage.getItem('cifras_theater_columns')).toBeNull();
+
+    // Toggle columns to 2 -> should auto-activate full-width
+    fireEvent.click(toggleColsBtn);
+    expect(localStorage.getItem('cifras_theater_columns')).toBe('2');
+    expect(localStorage.getItem('cifras_theater_fullwidth')).toBe('true');
+
+    // Can manually toggle full-width off if desired
+    fireEvent.click(toggleFullWidthBtn);
+    expect(localStorage.getItem('cifras_theater_fullwidth')).toBe('false');
+
+    // Toggle back to 1 column
+    fireEvent.click(toggleColsBtn);
+    expect(localStorage.getItem('cifras_theater_columns')).toBe('1');
+  });
+
+  it('persists and recovers font size definitions across theater modes and songs', async () => {
+    localStorage.clear();
+    renderComponent();
+    expect(await screen.findByText('Song 1')).toBeInTheDocument();
+
+    const increaseFontBtn = screen.getByTestId('increase-font-btn');
+    fireEvent.click(increaseFontBtn);
+
+    // Font size should be persisted in localStorage
+    expect(localStorage.getItem('cifras_theater_fontsize')).toBeDefined();
+    const savedFontSize = Number(localStorage.getItem('cifras_theater_fontsize'));
+    expect(savedFontSize).toBeGreaterThan(0);
+  });
+
+  it('attempts to unlock screen orientation on mount to support landscape mode', async () => {
+    const unlockMock = vi.fn().mockReturnValue(Promise.resolve());
+    Object.defineProperty(window.screen, 'orientation', {
+      value: { unlock: unlockMock },
+      configurable: true,
+      writable: true
+    });
+
+    renderComponent();
+    expect(await screen.findByText('Song 1')).toBeInTheDocument();
+    expect(unlockMock).toHaveBeenCalled();
+  });
+
+  it('displays CoachMark tooltip for 2 columns toggle in theater mode and dismisses properly', async () => {
+    localStorage.clear();
+    renderComponent();
+    expect(await screen.findByText('Song 1')).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.getByText(/Visualização em 2 Colunas/i)).toBeInTheDocument();
+    });
+
+    const closeBtn = screen.getByRole('button', { name: /close/i });
+    fireEvent.click(closeBtn);
+
+    await waitFor(() => {
+      expect(screen.queryByText(/Visualização em 2 Colunas/i)).not.toBeInTheDocument();
+    });
   });
 });
+
+
+

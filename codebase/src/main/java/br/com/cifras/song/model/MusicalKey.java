@@ -24,12 +24,14 @@ public record MusicalKey(String root, String suffix) {
      */
     public static final String[] FLATS = {"C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"};
 
+    public static final java.util.Set<Character> NOTE_LETTERS = java.util.Set.of('A', 'B', 'C', 'D', 'E', 'F', 'G');
+
     /**
      * Parses a chord string into root + suffix.
      * For compound chords (e.g. "G/B"), only the numerator part is parsed here;
      * bass extraction is the responsibility of TranspositionService.
      *
-     * @param chord the chord string (e.g. "Am", "F#m7", "G/B", "Bb")
+     * @param chord the chord string (e.g. "Am", "F#m7", "G/B", "Bb", "(C", "Cº", "C9")
      * @return MusicalKey with separated root and suffix
      */
     public static MusicalKey parse(String chord) {
@@ -37,8 +39,21 @@ public record MusicalKey(String root, String suffix) {
             return new MusicalKey("", "");
         }
 
+        // Strip leading punctuation/parentheses like '(' or '[' if present
+        int start = 0;
+        while (start < chord.length() && (chord.charAt(start) == '(' || chord.charAt(start) == '[' || chord.charAt(start) == '{' || chord.charAt(start) == '|')) {
+            start++;
+        }
+        String toParse = chord.substring(start);
+
         // For compound chords, parse only the part before the slash
-        String toParse = chord.contains("/") ? chord.substring(0, chord.indexOf('/')) : chord;
+        if (toParse.contains("/")) {
+            toParse = toParse.substring(0, toParse.indexOf('/'));
+        }
+
+        if (toParse.isEmpty() || !NOTE_LETTERS.contains(toParse.charAt(0))) {
+            return new MusicalKey("", chord);
+        }
 
         // Root is the first character (note letter)
         int rootEnd = 1;

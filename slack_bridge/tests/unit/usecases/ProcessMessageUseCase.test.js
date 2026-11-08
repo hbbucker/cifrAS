@@ -5,6 +5,7 @@ const { MockEngineAdapter } = require('../../../src/adapters/engines/mock/MockEn
 const { ThreadSession } = require('../../../src/domain/entities/ThreadSession');
 const { EngineEvent } = require('../../../src/domain/events/EngineEvent');
 const { TurnResultDTO } = require('../../../src/domain/dtos/TurnResultDTO');
+const { EngineQuotaExhaustedError } = require('../../../src/domain/errors/EngineQuotaExhaustedError');
 
 class InMemoryThreadRepository {
   constructor() {
@@ -25,14 +26,20 @@ class InMemoryNotificationService {
   constructor() {
     this.events = [];
   }
-  async sendAcknowledgement(threadId, channelId) {
-    this.events.push({ type: 'ack', threadId, channelId });
+  async sendAcknowledgement(threadId, channelId, options) {
+    this.events.push({ type: 'ack', threadId, channelId, options });
   }
   async sendStatus(threadId, channelId, text, options) {
     this.events.push({ type: 'status', threadId, channelId, text, options });
   }
   async sendIntermediateNarrative(threadId, channelId, role, markdown) {
     this.events.push({ type: 'narrative', threadId, channelId, role, markdown });
+  }
+  async streamNarrative(threadId, channelId, role, textChunk) {
+    this.events.push({ type: 'narrative', threadId, channelId, role, markdown: textChunk });
+  }
+  async sendPrimaryResponse(threadId, channelId, role, markdown) {
+    this.events.push({ type: 'milestone', threadId, channelId, role, markdown });
   }
   async sendMilestoneNotification(threadId, channelId, role, markdown) {
     this.events.push({ type: 'milestone', threadId, channelId, role, markdown });
@@ -136,6 +143,7 @@ test('ProcessMessageUseCase: successfully orchestrates end-to-end turn with mock
   // Verifica despachos para a notificação
   const ackEvent = notifier.events.find(e => e.type === 'ack');
   assert.ok(ackEvent);
+  assert.equal(ackEvent.options.protectedText, 'Por favor, crie os índices do banco');
 
   const statusEvents = notifier.events.filter(e => e.type === 'status');
   assert.ok(statusEvents.length >= 1);
@@ -145,14 +153,93 @@ test('ProcessMessageUseCase: successfully orchestrates end-to-end turn with mock
   assert.ok(finalEvent.markdown.includes('Entrega final concluída'));
 });
 
+test('ProcessMessageUseCase: labels engine and canonical subagent status sources without bypass', async () => {
+  const repository = new InMemoryThreadRepository();
+  const notifier = new InMemoryNotificationService();
+  const engine = new MockEngineAdapter({
+    events: async function* () {
+      yield EngineEvent.subagentDiscovered('sub-cto', 'CTO');
+      yield EngineEvent.statusUpdated('Analisando a arquitetura da solução…');
+      yield EngineEvent.executionCompleted(new TurnResultDTO({
+        exitCode: 0,
+        responseText: 'Entrega concluída.',
+        filePaths: [],
+      }));
+    },
+  });
+  const useCase = new ProcessMessageUseCase({
+    llmEngine: engine,
+    notificationGateway: notifier,
+    sessionRepository: repository,
+  });
+
+  const result = await useCase.execute({
+    threadId: 'status-source-thread',
+    channelId: 'C_TEST',
+    userText: 'implemente a solução',
+  });
+  const statusEvents = notifier.events.filter((event) => event.type === 'status');
+
+  assert.equal(result.success, true);
+  assert.deepEqual(statusEvents.map((event) => event.options), [
+    { source: 'subagent' },
+    { source: 'engine' },
+  ]);
+  assert.equal(statusEvents.some((event) => event.options.bypassInterval), false);
+});
+
+test('ProcessMessageUseCase: labels inactivity heartbeat without bypassing status policy', async () => {
+  const repository = new InMemoryThreadRepository();
+  const notifier = new InMemoryNotificationService();
+  const originalNow = Date.now;
+  const originalSetInterval = global.setInterval;
+  const originalClearInterval = global.clearInterval;
+  let currentTime = 0;
+  let heartbeatCallback;
+  Date.now = () => currentTime;
+  global.setInterval = (callback) => {
+    heartbeatCallback = callback;
+    return { unref() {} };
+  };
+  global.clearInterval = () => {};
+
+  try {
+    const engine = {
+      async *executeStream() {
+        currentTime = 35_000;
+        await heartbeatCallback();
+        yield EngineEvent.executionCompleted(new TurnResultDTO({
+          exitCode: 0,
+          responseText: 'Finalizado.',
+          filePaths: [],
+        }));
+      },
+    };
+    const useCase = new ProcessMessageUseCase({
+      llmEngine: engine,
+      notificationGateway: notifier,
+      sessionRepository: repository,
+    });
+    await useCase.execute({ threadId: 'heartbeat-thread', channelId: 'C_TEST', userText: 'continue' });
+
+    const heartbeat = notifier.events.find((event) => event.options?.source === 'heartbeat');
+    assert.ok(heartbeat);
+    assert.equal(heartbeat.options.bypassInterval, undefined);
+  } finally {
+    Date.now = originalNow;
+    global.setInterval = originalSetInterval;
+    global.clearInterval = originalClearInterval;
+  }
+});
 
 
 
-test('ProcessMessageUseCase: handles engine failure and triggers session recovery', async () => {
+
+test('ProcessMessageUseCase: handles engine failure non-destructively and preserves session', async () => {
   const repository = new InMemoryThreadRepository();
   const notifier = new InMemoryNotificationService();
 
-  const existingSession = new ThreadSession({ threadId: '1000.2000', channelId: 'C_TEST', sessionId: 'broken-session-999' });
+  const existingSession = new ThreadSession({ threadId: '1000.2000', channelId: 'C_TEST', sessionId: 'existing-session-999' });
   await repository.save(existingSession);
 
   const failingEngine = new MockEngineAdapter({
@@ -175,13 +262,228 @@ test('ProcessMessageUseCase: handles engine failure and triggers session recover
   });
 
   assert.equal(result.success, false);
+  assert.equal(result.sessionId, 'existing-session-999');
 
-  // Verifica que a sessão quebrada foi resetada no repositório
-  const recoveredSession = await repository.getByThreadId('1000.2000');
-  assert.equal(recoveredSession.sessionId, null);
+  // Verifica que a sessão NÃO foi resetada no repositório
+  const preservedSession = await repository.getByThreadId('1000.2000');
+  assert.equal(preservedSession.sessionId, 'existing-session-999');
+  assert.equal(preservedSession.isActive, false);
 
-  // Verifica mensagem de aviso ao usuário
+  // Verifica mensagem de aviso ao usuário informando que a sessão foi preservada
   const errorEvent = notifier.events.find(e => e.type === 'error');
   assert.ok(errorEvent);
-  assert.ok(errorEvent.errorText.includes('reinicializado'));
+  assert.ok(errorEvent.errorText.includes('preservada'));
+  assert.equal(errorEvent.errorText.includes('reinicializado'), false);
+});
+
+test('ProcessMessageUseCase: handles turn timeout non-destructively and informs user of preserved session', async () => {
+  const repository = new InMemoryThreadRepository();
+  const notifier = new InMemoryNotificationService();
+
+  const existingSession = new ThreadSession({ threadId: 'timeout-thread', channelId: 'C_TEST', sessionId: 'timeout-session-123' });
+  await repository.save(existingSession);
+
+  const timeoutEngine = new MockEngineAdapter({
+    events: async function* () {
+      yield EngineEvent.executionFailed(new Error('Turn execution timed out after 300000ms'), 1);
+    },
+  });
+
+  const useCase = new ProcessMessageUseCase({
+    llmEngine: timeoutEngine,
+    notificationGateway: notifier,
+    sessionRepository: repository,
+    workspaceDir: '/test/workspace',
+  });
+
+  const result = await useCase.execute({
+    threadId: 'timeout-thread',
+    channelId: 'C_TEST',
+    userText: 'comando demorado',
+  });
+
+  assert.equal(result.success, false);
+  assert.equal(result.sessionId, 'timeout-session-123');
+
+  const preservedSession = await repository.getByThreadId('timeout-thread');
+  assert.equal(preservedSession.sessionId, 'timeout-session-123');
+  assert.equal(preservedSession.isActive, false);
+
+  const errorEvent = notifier.events.find(e => e.type === 'error');
+  assert.ok(errorEvent);
+  assert.ok(errorEvent.errorText.includes('tempo limite'));
+  assert.ok(errorEvent.errorText.includes('preservada'));
+});
+
+test('ProcessMessageUseCase: preserves the complete session and reuses it after quota exhaustion', async () => {
+  const repository = new InMemoryThreadRepository();
+  const notifier = new InMemoryNotificationService();
+  const existingSession = new ThreadSession({
+    threadId: 'quota-thread',
+    channelId: 'C_TEST',
+    sessionId: 'preserved-session',
+    pendingId: 'pending-7',
+    offset: 12,
+    participantRoles: ['CEO', 'CTO'],
+    publishedNarratives: ['CTO:work kept'],
+    subagents: new Map([['sub-1', { conversationId: 'sub-1', role: 'CTO', offset: 9 }]]),
+  });
+  await repository.save(existingSession);
+
+  const receivedInstructions = [];
+  let executionCount = 0;
+  const engine = {
+    async *executeStream(instruction) {
+      receivedInstructions.push(instruction);
+      executionCount += 1;
+      if (executionCount === 1) {
+        yield EngineEvent.executionFailed(new EngineQuotaExhaustedError(1301), 0);
+        return;
+      }
+      yield EngineEvent.executionCompleted(new TurnResultDTO({
+        exitCode: 0,
+        responseText: 'continued safely',
+        filePaths: [],
+      }));
+    },
+  };
+  const useCase = new ProcessMessageUseCase({
+    llmEngine: engine,
+    notificationGateway: notifier,
+    sessionRepository: repository,
+    workspaceDir: '/test/workspace',
+  });
+
+  const quotaResult = await useCase.execute({
+    threadId: 'quota-thread',
+    channelId: 'C_TEST',
+    userText: 'first attempt',
+  });
+  const preservedSession = await repository.getByThreadId('quota-thread');
+
+  assert.equal(quotaResult.success, false);
+  assert.equal(quotaResult.sessionId, 'preserved-session');
+  assert.equal(quotaResult.responseText, '');
+  assert.deepEqual({
+    sessionId: preservedSession.sessionId,
+    pendingId: preservedSession.pendingId,
+    offset: preservedSession.offset,
+    participantRoles: preservedSession.participantRoles,
+    publishedNarratives: preservedSession.publishedNarratives,
+    subagents: [...preservedSession.subagents],
+    isActive: preservedSession.isActive,
+  }, {
+    sessionId: 'preserved-session',
+    pendingId: 'pending-7',
+    offset: 12,
+    participantRoles: ['CEO', 'CTO'],
+    publishedNarratives: ['CTO:work kept'],
+    subagents: [['sub-1', { conversationId: 'sub-1', role: 'CTO', offset: 9 }]],
+    isActive: false,
+  });
+
+  const quotaMessages = notifier.events.filter((event) => event.type === 'error');
+  assert.equal(quotaMessages.length, 1);
+  assert.equal(
+    quotaMessages[0].errorText,
+    '⚠️ O limite individual do Antigravity foi atingido. A plataforma informou nova tentativa em aproximadamente 21 min 41 s. Sua sessão foi preservada.'
+  );
+
+  const retryResult = await useCase.execute({
+    threadId: 'quota-thread',
+    channelId: 'C_TEST',
+    userText: 'manual retry',
+  });
+  assert.equal(retryResult.success, true);
+  assert.equal(receivedInstructions[1].sessionId, 'preserved-session');
+});
+
+test('ProcessMessageUseCase: quota fallback message contains no provider output', async () => {
+  const repository = new InMemoryThreadRepository();
+  const notifier = new InMemoryNotificationService();
+  await repository.save(new ThreadSession({
+    threadId: 'quota-fallback',
+    channelId: 'C_TEST',
+    sessionId: 'preserved-session',
+  }));
+  const engine = new MockEngineAdapter({
+    events: async function* () {
+      yield EngineEvent.executionFailed(new EngineQuotaExhaustedError(), 1);
+    },
+  });
+  const useCase = new ProcessMessageUseCase({
+    llmEngine: engine,
+    notificationGateway: notifier,
+    sessionRepository: repository,
+  });
+
+  const result = await useCase.execute({
+    threadId: 'quota-fallback',
+    channelId: 'C_TEST',
+    userText: 'retry',
+  });
+  const errorEvents = notifier.events.filter((event) => event.type === 'error');
+
+  assert.equal(result.success, false);
+  assert.equal(errorEvents.length, 1);
+  assert.equal(
+    errorEvents[0].errorText,
+    '⚠️ O limite individual do Antigravity foi atingido. Tente novamente mais tarde. Sua sessão foi preservada.'
+  );
+  assert.doesNotMatch(JSON.stringify(notifier.events), /Error ID|Individual quota reached|\/home\//);
+});
+
+test('ProcessMessageUseCase: reuses preserved sessionId after turn timeout on subsequent message', async () => {
+  const repository = new InMemoryThreadRepository();
+  const notifier = new InMemoryNotificationService();
+  await repository.save(new ThreadSession({
+    threadId: 'timeout-flow-thread',
+    channelId: 'C_TEST',
+    sessionId: 'session-to-continue',
+    participantRoles: ['CEO', 'CTO'],
+  }));
+
+  const receivedInstructions = [];
+  let attempt = 0;
+  const engine = {
+    async *executeStream(instruction) {
+      receivedInstructions.push(instruction);
+      attempt += 1;
+      if (attempt === 1) {
+        yield EngineEvent.executionFailed(new Error('Turn execution timed out after 300000ms'), 1);
+        return;
+      }
+      yield EngineEvent.executionCompleted(new TurnResultDTO({
+        exitCode: 0,
+        responseText: 'Sucesso na continuidade',
+        filePaths: [],
+      }));
+    },
+  };
+
+  const useCase = new ProcessMessageUseCase({
+    llmEngine: engine,
+    notificationGateway: notifier,
+    sessionRepository: repository,
+    workspaceDir: '/test/workspace',
+  });
+
+  // Primeira tentativa: timeout
+  const firstResult = await useCase.execute({
+    threadId: 'timeout-flow-thread',
+    channelId: 'C_TEST',
+    userText: 'comando que deu timeout',
+  });
+  assert.equal(firstResult.success, false);
+  assert.equal(firstResult.sessionId, 'session-to-continue');
+
+  // Segunda tentativa na mesma thread: deve reutilizar session-to-continue
+  const secondResult = await useCase.execute({
+    threadId: 'timeout-flow-thread',
+    channelId: 'C_TEST',
+    userText: 'comando seguinte após timeout',
+  });
+  assert.equal(secondResult.success, true);
+  assert.equal(secondResult.sessionId, 'session-to-continue');
+  assert.equal(receivedInstructions[1].sessionId, 'session-to-continue');
 });

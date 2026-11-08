@@ -63,9 +63,12 @@ const THEME_STYLES: Record<
     textColor: 'F9FAFB',
     accentColor: 'E60023',
     subtextColor: 'D1D5DB',
-    fontFace: 'Georgia',
+    fontFace: 'Arial',
   },
 };
+
+// why: FHP-35 fixa Arial 40 nos slides de letra para legibilidade uniforme em projeção.
+const LYRICS_FONT_SIZE = 40;
 
 /**
  * Detects if a line is a guitar/bass tablature line.
@@ -142,15 +145,14 @@ export function isStrummingOrRhythmLine(line: string): boolean {
   return false;
 }
 
+import { stripOuterPunctuation, CORE_CHORD_REGEX, MARKER_REGEX } from './chordTransposer';
+
 /**
  * Detects if a line is composed purely or predominantly of chord notations.
  */
 export function isChordOnlyLine(line: string): boolean {
   const trimmed = line.trim();
   if (!trimmed) return false;
-
-  const chordRegex = /^([A-G][#b]?)([mM0-9]|maj|min|dim|aug|sus|add|\+|-|º|°|ø|b|#)*(\([^)]+\))*(\/([A-G][#b]?|[0-9]+))?$/;
-  const markerRegex = /^(\|:|:\||\||%|-|~|\(\d+x\)|\d+x|intro:?|solo:?|riff:?|base:?|interlúdio:?|interlude:?|fim:?|final:?)$/i;
 
   const tokens = trimmed.split(/\s+/).filter(Boolean);
   if (tokens.length === 0) return false;
@@ -159,14 +161,17 @@ export function isChordOnlyLine(line: string): boolean {
   let evaluatedTokens = 0;
 
   for (const token of tokens) {
-    const cleanToken = token.replace(/^[([]+|[)\].,;]+$/g, '');
+    if (MARKER_REGEX.test(token)) {
+      continue;
+    }
 
-    if (markerRegex.test(token) || markerRegex.test(cleanToken)) {
+    const cleanToken = stripOuterPunctuation(token);
+    if (!cleanToken || MARKER_REGEX.test(cleanToken)) {
       continue;
     }
 
     evaluatedTokens++;
-    if (chordRegex.test(token) || (cleanToken.length > 0 && chordRegex.test(cleanToken))) {
+    if (CORE_CHORD_REGEX.test(cleanToken)) {
       chordCount++;
     }
   }
@@ -424,14 +429,13 @@ export function buildPresentation(
 
         // Lyrics Text Block
         const lyricsText = chunk.join('\n');
-        const calculatedFontSize = chunk.length > 4 ? 32 : 36;
 
         slide.addText(lyricsText, {
           x: '6%',
           y: section.label ? '18%' : '12%',
           w: '88%',
           h: '70%',
-          fontSize: calculatedFontSize,
+          fontSize: LYRICS_FONT_SIZE,
           fontFace: style.fontFace,
           bold: true,
           color: style.textColor,
@@ -439,19 +443,6 @@ export function buildPresentation(
           valign: 'middle',
           isTextBox: true,
           lineSpacingMultiple: 1.25,
-        });
-
-        // Small Footer
-        slide.addText(song.title, {
-          x: '6%',
-          y: '90%',
-          w: '88%',
-          h: '6%',
-          fontSize: 12,
-          fontFace: style.fontFace,
-          color: style.subtextColor,
-          align: 'right',
-          valign: 'middle',
         });
       });
     }

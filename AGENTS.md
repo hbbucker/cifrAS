@@ -228,101 +228,43 @@ Para economizar tokens de contexto nas interações com o terminal e o git, todo
   npx playwright test
   ```
 
-### Deploy
-**Executar o deploy na raiz do projeto
-```bash
-fly deploy --local-only --verbose
-```
+### Deploy e Procedimento Padrão para Encerramento de Release ("fechar release")
+Quando o usuário instruir "fechar release" (com autorização explícita), execute OBRIGATORIAMENTE o seguinte ciclo padronizado completo na ordem:
 
----
-
-## 9. Princípios Fundamentais
-
-### 9.1 Spec-Driven Development (TLC)
-Toda implementação regular deve ser precedida por uma especificação clara. O fluxo padrão é:
-> **Specify → Clarify/Plan (Fundidos) → Tasks → Implement → Validate**
-
-**Fast-Track**: Alterações de baixa complexidade ou ajustes de UI podem pular do `Specify` direto para o `Implement`.
-
-### 9.2 Maker-Checker Separation
-O agente que gera o artefato (Maker) **nunca** pode validá-lo. A validação é responsabilidade exclusiva do Checker (QA Lead). O QA Lead atua também com viés adversarial caso os Makers excedam 3 rejeições.
-
-### 9.3 Autoridade de Domínio (Domain Authority)
-Para evitar o "Paradoxo do Árbitro" e poupar o fundador humano:
-- O **CPO** tem a decisão final irrevogável em regras de produto e negócio.
-- O **CTO** tem a decisão final irrevogável em arquitetura e stack técnica.
-O humano (CEO/Fundador) só deve ser escalado para pivotagens de roadmap, aumento crítico de escopo ou decisões financeiras/tempo.
-
-### 9.4 Paralelismo Contract-First
-Ao iniciar a etapa de `Implement`, o CTO deve gerar os DTOs (Contratos de API) primeiro. A partir da selagem do contrato, CTO e Frontend codificam em paralelo.
-
----
-
-## 10. Papéis (Agents)
-
-| Papel | Responsabilidade | Ferramentas Permitidas | Modelo Sugerido | Skill Correspondente |
-|-------|------------------|------------------------|-----------------|----------------------|
-| **CEO & Orquestrador** | Roteamento do workflow, aplicação da Autoridade, escalação | Leitura/Escrita completa | Sonnet / Opus / Pro | `startupos-ceo` |
-| **CTO** | Arquitetura, backend, DTOs, banco de dados | Leitura/Escrita/Execução | Sonnet / Opus / Pro | `startupos-cto` |
-| **CPO** | Produto, UX, critérios de aceite, roadmap | Leitura/Escrita (docs) | Sonnet / Opus / Pro | `startupos-cpo` |
-| **QA Lead** | Checker único. Testes, aprovação de release | **Somente Leitura** | Sonnet / Pro | `startupos-qa-lead` |
-| **Frontend Staff** | UX, jornadas, UI (React/Vite) | Leitura/Escrita/Execução | Sonnet / Opus / Pro | `startupos-frontend-staff` |
-
----
-
-## 11. Regras de Ferramentas por Papel
-
-### 11.1 Restrições Estritas de QA Lead
-
-O papel de **QA Lead** é estritamente **read-only**:
-
-- `Read` — Permitido
-- `Grep` — Permitido
-- `Glob` — Permitido
-- `Write` — **Proibido**
-- `Exec` — **Proibido**
-- `Edit` — **Proibido**
-
-### 11.2 Makers (CTO e Frontend Staff)
-
-Podem executar código, escrever arquivos e usar ferramentas de implementação, mas **não podem** validar seu próprio trabalho.
-
----
-
-## 12. Workflow de Governança
-
-### 12.1 Workflow Operacional
-1. **Specify** — CPO captura requisitos e cria critérios de aceite.
-2. **Clarify/Plan** — CTO levanta viabilidade técnica e define DTOs/Banco.
-3. **Implement (Paralelo)** — CTO (Backend) e Frontend codificam simultaneamente guiados pelos DTOs.
-4. **Validate** — QA Lead avalia. Se reprovar, devolve ao Maker. 
-5. **Adversarial Mode** — Se o QA Lead rejeitar 3 vezes a mesma entrega, ele congela a feature e força a Autoridade de Domínio (CTO ou CPO) a assumir a responsabilidade técnica/funcional.
-
-### 12.2 Escalação Humana (CEO/Fundador)
-A IA (Orquestrador) só deve pausar o workflow e chamar o humano se:
-1. Houver necessidade de alterar `.specs/project/ROADMAP.md` ou `.specs/project/PROJECT.md`.
-2. O risco financeiro, de tempo ou de segurança for muito alto para a IA assumir.
-
----
-
-## 13. Princípios de Trade-Off (Startup Principles)
-
-1. **Progresso sobre Perfeição** — Entregue valor incremental (Fast-Track para coisas simples).
-2. **Especifique antes de Codificar** — Para features complexas, o contrato é inegociável.
-3. **Separe Maker de Checker** — Quem escreve código não pode dar "Go" para release.
-4. **Autoridade de Domínio** — Deixe a engenharia decidir engenharia e o produto decidir produto. Poupe o fundador.
-5. **Contexto Fresco** — O QA Lead não deve ler o histórico de pensamento do Maker para não contaminar seu viés.
-
----
-
-## 14. Documentação do Projeto
-
-Os documentos de referência do projeto vivem em `.specs/project/`:
-
-- **[`PROJECT.md`](.specs/project/PROJECT.md)** — Constituição: visão, objetivos, stack e escopo.
-- **[`ROADMAP.md`](.specs/project/ROADMAP.md)** — Milestones e status de entrega.
-- **[`STATE.md`](.specs/project/STATE.md)** — Estado atual do projeto (contexto operacional).
-- **[`.specs/features/`](.specs/features/)** — Especificações técnicas por feature.
+1. **Merge do Pull Request:**
+   Realizar squash merge do PR e deletar a branch da feature/fix:
+   ```bash
+   gh pr merge <PR_NUM> --squash --delete-branch
+   ```
+2. **Registro do Parecer de Release:**
+   Criar/atualizar `.specs/features/<feature>/release/verdict.md` documentando escopo, evidências de validação e veredicto.
+3. **Atualização do Estado do Projeto:**
+   Registrar o item concluído em `.specs/project/STATE.md` (e `ROADMAP.md` se aplicável).
+4. **Commit e Sincronização da Documentação:**
+   Comitar os registros de release e sincronizar na branch `main`:
+   ```bash
+   git add .specs/ && git commit -m "docs(release): atualizar estado do projeto e encerrar release vX.Y.Z" && git push origin main
+   ```
+5. **Versionamento e Git Tag:**
+   Incrementar versão semântica e criar/enviar a tag anotada:
+   ```bash
+   git tag -a vX.Y.Z -m "vX.Y.Z - <Título da Release>" && git push origin vX.Y.Z
+   ```
+6. **Publicação da Release no GitHub:**
+   Criar a release oficial no GitHub:
+   ```bash
+   gh release create vX.Y.Z --title "vX.Y.Z - <Título da Release>" --notes "<Notas da Release>"
+   ```
+7. **Deploy em Produção:**
+   Executar o deploy na raiz do projeto:
+   ```bash
+   fly deploy --local-only --verbose
+   ```
+8. **Limpeza de Worktrees:**
+   Remover a worktree local utilizada para o desenvolvimento:
+   ```bash
+   git worktree remove <caminho_worktree>
+   ```
 
 <!-- startupos-governance:start -->
 # Startup OS Governance
@@ -382,6 +324,10 @@ O papel de **QA Lead** é estritamente **read-only**:
 
 Podem executar código, escrever arquivos e usar ferramentas de implementação, mas **não podem** validar seu próprio trabalho.
 
+### 3.3 Bots Autônomos e Wrappers (CLI)
+
+Qualquer ponte, integração (como `slack_bridge`) ou wrapper que invoque a CLI do AGY de forma autônoma e silenciosa para operar em background **deve** usar a flag `--sandbox` em sua matriz de argumentos. Essa restrição de segurança no terminal garante que, embora o bot possua privilégios para atuar nos arquivos (`--dangerously-skip-permissions`), ele estará operando sob barreiras controladas em relação a comandos de shell perigosos.
+
 ---
 
 ## 4. Workflow de Governança
@@ -392,6 +338,8 @@ Podem executar código, escrever arquivos e usar ferramentas de implementação,
 3. **Implement (Paralelo)** — CTO (Backend) e Frontend codificam simultaneamente guiados pelos DTOs. Ambos devem avaliar e registrar ADRs caso tomem decisões arquiteturais complexas em suas áreas.
 4. **Validate** — QA Lead avalia contra o nível consolidado, gates e evidências. O parecer de integração é `PRONTA PARA INTEGRAÇÃO` ou `REJEITADA`; ele não autoriza release. O QA produz o texto do parecer read-only e o CEO/Orquestrador o persiste verbatim em `.specs/features/<feature>/qa/`.
 5. **Adversarial Mode** — Se o QA Lead rejeitar 3 vezes a mesma entrega, ele congela a feature e força a Autoridade de Domínio (CTO ou CPO) a assumir a responsabilidade técnica/funcional.
+6. **Gerenciamento de Alterações** - Sempre que uma alteração de código for iniciada, abra uma worktree com uma nova branch, e ao encerrar a release e o deploy remova a worktree local.
+7. **Deploy e Release** - Nunca feche uma release e um deploy em produção sem autorização explícita do humano. Ao receber o comando "fechar release", execute obrigatoriamente o ciclo padronizado completo: merge do PR via squash, registro do parecer de release, atualização de `.specs/project/STATE.md`, commit/push na `main`, criação e envio de git tag anotada (`vX.Y.Z`), publicação da release no GitHub (`gh release create`), deploy com `fly deploy --local-only --verbose` e remoção da worktree local.
 
 ### 4.2 Fast-Track com Gate de Qualidade
 1. Registrar uma microespecificação com objetivo, escopo, critérios de aceite e riscos conhecidos.

@@ -37,7 +37,7 @@ export const Sidebar: React.FC = () => {
           {!collapsed && <BrandLogo size="md" asLink to="/dashboard" />}
           <button 
             onClick={() => setCollapsed(!collapsed)} 
-            className="p-1 rounded hover:bg-bg-elevated focus:outline-none focus:ring-2 focus:ring-[#8629cc]"
+            className="p-1 rounded hover:bg-bg-elevated focus:outline-none focus:ring-2 focus:ring-[#aa3bff]"
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             aria-expanded={!collapsed}
           >
@@ -53,7 +53,7 @@ export const Sidebar: React.FC = () => {
               className={({ isActive }) => 
                 `flex items-center gap-4 px-3 py-3 rounded-lg transition-colors relative ${
                   isActive 
-                    ? 'bg-[#8629cc]/10 text-[#8629cc]' 
+                    ? 'bg-[#aa3bff]/10 text-[#aa3bff]' 
                     : 'text-text-mute hover:bg-bg-elevated'
                 } ${collapsed ? 'justify-center' : ''}`
               }
@@ -62,7 +62,7 @@ export const Sidebar: React.FC = () => {
               <div className="relative flex items-center justify-center">
                 {link.icon}
                 {link.badge !== null && link.badge !== undefined && (
-                  <span className="absolute -top-1.5 -right-2 bg-[#8629cc] text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full min-w-[16px] h-4 flex items-center justify-center">
+                  <span className="absolute -top-1.5 -right-2 bg-[#aa3bff] text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full min-w-[16px] h-4 flex items-center justify-center">
                     {link.badge}
                   </span>
                 )}
@@ -71,7 +71,7 @@ export const Sidebar: React.FC = () => {
                 <div className="flex-1 flex items-center justify-between">
                   <span className="font-medium">{link.label}</span>
                   {link.badge !== null && link.badge !== undefined && (
-                    <span className="bg-[#8629cc]/10 text-[#8629cc] text-xs font-bold px-2 py-0.5 rounded-full">
+                    <span className="bg-[#aa3bff]/10 text-[#aa3bff] text-xs font-bold px-2 py-0.5 rounded-full">
                       {link.badge}
                     </span>
                   )}

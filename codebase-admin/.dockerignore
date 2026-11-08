@@ -1,0 +1,11 @@
+target/
+**/target/
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+.vite/
+**/.vite/
+.git/
+.github/
+.specs/

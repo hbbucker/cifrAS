@@ -3,11 +3,15 @@ const assert = require('node:assert/strict');
 const { createEngine } = require('../../../src/infrastructure/bootstrap');
 const { EnvironmentConfig } = require('../../../src/infrastructure/config/EnvironmentConfig');
 const { MockEngineAdapter } = require('../../../src/adapters/engines/mock/MockEngineAdapter');
+const { CodexEngineAdapter } = require('../../../src/adapters/engines/codex/CodexEngineAdapter');
 const { AntigravityEngineAdapter } = require('../../../src/adapters/engines/antigravity/AntigravityEngineAdapter');
 
 test('Bootstrap: createEngine factory returns correct engine instance', () => {
   const mockEngine = createEngine('mock');
   assert.ok(mockEngine instanceof MockEngineAdapter);
+
+  const codexEngine = createEngine('codex');
+  assert.ok(codexEngine instanceof CodexEngineAdapter);
 
   const agyEngine = createEngine('antigravity');
   assert.ok(agyEngine instanceof AntigravityEngineAdapter);

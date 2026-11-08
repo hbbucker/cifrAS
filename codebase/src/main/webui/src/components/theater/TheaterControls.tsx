@@ -1,14 +1,14 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Play, Pause, ChevronLeft, ChevronRight, Maximize, X, Lock, Unlock, Mic } from 'lucide-react';
+import { Play, Pause, ChevronLeft, ChevronRight, Maximize, X, Lock, Unlock, Mic, Columns, Maximize2, Minimize2 } from 'lucide-react';
 import { TransposePad } from '../music/TransposePad';
+import { CoachMark } from '../ui/CoachMark';
 
 interface TheaterControlsProps {
-  title?: string;
-  artist?: string;
   isScrolling: boolean;
   speed: number;
   currentKey: string;
+  showControls?: boolean;
   onPlayPause: () => void;
   onSpeedChange: (speed: number) => void;
   onTransposeUp: () => void;
@@ -24,14 +24,17 @@ interface TheaterControlsProps {
   onLockToggle?: () => void;
   isSingerMode?: boolean;
   onToggleSingerMode?: () => void;
+  columns?: 1 | 2;
+  onToggleColumns?: () => void;
+  isFullWidth?: boolean;
+  onToggleFullWidth?: () => void;
 }
 
 export const TheaterControls: React.FC<TheaterControlsProps> = ({
-  title,
-  artist,
   isScrolling,
   speed,
   currentKey,
+  showControls = true,
   onPlayPause,
   onSpeedChange,
   onTransposeUp,
@@ -46,44 +49,44 @@ export const TheaterControls: React.FC<TheaterControlsProps> = ({
   isLocked = false,
   onLockToggle,
   isSingerMode = false,
-  onToggleSingerMode
+  onToggleSingerMode,
+  columns = 1,
+  onToggleColumns,
+  isFullWidth = false,
+  onToggleFullWidth
 }) => {
   const { t } = useTranslation();
 
+  const isVisible = showControls && !className.includes('opacity-0');
+  const opacityClass = isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none';
+
   return (
     <div 
-      className={`fixed inset-0 pointer-events-none z-40 transition-all duration-300 ${className}`} 
+      className={`fixed inset-0 pointer-events-none z-40 transition-opacity duration-300 ${opacityClass} ${className}`} 
       data-testid="theater-controls"
     >
       {/* ========================================================================= */}
-      {/* 1. TOP HEADER (Session & Utilities)                                       */}
+      {/* 1. TOP HEADER (Action Buttons)                                            */}
       {/* ========================================================================= */}
-      <header className="fixed top-0 left-0 right-0 px-3.5 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between bg-gradient-to-b from-bg-main via-bg-main/85 to-transparent backdrop-blur-sm border-b border-border-main/30 pointer-events-auto transition-all">
-        {/* Left: Exit button + Song Title & Artist */}
+      <header className="fixed top-0 left-0 right-0 px-3.5 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between pointer-events-none z-40 transition-all">
+        {/* Left: Exit button */}
         <div className="flex items-center gap-2 sm:gap-3.5 min-w-0 pr-2">
           <button 
             onClick={onExit} 
-            className="p-2 min-h-[38px] min-w-[38px] sm:min-h-[42px] sm:min-w-[42px] flex items-center justify-center rounded-full bg-bg-card/90 hover:bg-red-500/20 text-text-mute hover:text-red-500 transition-colors border border-border-main/50 shadow-sm shrink-0" 
+            className="p-2 min-h-[38px] min-w-[38px] sm:min-h-[42px] sm:min-w-[42px] flex items-center justify-center rounded-full bg-bg-card/90 hover:bg-red-500/20 text-text-mute hover:text-red-500 transition-colors border border-border-main/50 shadow-sm shrink-0 pointer-events-auto" 
             title={t('theater.exit')} 
             aria-label={t('theater.exit')}
             data-testid="exit-theater-btn"
           >
             <X className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
-          
-          {(title || artist) && (
-            <div className="min-w-0">
-              {title && <h1 className="text-sm sm:text-base md:text-lg font-bold truncate text-text-main">{title}</h1>}
-              {artist && <p className="text-xs sm:text-sm text-text-mute truncate">{artist}</p>}
-            </div>
-          )}
         </div>
 
         {/* Right: Lock & Fullscreen buttons */}
-        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 pointer-events-auto">
           <button 
             onClick={onLockToggle}
-            className={`p-2 min-h-[38px] min-w-[38px] sm:min-h-[42px] sm:min-w-[42px] flex items-center justify-center rounded-full bg-bg-card/90 hover:bg-bg-elevated transition-colors border border-border-main/50 shadow-sm ${isLocked ? 'text-[#8629cc] ring-1 ring-[#8629cc]/40' : 'text-text-mute hover:text-text-main'}`}
+            className={`p-2 min-h-[38px] min-w-[38px] sm:min-h-[42px] sm:min-w-[42px] flex items-center justify-center rounded-full bg-bg-card/90 hover:bg-bg-elevated transition-colors border border-border-main/50 shadow-sm ${isLocked ? 'text-[#aa3bff] ring-1 ring-[#aa3bff]/40' : 'text-text-mute hover:text-text-main'}`}
             title={isLocked ? t('theater.unlock') : t('theater.lock')} 
             aria-label={isLocked ? t('theater.unlock') : t('theater.lock')}
             data-testid="lock-mode-btn"
@@ -109,10 +112,10 @@ export const TheaterControls: React.FC<TheaterControlsProps> = ({
       {/* 2. SIDE DOCK (Typography & View Mode)                                     */}
       {/* ========================================================================= */}
       {!isLocked && (
-        <aside className="fixed right-3 sm:right-6 top-1/3 -translate-y-1/2 flex flex-col items-center gap-1 sm:gap-1.5 p-1.5 bg-bg-card/90 backdrop-blur-xl border border-border-main rounded-2xl shadow-xl pointer-events-auto transition-all">
+        <aside className="fixed right-3 sm:right-6 top-1/3 -translate-y-1/2 flex flex-col items-center gap-1 sm:gap-1.5 p-1.5 bg-bg-card/90 backdrop-blur-xl border border-border-main rounded-lg shadow-xl pointer-events-auto transition-all">
           <button 
             onClick={onFontSizeIncrease} 
-            className="p-2 min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center hover:bg-bg-elevated rounded-xl transition-colors text-text-mute hover:text-text-main font-bold text-sm sm:text-base" 
+            className="p-2 min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center hover:bg-bg-elevated rounded-md transition-colors text-text-mute hover:text-text-main font-bold text-sm sm:text-base" 
             title={t('theater.increaseFont')} 
             aria-label={t('theater.increaseFont')}
             data-testid="increase-font-btn"
@@ -122,7 +125,7 @@ export const TheaterControls: React.FC<TheaterControlsProps> = ({
           
           <button 
             onClick={onFontSizeDecrease} 
-            className="p-2 min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center hover:bg-bg-elevated rounded-xl transition-colors text-text-mute hover:text-text-main font-bold text-xs sm:text-sm" 
+            className="p-2 min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center hover:bg-bg-elevated rounded-md transition-colors text-text-mute hover:text-text-main font-bold text-xs sm:text-sm" 
             title={t('theater.decreaseFont')} 
             aria-label={t('theater.decreaseFont')}
             data-testid="decrease-font-btn"
@@ -132,9 +135,42 @@ export const TheaterControls: React.FC<TheaterControlsProps> = ({
 
           <div className="w-4 h-px bg-border-main my-0.5" />
 
+          {onToggleColumns && (
+            <CoachMark
+              tourId="theater-columns-toggle"
+              title={t('theater.tourColumnsTitle', 'Visualização em 2 Colunas')}
+              description={t('theater.tourColumnsDesc', 'Alterne para 2 colunas para aproveitar melhor telas em paisagem ou tablets. A cifra respeita a quebra manual [coluna] ou balanceia automaticamente.')}
+              position="left"
+            >
+              <button 
+                onClick={onToggleColumns}
+                className={`p-2 min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center hover:bg-bg-elevated rounded-md transition-colors ${columns === 2 ? 'bg-[#aa3bff]/15 text-[#aa3bff] ring-1 ring-[#aa3bff]/30' : 'text-text-mute hover:text-text-main'}`}
+                title={columns === 2 ? t('theater.columns1') : t('theater.columns2')} 
+                aria-label={t('theater.toggleColumns')}
+                data-testid="toggle-columns-btn"
+              >
+                <Columns className="w-4 h-4 sm:w-5 sm:h-5" />
+              </button>
+            </CoachMark>
+          )}
+
+          {onToggleFullWidth && (
+            <button 
+              onClick={onToggleFullWidth}
+              className={`p-2 min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center hover:bg-bg-elevated rounded-md transition-colors ${isFullWidth ? 'bg-[#aa3bff]/15 text-[#aa3bff] ring-1 ring-[#aa3bff]/30' : 'text-text-mute hover:text-text-main'}`}
+              title={isFullWidth ? t('theater.fitWidth') : t('theater.expandWidth')} 
+              aria-label={t('theater.toggleWidth')}
+              data-testid="toggle-fullwidth-btn"
+            >
+              {isFullWidth ? <Minimize2 className="w-4 h-4 sm:w-5 sm:h-5" /> : <Maximize2 className="w-4 h-4 sm:w-5 sm:h-5" />}
+            </button>
+          )}
+
+          <div className="w-4 h-px bg-border-main my-0.5" />
+
           <button 
             onClick={onToggleSingerMode}
-            className={`p-2 min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center hover:bg-bg-elevated rounded-xl transition-colors ${isSingerMode ? 'bg-[#8629cc]/15 text-[#8629cc] ring-1 ring-[#8629cc]/30' : 'text-text-mute hover:text-text-main'}`}
+            className={`p-2 min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center hover:bg-bg-elevated rounded-md transition-colors ${isSingerMode ? 'bg-[#aa3bff]/15 text-[#aa3bff] ring-1 ring-[#aa3bff]/30' : 'text-text-mute hover:text-text-main'}`}
             title={isSingerMode ? t('theater.chordsMode') : t('theater.singerMode')} 
             aria-label={isSingerMode ? t('theater.chordsMode') : t('theater.singerMode')}
             data-testid="singer-mode-btn"
@@ -190,7 +226,7 @@ export const TheaterControls: React.FC<TheaterControlsProps> = ({
               <input 
                 type="range" min="1" max="10" step="1" 
                 value={speed} onChange={(e) => onSpeedChange(Number(e.target.value))}
-                className="w-full accent-[#8629cc] h-1.5 bg-bg-elevated rounded-lg cursor-pointer"
+                className="w-full accent-[#aa3bff] h-1.5 bg-bg-elevated rounded-lg cursor-pointer"
                 data-testid="speed-slider"
                 aria-label={t('theater.scrollSpeed')}
               />
@@ -199,7 +235,7 @@ export const TheaterControls: React.FC<TheaterControlsProps> = ({
 
           <button 
             onClick={onPlayPause}
-            className="w-10 h-10 sm:w-12 sm:h-12 bg-[#8629cc] hover:bg-[#721eb8] flex items-center justify-center rounded-full transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-[#8629cc]/20 shrink-0 disabled:opacity-50"
+            className="w-10 h-10 sm:w-12 sm:h-12 bg-[#aa3bff] hover:bg-[#9926f0] flex items-center justify-center rounded-full transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-[#aa3bff]/20 shrink-0 disabled:opacity-50"
             data-testid="play-pause-btn"
             disabled={isLocked}
             aria-label={isScrolling ? t('theater.pauseScroll') : t('theater.startScroll')}

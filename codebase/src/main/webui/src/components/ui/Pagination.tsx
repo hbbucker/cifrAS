@@ -50,7 +50,7 @@ export const Pagination: React.FC<PaginationProps> = ({
         onClick={handlePrev}
         disabled={currentPage === 1}
         aria-label={t('pagination.prev', 'Previous page')}
-        className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 min-w-[36px] min-h-[36px] rounded-xl sm:rounded-2xl bg-bg-card hover:bg-bg-elevated disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus-visible:ring-2 focus-visible:ring-[#8629cc] outline-none"
+        className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 min-w-[36px] min-h-[36px] rounded-md sm:rounded-lg bg-bg-card hover:bg-bg-elevated disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus-visible:ring-2 focus-visible:ring-[#aa3bff] outline-none"
       >
         <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-text-main" />
       </button>
@@ -71,7 +71,7 @@ export const Pagination: React.FC<PaginationProps> = ({
             onClick={() => onPageChange(page as number)}
             aria-label={t('pagination.page', `Page ${page}`)}
             aria-current={isCurrent ? 'page' : undefined}
-            className={`flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 min-w-[36px] min-h-[36px] rounded-xl sm:rounded-2xl font-medium text-xs sm:text-sm transition-colors focus-visible:ring-2 focus-visible:ring-[#8629cc] outline-none ${
+            className={`flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 min-w-[36px] min-h-[36px] rounded-md sm:rounded-lg font-medium text-xs sm:text-sm transition-colors focus-visible:ring-2 focus-visible:ring-[#aa3bff] outline-none ${
               isCurrent
                 ? 'bg-[#aa3bff] text-white font-bold'
                 : 'bg-bg-card text-text-main hover:bg-bg-elevated'
@@ -86,7 +86,7 @@ export const Pagination: React.FC<PaginationProps> = ({
         onClick={handleNext}
         disabled={currentPage === totalPages}
         aria-label={t('pagination.next', 'Next page')}
-        className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 min-w-[36px] min-h-[36px] rounded-xl sm:rounded-2xl bg-bg-card hover:bg-bg-elevated disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus-visible:ring-2 focus-visible:ring-[#8629cc] outline-none"
+        className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 min-w-[36px] min-h-[36px] rounded-md sm:rounded-lg bg-bg-card hover:bg-bg-elevated disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus-visible:ring-2 focus-visible:ring-[#aa3bff] outline-none"
       >
         <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-text-main" />
       </button>

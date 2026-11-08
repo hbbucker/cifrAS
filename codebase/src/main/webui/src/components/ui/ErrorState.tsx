@@ -18,7 +18,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
 }) => {
   const { t } = useTranslation();
  return (
- <div className={`flex flex-col items-center justify-center p-8 text-center bg-red-50 dark:bg-red-900/10 rounded-xl border border-red-100 dark:border-red-900/30 ${className}`}>
+ <div className={`flex flex-col items-center justify-center p-8 text-center bg-red-50 dark:bg-red-900/10 rounded-md border border-red-100 dark:border-red-900/30 ${className}`}>
  <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
  <h3 className="text-lg font-bold text-text-main mb-2">{title}</h3>
  <p className="text-text-mute max-w-md mb-6">{message}</p>

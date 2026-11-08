@@ -54,7 +54,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({ isOpen, onCl
 
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-bg-card border border-border-main rounded-2xl w-full max-w-md shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
+      <div className="bg-bg-card border border-border-main rounded-lg w-full max-w-md shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
         <div className="flex items-center justify-between p-4 border-b border-border-main">
           <h2 className="text-xl font-bold text-text-main">{t('userMenu.preferences') || 'Preferences'}</h2>
           <button
@@ -74,7 +74,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({ isOpen, onCl
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-3 bg-bg-main border border-border-main rounded-xl text-text-main focus:ring-2 focus:ring-[#8629cc] focus:border-transparent transition-all outline-none"
+              className="w-full px-4 py-3 bg-bg-main border border-border-main rounded-md text-text-main focus:ring-2 focus:ring-[#aa3bff] focus:border-transparent transition-all outline-none"
               placeholder="Your name"
               required
             />
@@ -87,7 +87,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({ isOpen, onCl
             <input
               type="email"
               value={user?.email || ''}
-              className="w-full px-4 py-3 bg-bg-elevated border border-border-main rounded-xl text-text-mute opacity-70 cursor-not-allowed"
+              className="w-full px-4 py-3 bg-bg-elevated border border-border-main rounded-md text-text-mute opacity-70 cursor-not-allowed"
               disabled
             />
             <p className="text-xs text-text-mute mt-1">{t('userMenu.emailNotEditable') || 'Email cannot be altered.'}</p>
@@ -97,14 +97,14 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({ isOpen, onCl
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-text-main hover:bg-bg-elevated rounded-xl font-medium transition-colors"
+              className="px-4 py-2 text-text-main hover:bg-bg-elevated rounded-md font-medium transition-colors"
             >
               {t('common.cancel') || 'Cancel'}
             </button>
             <button
               type="submit"
               disabled={isLoading || name === user?.name || !name.trim()}
-              className="px-6 py-2 bg-[#8629cc] hover:bg-[#721eb8] text-white rounded-xl font-medium transition-colors disabled:opacity-50 flex items-center justify-center min-w-[100px]"
+              className="px-6 py-2 bg-[#aa3bff] hover:bg-[#9926f0] text-white rounded-md font-medium transition-colors disabled:opacity-50 flex items-center justify-center min-w-[100px]"
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

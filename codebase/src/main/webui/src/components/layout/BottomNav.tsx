@@ -37,7 +37,7 @@ export const BottomNav: React.FC = () => {
             to={link.to}
             className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors relative ${
               isActive 
-                ? 'text-[#8629cc]' 
+                ? 'text-[#aa3bff]' 
                 : 'text-text-mute hover:text-text-main dark:hover:text-gray-100'
             }`}
             aria-label={link.label}
@@ -45,7 +45,7 @@ export const BottomNav: React.FC = () => {
             <div className="relative">
               {link.icon}
               {link.badge !== null && link.badge !== undefined && (
-                <span className="absolute -top-1.5 -right-2.5 bg-[#8629cc] text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full min-w-[16px] h-4 flex items-center justify-center animate-pulse">
+                <span className="absolute -top-1.5 -right-2.5 bg-[#aa3bff] text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full min-w-[16px] h-4 flex items-center justify-center animate-pulse">
                   {link.badge}
                 </span>
               )}

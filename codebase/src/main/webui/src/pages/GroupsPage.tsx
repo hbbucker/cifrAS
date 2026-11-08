@@ -1,11 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { GroupCard } from '../components/cards/GroupCard';
-import { Plus } from 'lucide-react';
+import { Plus, Users } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../context/ToastContext';
 import { BrandLogo } from '../components/ui/BrandLogo';
+import { createShareLink } from '../api/shareLinks';
+import { CoachMark } from '../components/ui/CoachMark';
+import { useTour } from '../context/TourContext';
+import { EducationalEmptyState } from '../components/ui/EducationalEmptyState';
 
 interface GroupData {
   id: string;
@@ -27,15 +31,18 @@ export const GroupsPage: React.FC = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { toast } = useToast();
+  const { startTour } = useTour();
   const [groups, setGroups] = useState<GroupData[]>([]);
   const [invites, setInvites] = useState<InviteData[]>([]);
   const [declinedInvites, setDeclinedInvites] = useState<InviteData[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [showInviteModal, setShowInviteModal] = useState(false);
-  const [inviteEmail, setInviteEmail] = useState('');
   const [inviteError, setInviteError] = useState('');
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [inviting, setInviting] = useState(false);
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newGroupName, setNewGroupName] = useState('');
@@ -122,6 +129,13 @@ export const GroupsPage: React.FC = () => {
     fetchInvites();
   }, [fetchGroups, fetchInvites]);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      startTour('group-create');
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [startTour]);
+
   const handleCreateGroup = () => {
     if (!newGroupName.trim()) return;
 
@@ -151,44 +165,30 @@ export const GroupsPage: React.FC = () => {
       .catch(() => toast('Failed to create group', 'error'));
   };
 
-  const handleInvite = async () => {
-    if (!inviteEmail.trim() || !selectedGroupId) return;
+  const handleGenerateLink = async () => {
+    if (!selectedGroupId) return;
+    setInviting(true);
     setInviteError('');
-
     try {
-      const res = await fetch(`/api/groups/${selectedGroupId}/members`, {
-        method: 'POST',
-        headers: { 
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email: inviteEmail })
-      });
-
-      if (res.status === 401) {
-        logout();
-        navigate('/login');
-        return;
-      }
-
-      if (!res.ok) {
-        let errorMsg = 'Failed to invite member. Please check if the email is correct and registered.';
-        try {
-          const data = await res.json();
-          if (data.error) errorMsg = data.error;
-        } catch {
-          // ignore
-        }
-        setInviteError(errorMsg);
-        return;
-      }
-
-      toast('Invitation sent successfully', 'success');
-      setShowInviteModal(false);
-      setInviteEmail('');
+      const data = await createShareLink({ type: 'GROUP', resourceId: selectedGroupId });
+      const url = `${window.location.origin}/invite/${data.token}`;
+      setShareUrl(url);
     } catch {
-      toast('An unexpected error occurred while inviting', 'error');
-      setInviteError('An unexpected error occurred.');
+      setInviteError(t('songSharing.generalError', 'Ocorreu um erro ao gerar o link.'));
+    } finally {
+      setInviting(false);
+    }
+  };
+
+  const handleCopy = async () => {
+    if (!shareUrl) return;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      toast(t('songSharing.copySuccess', 'Link copiado!'), 'success');
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast(t('songSharing.copyError', 'Erro ao copiar o link.'), 'error');
     }
   };
 
@@ -218,13 +218,21 @@ export const GroupsPage: React.FC = () => {
             <BrandLogo iconOnly size="sm" asLink to="/dashboard" className="sm:hidden shrink-0" />
             <h1 className="text-lg sm:text-xl font-bold text-text-main truncate">{t('groups.groups')}</h1>
           </div>
-          <button 
-            onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-1.5 sm:gap-2 bg-[#8629cc] hover:bg-[#721eb8] text-white px-3.5 sm:px-4 py-2 min-h-[40px] sm:min-h-[44px] rounded-xl font-medium transition-colors text-xs sm:text-sm"
+          <CoachMark
+            tourId="group-create"
+            title={t('groups.tourCreateTitle', 'Crie seu Grupo Musical')}
+            description={t('groups.tourCreateDesc', 'Reúna sua banda, ministério de louvor ou amigos para compartilhar cifras e playlists colaborativas em tempo real.')}
+            position="bottom"
           >
-            <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
-            <span>{t('groups.newGroup')}</span>
-          </button>
+            <button 
+              onClick={() => setShowCreateModal(true)}
+              data-testid="create-group-btn"
+              className="flex items-center gap-1.5 sm:gap-2 bg-[#aa3bff] hover:bg-[#9926f0] text-white px-3.5 sm:px-4 py-2 min-h-[40px] sm:min-h-[44px] rounded-md font-medium transition-colors text-xs sm:text-sm"
+            >
+              <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span>{t('groups.newGroup')}</span>
+            </button>
+          </CoachMark>
         </header>
 
         <div className="flex-1 overflow-y-auto p-3.5 sm:p-6 pb-24 sm:pb-8 min-w-0">
@@ -233,7 +241,7 @@ export const GroupsPage: React.FC = () => {
               <h2 className="text-base sm:text-lg font-bold text-text-main mb-3">{t('groups.declinedInvitations')}</h2>
               <div className="flex flex-col gap-2.5 sm:gap-3">
                 {declinedInvites.map(invite => (
-                  <div key={invite.id} className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-3.5 sm:p-4 flex items-center justify-between gap-3">
+                  <div key={invite.id} className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3.5 sm:p-4 flex items-center justify-between gap-3">
                     <p className="text-xs sm:text-sm text-red-800 dark:text-red-200 min-w-0 flex-1">
                       <strong>{invite.inviteeEmail}</strong> {t('groups.declinedInvitation')} <strong>{invite.groupName}</strong>.
                     </p>
@@ -251,12 +259,12 @@ export const GroupsPage: React.FC = () => {
               <h2 className="text-base sm:text-lg font-bold text-text-main mb-3">{t('groups.pendingInvitations')}</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-6">
                 {invites.map(invite => (
-                  <div key={invite.id} className="bg-bg-card rounded-2xl border border-yellow-200 dark:border-yellow-700/50 p-4 sm:p-5 shadow-sm relative">
+                  <div key={invite.id} className="bg-bg-card rounded-lg border border-yellow-200 dark:border-yellow-700/50 p-4 sm:p-5 shadow-sm relative">
                     <h3 className="text-base sm:text-lg font-bold text-text-main mb-1 truncate">{invite.groupName}</h3>
                     <p className="text-xs sm:text-sm text-text-mute mb-3 sm:mb-4">{t('groups.invitedToJoin')}</p>
                     <div className="flex gap-2">
-                      <button onClick={() => handleAcceptInvite(invite.id)} className="flex-1 py-2 min-h-[40px] bg-[#8629cc] hover:bg-[#721eb8] text-white rounded-xl text-xs sm:text-sm font-medium transition-colors">{t('groups.accept')}</button>
-                      <button onClick={() => handleDeclineInvite(invite.id)} className="flex-1 py-2 min-h-[40px] bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-xl text-xs sm:text-sm font-medium transition-colors">{t('groups.decline')}</button>
+                      <button onClick={() => handleAcceptInvite(invite.id)} className="flex-1 py-2 min-h-[40px] bg-[#aa3bff] hover:bg-[#9926f0] text-white rounded-md text-xs sm:text-sm font-medium transition-colors">{t('groups.accept')}</button>
+                      <button onClick={() => handleDeclineInvite(invite.id)} className="flex-1 py-2 min-h-[40px] bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md text-xs sm:text-sm font-medium transition-colors">{t('groups.decline')}</button>
                     </div>
                   </div>
                 ))}
@@ -267,7 +275,19 @@ export const GroupsPage: React.FC = () => {
           {loading ? (
             <div className="text-center py-8 text-text-mute text-sm">{t('groups.loadingGroups')}</div>
           ) : groups.length === 0 ? (
-            <div className="text-center py-12 text-text-mute text-sm">{t('groups.noGroups')}</div>
+            <EducationalEmptyState
+              icon={Users}
+              title={t('groups.educationalEmptyTitle', 'Organize e compartilhe seu repertório em equipe')}
+              steps={[
+                t('groups.educationalEmptyStep1', '1. Crie seu grupo musical ou ministério'),
+                t('groups.educationalEmptyStep2', '2. Convide os integrantes com um link rápido'),
+                t('groups.educationalEmptyStep3', '3. Compartilhe playlists e cifras com a equipe')
+              ]}
+              action={{
+                label: t('groups.newGroup', 'Novo Grupo'),
+                onClick: () => setShowCreateModal(true)
+              }}
+            />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-6">
               {groups.map(group => (
@@ -293,14 +313,14 @@ export const GroupsPage: React.FC = () => {
               value={newGroupName}
               onChange={(e) => setNewGroupName(e.target.value)}
               placeholder={t('groups.groupName')}
-              className="w-full px-4 py-3 bg-bg-main border border-border-main rounded-xl mb-6 text-text-main focus:ring-2 focus:ring-[#8629cc] outline-none text-sm sm:text-base"
+              className="w-full px-4 py-3 bg-bg-main border border-border-main rounded-md mb-6 text-text-main focus:ring-2 focus:ring-[#aa3bff] outline-none text-sm sm:text-base"
               data-testid="create-group-name-input"
             />
             <div className="flex justify-end gap-3">
-              <button onClick={() => setShowCreateModal(false)} className="px-4 py-2.5 min-h-[44px] font-medium text-text-mute hover:bg-bg-elevated rounded-xl transition-colors text-sm">{t('common.cancel')}</button>
+              <button onClick={() => setShowCreateModal(false)} className="px-4 py-2.5 min-h-[44px] font-medium text-text-mute hover:bg-bg-elevated rounded-md transition-colors text-sm">{t('common.cancel')}</button>
               <button 
                 onClick={handleCreateGroup} 
-                className="px-4 py-2.5 min-h-[44px] font-medium bg-[#8629cc] hover:bg-[#721eb8] text-white rounded-xl transition-colors text-sm"
+                className="px-4 py-2.5 min-h-[44px] font-medium bg-[#aa3bff] hover:bg-[#9926f0] text-white rounded-md transition-colors text-sm"
               >
                 {t('groups.create')}
               </button>
@@ -313,32 +333,68 @@ export const GroupsPage: React.FC = () => {
       {showInviteModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-bg-card rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl mx-auto">
-            <h2 className="text-lg sm:text-xl font-bold text-text-main mb-4">{t('groups.inviteToGroup')}</h2>
+            <h2 className="text-lg sm:text-xl font-bold text-text-main mb-4">{t('groups.inviteToGroup', 'Convidar para o Grupo')}</h2>
             
             {inviteError && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl">
+              <div className="mb-4 p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 text-red-700 dark:text-red-300 text-sm rounded-md">
                 {inviteError}
               </div>
             )}
 
-            <input 
-              type="email" 
-              value={inviteEmail}
-              onChange={(e) => { setInviteEmail(e.target.value); setInviteError(''); }}
-              placeholder={t('groups.memberEmail')}
-              className="w-full px-4 py-3 bg-bg-main border border-border-main rounded-xl mb-6 text-text-main focus:ring-2 focus:ring-[#8629cc] outline-none text-sm sm:text-base"
-              data-testid="invite-email-input"
-            />
-            <div className="flex justify-end gap-3">
-              <button onClick={() => { setShowInviteModal(false); setInviteError(''); }} className="px-4 py-2.5 min-h-[44px] font-medium text-text-mute hover:bg-bg-elevated rounded-xl transition-colors text-sm">{t('common.cancel')}</button>
-              <button 
-                onClick={handleInvite} 
-                className="px-4 py-2.5 min-h-[44px] font-medium bg-[#8629cc] hover:bg-[#721eb8] text-white rounded-xl transition-colors text-sm" 
-                data-testid="send-invite-btn"
-              >
-                {t('groups.sendInvite')}
-              </button>
-            </div>
+            {!shareUrl ? (
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  onClick={() => {
+                    setShowInviteModal(false);
+                    setInviteError('');
+                  }}
+                  className="px-4 py-2.5 min-h-[44px] font-medium text-text-mute hover:bg-bg-elevated rounded-md transition-colors text-sm"
+                  disabled={inviting}
+                >
+                  {t('common.cancel', 'Cancelar')}
+                </button>
+                <button
+                  onClick={handleGenerateLink}
+                  disabled={inviting}
+                  className="px-4 py-2.5 min-h-[44px] font-medium bg-[#aa3bff] hover:bg-[#9926f0] text-white rounded-md transition-colors disabled:opacity-50 text-sm"
+                  data-testid="generate-group-link-btn"
+                >
+                  {inviting ? '...' : t('songSharing.generateLink', 'Gerar Link')}
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={shareUrl}
+                    className="flex-1 px-4 py-2.5 rounded-md border border-border-main bg-bg-main text-text-main focus:outline-none focus:ring-2 focus:ring-[#aa3bff] transition-colors text-sm"
+                    data-testid="share-link-input"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCopy}
+                    className="px-4 py-2.5 bg-[#aa3bff] hover:bg-[#9926f0] text-white rounded-md transition-colors text-sm font-medium"
+                    data-testid="copy-link-btn"
+                  >
+                    {copied ? t('songSharing.copySuccess', 'Copiado!') : t('songSharing.copy', 'Copiar')}
+                  </button>
+                </div>
+                <div className="flex justify-end gap-3 pt-2">
+                  <button
+                    onClick={() => {
+                      setShowInviteModal(false);
+                      setShareUrl(null);
+                      setCopied(false);
+                    }}
+                    className="px-4 py-2.5 min-h-[44px] font-medium bg-bg-elevated text-text-main hover:bg-border-main rounded-md transition-colors text-sm"
+                  >
+                    {t('common.close', 'Fechar')}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

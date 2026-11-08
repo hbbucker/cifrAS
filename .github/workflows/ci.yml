@@ -9,7 +9,8 @@ on:
 jobs:
   build-and-test-main:
     name: CifrAS Main App — Build & Tests
-    runs-on: ubuntu-latest
+    # why: Playwright 1.60 nao suporta ubuntu 26.04 (ubuntu-latest atual) e falha no install dos browsers.
+    runs-on: ubuntu-24.04
     environment: pipeline
     defaults:
       run:

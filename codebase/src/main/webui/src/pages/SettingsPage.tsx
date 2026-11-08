@@ -20,7 +20,7 @@ export const SettingsPage: React.FC = () => {
         </header>
 
         <div className="flex-1 overflow-y-auto p-3.5 sm:p-6 pb-24 sm:pb-8 max-w-2xl min-w-0">
-          <div className="bg-bg-card rounded-2xl border border-border-main p-4 sm:p-6 shadow-xs">
+          <div className="bg-bg-card rounded-lg border border-border-main p-4 sm:p-6 shadow-xs">
             <h2 className="text-base sm:text-lg font-bold text-text-main mb-4 sm:mb-6">{t('settings.musicPrefs')}</h2>
             
             <div className="space-y-5 sm:space-y-6">
@@ -36,7 +36,7 @@ export const SettingsPage: React.FC = () => {
                       value="flats"
                       checked={preferences.enharmonics === 'flats'}
                       onChange={() => setPreferences({ ...preferences, enharmonics: 'flats' })}
-                      className="w-4 h-4 text-[#8629cc] focus:ring-[#8629cc]"
+                      className="w-4 h-4 text-[#aa3bff] focus:ring-[#aa3bff]"
                     />
                     <span className="text-xs sm:text-sm text-text-main">{t('settings.flats')}</span>
                   </label>
@@ -47,7 +47,7 @@ export const SettingsPage: React.FC = () => {
                       value="sharps"
                       checked={preferences.enharmonics === 'sharps'}
                       onChange={() => setPreferences({ ...preferences, enharmonics: 'sharps' })}
-                      className="w-4 h-4 text-[#8629cc] focus:ring-[#8629cc]"
+                      className="w-4 h-4 text-[#aa3bff] focus:ring-[#aa3bff]"
                     />
                     <span className="text-xs sm:text-sm text-text-main">{t('settings.sharps')}</span>
                   </label>
@@ -63,7 +63,7 @@ export const SettingsPage: React.FC = () => {
                   min="80" max="150" step="10"
                   value={preferences.fontScale}
                   onChange={(e) => setPreferences({ ...preferences, fontScale: Number(e.target.value) })}
-                  className="w-full accent-[#8629cc] h-2 bg-bg-elevated rounded-lg cursor-pointer"
+                  className="w-full accent-[#aa3bff] h-2 bg-bg-elevated rounded-lg cursor-pointer"
                 />
               </div>
 
@@ -76,12 +76,12 @@ export const SettingsPage: React.FC = () => {
                   min="0.5" max="2.0" step="0.1"
                   value={preferences.scrollSpeedMultiplier}
                   onChange={(e) => setPreferences({ ...preferences, scrollSpeedMultiplier: Number(e.target.value) })}
-                  className="w-full accent-[#8629cc] h-2 bg-bg-elevated rounded-lg cursor-pointer"
+                  className="w-full accent-[#aa3bff] h-2 bg-bg-elevated rounded-lg cursor-pointer"
                 />
               </div>
 
               <div className="pt-4 border-t border-border-main">
-                <button className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#8629cc] hover:bg-[#721eb8] text-white px-5 py-2.5 min-h-[44px] rounded-xl font-bold text-xs sm:text-sm transition-colors shadow-xs">
+                <button className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#aa3bff] hover:bg-[#9926f0] text-white px-5 py-2.5 min-h-[44px] rounded-md font-bold text-xs sm:text-sm transition-colors shadow-xs">
                   <Save className="w-4 h-4 sm:w-5 sm:h-5" /> {t('settings.save')}
                 </button>
               </div>

@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { TheaterControls } from '../components/theater/TheaterControls';
+import { TourProvider } from '../context/TourContext';
 import '@testing-library/jest-dom/vitest';
 
 vi.mock('react-i18next', () => ({
@@ -25,6 +26,14 @@ vi.mock('react-i18next', () => ({
         'theater.scrollSpeed': 'Velocidade da Rolagem',
         'theater.pauseScroll': 'Pausar Rolagem',
         'theater.startScroll': 'Iniciar Rolagem',
+        'theater.keyLabel': 'Tom',
+        'theater.originalKeyLabel': 'Orig.',
+        'theater.columns1': '1 Coluna',
+        'theater.columns2': '2 Colunas',
+        'theater.toggleColumns': 'Alternar Colunas (1 ou 2)',
+        'theater.expandWidth': 'Expandir Largura Total',
+        'theater.fitWidth': 'Largura Padrão',
+        'theater.toggleWidth': 'Alternar Largura da Tela',
       };
       return dict[key] || key;
     }
@@ -36,6 +45,8 @@ describe('TheaterControls Component', () => {
     isScrolling: false,
     speed: 3,
     currentKey: 'C',
+    originalKey: 'C',
+    showControls: true,
     onPlayPause: vi.fn(),
     onSpeedChange: vi.fn(),
     onTransposeUp: vi.fn(),
@@ -52,8 +63,10 @@ describe('TheaterControls Component', () => {
     onToggleSingerMode: vi.fn(),
   };
 
+  const renderWithTour = (ui: React.ReactElement) => render(<TourProvider>{ui}</TourProvider>);
+
   it('renders all control buttons including Singer Mode button', () => {
-    render(<TheaterControls {...defaultProps} />);
+    renderWithTour(<TheaterControls {...defaultProps} />);
 
     expect(screen.getByTestId('play-pause-btn')).toBeInTheDocument();
     expect(screen.getByTestId('speed-slider')).toBeInTheDocument();
@@ -67,9 +80,17 @@ describe('TheaterControls Component', () => {
     expect(screen.getByTestId('exit-theater-btn')).toBeInTheDocument();
   });
 
+  it('applies opacity-100 when showControls is true and opacity-0 when false', () => {
+    const { rerender } = renderWithTour(<TheaterControls {...defaultProps} showControls={true} />);
+    expect(screen.getByTestId('theater-controls')).toHaveClass('opacity-100');
+
+    rerender(<TourProvider><TheaterControls {...defaultProps} showControls={false} /></TourProvider>);
+    expect(screen.getByTestId('theater-controls')).toHaveClass('opacity-0');
+  });
+
   it('toggles singer mode when singer-mode-btn is clicked', () => {
     const onToggleSingerMode = vi.fn();
-    render(<TheaterControls {...defaultProps} onToggleSingerMode={onToggleSingerMode} />);
+    renderWithTour(<TheaterControls {...defaultProps} onToggleSingerMode={onToggleSingerMode} />);
 
     const singerBtn = screen.getByTestId('singer-mode-btn');
     expect(singerBtn).toHaveAttribute('title', 'Modo Cantor');
@@ -79,27 +100,27 @@ describe('TheaterControls Component', () => {
   });
 
   it('updates title and active styling when isSingerMode is true', () => {
-    render(<TheaterControls {...defaultProps} isSingerMode={true} />);
+    renderWithTour(<TheaterControls {...defaultProps} isSingerMode={true} />);
 
     const singerBtn = screen.getByTestId('singer-mode-btn');
     expect(singerBtn).toHaveAttribute('title', 'Modo Cifras');
   });
 
   it('hides transpose pad when in singer mode and displays it in chords mode', () => {
-    const { rerender } = render(<TheaterControls {...defaultProps} isSingerMode={false} />);
+    const { rerender } = renderWithTour(<TheaterControls {...defaultProps} isSingerMode={false} />);
 
     // In chords mode, transpose controls are present
     expect(screen.getByTestId('transpose-up')).toBeInTheDocument();
     expect(screen.getByTestId('transpose-down')).toBeInTheDocument();
 
     // In singer mode, transpose controls are hidden
-    rerender(<TheaterControls {...defaultProps} isSingerMode={true} />);
+    rerender(<TourProvider><TheaterControls {...defaultProps} isSingerMode={true} /></TourProvider>);
     expect(screen.queryByTestId('transpose-up')).not.toBeInTheDocument();
     expect(screen.queryByTestId('transpose-down')).not.toBeInTheDocument();
   });
 
   it('disables controls and hides singer mode button when screen is locked', () => {
-    render(<TheaterControls {...defaultProps} isLocked={true} />);
+    renderWithTour(<TheaterControls {...defaultProps} isLocked={true} />);
 
     expect(screen.queryByTestId('singer-mode-btn')).not.toBeInTheDocument();
     expect(screen.queryByTestId('speed-slider')).not.toBeInTheDocument();
@@ -117,7 +138,7 @@ describe('TheaterControls Component', () => {
     const onNextSong = vi.fn();
     const onPrevSong = vi.fn();
 
-    render(
+    renderWithTour(
       <TheaterControls
         {...defaultProps}
         onPlayPause={onPlayPause}
@@ -160,17 +181,69 @@ describe('TheaterControls Component', () => {
     expect(onPrevSong).toHaveBeenCalledTimes(1);
   });
 
-  it('renders song title and artist in the top header when provided', () => {
-    render(<TheaterControls {...defaultProps} title="Tempo Perdido" artist="Legião Urbana" />);
-
-    expect(screen.getByText('Tempo Perdido')).toBeInTheDocument();
-    expect(screen.getByText('Legião Urbana')).toBeInTheDocument();
-  });
-
   it('renders Pause icon and proper aria-label when isScrolling is true', () => {
-    render(<TheaterControls {...defaultProps} isScrolling={true} />);
+    renderWithTour(<TheaterControls {...defaultProps} isScrolling={true} />);
 
     const playBtn = screen.getByTestId('play-pause-btn');
     expect(playBtn).toHaveAttribute('aria-label', 'Pausar Rolagem');
   });
+
+  it('triggers onToggleColumns and shows appropriate titles when columns change', () => {
+    const onToggleColumns = vi.fn();
+    const { rerender } = renderWithTour(
+      <TheaterControls 
+        {...defaultProps} 
+        columns={1} 
+        onToggleColumns={onToggleColumns} 
+      />
+    );
+
+    const columnsBtn = screen.getByTestId('toggle-columns-btn');
+    expect(columnsBtn).toHaveAttribute('title', '2 Colunas');
+
+    fireEvent.click(columnsBtn);
+    expect(onToggleColumns).toHaveBeenCalledTimes(1);
+
+    rerender(
+      <TourProvider>
+        <TheaterControls 
+          {...defaultProps} 
+          columns={2} 
+          onToggleColumns={onToggleColumns} 
+        />
+      </TourProvider>
+    );
+    expect(columnsBtn).toHaveAttribute('title', '1 Coluna');
+    expect(columnsBtn.className).toContain('text-[#aa3bff]');
+  });
+
+  it('triggers onToggleFullWidth and shows appropriate titles when fullWidth changes', () => {
+    const onToggleFullWidth = vi.fn();
+    const { rerender } = renderWithTour(
+      <TheaterControls 
+        {...defaultProps} 
+        isFullWidth={false} 
+        onToggleFullWidth={onToggleFullWidth} 
+      />
+    );
+
+    const fullWidthBtn = screen.getByTestId('toggle-fullwidth-btn');
+    expect(fullWidthBtn).toHaveAttribute('title', 'Expandir Largura Total');
+
+    fireEvent.click(fullWidthBtn);
+    expect(onToggleFullWidth).toHaveBeenCalledTimes(1);
+
+    rerender(
+      <TourProvider>
+        <TheaterControls 
+          {...defaultProps} 
+          isFullWidth={true} 
+          onToggleFullWidth={onToggleFullWidth} 
+        />
+      </TourProvider>
+    );
+    expect(fullWidthBtn).toHaveAttribute('title', 'Largura Padrão');
+    expect(fullWidthBtn.className).toContain('text-[#aa3bff]');
+  });
 });
+
