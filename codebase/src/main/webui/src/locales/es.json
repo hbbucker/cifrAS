@@ -473,5 +473,32 @@
     "acceptSuccess": "¡Canción añadida a tu biblioteca!",
     "declineSuccess": "Canción compartida rechazada.",
     "noPendingSongs": "No tienes canciones compartidas pendientes."
+  },
+  "pricing": {
+    "title": "Actualiza y desbloquea tu potencial",
+    "subtitle": "Elige el mejor plan para tu viaje musical",
+    "free": {
+      "title": "Plan Gratis",
+      "description": "Ideal para empezar a organizar tu repertorio",
+      "limit": "Hasta 10 canciones",
+      "feature1": "Acceso a funciones básicas",
+      "button": "Plan Actual"
+    },
+    "pro": {
+      "badge": "MÁS POPULAR",
+      "title": "Plan PRO",
+      "description": "Para músicos que necesitan libertad y funciones ilimitadas",
+      "price": "Ilimitado",
+      "period": "para siempre",
+      "feature1": "Repertorio ilimitado de acordes",
+      "feature2": "Soporte prioritario y funciones exclusivas",
+      "button": "Suscribirse a PRO"
+    },
+    "modal": {
+      "title": "Límite de Canciones Alcanzado",
+      "message": "Has alcanzado el límite de 10 canciones del Plan Gratis. ¡Actualiza a PRO y añade canciones ilimitadas!",
+      "upgradeButton": "Ver Planes PRO",
+      "maybeLater": "Quizás más tarde"
+    }
   }
 }

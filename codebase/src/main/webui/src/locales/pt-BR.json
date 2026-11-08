@@ -473,5 +473,32 @@
     "acceptSuccess": "Música adicionada ao seu repertório!",
     "declineSuccess": "Compartilhamento recusado.",
     "noPendingSongs": "Você não possui nenhuma música compartilhada pendente."
+  },
+  "pricing": {
+    "title": "Faça um upgrade e libere seu potencial",
+    "subtitle": "Escolha o melhor plano para sua jornada musical",
+    "free": {
+      "title": "Plano Free",
+      "description": "Ideal para começar a organizar seu repertório",
+      "limit": "Até 10 músicas",
+      "feature1": "Acesso a recursos básicos",
+      "button": "Plano Atual"
+    },
+    "pro": {
+      "badge": "MAIS POPULAR",
+      "title": "Plano PRO",
+      "description": "Para músicos que precisam de liberdade e recursos ilimitados",
+      "price": "Ilimitado",
+      "period": "para sempre",
+      "feature1": "Repertório ilimitado de cifras",
+      "feature2": "Suporte prioritário e recursos exclusivos",
+      "button": "Assinar PRO"
+    },
+    "modal": {
+      "title": "Limite de Músicas Atingido",
+      "message": "Você atingiu o limite de 10 músicas do Plano Free. Faça um upgrade para o PRO e adicione músicas ilimitadas!",
+      "upgradeButton": "Ver Planos PRO",
+      "maybeLater": "Talvez mais tarde"
+    }
   }
 }

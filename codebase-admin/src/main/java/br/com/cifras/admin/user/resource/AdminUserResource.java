@@ -85,4 +85,20 @@ public class AdminUserResource {
         List<UserAuditLogDTO> logs = getUserAuditLogsUseCase.execute(id);
         return Response.ok(logs).build();
     }
+
+    @Inject
+    br.com.cifras.admin.user.application.BypassSubscriptionUseCase bypassSubscriptionUseCase;
+
+    @POST
+    @Path("/{id}/bypass-subscription")
+    public Response bypassSubscription(@PathParam("id") String id, BypassSubscriptionRequest request) {
+        securityUtils.requireAdmin();
+        String couponCode = request != null ? request.couponCode : null;
+        br.com.cifras.admin.user.dto.AdminUserDTO user = bypassSubscriptionUseCase.execute(id, couponCode);
+        return Response.ok(user).build();
+    }
+}
+
+class BypassSubscriptionRequest {
+    public String couponCode;
 }

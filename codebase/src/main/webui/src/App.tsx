@@ -22,10 +22,15 @@ import { LandingPage } from './pages/LandingPage';
 import { InvitePage } from './pages/InvitePage';
 import { usePwaAutoUpdate } from './hooks/usePwaAutoUpdate';
 
+import { PricingPage } from './pages/PricingPage';
+import { PaywallModal } from './components/modals/PaywallModal';
+
 function App() {
  usePwaAutoUpdate();
 
  return (
+  <>
+  <PaywallModal />
   <Routes>
   <Route path="/" element={<LandingPage />} />
   <Route path="/invite/:token" element={<InvitePage />} />
@@ -37,6 +42,7 @@ function App() {
   {/* Protected Routes wrapped in MainLayout */}
   <Route element={<PrivateRoute><MainLayout /></PrivateRoute>}>
     <Route path="/dashboard" element={<DashboardPage />} />
+    <Route path="/pricing" element={<PricingPage />} />
     <Route path="/songs" element={<SongsListPage />} />
     <Route path="/songs/new" element={<SongFormPage />} />
     <Route path="/songs/edit/:id" element={<SongFormPage />} />
@@ -59,6 +65,7 @@ function App() {
   <Route path="/theater/:playlistId" element={<PrivateRoute><TheaterModePage /></PrivateRoute>} />
   <Route path="/theater/song/:songId" element={<PrivateRoute><TheaterModePage /></PrivateRoute>} />
   </Routes>
+  </>
  );
 }
 

@@ -96,6 +96,10 @@ const setupInterceptors = (client: AxiosInstance) => {
         }
       }
 
+      if (error.response?.status === 403 && error.response?.data?.code === 'QUOTA_EXCEEDED') {
+        window.dispatchEvent(new Event('quota_exceeded'));
+      }
+
       return Promise.reject(error);
     }
   );
