@@ -34,6 +34,17 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
                     .build();
         }
 
+        if (exception instanceof QuotaExceededException) {
+            Map<String, Object> body = new LinkedHashMap<>();
+            body.put("error", "QUOTA_EXCEEDED");
+            body.put("message", exception.getMessage());
+            body.put("status", 403);
+            return Response.status(Response.Status.FORBIDDEN)
+                    .type(MediaType.APPLICATION_JSON)
+                    .entity(body)
+                    .build();
+        }
+
         if (exception instanceof ForbiddenException) {
             return buildResponse(403, "Forbidden", null);
         }
@@ -46,7 +57,14 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
             return buildResponse(409, exception.getMessage(), null);
         }
 
-        if (exception instanceof IllegalArgumentException || exception instanceof IllegalStateException) {
+        if (exception instanceof jakarta.ws.rs.WebApplicationException wae) {
+            int status = wae.getResponse() != null ? wae.getResponse().getStatus() : 500;
+            return buildResponse(status, wae.getMessage(), null);
+        }
+
+        if (exception instanceof IllegalArgumentException || exception instanceof IllegalStateException
+                || exception instanceof com.fasterxml.jackson.core.JsonProcessingException
+                || exception instanceof jakarta.ws.rs.ProcessingException) {
             return buildResponse(400, exception.getMessage(), null);
         }
 

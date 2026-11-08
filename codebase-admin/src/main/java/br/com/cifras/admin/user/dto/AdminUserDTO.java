@@ -17,5 +17,7 @@ public record AdminUserDTO(
     Instant updatedAt,
     long songCount,
     boolean banned,
-    boolean isAdmin
+    boolean isAdmin,
+    String subscriptionPlan,
+    String couponCode
 ) {}

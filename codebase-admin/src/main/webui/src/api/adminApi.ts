@@ -59,6 +59,11 @@ export const getUserAuditLogs = async (userId: string): Promise<UserAuditLog[]> 
   return res.data;
 };
 
+export const bypassSubscription = async (userId: string, couponCode?: string): Promise<AdminUser> => {
+  const res = await adminClient.post<AdminUser>(`/users/${userId}/bypass-subscription`, { couponCode });
+  return res.data;
+};
+
 export const getAdminSongs = async (
   page: number = 0,
   pageSize: number = 20,

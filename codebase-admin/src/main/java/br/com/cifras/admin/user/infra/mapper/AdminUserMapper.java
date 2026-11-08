@@ -24,7 +24,9 @@ public class AdminUserMapper {
             user.getUpdatedAt(),
             user.getSongCount(),
             user.isBanned(),
-            user.isAdmin()
+            user.isAdmin(),
+            user.getSubscriptionPlan(),
+            user.getCouponCode()
         );
     }
 

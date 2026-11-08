@@ -6,6 +6,7 @@ import br.com.cifras.group.model.GroupRole;
 import br.com.cifras.group.infra.persistence.repository.GroupRepository;
 import br.com.cifras.shared.exception.ForbiddenException;
 import br.com.cifras.shared.exception.NotFoundException;
+import br.com.cifras.user.application.QuotaService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -17,12 +18,18 @@ public class AddGroupMemberUseCase {
     @Inject
     GroupRepository groupRepository;
 
+    @Inject
+    QuotaService quotaService;
+
     @Transactional
     public void execute(UUID groupId, String targetUserId, String requestingUserId) {
         Group group = groupRepository.findById(groupId).orElseThrow(() -> new NotFoundException("Group not found"));
         if (!groupRepository.isOwner(groupId, requestingUserId)) throw new ForbiddenException("Only OWNER can add members");
 
+        quotaService.checkGroupMemberQuota(groupId);
+
         GroupMember member = GroupMember.create(group, targetUserId, GroupRole.MEMBER);
         groupRepository.persistMember(member);
     }
 }
+

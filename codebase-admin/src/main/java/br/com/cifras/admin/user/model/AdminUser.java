@@ -87,4 +87,13 @@ public class AdminUser {
     public String getLastBlockReason() { return lastBlockReason; }
     public Instant getUpdatedAt() { return updatedAt; }
     public boolean isAdmin() { return "admin".equalsIgnoreCase(role); }
+
+    private String subscriptionPlan = "FREE";
+    private String couponCode;
+
+    public String getSubscriptionPlan() { return subscriptionPlan; }
+    public void setSubscriptionPlan(String plan) { this.subscriptionPlan = plan; }
+    
+    public String getCouponCode() { return couponCode; }
+    public void setCouponCode(String code) { this.couponCode = code; }
 }

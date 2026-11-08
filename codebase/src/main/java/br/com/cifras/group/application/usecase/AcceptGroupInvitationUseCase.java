@@ -7,6 +7,7 @@ import br.com.cifras.group.model.GroupRole;
 import br.com.cifras.group.infra.persistence.repository.GroupRepository;
 import br.com.cifras.group.infra.persistence.repository.GroupInvitationRepository;
 import br.com.cifras.shared.exception.NotFoundException;
+import br.com.cifras.user.application.QuotaService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -20,6 +21,9 @@ public class AcceptGroupInvitationUseCase {
 
     @Inject
     GroupRepository groupRepository;
+    
+    @Inject
+    QuotaService quotaService;
 
     @Transactional
     public void execute(UUID inviteId, String currentUserEmail, String currentUserId) {
@@ -30,12 +34,18 @@ public class AcceptGroupInvitationUseCase {
         if (invite.getStatus() != GroupInvitationStatus.PENDING) {
             throw new IllegalArgumentException("Invitation is not pending");
         }
-        invite.accept();
-        invitationRepository.update(invite);
         
         if (!groupRepository.isMember(invite.getGroup().getId(), currentUserId)) {
+            quotaService.checkGroupMemberQuota(invite.getGroup().getId());
+            invite.accept();
+            invitationRepository.update(invite);
+            
             GroupMember member = GroupMember.create(invite.getGroup(), currentUserId, GroupRole.MEMBER);
             groupRepository.persistMember(member);
+        } else {
+            invite.accept();
+            invitationRepository.update(invite);
         }
     }
 }
+

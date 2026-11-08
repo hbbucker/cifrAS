@@ -62,7 +62,9 @@ public class AdminUserRepository {
                 "coalesce(u.raw_app_meta_data->>'status', 'ACTIVE'), " +
                 "coalesce((u.raw_app_meta_data->>'is_blocked')::boolean, false), " +
                 "u.raw_app_meta_data->>'last_block_reason', " +
-                "u.updated_at " +
+                "u.updated_at, " +
+                "coalesce((SELECT plan_type FROM user_subscriptions us WHERE us.user_id = u.id::text LIMIT 1), 'FREE'), " +
+                "(SELECT coupon_code FROM user_subscriptions us WHERE us.user_id = u.id::text LIMIT 1) " +
                 "FROM auth.users u WHERE 1=1 "
             );
 
@@ -95,8 +97,12 @@ public class AdminUserRepository {
                     boolean isBlocked = row.length > 8 && row[8] != null && (Boolean.TRUE.equals(row[8]) || "true".equalsIgnoreCase(row[8].toString()));
                     String lastBlockReason = row.length > 9 && row[9] != null ? row[9].toString() : null;
                     Instant updatedAt = row.length > 10 ? parseInstant(row[10]) : createdAt;
+                    String plan = row.length > 11 && row[11] != null ? row[11].toString() : "FREE";
+                    String coupon = row.length > 12 && row[12] != null ? row[12].toString() : null;
 
                     AdminUser adminUser = new AdminUser(id, email, name, role, createdAt, lastSignInAt, songCount, status, isBlocked, lastBlockReason, updatedAt);
+                    adminUser.setSubscriptionPlan(plan);
+                    adminUser.setCouponCode(coupon);
                     users.add(adminUser);
                 }
             }
@@ -143,7 +149,9 @@ public class AdminUserRepository {
                 "coalesce(u.raw_app_meta_data->>'status', 'ACTIVE'), " +
                 "coalesce((u.raw_app_meta_data->>'is_blocked')::boolean, false), " +
                 "u.raw_app_meta_data->>'last_block_reason', " +
-                "u.updated_at " +
+                "u.updated_at, " +
+                "coalesce((SELECT plan_type FROM user_subscriptions us WHERE us.user_id = u.id::text LIMIT 1), 'FREE'), " +
+                "(SELECT coupon_code FROM user_subscriptions us WHERE us.user_id = u.id::text LIMIT 1) " +
                 "FROM auth.users u WHERE u.id::text = :id";
             var query = em.createNativeQuery(sql);
             query.setParameter("id", id.trim());
@@ -161,8 +169,12 @@ public class AdminUserRepository {
                 boolean isBlocked = row.length > 8 && row[8] != null && (Boolean.TRUE.equals(row[8]) || "true".equalsIgnoreCase(row[8].toString()));
                 String lastBlockReason = row.length > 9 && row[9] != null ? row[9].toString() : null;
                 Instant updatedAt = row.length > 10 ? parseInstant(row[10]) : createdAt;
+                String plan = row.length > 11 && row[11] != null ? row[11].toString() : "FREE";
+                String coupon = row.length > 12 && row[12] != null ? row[12].toString() : null;
 
                 AdminUser adminUser = new AdminUser(userId, email, name, role, createdAt, lastSignInAt, songCount, status, isBlocked, lastBlockReason, updatedAt);
+                adminUser.setSubscriptionPlan(plan);
+                adminUser.setCouponCode(coupon);
                 fallbackUsers.put(userId, adminUser);
                 return Optional.of(adminUser);
             }

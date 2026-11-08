@@ -473,5 +473,32 @@
     "acceptSuccess": "Song added to your songs library!",
     "declineSuccess": "Song share declined.",
     "noPendingSongs": "You have no pending shared songs."
+  },
+  "pricing": {
+    "title": "Upgrade and unlock your potential",
+    "subtitle": "Choose the best plan for your musical journey",
+    "free": {
+      "title": "Free Plan",
+      "description": "Ideal to start organizing your repertoire",
+      "limit": "Up to 10 songs",
+      "feature1": "Access to basic features",
+      "button": "Current Plan"
+    },
+    "pro": {
+      "badge": "MOST POPULAR",
+      "title": "PRO Plan",
+      "description": "For musicians who need freedom and unlimited features",
+      "price": "Unlimited",
+      "period": "forever",
+      "feature1": "Unlimited chord repertoire",
+      "feature2": "Priority support and exclusive features",
+      "button": "Subscribe PRO"
+    },
+    "modal": {
+      "title": "Song Limit Reached",
+      "message": "You have reached the 10-song limit of the Free Plan. Upgrade to PRO and add unlimited songs!",
+      "upgradeButton": "See PRO Plans",
+      "maybeLater": "Maybe later"
+    }
   }
 }

@@ -6,6 +6,7 @@ import br.com.cifras.playlist.dto.CreatePlaylistRequest;
 import br.com.cifras.playlist.infra.persistence.repository.PlaylistRepository;
 import br.com.cifras.shared.exception.ForbiddenException;
 import br.com.cifras.shared.exception.NotFoundException;
+import br.com.cifras.user.application.QuotaService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -19,8 +20,12 @@ public class CreatePlaylistUseCase {
     @Inject
     GroupRepository groupRepository;
 
+    @Inject
+    QuotaService quotaService;
+
     @Transactional
     public Playlist execute(CreatePlaylistRequest req, String userId) {
+        quotaService.checkPlaylistQuota(userId);
         Playlist playlist = Playlist.create(userId, req.name());
         
         if (req.isCollaborative() && req.groupId() != null) {
