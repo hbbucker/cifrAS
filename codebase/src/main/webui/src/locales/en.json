@@ -474,5 +474,13 @@
     "acceptSuccess": "Song added to your songs library!",
     "declineSuccess": "Song share declined.",
     "noPendingSongs": "You have no pending shared songs."
+  },
+  "tutorial": {
+    "helpLabel": "How to share?",
+    "helpAriaLabel": "Watch video tutorial on how to create playlists and share groups",
+    "groupPlaylistTitle": "How to share with your group",
+    "groupPlaylistDesc": "See in 30 seconds how to create a playlist, link it to your group, and generate the official invite link.",
+    "watchOnYoutube": "Open on YouTube",
+    "close": "Close"
   }
 }

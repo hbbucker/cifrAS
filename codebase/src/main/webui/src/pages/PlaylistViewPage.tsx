@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
-import { ArrowLeft, PlayCircle, GripVertical, Trash2, ChevronUp, ChevronDown, Plus, Search, Presentation, Play } from 'lucide-react';
+import { ArrowLeft, PlayCircle, GripVertical, Trash2, ChevronUp, ChevronDown, Plus, Search, Presentation, Play, HelpCircle } from 'lucide-react';
+import { TutorialVideoModal } from '../components/modals/TutorialVideoModal';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useToast } from '../context/ToastContext';
 import { ExportPlaylistPresentationModal } from '../components/modals/ExportPlaylistPresentationModal';
@@ -48,6 +49,7 @@ export const PlaylistViewPage: React.FC = () => {
  const [searchQuery, setSearchQuery] = useState('');
  const [isSearching, setIsSearching] = useState(false);
  const [showPresentationModal, setShowPresentationModal] = useState(false);
+ const [showTutorialModal, setShowTutorialModal] = useState(false);
 
  const availableSongs = allSongs.filter(s => !songs.some(ps => ps.id === s.id));
 
@@ -205,6 +207,17 @@ export const PlaylistViewPage: React.FC = () => {
           </div>
           
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => setShowTutorialModal(true)}
+              className="flex items-center justify-center gap-1.5 bg-bg-card hover:bg-bg-elevated border border-border-main text-text-mute hover:text-text-main px-2.5 sm:px-3 py-2 sm:py-2.5 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] rounded-md font-medium text-xs sm:text-sm transition-colors"
+              title={t('tutorial.helpLabel')}
+              aria-label={t('tutorial.helpAriaLabel')}
+              data-testid="playlist-tutorial-btn"
+            >
+              <HelpCircle className="w-4 h-4 sm:w-5 sm:h-5 text-[#aa3bff]" />
+              <span className="hidden lg:inline">{t('tutorial.helpLabel')}</span>
+            </button>
             {isOwner && (
               <CoachMark
                 tourId="playlist-add-song"
@@ -499,6 +512,10 @@ export const PlaylistViewPage: React.FC = () => {
         playlistTitle={playlist?.name || 'Playlist'}
         songs={songs as unknown as SongForPresentation[]}
         onClose={() => setShowPresentationModal(false)}
+      />
+      <TutorialVideoModal
+        isOpen={showTutorialModal}
+        onClose={() => setShowTutorialModal(false)}
       />
     </>
   );

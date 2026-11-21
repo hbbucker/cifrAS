@@ -338,5 +338,16 @@ describe('PlaylistViewPage Component', () => {
     expect(screen.queryByText(/Adicione Músicas à Playlist|tourTitle/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Gerar Slides|tourPresentationTitle/i)).not.toBeInTheDocument();
   });
+
+  it('opens and closes TutorialVideoModal when tutorial help button is clicked', async () => {
+    renderWithProviders();
+
+    expect(await screen.findByText('Minha Playlist')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('playlist-tutorial-btn'));
+    expect(screen.getByTestId('tutorial-video-modal')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId('tutorial-modal-close-btn'));
+    expect(screen.queryByTestId('tutorial-video-modal')).not.toBeInTheDocument();
+  });
 });
 

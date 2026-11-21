@@ -2,7 +2,8 @@ import { createShareLink } from "../api/shareLinks";
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Users, UserPlus, ListMusic } from 'lucide-react';
+import { ArrowLeft, Users, UserPlus, ListMusic, HelpCircle } from 'lucide-react';
+import { TutorialVideoModal } from '../components/modals/TutorialVideoModal';
 import { GroupPlaylistsSection } from '../components/groups/GroupPlaylistsSection';
 import { GroupMembersSection } from '../components/groups/GroupMembersSection';
 import { LinkPlaylistModal } from '../components/modals/LinkPlaylistModal';
@@ -38,6 +39,7 @@ export const GroupDetailsPage: React.FC = () => {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const [showInviteModal, setShowInviteModal] = useState(false);
+  const [showTutorialModal, setShowTutorialModal] = useState(false);
   const [inviteError, setInviteError] = useState('');
   const [inviting, setInviting] = useState(false);
 
@@ -162,8 +164,20 @@ export const GroupDetailsPage: React.FC = () => {
             </div>
           </div>
 
-          {group.role === 'Admin' && (
-            <div className="shrink-0 ml-auto">
+          <div className="flex items-center gap-2 shrink-0 ml-auto">
+            <button
+              type="button"
+              onClick={() => setShowTutorialModal(true)}
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 min-h-[40px] sm:min-h-[44px] rounded-md border border-border-main bg-bg-card hover:bg-bg-elevated text-text-mute hover:text-text-main transition-colors text-xs sm:text-sm font-medium"
+              aria-label={t('tutorial.helpAriaLabel')}
+              title={t('tutorial.helpLabel')}
+              data-testid="group-details-tutorial-btn"
+            >
+              <HelpCircle className="w-4 h-4 sm:w-5 sm:h-5 text-[#aa3bff]" />
+              <span className="hidden md:inline">{t('tutorial.helpLabel')}</span>
+            </button>
+
+            {group.role === 'Admin' && (
               <CoachMark
                 tourId="group-invite-members"
                 title={t('group.tourInviteTitle', 'Convide integrantes para o Grupo')}
@@ -180,8 +194,8 @@ export const GroupDetailsPage: React.FC = () => {
                   <span className="hidden sm:inline">{t('group.invite')}</span>
                 </button>
               </CoachMark>
-            </div>
-          )}
+            )}
+          </div>
         </header>
 
         {/* Navigation Tabs (Pinterest-inspired) */}
@@ -315,6 +329,10 @@ export const GroupDetailsPage: React.FC = () => {
           </div>
         </div>
       )}
+      <TutorialVideoModal
+        isOpen={showTutorialModal}
+        onClose={() => setShowTutorialModal(false)}
+      />
     </>
   );
 };
