@@ -1,6 +1,6 @@
 package br.com.cifras.song.application.usecase;
 
-import br.com.cifras.song.application.service.CifraClubScraper;
+import br.com.cifras.song.application.service.SongScraperRegistry;
 import br.com.cifras.song.dto.CreateSongRequest;
 import br.com.cifras.song.model.Song;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -11,14 +11,14 @@ import jakarta.transaction.Transactional;
 public class ImportSongUseCase {
 
     @Inject
-    CifraClubScraper scraper;
+    SongScraperRegistry scraperRegistry;
 
     @Inject
     CreateSongUseCase createSongUseCase;
 
     @Transactional
     public Song execute(String url, String userId) {
-        CreateSongRequest request = scraper.scrapeAndParse(url);
+        CreateSongRequest request = scraperRegistry.scrape(url);
         return createSongUseCase.execute(request, userId);
     }
 }

@@ -101,10 +101,15 @@
     "songsCount": "songs",
     "emptyDesc": "Your repertoire is empty. Start adding songs to build your library.",
     "addFirstSong": "Add First Song",
-    "importTitle": "Import from CifraClub",
-    "importDesc": "Paste a CifraClub song link to import it directly to your repertoire.",
+    "importTitle": "Import Song from Web",
+    "importDesc": "Paste a song link from Cifra Club, Ultimate Guitar, LaCuerda, Chordie, or e-Chords to import it directly into your repertoire.",
+    "supportedProviders": "Supported sites (click to open and search):",
+    "searchOnWebHint": "Click on a site to search for a song:",
+    "searchOnSite": "Search \"{{query}}\" on {{name}}",
+    "openSite": "Open {{name}} in new tab",
+    "providerDetected": "Provider detected: {{name}}",
     "importSuccess": "Song imported successfully!",
-    "importError": "Error importing song. Check the URL."
+    "importError": "Error importing song. Check the URL and try again."
   },
   "landing": {
     "badge": "⚡ Optimized for Gigs, Rehearsals & Practice",

@@ -101,10 +101,15 @@
     "songsCount": "canciones",
     "emptyDesc": "Tu repertorio está vacío. Empieza agregando canciones.",
     "addFirstSong": "Agregar Primera Canción",
-    "importTitle": "Importar de CifraClub",
-    "importDesc": "Pega un enlace de una canción de CifraClub para importarla directamente a tu repertorio.",
+    "importTitle": "Importar Acordes de la Web",
+    "importDesc": "Pega un enlace de una canción de Cifra Club, Ultimate Guitar, LaCuerda, Chordie o e-Chords para importarla directamente a tu repertorio.",
+    "supportedProviders": "Sitios compatibles (haz clic para abrir y buscar):",
+    "searchOnWebHint": "Haz clic en un sitio para buscar una canción:",
+    "searchOnSite": "Buscar \"{{query}}\" en {{name}}",
+    "openSite": "Abrir {{name}} en nueva pestaña",
+    "providerDetected": "Proveedor detectado: {{name}}",
     "importSuccess": "¡Canción importada con éxito!",
-    "importError": "Error al importar la canción. Verifica la URL."
+    "importError": "Error al importar la canción. Verifica la URL e inténtalo de nuevo."
   },
   "landing": {
     "badge": "⚡ Optimizado para Conciertos, Ensayos y Estudio",
