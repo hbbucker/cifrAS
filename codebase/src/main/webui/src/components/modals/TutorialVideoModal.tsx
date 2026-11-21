@@ -58,7 +58,7 @@ export const TutorialVideoModal: React.FC<TutorialVideoModalProps> = ({
           type="button"
           onClick={onClose}
           className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-full text-text-mute hover:text-text-main hover:bg-bg-elevated transition-colors"
-          aria-label={t('common.close')}
+          aria-label={t('tutorial.close')}
           data-testid="tutorial-modal-close-btn"
         >
           <X className="w-5 h-5" />
@@ -107,7 +107,7 @@ export const TutorialVideoModal: React.FC<TutorialVideoModalProps> = ({
             onClick={onClose}
             className="px-4 py-2 min-h-[40px] rounded-md font-medium bg-bg-elevated text-text-main hover:bg-border-main transition-colors text-xs sm:text-sm"
           >
-            {t('common.close')}
+            {t('tutorial.close')}
           </button>
         </div>
       </div>

@@ -480,6 +480,7 @@
     "helpAriaLabel": "Ver tutorial en video de cómo crear playlists y compartir grupos",
     "groupPlaylistTitle": "Cómo compartir con tu grupo",
     "groupPlaylistDesc": "Mira en 30 segundos cómo crear una playlist, vincularla al grupo y generar el enlace oficial de invitación.",
-    "watchOnYoutube": "Abrir en YouTube"
+    "watchOnYoutube": "Abrir en YouTube",
+    "close": "Cerrar"
   }
 }
