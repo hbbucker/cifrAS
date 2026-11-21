@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { GroupCard } from '../components/cards/GroupCard';
-import { Plus, Users } from 'lucide-react';
+import { Plus, Users, HelpCircle } from 'lucide-react';
+import { TutorialVideoModal } from '../components/modals/TutorialVideoModal';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../context/ToastContext';
@@ -46,6 +47,7 @@ export const GroupsPage: React.FC = () => {
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newGroupName, setNewGroupName] = useState('');
+  const [showTutorialModal, setShowTutorialModal] = useState(false);
 
   const fetchInvites = useCallback(() => {
     fetch('/api/invites', {
@@ -218,21 +220,34 @@ export const GroupsPage: React.FC = () => {
             <BrandLogo iconOnly size="sm" asLink to="/dashboard" className="sm:hidden shrink-0" />
             <h1 className="text-lg sm:text-xl font-bold text-text-main truncate">{t('groups.groups')}</h1>
           </div>
-          <CoachMark
-            tourId="group-create"
-            title={t('groups.tourCreateTitle', 'Crie seu Grupo Musical')}
-            description={t('groups.tourCreateDesc', 'Reúna sua banda, ministério de louvor ou amigos para compartilhar cifras e playlists colaborativas em tempo real.')}
-            position="bottom"
-          >
-            <button 
-              onClick={() => setShowCreateModal(true)}
-              data-testid="create-group-btn"
-              className="flex items-center gap-1.5 sm:gap-2 bg-[#aa3bff] hover:bg-[#9926f0] text-white px-3.5 sm:px-4 py-2 min-h-[40px] sm:min-h-[44px] rounded-md font-medium transition-colors text-xs sm:text-sm"
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => setShowTutorialModal(true)}
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 min-h-[40px] sm:min-h-[44px] rounded-md border border-border-main bg-bg-card hover:bg-bg-elevated text-text-mute hover:text-text-main transition-colors text-xs sm:text-sm font-medium"
+              aria-label={t('tutorial.helpAriaLabel')}
+              title={t('tutorial.helpLabel')}
+              data-testid="groups-tutorial-btn"
             >
-              <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span>{t('groups.newGroup')}</span>
+              <HelpCircle className="w-4 h-4 sm:w-5 sm:h-5 text-[#aa3bff]" />
+              <span className="hidden md:inline">{t('tutorial.helpLabel')}</span>
             </button>
-          </CoachMark>
+            <CoachMark
+              tourId="group-create"
+              title={t('groups.tourCreateTitle', 'Crie seu Grupo Musical')}
+              description={t('groups.tourCreateDesc', 'Reúna sua banda, ministério de louvor ou amigos para compartilhar cifras e playlists colaborativas em tempo real.')}
+              position="bottom"
+            >
+              <button 
+                onClick={() => setShowCreateModal(true)}
+                data-testid="create-group-btn"
+                className="flex items-center gap-1.5 sm:gap-2 bg-[#aa3bff] hover:bg-[#9926f0] text-white px-3.5 sm:px-4 py-2 min-h-[40px] sm:min-h-[44px] rounded-md font-medium transition-colors text-xs sm:text-sm"
+              >
+                <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span>{t('groups.newGroup')}</span>
+              </button>
+            </CoachMark>
+          </div>
         </header>
 
         <div className="flex-1 overflow-y-auto p-3.5 sm:p-6 pb-24 sm:pb-8 min-w-0">
@@ -398,6 +413,10 @@ export const GroupsPage: React.FC = () => {
           </div>
         </div>
       )}
+      <TutorialVideoModal
+        isOpen={showTutorialModal}
+        onClose={() => setShowTutorialModal(false)}
+      />
     </>
   );
 };

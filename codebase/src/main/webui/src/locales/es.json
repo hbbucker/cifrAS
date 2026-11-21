@@ -474,5 +474,12 @@
     "acceptSuccess": "¡Canción añadida a tu biblioteca!",
     "declineSuccess": "Canción compartida rechazada.",
     "noPendingSongs": "No tienes canciones compartidas pendientes."
+  },
+  "tutorial": {
+    "helpLabel": "¿Cómo compartir?",
+    "helpAriaLabel": "Ver tutorial en video de cómo crear playlists y compartir grupos",
+    "groupPlaylistTitle": "Cómo compartir con tu grupo",
+    "groupPlaylistDesc": "Mira en 30 segundos cómo crear una playlist, vincularla al grupo y generar el enlace oficial de invitación.",
+    "watchOnYoutube": "Abrir en YouTube"
   }
 }

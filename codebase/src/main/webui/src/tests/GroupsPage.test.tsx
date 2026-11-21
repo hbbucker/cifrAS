@@ -136,4 +136,27 @@ describe('GroupsPage Component', () => {
 
     vi.useRealTimers();
   });
+
+  it('opens and closes TutorialVideoModal when tutorial help button is clicked', async () => {
+    render(
+      <AuthProvider>
+        <ThemeProvider>
+          <ToastProvider>
+            <TourProvider>
+              <MemoryRouter>
+                <GroupsPage />
+              </MemoryRouter>
+            </TourProvider>
+          </ToastProvider>
+        </ThemeProvider>
+      </AuthProvider>
+    );
+
+    const helpBtn = await screen.findByTestId('groups-tutorial-btn');
+    fireEvent.click(helpBtn);
+    expect(screen.getByTestId('tutorial-video-modal')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId('tutorial-modal-close-btn'));
+    expect(screen.queryByTestId('tutorial-video-modal')).not.toBeInTheDocument();
+  });
 });

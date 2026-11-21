@@ -474,5 +474,12 @@
     "acceptSuccess": "Música adicionada ao seu repertório!",
     "declineSuccess": "Compartilhamento recusado.",
     "noPendingSongs": "Você não possui nenhuma música compartilhada pendente."
+  },
+  "tutorial": {
+    "helpLabel": "Como compartilhar?",
+    "helpAriaLabel": "Assistir tutorial em vídeo de como criar playlists e compartilhar grupos",
+    "groupPlaylistTitle": "Como compartilhar com seu grupo",
+    "groupPlaylistDesc": "Veja em 30 segundos como criar uma playlist, vincular ao grupo e gerar o link oficial de convite.",
+    "watchOnYoutube": "Abrir no YouTube"
   }
 }

@@ -290,4 +290,21 @@ describe('GroupDetailsPage Component', () => {
 
     vi.useRealTimers();
   });
+
+  it('opens and closes TutorialVideoModal when tutorial help button is clicked', async () => {
+    render(
+      <TourProvider>
+        <BrowserRouter>
+          <GroupDetailsPage />
+        </BrowserRouter>
+      </TourProvider>
+    );
+
+    const helpBtn = await screen.findByTestId('group-details-tutorial-btn');
+    fireEvent.click(helpBtn);
+    expect(screen.getByTestId('tutorial-video-modal')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId('tutorial-modal-close-btn'));
+    expect(screen.queryByTestId('tutorial-video-modal')).not.toBeInTheDocument();
+  });
 });
