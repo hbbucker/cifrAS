@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams, useLocation, useSearchParams } from 'react-router-dom';
 import { TheaterControls } from '../components/theater/TheaterControls';
 import { useAutoScroll } from '../hooks/useAutoScroll';
+import { usePedalController } from '../hooks/usePedalController';
 import { ChordSheet } from '../components/music/ChordSheet';
 import { transposeContent } from '../utils/chordTransposer';
 import { stringifyLyrics } from '../utils/lyricsParser';
@@ -437,27 +438,20 @@ export const TheaterModePage: React.FC = () => {
     }
   };
 
-  // Keyboard accessibility for stage / pedal controllers
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-      if (isLocked) return;
-      if (e.key === 'ArrowRight') {
-        handleNextSong();
-      } else if (e.key === 'ArrowLeft') {
-        handlePrevSong();
-      } else if (e.key === ' ' || e.code === 'Space') {
-        e.preventDefault();
-        if (isScrolling) {
-          pause();
-        } else {
-          play();
-        }
+  // Universal Bluetooth Pedal & Keyboard Navigation
+  usePedalController({
+    containerRef,
+    enabled: !isLocked,
+    onNextSong: handleNextSong,
+    onPrevSong: handlePrevSong,
+    onToggleAutoScroll: () => {
+      if (isScrolling) {
+        pause();
+      } else {
+        play();
       }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isLocked, isScrolling, pause, play, handleNextSong, handlePrevSong]);
+    },
+  });
 
   // Fake full screen logic
   const toggleFullscreen = () => {

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Save } from 'lucide-react';
 import { BrandLogo } from '../components/ui/BrandLogo';
+import { PedalSettingsSection } from '../components/settings/PedalSettingsSection';
 
 export const SettingsPage: React.FC = () => {
  const { t } = useTranslation();
@@ -19,7 +20,7 @@ export const SettingsPage: React.FC = () => {
           <h1 className="text-lg sm:text-xl font-bold text-text-main truncate">{t('settings.title')}</h1>
         </header>
 
-        <div className="flex-1 overflow-y-auto p-3.5 sm:p-6 pb-24 sm:pb-8 max-w-2xl min-w-0">
+        <div className="flex-1 overflow-y-auto p-3.5 sm:p-6 pb-24 sm:pb-8 max-w-5xl min-w-0">
           <div className="bg-bg-card rounded-lg border border-border-main p-4 sm:p-6 shadow-xs">
             <h2 className="text-base sm:text-lg font-bold text-text-main mb-4 sm:mb-6">{t('settings.musicPrefs')}</h2>
             
@@ -87,8 +88,11 @@ export const SettingsPage: React.FC = () => {
               </div>
             </div>
           </div>
+
+          {/* Dedicated Bluetooth Pedal Settings & Simulator */}
+          <PedalSettingsSection />
         </div>
       </div>
- </>
+    </>
  );
 };
