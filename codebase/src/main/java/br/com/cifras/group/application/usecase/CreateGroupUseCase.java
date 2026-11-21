@@ -4,6 +4,7 @@ import br.com.cifras.group.model.Group;
 import br.com.cifras.group.model.GroupMember;
 import br.com.cifras.group.model.GroupRole;
 import br.com.cifras.group.infra.persistence.repository.GroupRepository;
+import br.com.cifras.user.application.QuotaService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -14,8 +15,13 @@ public class CreateGroupUseCase {
     @Inject
     GroupRepository groupRepository;
 
+    @Inject
+    QuotaService quotaService;
+
     @Transactional
     public Group execute(String name, String ownerId) {
+        quotaService.checkGroupQuota(ownerId);
+        
         Group group = Group.create(name, ownerId);
         groupRepository.persist(group);
 

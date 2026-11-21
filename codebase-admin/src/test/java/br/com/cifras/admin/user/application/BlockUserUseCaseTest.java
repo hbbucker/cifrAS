@@ -66,7 +66,7 @@ class BlockUserUseCaseTest {
         when(userAuditLogMapper.toEntity(any())).thenReturn(new UserAuditLogEntity());
         when(adminUserMapper.toDTO(any())).thenReturn(new AdminUserDTO(
             targetUserId, "user@cifras.com", "User Target", "user", "BLOCKED", true, reason,
-            Instant.now(), Instant.now(), Instant.now(), 5, true, false
+            Instant.now(), Instant.now(), Instant.now(), 5, true, false, "FREE", null
         ));
 
         AdminUserDTO result = blockUserUseCase.execute(targetUserId, reason);

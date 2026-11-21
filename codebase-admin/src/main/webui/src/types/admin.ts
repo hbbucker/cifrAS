@@ -33,6 +33,8 @@ export interface AdminUser {
   songCount: number;
   banned: boolean;
   isAdmin: boolean;
+  subscriptionPlan?: string;
+  couponCode?: string;
 }
 
 export interface UserAuditLog {

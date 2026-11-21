@@ -13,7 +13,7 @@ import {
   CheckCircle,
   X,
 } from 'lucide-react';
-import { getAdminUsers } from '../api/adminApi';
+import { getAdminUsers, bypassSubscription } from '../api/adminApi';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import { BlockUserModal } from '../components/modals/BlockUserModal';
 import { UnblockUserModal } from '../components/modals/UnblockUserModal';
@@ -167,6 +167,7 @@ export const UsersPage: React.FC = () => {
                   <tr>
                     <th className="px-6 py-3">{t('users.title')}</th>
                     <th className="px-6 py-3">{t('common.role')}</th>
+                    <th className="px-6 py-3">Plan / Coupon</th>
                     <th className="px-6 py-3">{t('common.status')}</th>
                     <th className="px-6 py-3">{t('users.songCount')}</th>
                     <th className="px-6 py-3">{t('common.createdAt')}</th>
@@ -206,6 +207,20 @@ export const UsersPage: React.FC = () => {
                             </span>
                           </td>
 
+                          {/* Plan Badge */}
+                          <td className="px-6 py-4">
+                            <div className="flex flex-col">
+                              <span className={`inline-flex items-center w-fit px-2.5 py-1 rounded-full text-xs font-bold ${user.subscriptionPlan === 'PRO' ? 'bg-purple-100 text-[#aa3bff]' : 'bg-gray-100 text-gray-700'}`}>
+                                {user.subscriptionPlan || 'FREE'}
+                              </span>
+                              {user.couponCode && (
+                                <span className="text-[10px] text-[#62625b] mt-1 break-all">
+                                  🎟 {user.couponCode}
+                                </span>
+                              )}
+                            </div>
+                          </td>
+
                           {/* Status Badge */}
                           <td className="px-6 py-4">
                             <button
@@ -243,6 +258,29 @@ export const UsersPage: React.FC = () => {
                           {/* Actions */}
                           <td className="px-6 py-4 text-right">
                             <div className="flex items-center justify-end space-x-2">
+                              {/* Bypass Action */}
+                              {user.subscriptionPlan !== 'PRO' && (
+                                <button
+                                  type="button"
+                                  onClick={async () => {
+                                    const code = window.prompt("Coupon Code (Optional):");
+                                    if (code !== null) {
+                                      try {
+                                        const updated = await bypassSubscription(user.id, code || undefined);
+                                        handleUserUpdated(updated, false);
+                                        showToast("Subscription bypassed to PRO!", "success");
+                                      } catch (err) {
+                                        showToast("Failed to bypass", "error");
+                                      }
+                                    }
+                                  }}
+                                  title="Bypass PRO Subscription"
+                                  className="p-1.5 rounded-md border border-[#dadad3] bg-[#f6f6f3] text-[#aa3bff] hover:bg-[#aa3bff] hover:text-white transition-colors cursor-pointer"
+                                >
+                                  <Shield size={16} />
+                                </button>
+                              )}
+
                               {/* Audit History Action */}
                               <button
                                 type="button"

@@ -66,7 +66,7 @@ class UnblockUserUseCaseTest {
         when(userAuditLogMapper.toEntity(any())).thenReturn(new UserAuditLogEntity());
         when(adminUserMapper.toDTO(any())).thenReturn(new AdminUserDTO(
             targetUserId, "user@cifras.com", "User Target", "user", "ACTIVE", false, null,
-            Instant.now(), Instant.now(), Instant.now(), 5, false, false
+            Instant.now(), Instant.now(), Instant.now(), 5, false, false, "FREE", null
         ));
 
         AdminUserDTO result = unblockUserUseCase.execute(targetUserId, reason);
@@ -93,7 +93,7 @@ class UnblockUserUseCaseTest {
         when(userAuditLogMapper.toEntity(any())).thenReturn(new UserAuditLogEntity());
         when(adminUserMapper.toDTO(any())).thenReturn(new AdminUserDTO(
             targetUserId, "user@cifras.com", "User Target", "user", "ACTIVE", false, null,
-            Instant.now(), Instant.now(), Instant.now(), 5, false, false
+            Instant.now(), Instant.now(), Instant.now(), 5, false, false, "FREE", null
         ));
 
         AdminUserDTO result = unblockUserUseCase.execute(targetUserId, "  ");
