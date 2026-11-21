@@ -449,6 +449,7 @@
     "theaterMode": "Theater Mode: maximize lyrics for stage use.",
     "singerMode": "Singer Mode in Theater Mode (lyrics only).",
     "playlistExport": "Playlist Export (.pptx) without tabs.",
+    "importCifraClub": "Import chords from Cifra Club via URL.",
     "button": "Got it!"
   },
   "songSharing": {
