@@ -449,6 +449,7 @@
     "theaterMode": "Modo Teatro: maximiza la letra para usar en el escenario.",
     "singerMode": "Modo Cantante en Modo Teatro (solo letras).",
     "playlistExport": "Exportación de Playlists (.pptx) sin tablaturas.",
+    "importCifraClub": "Importación de acordes de Cifra Club vía URL.",
     "button": "¡Entendido!"
   },
   "songSharing": {
